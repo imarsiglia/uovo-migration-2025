@@ -76,3 +76,5 @@ yarn-error.log
 
 # environment variables
 .env
+
+/ios/GoogleService-Info.plist

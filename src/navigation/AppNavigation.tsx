@@ -78,7 +78,10 @@ import {getDeviceInfo} from '@utils/functions';
 import {useAuth} from '@store/auth';
 import {isInternet} from '@utils/internet';
 import {Splash} from '@components/splash/Splash';
-import { EditImageScreen } from '@screens/editImage/EditImageScreen';
+import {EditImageScreen} from '@screens/editImage/EditImageScreen';
+import {LoginEmailScreen} from '@screens/auth/LoginEmailScreen';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {CustomStatusBar} from '@components/statusbar/CustomStatusBar';
 // import InventoryNS from '../screens/nationalShuttle/InventoryNS';
 
 // LogBox.ignoreLogs([
@@ -118,39 +121,39 @@ export const AppNavigation = () => {
       {/* {loading == true && <Splash />} */}
       {!isSuccess && !isError && !isLoaded && <Splash />}
       {(isSuccess || isLoaded) && (
-        <>
-          <NavigationContainer>
-            <Stack.Navigator
-              initialRouteName={
-                token == null
-                  ? RoutesNavigation.Login
-                  : user?.user_updated == 0
-                  ? RoutesNavigation.EditProfile
-                  : RoutesNavigation.Home
-              }
-              screenOptions={{headerShown: false}}>
-              <Stack.Screen
-                name={RoutesNavigation.Login}
-                component={LoginScreen}
-              />
-              <Stack.Screen
-                name={RoutesNavigation.ContactUs}
-                component={ContactScreen}
-              />
-              <Stack.Screen
-                name={RoutesNavigation.Home}
-                component={HomeScreen}
-              />
-              <Stack.Screen
-                name={RoutesNavigation.EditImage}
-                component={EditImageScreen}
-              />
-            </Stack.Navigator>
-            {/* <GeneralModal /> */}
-          </NavigationContainer>
-          {/* <OfflineComponentSync />
-          <OfflineCompSecondSync /> */}
-        </>
+        <NavigationContainer>
+          <CustomStatusBar />
+          <Stack.Navigator
+            initialRouteName={
+              token == null
+                ? RoutesNavigation.Login
+                : user?.user_updated == 0
+                ? RoutesNavigation.EditProfile
+                : RoutesNavigation.Home
+            }
+            screenOptions={{headerShown: false}}>
+            <Stack.Screen
+              name={RoutesNavigation.Login}
+              component={LoginScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.ContactUs}
+              component={ContactScreen}
+            />
+            <Stack.Screen name={RoutesNavigation.Home} component={HomeScreen} />
+            <Stack.Screen
+              name={RoutesNavigation.EditImage}
+              component={EditImageScreen}
+            />
+
+            <Stack.Screen
+              name={RoutesNavigation.LoginEmail}
+              component={LoginEmailScreen}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+        // <OfflineComponentSync />
+        // <OfflineCompSecondSync />
       )}
     </>
   );

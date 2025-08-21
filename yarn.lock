@@ -7417,6 +7417,11 @@ react-native-screens@^4.14.1:
     react-native-is-edge-to-edge "^1.2.1"
     warn-once "^0.1.0"
 
+react-native-scrollable-navigation-bar@^3.0.6:
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/react-native-scrollable-navigation-bar/-/react-native-scrollable-navigation-bar-3.0.6.tgz#abb96b4c17269cf6855f2fdfbcadbc017421e6b3"
+  integrity sha512-qxQrczJQEMV7+jkyFFBOcnGfBsZq+MMLoAbqGlIsxWho7MlBTyE3aQVJ56PCJnKe5C9us2SowGoUsT+SeRRTqA==
+
 react-native-simple-toast@^3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/react-native-simple-toast/-/react-native-simple-toast-3.3.2.tgz#9f1c3a92bb56424d3e5d3bc7caf3f29dee819d9b"

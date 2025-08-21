@@ -1,29 +1,25 @@
-import { Icons } from '@assets/icons/icons';
+import {Icons} from '@assets/icons/icons';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import { Wrapper } from '@components/commons/wrappers/Wrapper';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {
   Canvas,
   CanvasControlProvider,
   CanvasControls,
 } from '@equinor/react-native-skia-draw';
-import { useCustomNavigation } from '@hooks/useCustomNavigation';
-import { RootStackParamList, RoutesNavigation } from '@navigation/types';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import {
-  Image,
-  ImageFormat,
-  Skia
-} from '@shopify/react-native-skia';
-import { COLORS } from '@styles/colors';
-import { GLOBAL_STYLES } from '@styles/globalStyles';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {RootStackParamList, RoutesNavigation} from '@navigation/types';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {Image, ImageFormat, Skia} from '@shopify/react-native-skia';
+import {COLORS} from '@styles/colors';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {useCallback, useMemo, useRef, useState} from 'react';
 import {
   StyleSheet,
   Text,
   TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditImage'>;
 
@@ -110,86 +106,78 @@ const DrawImage = (props: Props) => {
   }, [refCanvas?.current]);
 
   return (
-    <SafeAreaView style={GLOBAL_STYLES.safeAreaLight}>
-      <Wrapper style={[styles.container]}>
-        <Wrapper style={[{backgroundColor: COLORS.white}]}>
-          <Wrapper style={GLOBAL_STYLES.containerBtnOptTop}>
-            <TouchableOpacity onPress={goBack}>
-              <Wrapper style={styles.backBtn}>
-                <Icons.AngleLeft fontSize={15} color={COLORS.gray} />
-                <Text style={styles.backBtnText}>Cancel</Text>
-              </Wrapper>
-            </TouchableOpacity>
-            <Text
-              style={[
-                GLOBAL_STYLES.title,
-                GLOBAL_STYLES.bold,
-                styles.topsheet,
-                {fontSize: 20},
-              ]}>
-              Edit image
-            </Text>
-            <TouchableOpacity
-              style={[styles.functionButton, GLOBAL_STYLES.row]}
-              onPress={() => saveImage()}>
-              <Icons.Check fontSize={15} color={COLORS.white} />
-              <Text style={{color: 'white', marginLeft: 5}}>OK</Text>
-            </TouchableOpacity>
-          </Wrapper>
-        </Wrapper>
-
-        <MinRoundedView />
-
-        {props.route.params.photo != null && (
-          <Wrapper
-            style={{flex: 1, flexDirection: 'row', position: 'relative'}}
-            onLayout={(e) => {
-              setDimensions(e.nativeEvent.layout);
-            }}>
-            <Wrapper style={styles.toolbar}>
-              <TouchableOpacity
-                onPress={undo}
-                style={[styles.functionButtonRound]}>
-                <Icons.Undo fontSize={15} color={COLORS.white} />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={clear}
-                style={[styles.functionButtonRound]}>
-                <Icons.PaintRoller fontSize={15} color={COLORS.white} />
-              </TouchableOpacity>
+    <Wrapper style={GLOBAL_STYLES.safeAreaLight}>
+      <Wrapper style={[{backgroundColor: COLORS.white}]}>
+        <Wrapper style={GLOBAL_STYLES.containerBtnOptTop}>
+          <TouchableOpacity onPress={goBack}>
+            <Wrapper style={styles.backBtn}>
+              <Icons.AngleLeft fontSize={15} color={COLORS.gray} />
+              <Text style={styles.backBtnText}>Cancel</Text>
             </Wrapper>
-
-            {skImage && imageDimensions && (
-              <Canvas
-                ref={refCanvas}
-                style={{
-                  width: imageDimensions.width,
-                  height: imageDimensions.height,
-                  alignSelf: 'center'
-                }}>
-                <Image
-                  image={skImage}
-                  width={imageDimensions.width}
-                  height={imageDimensions.height}
-                  fit={'contain'}
-                />
-              </Canvas>
-            )}
-          </Wrapper>
-        )}
+          </TouchableOpacity>
+          <Text
+            style={[
+              GLOBAL_STYLES.title,
+              GLOBAL_STYLES.bold,
+              styles.topsheet,
+              {fontSize: 20},
+            ]}>
+            Edit image
+          </Text>
+          <TouchableOpacity
+            style={[styles.functionButton, GLOBAL_STYLES.row]}
+            onPress={() => saveImage()}>
+            <Icons.Check fontSize={15} color={COLORS.white} />
+            <Text style={{color: 'white', marginLeft: 5}}>OK</Text>
+          </TouchableOpacity>
+        </Wrapper>
       </Wrapper>
-    </SafeAreaView>
+
+      <MinRoundedView />
+
+      {props.route.params.photo != null && (
+        <Wrapper
+          style={{flex: 1, flexDirection: 'row', position: 'relative'}}
+          onLayout={(e) => {
+            setDimensions(e.nativeEvent.layout);
+          }}>
+          <Wrapper style={styles.toolbar}>
+            <TouchableOpacity
+              onPress={undo}
+              style={[styles.functionButtonRound]}>
+              <Icons.Undo fontSize={15} color={COLORS.white} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={clear}
+              style={[styles.functionButtonRound]}>
+              <Icons.PaintRoller fontSize={15} color={COLORS.white} />
+            </TouchableOpacity>
+          </Wrapper>
+
+          {skImage && imageDimensions && (
+            <Canvas
+              ref={refCanvas}
+              style={{
+                width: imageDimensions.width,
+                height: imageDimensions.height,
+                alignSelf: 'center',
+              }}>
+              <Image
+                image={skImage}
+                width={imageDimensions.width}
+                height={imageDimensions.height}
+                fit={'contain'}
+              />
+            </Canvas>
+          )}
+        </Wrapper>
+      )}
+    </Wrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 0,
-    flexGrow: 1,
-    height: '100%',
-    backgroundColor: COLORS.bgWhite,
-  },
   backBtn: {
     flexDirection: 'row',
     opacity: 0.8,
@@ -245,7 +233,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
     top: 0,
     right: 20,
-    backgroundColor: "#FFFFFF50",
-    borderRadius: 10
+    backgroundColor: '#FFFFFF50',
+    borderRadius: 10,
   },
 });

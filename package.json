@@ -60,6 +60,7 @@
     "react-native-reanimated": "^3.19.1",
     "react-native-safe-area-context": "^5.5.2",
     "react-native-screens": "^4.14.1",
+    "react-native-scrollable-navigation-bar": "^3.0.6",
     "react-native-simple-toast": "^3.3.2",
     "react-native-svg": "^15.12.1",
     "yarn": "^1.22.22",

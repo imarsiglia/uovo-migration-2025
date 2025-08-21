@@ -1,28 +1,21 @@
-import { useLogin } from '@api/hooks/HooksAuthentication';
-import { IndicatorLoading } from '@components/commons/loading/IndicatorLoading';
-import { CustomPressable } from '@components/commons/pressable/CustomPressable';
-import { initCnfigureGoogleSignIn } from '@config/google/GoogleSignIn';
-import { RoutesNavigation } from '@navigation/types';
+import {useLogin} from '@api/hooks/HooksAuthentication';
+import {IndicatorLoading} from '@components/commons/loading/IndicatorLoading';
+import {CustomPressable} from '@components/commons/pressable/CustomPressable';
+import {initCnfigureGoogleSignIn} from '@config/google/GoogleSignIn';
+import {RoutesNavigation} from '@navigation/types';
 import {
   getAuth,
   GoogleAuthProvider,
   signInWithCredential,
 } from '@react-native-firebase/auth';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { useAuth } from '@store/auth';
-import { COLORS } from '@styles/colors';
-import { getDeviceInfo } from '@utils/functions';
-import { useCallback, useEffect } from 'react';
-import {
-  Alert,
-  Image,
-  Platform,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useCustomNavigation } from 'src/hooks/useCustomNavigation';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {useAuth} from '@store/auth';
+import {COLORS} from '@styles/colors';
+import {getDeviceInfo} from '@utils/functions';
+import {useCallback, useEffect} from 'react';
+import {Alert, Image, Platform, StyleSheet, Text, View} from 'react-native';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useCustomNavigation} from 'src/hooks/useCustomNavigation';
 
 const logotipo = require('../../assets/logotipo/logotipo.png');
 
@@ -103,64 +96,60 @@ export const LoginScreen = () => {
     navigate(RoutesNavigation.ContactUs, {});
   };
 
+  const goToRegularLogin = useCallback(() => {
+    navigate(RoutesNavigation.LoginEmail);
+  }, []);
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={{height: top, backgroundColor: COLORS.primary}} />
+    <View style={styles.content}>
+      {isPending && <IndicatorLoading />}
 
-      <View style={styles.content}>
-        {isPending && <IndicatorLoading />}
-
-        {!isPending && (
-          <View style={[styles.bottom]}>
-            <View style={styles.logotipoContainer}>
-              <Image
-                style={styles.logotipo}
-                resizeMode="contain"
-                source={logotipo}
-              />
-            </View>
-            <View style={styles.formContainer}>
-              <CustomPressable
-                style={styles.button}
-                onPress={() => onGoogleButtonPress()}>
-                <Text style={styles.buttonTitle}>Sign in with Google</Text>
-              </CustomPressable>
-              <CustomPressable
-                // onPress={() => props.navigation.navigate('LoginEmail')}
-                style={{alignItems: 'center', marginTop: 20}}>
-                <Text style={{color: 'white', fontSize: 14}}>
-                  Developer login
-                </Text>
-              </CustomPressable>
-            </View>
-
-            <View style={styles.footerContainer}>
-              <View style={{padding: 5, paddingRight: 0}}>
-                <Text style={[styles.footerText, {color: '#a9a9aa'}]}>
-                  Need help?
-                </Text>
-              </View>
-              <CustomPressable style={{padding: 5}} onPress={goToContactUs}>
-                <Text style={[styles.footerText, {color: 'white'}]}>
-                  Contact us
-                </Text>
-              </CustomPressable>
-            </View>
+      {!isPending && (
+        <View style={[styles.bottom]}>
+          <View style={styles.logotipoContainer}>
+            <Image
+              style={styles.logotipo}
+              resizeMode="contain"
+              source={logotipo}
+            />
           </View>
-        )}
-      </View>
-    </SafeAreaView>
+          <View style={styles.formContainer}>
+            <CustomPressable
+              style={styles.button}
+              onPress={() => onGoogleButtonPress()}>
+              <Text style={styles.buttonTitle}>Sign in with Google</Text>
+            </CustomPressable>
+            <CustomPressable
+              onPress={goToRegularLogin}
+              style={{alignItems: 'center', marginTop: 20}}>
+              <Text style={{color: 'white', fontSize: 14}}>
+                Developer login
+              </Text>
+            </CustomPressable>
+          </View>
+
+          <View style={styles.footerContainer}>
+            <View style={{padding: 5, paddingRight: 0}}>
+              <Text style={[styles.footerText, {color: '#a9a9aa'}]}>
+                Need help?
+              </Text>
+            </View>
+            <CustomPressable style={{padding: 5}} onPress={goToContactUs}>
+              <Text style={[styles.footerText, {color: 'white'}]}>
+                Contact us
+              </Text>
+            </CustomPressable>
+          </View>
+        </View>
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: COLORS.primary,
-    flex: 1,
-  },
   content: {
     flexGrow: 1,
-    height: '100%',
+    backgroundColor: COLORS.primary,
   },
   bottom: {
     position: 'absolute',

@@ -121,9 +121,7 @@ const App = () => {
                     <NationalShuttleProvider>
                       <InventoryProvider> */}
             <SafeAreaProvider>
-              <SafeAreaView style={{flex: 1}}>
-                <AppNavigation />
-              </SafeAreaView>
+              <AppNavigation />
             </SafeAreaProvider>
             {/* </InventoryProvider>
                     </NationalShuttleProvider>
