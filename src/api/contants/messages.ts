@@ -1,0 +1,2 @@
+export const TIME_OUT_REQUEST = 30000;
+export const TIME_OUT_MESSAGE = "SERVICIO NO DISPONIBLE";
