@@ -1,4 +1,4 @@
-import { useContactUsService } from '@api/hooks/HooksGeneralServices';
+import { useHelpDeskService } from '@api/hooks/HooksGeneralServices';
 import { Icons } from '@assets/icons/icons';
 import {
     ImageOptionSheet,
@@ -36,13 +36,13 @@ import {
     KeyboardStickyView,
 } from 'react-native-keyboard-controller';
 import { useCustomNavigation } from 'src/hooks/useCustomNavigation';
-import { ContactUsSchema, ContactUsSchemaType } from 'src/types/schemas';
+import { HelpDeskSchema, HelpDeskSchemaType } from 'src/types/schemas';
 
-export const ContactScreen = () => {
+export const HelpDeskScreen = () => {
   const {goBack, navigate} = useCustomNavigation();
   const route = useRoute<any>();
 
-  const {mutateAsync, isPending} = useContactUsService();
+  const {mutateAsync, isPending} = useHelpDeskService();
   const [photo, setPhoto] = useState<ImageType | null>(null);
 
   const refCallSheet = useRef<RBSheetRef>(null);
@@ -58,7 +58,7 @@ export const ContactScreen = () => {
     }
   }, [route.params?.editedImage]);
 
-  const saveReport = useCallback((props: ContactUsSchemaType) => {
+  const saveReport = useCallback((props: HelpDeskSchemaType) => {
     Keyboard.dismiss();
     refVoice?.current?.stop();
     mutateAsync({
@@ -143,21 +143,19 @@ export const ContactScreen = () => {
                 GLOBAL_STYLES.bold,
                 styles.topsheet,
               ]}>
-              Contact Us
+              Help Desk
             </Label>
           </Wrapper>
         </Wrapper>
 
         <MinRoundedView />
 
-        <BasicFormProvider schema={ContactUsSchema}>
+        <BasicFormProvider schema={HelpDeskSchema}>
           <KeyboardAwareScrollView
             bottomOffset={220}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollview}
             keyboardShouldPersistTaps="handled">
-            <InputTextContext label="Name*" currentId="name" />
-            <InputTextContext label="Email*" currentId="email" />
             <InputTextContext label="Title*" currentId="title" />
             <InputTextContext
               label="Description*"

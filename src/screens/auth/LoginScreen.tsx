@@ -1,21 +1,23 @@
-import {useLogin} from '@api/hooks/HooksAuthentication';
-import {IndicatorLoading} from '@components/commons/loading/IndicatorLoading';
-import {CustomPressable} from '@components/commons/pressable/CustomPressable';
-import {initCnfigureGoogleSignIn} from '@config/google/GoogleSignIn';
-import {RoutesNavigation} from '@navigation/types';
+import { useLogin } from '@api/hooks/HooksAuthentication';
+import { IndicatorLoading } from '@components/commons/loading/IndicatorLoading';
+import { CustomPressable } from '@components/commons/pressable/CustomPressable';
+import { Label } from '@components/commons/text/Label';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
+import { initCnfigureGoogleSignIn } from '@config/google/GoogleSignIn';
+import { RoutesNavigation } from '@navigation/types';
 import {
   getAuth,
   GoogleAuthProvider,
   signInWithCredential,
 } from '@react-native-firebase/auth';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {useAuth} from '@store/auth';
-import {COLORS} from '@styles/colors';
-import {getDeviceInfo} from '@utils/functions';
-import {useCallback, useEffect} from 'react';
-import {Alert, Image, Platform, StyleSheet, Text, View} from 'react-native';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useCustomNavigation} from 'src/hooks/useCustomNavigation';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { useAuth } from '@store/auth';
+import { COLORS } from '@styles/colors';
+import { closeSessionOnGoogle, getDeviceInfo } from '@utils/functions';
+import { useCallback, useEffect } from 'react';
+import { Alert, Image, Platform, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useCustomNavigation } from 'src/hooks/useCustomNavigation';
 
 const logotipo = require('../../assets/logotipo/logotipo.png');
 
@@ -77,11 +79,7 @@ export const LoginScreen = () => {
     } catch (err: any) {
       // Limpieza de sesión de Google si algo falla
       try {
-        if (Platform.OS === 'android') {
-          await GoogleSignin.revokeAccess(); // desvincula
-        } else {
-          await GoogleSignin.signOut(); // iOS: limpia sesión
-        }
+        closeSessionOnGoogle();
       } catch {}
 
       console.error('[LoginError]', err?.message ?? err);
@@ -101,48 +99,48 @@ export const LoginScreen = () => {
   }, []);
 
   return (
-    <View style={styles.content}>
+    <Wrapper style={styles.content}>
       {isPending && <IndicatorLoading />}
 
       {!isPending && (
-        <View style={[styles.bottom]}>
-          <View style={styles.logotipoContainer}>
+        <Wrapper style={[styles.bottom]}>
+          <Wrapper style={styles.logotipoContainer}>
             <Image
               style={styles.logotipo}
               resizeMode="contain"
               source={logotipo}
             />
-          </View>
-          <View style={styles.formContainer}>
+          </Wrapper>
+          <Wrapper style={styles.formContainer}>
             <CustomPressable
               style={styles.button}
               onPress={() => onGoogleButtonPress()}>
-              <Text style={styles.buttonTitle}>Sign in with Google</Text>
+              <Label style={styles.buttonTitle}>Sign in with Google</Label>
             </CustomPressable>
             <CustomPressable
               onPress={goToRegularLogin}
               style={{alignItems: 'center', marginTop: 20}}>
-              <Text style={{color: 'white', fontSize: 14}}>
+              <Label style={{color: 'white', fontSize: 14}}>
                 Developer login
-              </Text>
+              </Label>
             </CustomPressable>
-          </View>
+          </Wrapper>
 
-          <View style={styles.footerContainer}>
-            <View style={{padding: 5, paddingRight: 0}}>
-              <Text style={[styles.footerText, {color: '#a9a9aa'}]}>
+          <Wrapper style={styles.footerContainer}>
+            <Wrapper style={{padding: 5, paddingRight: 0}}>
+              <Label style={[styles.footerText, {color: '#a9a9aa'}]}>
                 Need help?
-              </Text>
-            </View>
+              </Label>
+            </Wrapper>
             <CustomPressable style={{padding: 5}} onPress={goToContactUs}>
-              <Text style={[styles.footerText, {color: 'white'}]}>
+              <Label style={[styles.footerText, {color: 'white'}]}>
                 Contact us
-              </Text>
+              </Label>
             </CustomPressable>
-          </View>
-        </View>
+          </Wrapper>
+        </Wrapper>
       )}
-    </View>
+    </Wrapper>
   );
 };
 

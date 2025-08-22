@@ -17,6 +17,7 @@ import {ModalProvider, createModalStack} from 'react-native-modalfy';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {AppNavigation} from './src/navigation/AppNavigation';
 import {ColorScheme, EDSProvider, useEDS} from '@equinor/mad-components';
+import {KeyboardProvider} from 'react-native-keyboard-controller';
 
 // import EditDeleteModal from './src/components/conditionReport/EditDeleteModal';
 // import EditModal from './src/components/conditionReport/EditModal';
@@ -112,23 +113,25 @@ const App = () => {
         <PersistQueryClientProvider
           client={queryClient}
           persistOptions={{persister: asyncStoragePersister}}>
-          <EDSProvider colorScheme={scheme as ColorScheme} density="phone">
-            {/* {Platform.OS == 'android' && <CustomStatusBar />} */}
-            {/* <ModalProvider stack={modalStack}> */}
-            {/* <UserProvider
+          <KeyboardProvider>
+            <EDSProvider colorScheme={scheme as ColorScheme} density="phone">
+              {/* {Platform.OS == 'android' && <CustomStatusBar />} */}
+              {/* <ModalProvider stack={modalStack}> */}
+              {/* <UserProvider
                   value={{isInventoryMode: false, activeFilter: false}}> */}
-            {/* <TabHomeProvider>
+              {/* <TabHomeProvider>
                     <NationalShuttleProvider>
                       <InventoryProvider> */}
-            <SafeAreaProvider>
-              <AppNavigation />
-            </SafeAreaProvider>
-            {/* </InventoryProvider>
+              <SafeAreaProvider>
+                <AppNavigation />
+              </SafeAreaProvider>
+              {/* </InventoryProvider>
                     </NationalShuttleProvider>
                   </TabHomeProvider> */}
-            {/* </UserProvider> */}
-            {/* </ModalProvider> */}
-          </EDSProvider>
+              {/* </UserProvider> */}
+              {/* </ModalProvider> */}
+            </EDSProvider>
+          </KeyboardProvider>
         </PersistQueryClientProvider>
       </AutocompleteDropdownContextProvider>
       {/* </Provider> */}

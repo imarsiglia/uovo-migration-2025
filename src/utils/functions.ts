@@ -1,4 +1,5 @@
-import {Platform} from 'react-native';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {Alert, Platform} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import * as RNLocalize from 'react-native-localize';
 
@@ -24,6 +25,24 @@ export function getDeviceInfo(): {
     osVersion: systemVersion,
     timeZone: getTimeZone(),
   };
+}
+
+export function getDeviceInfoAsString() {
+  const {
+    getDeviceId,
+    getModel,
+    getBrand,
+    getSystemVersion,
+    getVersion,
+    getBundleId,
+  } = DeviceInfo;
+  return `Device Id: ${getDeviceId()} 
+      - Model: ${getModel()} 
+      - Brand: ${getBrand()}
+      - OS Version: ${getSystemVersion()}
+      - Build Number: ${getVersion()}
+      - Platform: ${Platform.OS}
+      - Bundle ID: ${getBundleId()}`;
 }
 
 export function getTimeZone(): string {
@@ -54,4 +73,29 @@ export function getInputIdFormContext(
 
 export function isAndroid() {
   return Platform.OS == 'ios';
+}
+
+export async function closeSessionOnGoogle() {
+  try {
+    if (Platform.OS === 'android') {
+      await GoogleSignin.revokeAccess(); // desvincula
+    }
+    await GoogleSignin.signOut(); // iOS: limpia sesión
+  } catch (e) {}
+}
+
+export function showAlertDialogWithOptions(onConfirm: () => void) {
+  Alert.alert(
+    'Logout',
+    'Sure want to logout?',
+    [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {text: 'Yes', onPress: onConfirm},
+    ],
+    {cancelable: false},
+  );
 }

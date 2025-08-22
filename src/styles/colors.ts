@@ -2,6 +2,7 @@ export const COLORS = {
   primary: '#1155cc',
   secondary: '#003fac',
   terteary: '#00D3ED',
+  tertearyDark: '#13B5EA',
   background: '#f0f0f0',
   text: '#000000',
   textLight: '#ffffff',
@@ -18,4 +19,6 @@ export const COLORS = {
   placeholderInput: '#d0d0d0',
   strokeRed: '#FF0000',
   titleColor: '#3a3a3a',
+  inputTextColor: '#3C424A',
+  statusbar: "transparent"
 };

@@ -9,8 +9,8 @@ export const LoginSchema = yup.object().shape({
   username: yup
     .string()
     .email(DEFAULT_EMAIL_TYPE_MESSAGE)
-    .required('Must input an email'),
-  password: yup.string().required('Must input a password'),
+    .required('Enter an email'),
+  password: yup.string().required('Enter a password'),
 });
 
 export type LoginSchemaType = yup.InferType<typeof LoginSchema>;
@@ -27,3 +27,11 @@ export const ContactUsSchema = yup.object().shape({
 });
 
 export type ContactUsSchemaType = yup.InferType<typeof ContactUsSchema>;
+
+export const HelpDeskSchema = yup.object().shape({
+  title: yup.string().required(DEFAULT_REQUIRED_MESSAGE),
+  description: yup.string().required(DEFAULT_REQUIRED_MESSAGE),
+  photo: yup.string().optional().nullable(),
+});
+
+export type HelpDeskSchemaType = yup.InferType<typeof HelpDeskSchema>;

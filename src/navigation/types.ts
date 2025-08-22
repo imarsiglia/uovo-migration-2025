@@ -6,6 +6,8 @@ export const RoutesNavigation = {
   EditProfile: 'EditProfile',
   EditImage: 'EditImage',
   LoginEmail: 'LoginEmail',
+  HelpDesk: 'HelpDesk',
+  Account: 'Account',
 } as const;
 
 // Union de nombres de ruta: "Home" | "ContactUs" | ...
@@ -26,4 +28,6 @@ export type RootStackParamList = {
     photos?: any;
   };
   [RoutesNavigation.LoginEmail]: undefined;
+  [RoutesNavigation.HelpDesk]: undefined;
+  [RoutesNavigation.Account]: undefined;
 };

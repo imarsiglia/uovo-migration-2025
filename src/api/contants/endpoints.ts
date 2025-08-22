@@ -4,9 +4,11 @@ import { API, API_CONTEXT } from '@env';
 //AUTHENTICATION ENDPOINTS
 export const API_LOGIN = `/login`;
 export const API_REFRESH_TOKEN = `/user/refreshtoken`;
+export const API_REGULAR_LOGIN = `/loginalter`;
 
 //help desk general
-export const API_HELPDESK = `/login/helpdesk`;
+export const API_CONTACT_US = `/login/helpdesk`;
+export const API_HELPDESK = `/user/helpdesk`;
 
 //NATIONAL SHUTTLE ENDPOINTS
 export const API_GET_LOCATION_PLACES = `${API}${API_CONTEXT}/jobns/load/locationplacesall`

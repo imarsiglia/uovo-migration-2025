@@ -3,6 +3,7 @@ import {API, API_CONTEXT} from '@env';
 import {fetchUserTokenFromStorage} from '@api/helpers/apiClientHelper';
 import {authState} from '@store/auth';
 
+export const URL_API = API;
 export const BASE_URL_ENDPOINTS = `${API}${API_CONTEXT}`;
 
 // Configurar Axios

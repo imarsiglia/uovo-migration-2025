@@ -11,14 +11,18 @@ import {authServices} from '@api/services/authServices';
 
 export const useLogin = () => {
   return useMutation({
-    mutationKey: [`login`],
     mutationFn: authServices.login,
-    gcTime: 0,
   });
 };
 
 export const useRefreshToken = () => {
   return useMutation({
     mutationFn: authServices.refreshToken,
+  });
+};
+
+export const useRegularLogin = () => {
+  return useMutation({
+    mutationFn: authServices.regularLogin,
   });
 };

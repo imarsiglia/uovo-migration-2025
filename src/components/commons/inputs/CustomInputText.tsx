@@ -55,10 +55,9 @@ const styles = StyleSheet.create({
     width: '100%',
     borderWidth: 0.5,
     borderRadius: 10,
-    borderColor: '#959595',
-    color: '#3C424A',
-    opacity: 0.7,
-    height: 40,
+    borderColor: COLORS.gray,
+    color: COLORS.inputTextColor,
+    height: 40
   },
   disabled: {
     backgroundColor: COLORS.disabled,

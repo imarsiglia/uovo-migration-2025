@@ -1,5 +1,5 @@
 import {UserType} from '@api/types/User';
-import {API_LOGIN, API_REFRESH_TOKEN} from '@api/contants/endpoints';
+import {API_LOGIN, API_REFRESH_TOKEN, API_REGULAR_LOGIN} from '@api/contants/endpoints';
 import {postRequest} from '@api/helpers/apiClientHelper';
 
 type PropsLogin = {
@@ -30,7 +30,24 @@ const refreshToken = async (props: PropsRefresgToken): Promise<UserType> => {
   return response.body;
 };
 
+type PropsRegularLogin = {
+  username: string;
+  password: string;
+  timeZone: string;
+  deviceId: string;
+  model: string;
+  brand: string;
+  buildNumber: string;
+  osVersion: string;
+};
+
+const regularLogin = async (props: PropsRegularLogin): Promise<UserType> => {
+  const response = await postRequest<UserType>(API_REGULAR_LOGIN, props);
+  return response.body;
+};
+
 export const authServices = {
   login,
   refreshToken,
+  regularLogin,
 };

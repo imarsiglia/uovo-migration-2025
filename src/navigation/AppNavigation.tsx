@@ -1,7 +1,6 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
 import {enableScreens} from 'react-native-screens';
-import {Alert, LogBox, Text} from 'react-native';
 // import {connect} from 'react-redux';
 // import * as UserActions from '../actions/user';
 // import Splash from '../screens/splash';
@@ -69,19 +68,20 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 // } from '../utils/storage';
 
 //national shuttle
+import {useRefreshToken} from '@api/hooks/HooksAuthentication';
+import {Splash} from '@components/splash/Splash';
+import {CustomStatusBar} from '@components/statusbar/CustomStatusBar';
+import {LoginEmailScreen} from '@screens/auth/LoginEmailScreen';
+import {ContactScreen} from '@screens/contact/ContactScreen';
+import {HelpDeskScreen} from '@screens/contact/HelpDeskScreen';
+import {EditImageScreen} from '@screens/editImage/EditImageScreen';
+import {HomeScreen} from '@screens/home/HomeScreen';
+import {useAuth} from '@store/auth';
+import {getDeviceInfo} from '@utils/functions';
+import {isInternet} from '@utils/internet';
 import {LoginScreen} from '../screens/auth/LoginScreen';
 import {RootStackParamList, RoutesNavigation} from './types';
-import {ContactScreen} from '@screens/contact/ContactScreen';
-import {HomeScreen} from '@screens/home/HomeScreen';
-import {useRefreshToken} from '@api/hooks/HooksAuthentication';
-import {getDeviceInfo} from '@utils/functions';
-import {useAuth} from '@store/auth';
-import {isInternet} from '@utils/internet';
-import {Splash} from '@components/splash/Splash';
-import {EditImageScreen} from '@screens/editImage/EditImageScreen';
-import {LoginEmailScreen} from '@screens/auth/LoginEmailScreen';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {CustomStatusBar} from '@components/statusbar/CustomStatusBar';
+import { AccountScreen } from '@screens/account/AccountScreen';
 // import InventoryNS from '../screens/nationalShuttle/InventoryNS';
 
 // LogBox.ignoreLogs([
@@ -145,11 +145,20 @@ export const AppNavigation = () => {
               name={RoutesNavigation.EditImage}
               component={EditImageScreen}
             />
-
             <Stack.Screen
               name={RoutesNavigation.LoginEmail}
               component={LoginEmailScreen}
             />
+            <Stack.Screen
+              name={RoutesNavigation.HelpDesk}
+              component={HelpDeskScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.Account}
+              component={AccountScreen}
+            />
+
+            
           </Stack.Navigator>
         </NavigationContainer>
         // <OfflineComponentSync />
