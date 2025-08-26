@@ -137,10 +137,7 @@ export const useGetInventoryUniqueRoutePickup = (param: string) => {
     refetchOnMount: false,
     queryKey: [`inventory_unique_route_pickup`],
     queryFn: () => NSEndpoints.getInventoryUniqueRoutePickup(param),
-    gcTime: 0,
-    select({data}) {
-      return data?.body?.data ?? [];
-    }
+    gcTime: 0
   });
 };
 

@@ -82,6 +82,7 @@ import {isInternet} from '@utils/internet';
 import {LoginScreen} from '../screens/auth/LoginScreen';
 import {RootStackParamList, RoutesNavigation} from './types';
 import { AccountScreen } from '@screens/account/AccountScreen';
+import { configureFontAwesomePro } from 'react-native-fontawesome-pro';
 // import InventoryNS from '../screens/nationalShuttle/InventoryNS';
 
 // LogBox.ignoreLogs([
@@ -90,6 +91,7 @@ import { AccountScreen } from '@screens/account/AccountScreen';
 
 enableScreens(true);
 const Stack = createNativeStackNavigator<RootStackParamList>();
+configureFontAwesomePro()
 
 export const AppNavigation = () => {
   const [isLoaded, setIsLoaded] = useState(false);

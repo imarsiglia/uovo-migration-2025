@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {createAsyncStoragePersister} from '@tanstack/query-async-storage-persister';
+// import {createAsyncStoragePersister} from '@tanstack/query-async-storage-persister';
 import {QueryClient} from '@tanstack/react-query';
 import {PersistQueryClientProvider} from '@tanstack/react-query-persist-client';
 import * as React from 'react';
@@ -18,6 +18,7 @@ import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {AppNavigation} from './src/navigation/AppNavigation';
 import {ColorScheme, EDSProvider, useEDS} from '@equinor/mad-components';
 import {KeyboardProvider} from 'react-native-keyboard-controller';
+import AppProviders from '@providers/AppProviders';
 
 // import EditDeleteModal from './src/components/conditionReport/EditDeleteModal';
 // import EditModal from './src/components/conditionReport/EditModal';
@@ -45,9 +46,9 @@ const queryClient = new QueryClient({
   },
 });
 
-const asyncStoragePersister = createAsyncStoragePersister({
-  storage: AsyncStorage,
-});
+// const asyncStoragePersister = createAsyncStoragePersister({
+//   storage: AsyncStorage,
+// });
 
 const {height} = Dimensions.get('screen');
 const defaultOptions = {
@@ -103,16 +104,12 @@ const App = () => {
   // }, [])
 
   const scheme = useColorScheme();
-  // const [hasLoadedEds] = useEDS(); // carga fuentes/assets de EDS
-  // if (!hasLoadedEds) return null;
 
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       {/* <Provider store={store}> */}
       <AutocompleteDropdownContextProvider>
-        <PersistQueryClientProvider
-          client={queryClient}
-          persistOptions={{persister: asyncStoragePersister}}>
+        <AppProviders>
           <KeyboardProvider>
             <EDSProvider colorScheme={scheme as ColorScheme} density="phone">
               {/* {Platform.OS == 'android' && <CustomStatusBar />} */}
@@ -132,29 +129,11 @@ const App = () => {
               {/* </ModalProvider> */}
             </EDSProvider>
           </KeyboardProvider>
-        </PersistQueryClientProvider>
+        </AppProviders>
       </AutocompleteDropdownContextProvider>
       {/* </Provider> */}
     </GestureHandlerRootView>
   );
 };
-
-// LogBox.ignoreLogs([
-//   'VirtualizedLists should never be nested', // TODO: Remove when fixed
-// ]);
-
-// LogBox.ignoreLogs(['ViewPropTypes will be removed from React Native']);
-
-// LogBox.ignoreLogs([
-//   `ViewPropTypes will be removed from React Native, along with all other PropTypes. We recommend that you migrate away from PropTypes and switch to a type system like TypeScript. If you need to continue using ViewPropTypes, migrate to the 'deprecated-react-native-prop-types' package.`,
-// ]);
-
-// LogBox.ignoreLogs([
-//   '`new NativeEventEmitter()` was called with a non-null argument without the required `addListener` method.',
-// ]);
-
-// LogBox.ignoreLogs([
-//   '`new NativeEventEmitter()` was called with a non-null argument without the required `removeListeners` method.',
-// ]);
 
 export default App;

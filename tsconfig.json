@@ -5,6 +5,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "jsx": "react-jsx",
+    "skipLibCheck": true,
     "paths": {
       // DOMAIN
       "@api/*": ["src/api/*"],
@@ -22,6 +23,9 @@
       "@utils/*": ["src/utils/*"],
       "@store/*": ["src/store/*"],
       "@navigation/*": ["src/navigation/*"],
+      "@fortawesome/*": ["@fortawesome/*"],
+      "@providers/*": ["src/providers/*"],
+      "@generalTypes/*": ["src/types/*"],
       
       // "@provider/*": ["src/provider/*"]
     }

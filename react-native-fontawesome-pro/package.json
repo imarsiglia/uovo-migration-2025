@@ -1,0 +1,87 @@
+{
+  "_args": [
+    [
+      "react-native-fontawesome-pro@2.1.0",
+      "/Users/devisesoft/Development/git/inmov/uovo/uovo-ios"
+    ]
+  ],
+  "_from": "react-native-fontawesome-pro@2.1.0",
+  "_id": "react-native-fontawesome-pro@2.1.0",
+  "_inBundle": false,
+  "_integrity": "sha512-m9x5wyY+AI5R4bIEJeJMHPbWpaKyTz0ObRph+GjTrBwo5mM5aXn+I4jStoyV7BqIdB6hy81LsN64H3x52GSz/A==",
+  "_location": "/react-native-fontawesome-pro",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "react-native-fontawesome-pro@2.1.0",
+    "name": "react-native-fontawesome-pro",
+    "escapedName": "react-native-fontawesome-pro",
+    "rawSpec": "2.1.0",
+    "saveSpec": null,
+    "fetchSpec": "2.1.0"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/react-native-fontawesome-pro/-/react-native-fontawesome-pro-2.1.0.tgz",
+  "_spec": "2.1.0",
+  "_where": "/Users/devisesoft/Development/git/inmov/uovo/uovo-ios",
+  "author": {
+    "name": "Yaniv Shnaider"
+  },
+  "bugs": {
+    "url": "https://github.com/shyaniv7/react-native-fontawesome-pro/issues"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "1.2.0"
+  },
+  "description": "Easily use your FontAwesome Pro 5.1 icons in React-Native.",
+  "devDependencies": {
+    "@types/react-native": "^0.56.19",
+    "babel-jest": "22.4.1",
+    "babel-preset-react-native": "4.0.0",
+    "jest": "22.4.2",
+    "merge": ">=1.2.1",
+    "prop-types": "^15.5.7",
+    "react-native-svg": "^7.0.2",
+    "react-test-renderer": "^16.2.0"
+  },
+  "homepage": "https://github.com/shyaniv7/react-native-fontawesome-pro#readme",
+  "jest": {
+    "preset": "react-native"
+  },
+  "keywords": [
+    "awesome",
+    "component",
+    "font",
+    "font-awesome",
+    "fontawesome",
+    "icon",
+    "react-native",
+    "fontawesome-pro",
+    "pro"
+  ],
+  "license": "MIT",
+  "main": "./index.js",
+  "name": "react-native-fontawesome-pro",
+  "peerDependencies": {
+    "react": ">=15.5.0",
+    "react-native": ">=0.49.2",
+    "react-native-svg": ">=5.3.0",
+    "@fortawesome/pro-light-svg-icons": "*",
+    "@fortawesome/pro-regular-svg-icons": "*",
+    "@fortawesome/pro-solid-svg-icons": "*",
+    "@fortawesome/free-brands-svg-icons": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shyaniv7/react-native-fontawesome-pro.git"
+  },
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "types": "./index.d.ts",
+  "version": "2.1.0"
+}

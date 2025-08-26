@@ -11,11 +11,14 @@ import {
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {useAuth} from '@store/auth';
 import {RoutesNavigation} from '@navigation/types';
+import useGeneralStore from '@store/general';
+import {IconNode} from '@rneui/base';
 
 export const HomeFloatingAction = () => {
   const [open, setOpen] = useState(false);
   const {resetTo, navigate} = useCustomNavigation();
   const clearSession = useAuth((d) => d.clearSession);
+  const {isFilterActive, setFilterActive} = useGeneralStore();
 
   const onCloseFab = useCallback(() => {
     setOpen(false);
@@ -45,6 +48,11 @@ export const HomeFloatingAction = () => {
     onCloseFab();
   }, []);
 
+  const toggleFilter = useCallback(() => {
+    setFilterActive(!isFilterActive);
+    onCloseFab();
+  }, [isFilterActive]);
+
   return (
     <SpeedDial
       isOpen={open}
@@ -52,52 +60,25 @@ export const HomeFloatingAction = () => {
       openIcon={<Icons.Close fontSize={25} color={COLORS.white} />}
       onOpen={() => setOpen(!open)}
       onClose={() => setOpen(!open)}
-      color={COLORS.tertearyDark}
+      color={isFilterActive ? 'green' : COLORS.tertearyDark}
       overlayColor="#00000040">
-      <SpeedDial.Action
-        color={COLORS.tertearyDark}
-        icon={<Icons.Filter fontSize={20} color={COLORS.white} />}
+      <CustomSpeedDialoAction
         title="Show active jobs"
-        onPress={() => console.log('Add Something')}
-        titleStyle={styles.title}
-        style={styles.buttonActionStyle}
-        buttonStyle={{
-          marginVertical: 0,
-        }}
-        containerStyle={{
-          marginVertical: 0,
-        }}
-        iconContainerStyle={{
-          marginVertical: 0,
-        }}
+        icon={<Icons.Filter fontSize={20} color={COLORS.white} />}
+        onPress={toggleFilter}
       />
-      <SpeedDial.Action
-        color={COLORS.tertearyDark}
-        icon={<Icons.UserSolid fontSize={21} color={COLORS.white} />}
+      <CustomSpeedDialoAction
         title="Account"
+        icon={<Icons.UserSolid fontSize={21} color={COLORS.white} />}
         onPress={goToAccount}
-        titleStyle={styles.title}
-        style={styles.buttonActionStyle}
-        buttonStyle={{
-          marginVertical: 0,
-        }}
-        containerStyle={{
-          marginVertical: 0,
-        }}
-        iconContainerStyle={{
-          marginVertical: 0,
-        }}
       />
-      <SpeedDial.Action
-        color={COLORS.tertearyDark}
-        icon={<Icons.Question fontSize={15} color={COLORS.white} />}
+      <CustomSpeedDialoAction
         title="Help Desk"
+        icon={<Icons.Question fontSize={15} color={COLORS.white} />}
         onPress={goToHelpDesk}
-        titleStyle={styles.title}
-        style={styles.buttonActionStyle}
       />
-      <SpeedDial.Action
-        color={COLORS.tertearyDark}
+      <CustomSpeedDialoAction
+        title="About"
         icon={
           <Icons.EllipsisVertical
             fontSize={15}
@@ -105,18 +86,12 @@ export const HomeFloatingAction = () => {
             style={{transform: [{rotate: '90deg'}]}}
           />
         }
-        title="About"
         onPress={showAbout}
-        titleStyle={styles.title}
-        style={styles.buttonActionStyle}
       />
-      <SpeedDial.Action
-        color={COLORS.tertearyDark}
-        icon={<Icons.Logout fontSize={22} color={COLORS.white} />}
+      <CustomSpeedDialoAction
         title="Logout"
+        icon={<Icons.Logout fontSize={22} color={COLORS.white} />}
         onPress={logout}
-        titleStyle={styles.title}
-        style={styles.buttonActionStyle}
       />
     </SpeedDial>
     //    <FloatingAction
@@ -180,3 +155,33 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
 });
+
+type CustomSpeedDialoActionProps = {
+  title: string;
+  icon: IconNode;
+  onPress: () => void;
+};
+
+const CustomSpeedDialoAction = ({
+  title,
+  icon,
+  onPress,
+}: CustomSpeedDialoActionProps) => (
+  <SpeedDial.Action
+    color={COLORS.tertearyDark}
+    icon={icon}
+    title={title}
+    onPress={onPress}
+    titleStyle={styles.title}
+    style={styles.buttonActionStyle}
+    buttonStyle={{
+      marginVertical: 0,
+    }}
+    containerStyle={{
+      marginVertical: 0,
+    }}
+    iconContainerStyle={{
+      marginVertical: 0,
+    }}
+  />
+);

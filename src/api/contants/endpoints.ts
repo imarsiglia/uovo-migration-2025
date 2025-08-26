@@ -10,6 +10,12 @@ export const API_REGULAR_LOGIN = `/loginalter`;
 export const API_CONTACT_US = `/login/helpdesk`;
 export const API_HELPDESK = `/user/helpdesk`;
 
+//jobs
+export const API_CALENDAR_TIMELINE = `/job/calendar`;
+export const API_TIMELINE = `/job/query`;
+
+
+
 //NATIONAL SHUTTLE ENDPOINTS
 export const API_GET_LOCATION_PLACES = `${API}${API_CONTEXT}/jobns/load/locationplacesall`
 export const API_GET_EAST_COAST_PICKUP = `${API}${API_CONTEXT}/jobns/eastcoastpickup/query`
@@ -34,3 +40,4 @@ export const SUCCESS_MESSAGES = {
   OPERACION_EXITOSA : "Operación exitosa",
   SUCCESS: "SUCCESS"
 }
+

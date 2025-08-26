@@ -8,3 +8,11 @@ export const SPEECH_EVENTS = {
 } as const;
 
 export type SpeechVoiceType = (typeof SPEECH_EVENTS)[keyof typeof SPEECH_EVENTS];
+
+export type AgendaItem = {
+  id: string;
+  title: string;
+  time?: string; // opcional
+};
+
+export type FAIconType = 'solid' | 'light' | 'regular' | 'brands' | undefined

@@ -1,17 +1,6 @@
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
-// import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {useCallback, useEffect, useState} from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import DeviceInfo from 'react-native-device-info';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import {useCallback} from 'react';
+import {Alert, StyleSheet, View} from 'react-native';
 // import {useTabHomeContext} from '../provider/TabHomeContext';
 // import {useUserContext} from '../provider/UserContext';
 // import mstyles from '../styles/styles';
@@ -37,22 +26,20 @@ import {HomeFloatingAction} from '@components/floating/HomeFloatingAction';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {COLORS} from '@styles/colors';
-import { Label } from '@components/commons/text/Label';
-import { BASE_URL_ENDPOINTS, URL_API } from '@api/config/apiClient';
-import { PressableOpacity } from '@components/commons/buttons/PressableOpacity';
-import { IndicatorLoading } from '@components/commons/loading/IndicatorLoading';
+import {Label} from '@components/commons/text/Label';
+import {URL_API} from '@api/config/apiClient';
+import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
+import {SpinningIcon} from '@components/commons/spin/SpinningIcon';
+import {TimelineView} from './TimelineView';
+import Icon from 'react-native-fontawesome-pro';
+import useGeneralStore from '@store/general';
+import {ParamListBase, TabNavigationState} from '@react-navigation/native';
 
-// const Tab = createMaterialTopTabNavigator();
-
-var versionNumber = DeviceInfo.getVersion();
+const Tab = createMaterialTopTabNavigator();
 
 export const HomeScreen = () => {
-  // const [floating, setFloating] = useState(false);
-  // const {activeFilter, setActiveFilter} = useUserContext();
-  // const {activeTab, setActiveTab, timelinePressed, setTimelinePressed} =
-  //   useTabHomeContext();
-  // const translationX = useSharedValue(0);
-  // const opacity = useSharedValue(1);
+  const {isFilterActive, timelinePressed, setTimelinePressed, setActiveTab} =
+    useGeneralStore();
 
   // useEffect(() => {
   //   createIdsInventory();
@@ -116,118 +103,18 @@ export const HomeScreen = () => {
   //   }
   // }
 
-  // function onPressTab(e: any) {
-  //   setTimeout(()=> {
-  //     setActiveTab(e.data.state.index);
-  //   }, 100)
-  //   if (e.data.state.index == 2) {
-  //     translationX.value = withTiming(0, {duration: 300});
-  //     opacity.value = withTiming(1, {duration: 300});
-  //   } else {
-  //     translationX.value = withTiming(50, {duration: 300});
-  //     opacity.value = withTiming(0, {duration: 300});
-  //   }
+  const onPressTab = useCallback((state: TabNavigationState<ParamListBase>) => {
+    Alert.alert('hola');
+    setTimeout(() => {
+      setActiveTab(state.index);
+    }, 100);
+  }, []);
 
-  // }
+  const onPressTimelineTab = useCallback(() => {
+    setTimelinePressed(!timelinePressed);
+  }, [timelinePressed]);
 
-  // function syncro() {
-  //   props.dispatch(HomeActions.syncro());
-  // }
-
-  // function showActiveJobs() {
-  //   setActiveFilter(true);
-  // }
-
-  // function showAllJobs() {
-  //   setActiveFilter(false);
-  // }
-
-  // function navigate(screen, body?: any) {
-  //   props.navigation.navigate(screen, body);
-  // }
-
-  // function goToHelpDesk() {
-  //   navigate('HelpDesk');
-  // }
-
-  // function showAbout() {
-  //   Alert.alert('ABOUT', '\nUOVO APP \nVersion ' + versionNumber);
-  // }
-
-  // function logout() {
-  //   Alert.alert(
-  //     'Logout',
-  //     'Sure want to logout?',
-  //     [
-  //       {
-  //         text: 'Cancel',
-  //         onPress: () => console.log('Cancel Pressed'),
-  //         style: 'cancel',
-  //       },
-  //       {text: 'Yes', onPress: signOut},
-  //     ],
-  //     {cancelable: false},
-  //   );
-  // }
-
-  // async function signOut() {
-  //   try {
-  //     var keysToDelete = [TOKEN_KEY_STORAGE, USER_INFO_KEY_STORAGE];
-  //     await removeMultiFromStorage(keysToDelete);
-
-  //     removeAllStorageOffline();
-
-  //     try {
-  //       if (Platform.OS == 'android') {
-  //         await GoogleSignin.revokeAccess();
-  //       }
-  //       await GoogleSignin.signOut();
-  //     } catch (error) {
-  //       // console.error(error);
-  //     }
-
-  //     RNRestart.Restart();
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
-
-  // function onPressMenuAction(name: string) {
-  //   setFloating(false);
-  //   switch (name) {
-  //     case 'active_jobs':
-  //       if (activeFilter) {
-  //         showAllJobs();
-  //       } else {
-  //         showActiveJobs();
-  //       }
-  //       break;
-  //     case 'account':
-  //       navigate('Account');
-  //       break;
-  //     case 'help_desk':
-  //       goToHelpDesk();
-  //       break;
-  //     case 'about':
-  //       showAbout();
-  //       break;
-  //     case 'logout':
-  //       logout();
-  //       break;
-  //   }
-  // }
-
-  // const animatedStyle = useAnimatedStyle(() => {
-  //   return {
-  //     transform: [{translateX: translationX.value}],
-  //     opacity: opacity.value,
-  //     marginLeft: -translationX.value + 4
-  //   };
-  // });
-
-  const syncro = useCallback(() => {
-
-  }, [])
+  const syncro = useCallback(() => {}, []);
 
   return (
     <Wrapper style={GLOBAL_STYLES.safeAreaLight}>
@@ -244,195 +131,72 @@ export const HomeScreen = () => {
                 disabled={false}
                 onPress={syncro}
                 style={[styles.btnSync, {backgroundColor: COLORS.primary}]}>
-                <View style={[GLOBAL_STYLES.row]}>
-                  {true && (
-                    <IndicatorLoading activityIndicatorProps={{
-                      size: "small",
-                      color: COLORS.white
-                    }} />
-                  )}
-                  {/* {!props.syncro && (
-                    <Icon name="sync" color="white" type="solid" size={17} />
-                  )} */}
-                </View>
+                <SpinningIcon size={17} spin />
               </PressableOpacity>
-
-            {/* <Animated.View style={animatedStyle}>
-                <TouchableOpacity
-                  disabled={activeTab != 2}
-                  onPress={() => setIsInventoryMode(!isInventoryMode)}
-                  style={[
-                    styles.btnSync,
-                    {backgroundColor: COLORS.primary, marginLeft: 8},
-                  ]}>
-                  <View style={[mstyles.row]}>
-                    {isInventoryMode ? (
-                      <NSJobsIcon color="white" />
-                    ) : (
-                      <NSInventoryIcon color={'white'} />
-                    )}
-                  </View>
-                </TouchableOpacity>
-              </Animated.View> */}
-
-            {/* {activeTab == 2 ? (
-                <TouchableOpacity
-                  disabled={activeTab != 2}
-                  onPress={() => setIsInventoryMode(!isInventoryMode)}
-                  style={[
-                    styles.btnSync,
-                    {backgroundColor: COLORS.primary, marginLeft: 8},
-                  ]}>
-                  <View style={[mstyles.row]}>
-                    {isInventoryMode ? (
-                      <NSJobsIcon color="white" />
-                    ) : (
-                      <NSInventoryIcon color={'white'} />
-                    )}
-                  </View>
-                </TouchableOpacity>
-              ) : null} */}
+            </Wrapper>
           </Wrapper>
         </Wrapper>
-        </Wrapper>
 
-        {/* <View style={{flex: 1, flexGrow: 1, height: '100%', width: '100%'}}>
+        <View style={{flex: 1, flexGrow: 1, height: '100%', width: '100%'}}>
           <Tab.Navigator
             initialRouteName="Timeline"
             screenListeners={{
               state: (e) => {
-                onPressTab(e);
+                onPressTab(e.data.state);
               },
             }}
             screenOptions={{
-              tabBarLabelStyle: {
-                fontSize: 14,
-                textTransform: 'capitalize',
-                flexWrap: 'nowrap',
-                paddingHorizontal: 0,
-              },
+              tabBarLabelStyle: styles.tabBarLabelStyle,
               swipeEnabled: false,
-              tabBarInactiveTintColor: 'gray',
+              tabBarInactiveTintColor: COLORS.gray,
               tabBarGap: 0,
-              tabBarActiveTintColor: COLORS.secondary,
+              tabBarActiveTintColor: COLORS.terteary,
               tabBarItemStyle: {paddingHorizontal: 0},
               tabBarStyle: {paddingHorizontal: 0, elevation: 1},
-              tabBarIndicatorStyle: {backgroundColor: COLORS.secondary},
-              tabBarPressColor: "#F0F0F0"
+              tabBarIndicatorStyle: {backgroundColor: COLORS.terteary},
+              tabBarPressColor: COLORS.background,
             }}>
             <Tab.Screen
               name="Timeline"
               component={TimelineView}
               options={{tabBarLabel: 'Timeline'}}
               listeners={{
-                tabPress: (e) => {
-                  if (activeTab == 0 && setTimelinePressed) {
-                    setTimelinePressed(!timelinePressed);
-                  }
-                },
+                tabPress: onPressTimelineTab,
               }}
             />
             <Tab.Screen
               name="JobQueue"
-              component={JobQueueView}
+              component={() => <></>}
               options={{tabBarLabel: 'Job Queue'}}
             />
             <Tab.Screen
               name="NationalShuttle"
-              component={NationalShuttleView}
+              component={() => <></>}
               options={{tabBarLabel: 'National Shuttle'}}
             />
           </Tab.Navigator>
-        </View> */}
+        </View>
 
         <HomeFloatingAction />
 
-        {/* <FloatingAction
-          onClose={() => setFloating(false)}
-          onOpen={() => setFloating(!floating)}
-          animated
-          color={activeFilter ? 'green' : COLORS.terceary}
-          actionsPaddingTopBottom={0}
-          dismissKeyboardOnPress
-          overlayColor="#FFFFFF70"
-          shadow={{
-            shadowOpacity: 0.1,
-            shadowRadius: 0,
-            shadowOffset: {height: 2, width: 0},
-          }}
-          floatingIcon={
-            !floating ? (
-              <Icon color="white" size={26} name="th" type="solid" />
-            ) : (
-              <Icon color="white" size={26} name="times" type="solid" />
-            )
-          }
-          actions={[
-            {
-              name: 'active_jobs',
-              text: activeFilter ? 'Show all jobs' : 'Show active jobs',
-              color: COLORS.terceary,
-              icon: <Icon name="filter" size={15} color="white" type="solid" />,
-              animated: true,
-              tintColor: 'red',
-            },
-            {
-              name: 'account',
-              text: 'Account',
-              color: COLORS.terceary,
-              icon: <Icon name="user" size={15} color="white" type="solid" />,
-            },
-            {
-              name: 'help_desk',
-              text: 'Help Desk',
-              color: COLORS.terceary,
-              icon: (
-                <Icon name="question" size={15} color="white" type="solid" />
-              ),
-            },
-            {
-              name: 'about',
-              text: 'About',
-              color: COLORS.terceary,
-              icon: (
-                <Icon name="ellipsis-h" size={15} color="white" type="solid" />
-              ),
-            },
-            {
-              name: 'logout',
-              text: 'Logout',
-              color: COLORS.terceary,
-              icon: (
-                <Icon name="sign-out" size={15} color="white" type="solid" />
-              ),
-            },
-          ]}
-          onPressItem={onPressMenuAction}
-        /> */}
-
-        {/* {activeFilter && (
+        {isFilterActive && (
           <View
             style={[
               styles.floatingInfoFilter,
               {flexDirection: 'row', alignItems: 'center'},
             ]}>
             <Icon name="exclamation" size={15} color="orange" type="solid" />
-            <Text allowFontScaling={false} style={{color: '#000000'}}>
+            <Label allowFontScaling={false} style={{color: '#000000'}}>
               You are currently on a filtered view for paused jobs
-            </Text>
+            </Label>
           </View>
-        )} */}
+        )}
       </Wrapper>
     </Wrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 0,
-    flexGrow: 1,
-    backgroundColor: '#fbfbfb',
-  },
   containerHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -443,16 +207,11 @@ const styles = StyleSheet.create({
   },
   titleHeader: {
     fontWeight: 'bold',
-    color: '#3a3a3a',
+    color: COLORS.titleColor,
     fontSize: 30,
   },
-  labelBtnSync: {
-    color: 'white',
-    fontSize: 16,
-    marginRight: 2,
-  },
   btnSync: {
-    backgroundColor: '#1155cc',
+    backgroundColor: COLORS.primary,
     justifyContent: 'center',
     height: 32,
     width: 32,
@@ -472,12 +231,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     elevation: 10,
   },
-  fullOpacity: {
-    zIndex: 1000,
-    position: 'absolute',
-    backgroundColor: '#d0d0d0',
-    opacity: 0.5,
-    height: '100%',
-    width: '100%',
+  tabBarLabelStyle: {
+    fontSize: 14,
+    textTransform: 'capitalize',
+    flexWrap: 'nowrap',
+    paddingHorizontal: 0,
   },
 });

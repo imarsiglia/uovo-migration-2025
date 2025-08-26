@@ -2,6 +2,12 @@ import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {Alert, Platform} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import * as RNLocalize from 'react-native-localize';
+import moment from 'moment';
+import { AgendaSchedule } from 'react-native-calendars';
+
+export function getFormattedDate(date: string | Date, format?: string) {
+  return moment(date).format(format ?? 'DD/MM/YYYY');
+}
 
 export function getDeviceInfo(): {
   deviceId: string;
@@ -98,4 +104,17 @@ export function showAlertDialogWithOptions(onConfirm: () => void) {
     ],
     {cancelable: false},
   );
+}
+
+
+export function adaptAgendaItemsToArray(itemsObj: AgendaSchedule) {
+  return Object.keys(itemsObj)
+    .sort() // ordena por fecha
+    .flatMap((date) =>
+      (itemsObj[date] || []).map((it, idx) => ({
+        ...it,
+        __date: date,
+        __first: idx === 0, // equivalente a firstItemInDay
+      })),
+    );
 }
