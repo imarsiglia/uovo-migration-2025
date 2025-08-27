@@ -36,6 +36,7 @@ type Props = {
   signatureBolCount: number;
   bolSended: boolean;
   isFilterActive?: boolean;
+  isOnline?: boolean;
   onPress: (id: string) => void;
 };
 
@@ -61,10 +62,10 @@ const TimelineCardCmp = ({
   signatureBolCount,
   bolSended,
   isFilterActive,
+  isOnline
 }: Props) => {
-  const {online} = useOnline();
 
-   const handleTopSheetPress = useCallback(() => onPress(id), [onPress, id]);
+  const handleTopSheetPress = useCallback(() => onPress(id), [onPress, id]);
 
   return (
     <Wrapper style={style.container}>
@@ -123,34 +124,34 @@ const TimelineCardCmp = ({
               <Label style={style.subtitle}>{date}</Label>
               <Wrapper
                 style={[
-                  !online
-                    ? style.offline
-                    : status == WO_CONFIRMED_STATUS ||
+                  isOnline
+                    ? status == WO_CONFIRMED_STATUS ||
                       status === 'Scheduled' ||
                       status.includes(STARTED_STATUS)
-                    ? style.scheduled
-                    : status.includes(PAUSED_STATUS)
-                    ? style.paused
-                    : status.includes(REPREPPED_STATUS)
-                    ? style.reprepped
-                    : style.canceled,
+                      ? style.scheduled
+                      : status.includes(PAUSED_STATUS)
+                      ? style.paused
+                      : status.includes(REPREPPED_STATUS)
+                      ? style.reprepped
+                      : style.canceled
+                    : style.offline,
                   style.containerStatus,
                 ]}>
                 <Label
                   style={
-                    !online
-                      ? style.offline_text
-                      : status == WO_CONFIRMED_STATUS ||
+                    isOnline
+                      ? status == WO_CONFIRMED_STATUS ||
                         status === 'Scheduled' ||
                         status.includes(STARTED_STATUS)
-                      ? style.scheduled_text
-                      : status.includes(PAUSED_STATUS)
-                      ? style.paused_text
-                      : status.includes(REPREPPED_STATUS)
-                      ? style.reprepped_text
-                      : style.canceled_text
+                        ? style.scheduled_text
+                        : status.includes(PAUSED_STATUS)
+                        ? style.paused_text
+                        : status.includes(REPREPPED_STATUS)
+                        ? style.reprepped_text
+                        : style.canceled_text
+                      : style.offline_text
                   }>
-                  {!online ? 'Offline' : status}
+                  {!isOnline ? 'Offline' : status}
                 </Label>
               </Wrapper>
             </Wrapper>

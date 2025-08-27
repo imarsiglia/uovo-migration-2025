@@ -1,5 +1,5 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {useCallback} from 'react';
+import {useCallback, useState} from 'react';
 import {Alert, StyleSheet, View} from 'react-native';
 // import {useTabHomeContext} from '../provider/TabHomeContext';
 // import {useUserContext} from '../provider/UserContext';
@@ -34,12 +34,28 @@ import {TimelineView} from './TimelineView';
 import Icon from 'react-native-fontawesome-pro';
 import useGeneralStore from '@store/general';
 import {ParamListBase, TabNavigationState} from '@react-navigation/native';
+import {useGetCalendar, useGetTimeline} from '@api/hooks/HooksJobServices';
+import {useIsFetching, useQueryClient} from '@tanstack/react-query';
+import {QUERY_KEYS} from '@api/contants/constants';
+import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {useMinBusy} from '@hooks/useMinBusy';
 
 const Tab = createMaterialTopTabNavigator();
 
 export const HomeScreen = () => {
   const {isFilterActive, timelinePressed, setTimelinePressed, setActiveTab} =
     useGeneralStore();
+  const selectedDate = useGeneralStore((d) => d.selectedDate);
+  const [isRefetching, setIsRefetching] = useState(false);
+  // const {isFetchingAny, isRefetchingAny, refetchAll} = useRefreshIndicator([
+  //   [QUERY_KEYS.TIMELINE, selectedDate],
+  //   [QUERY_KEYS.CALENDAR],
+  // ]);
+
+  const {refetch: refetchCalendar} = useGetCalendar();
+  const {refetch: refetchTimeline} = useGetTimeline(selectedDate);
+
+  const loading = useMinBusy(isRefetching, 1000);
 
   // useEffect(() => {
   //   createIdsInventory();
@@ -104,7 +120,6 @@ export const HomeScreen = () => {
   // }
 
   const onPressTab = useCallback((state: TabNavigationState<ParamListBase>) => {
-    Alert.alert('hola');
     setTimeout(() => {
       setActiveTab(state.index);
     }, 100);
@@ -114,7 +129,13 @@ export const HomeScreen = () => {
     setTimelinePressed(!timelinePressed);
   }, [timelinePressed]);
 
-  const syncro = useCallback(() => {}, []);
+  const syncro = useCallback(() => {
+    setIsRefetching(true);
+    return Promise.all([refetchCalendar(), refetchTimeline()])
+      .then(() => {})
+      .catch(() => {})
+      .finally(() => setIsRefetching(false));
+  }, [refetchCalendar, refetchTimeline]);
 
   return (
     <Wrapper style={GLOBAL_STYLES.safeAreaLight}>
@@ -131,7 +152,7 @@ export const HomeScreen = () => {
                 disabled={false}
                 onPress={syncro}
                 style={[styles.btnSync, {backgroundColor: COLORS.primary}]}>
-                <SpinningIcon size={17} spin />
+                <SpinningIcon size={17} spin={loading} />
               </PressableOpacity>
             </Wrapper>
           </Wrapper>

@@ -1,35 +1,39 @@
 import {COLORS} from '@styles/colors';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {ActivityIndicator, Alert, StyleSheet, View} from 'react-native';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
 
 import {
   PAUSED_STATUS,
   STARTED_STATUS,
   WO_DEFAULT_NAME,
+  WO_TYPE_PLACEHOLDER,
 } from '@api/contants/constants';
 import {useGetCalendar, useGetTimeline} from '@api/hooks/HooksJobServices';
 import {JobType} from '@api/types/Jobs';
 import {PlaceholderCard} from '@components/timeline/PlaceholderCard';
 import {TimelineCard} from '@components/timeline/TimelineCard';
+import {useOnline} from '@hooks/useOnline';
 import {useAuth} from '@store/auth';
 import useGeneralStore from '@store/general';
 import {getFormattedDate} from '@utils/functions';
 import {Agenda, DateData} from 'react-native-calendars';
 import {FAIconType} from 'src/types/general';
+import {Label} from '@components/commons/text/Label';
 
 export const TimelineView = () => {
-  const [selectedDate, setSelectedDate] = useState<string | null>(
-    getFormattedDate(new Date(), 'YYYY-MM-DD'),
-  );
-
   const refAgenda = useRef<any>(null);
   const sessionUser = useAuth((d) => d.user);
-  const {isFilterActive, timelinePressed} = useGeneralStore();
+  const {isFilterActive, timelinePressed, selectedDate, setSelectedDate} =
+    useGeneralStore();
+  const {online} = useOnline();
 
   const {data: dataCalendar, isLoading: isLoadingCalendar} = useGetCalendar();
-  const {data: dataTimeline, isLoading: isLoadingTimeline} = useGetTimeline(
-    selectedDate!,
-  );
+
+  const {
+    data: dataTimeline,
+    isLoading: isLoadingTimeline,
+    isRefetching: isRefetchingTimeline,
+  } = useGetTimeline(selectedDate!);
 
   useEffect(() => {
     collapseAgenda();
@@ -56,13 +60,13 @@ export const TimelineView = () => {
 
   const handleItemPress = useCallback((id: string) => {}, []);
 
-  function onDayPress(date: DateData, sync = false) {
+  function onDayPress(date: DateData) {
     setSelectedDate(date.dateString);
   }
 
   const renderItem = useCallback(
     (item: JobType & {__dateFmt?: string; statusOwn?: boolean}) =>
-      item.type == 'job' ? (
+      item.type == WO_TYPE_PLACEHOLDER ? (
         <PlaceholderCard
           title_instructions={item.wo_title}
           instructions={item.wo_title}
@@ -99,9 +103,10 @@ export const TimelineView = () => {
           wo_type={item.job_type_desc}
           jobQueue={false}
           isFilterActive={isFilterActive}
+          isOnline={online}
         />
       ),
-    [handleItemPress, isFilterActive],
+    [handleItemPress, isFilterActive, online],
   );
 
   const renderDay = useCallback(() => <></>, []);
@@ -112,7 +117,7 @@ export const TimelineView = () => {
   const renderEmptyData = useCallback(
     () => (
       <View style={styles.emptyData}>
-        {isLoadingTimeline && (
+        {(isLoadingTimeline || isRefetchingTimeline) && (
           <ActivityIndicator
             style={{position: 'absolute', top: '30%', left: 0, right: 0}}
             size="large"
@@ -121,7 +126,7 @@ export const TimelineView = () => {
         )}
       </View>
     ),
-    [isLoadingTimeline],
+    [isLoadingTimeline, isRefetchingTimeline],
   );
 
   const renderKnob = useCallback(() => <View style={styles.knobAgenda} />, []);
@@ -130,9 +135,9 @@ export const TimelineView = () => {
     () => ({
       agendaKnobColor: 'blue',
       dayTextColor: '#3C424A',
-      dotColor: '#CA65FF',
-      selectedDayBackgroundColor: '#487EFD',
-      selectedDotColor: '#FFF565',
+      dotColor: COLORS.dotColor,
+      selectedDayBackgroundColor: COLORS.primaryDark,
+      selectedDotColor: COLORS.selectedDotColor,
     }),
     [],
   );
@@ -181,29 +186,27 @@ export const TimelineView = () => {
     }, {});
   }, [dataTimeline, isFilterActive, sessionUser?.user_id]);
 
-  if (isLoadingCalendar) {
-    return <View style={styles.emptyData} />;
-    // <LoadingModal isVisible={loadingInitial} />
-  }
+  // if (isLoadingCalendar) {
+  //   return <View style={styles.emptyData} />;
+  //   // <LoadingModal isVisible={loadingInitial} />
+  // }
 
   return (
-    <>
-      <Agenda
-        ref={refAgenda}
-        markedDates={markedDates}
-        items={formattedItems}
-        onDayPress={onDayPress}
-        pastScrollRange={6}
-        futureScrollRange={12}
-        renderDay={renderDay}
-        renderEmptyDate={renderEmptyDate}
-        renderKnob={renderKnob}
-        renderItem={renderItem}
-        renderEmptyData={renderEmptyData}
-        theme={theme}
-        style={styles.agenda}
-      />
-    </>
+    <Agenda
+      ref={refAgenda}
+      markedDates={markedDates}
+      items={formattedItems}
+      onDayPress={onDayPress}
+      pastScrollRange={6}
+      futureScrollRange={12}
+      renderDay={renderDay}
+      renderEmptyDate={renderEmptyDate}
+      renderKnob={renderKnob}
+      renderItem={renderItem}
+      renderEmptyData={renderEmptyData}
+      theme={theme}
+      style={styles.agenda}
+    />
   );
 };
 

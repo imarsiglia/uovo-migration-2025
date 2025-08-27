@@ -41,7 +41,6 @@ export const useAuth = create<AuthState>()(
       },
 
       clearSession: () => {
-        console.log("clearSession")
         if (logoutTimer) clearTimeout(logoutTimer);
         logoutTimer = null;
         set({token: null, user: null});

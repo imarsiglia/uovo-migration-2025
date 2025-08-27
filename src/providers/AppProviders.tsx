@@ -1,14 +1,16 @@
 // AppProviders.tsx
-import React from 'react';
+import React, {useEffect} from 'react';
 import NetInfo from '@react-native-community/netinfo';
-import { QueryClient, QueryClientProvider, onlineManager } from '@tanstack/react-query';
-import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
-import { mmkvPersister } from '@api/storage/react-query-mmkv';
+import {QueryClient, focusManager, onlineManager} from '@tanstack/react-query';
+import {PersistQueryClientProvider} from '@tanstack/react-query-persist-client';
+import {mmkvPersister} from '@api/storage/react-query-mmkv';
+import {QUERY_KEYS} from '@api/contants/constants';
+import {AppState, AppStateStatus} from 'react-native';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000,        // 5 min “fresh”
+      staleTime: 5 * 60 * 1000, // 5 min “fresh”
       gcTime: 30 * 24 * 60 * 60 * 1000, // 30 días en memoria
       retry: 1,
       refetchOnReconnect: true,
@@ -26,7 +28,18 @@ onlineManager.setEventListener((setOnline) => {
   return unsub;
 });
 
-export default function AppProviders({ children }: { children: React.ReactNode }) {
+function useReactQueryFocusOnAppState() {
+  useEffect(() => {
+    const onChange = (status: AppStateStatus) => {
+      focusManager.setFocused(status === 'active');
+    };
+    const sub = AppState.addEventListener('change', onChange);
+    return () => sub.remove();
+  }, []);
+}
+
+export default function AppProviders({children}: {children: React.ReactNode}) {
+  useReactQueryFocusOnAppState();
   return (
     <PersistQueryClientProvider
       client={queryClient}
@@ -39,18 +52,18 @@ export default function AppProviders({ children }: { children: React.ReactNode }
         dehydrateOptions: {
           shouldDehydrateQuery: (q) => {
             // Ejemplo: guarda solo queries exitosas del calendario
-            const isCalendar = Array.isArray(q.queryKey) && q.queryKey[0] === 'CALENDAR';
+            const areSomeKeys =
+              Array.isArray(q.queryKey) &&
+              (q.queryKey[0] === QUERY_KEYS.CALENDAR ||
+                q.queryKey[0] === QUERY_KEYS.TIMELINE);
             const isSuccess = q.state.status === 'success';
-            return isCalendar && isSuccess;
+            return areSomeKeys && isSuccess;
           },
         },
         // Limpia el cache persistido si cambias la “versión” de datos:
-        buster: 'app-v1', // cambia a 'app-v2' tras cambios de schema o logout
-      }}
-    >
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
+        buster: 'app-v2', // cambia a 'app-v2' tras cambios de schema o logout
+      }}>
+      {children}
     </PersistQueryClientProvider>
   );
 }

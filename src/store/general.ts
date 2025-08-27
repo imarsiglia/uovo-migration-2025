@@ -1,3 +1,4 @@
+import { getFormattedDate } from '@utils/functions';
 import {create} from 'zustand';
 
 export type GeneralStore = {
@@ -7,6 +8,8 @@ export type GeneralStore = {
   setActiveTab: (tab: number) => void;
   timelinePressed?: boolean;
   setTimelinePressed: (pressed: boolean) => void;
+  selectedDate?: string;
+  setSelectedDate: (date: string) => void;
 };
 
 export const useGeneralStore = create<GeneralStore>((set) => ({
@@ -18,6 +21,8 @@ export const useGeneralStore = create<GeneralStore>((set) => ({
   timelinePressed: undefined,
   setTimelinePressed: (pressed) =>
     set((state) => ({...state, timelinePressed: pressed})),
+  selectedDate: getFormattedDate(new Date(), 'YYYY-MM-DD'),
+  setSelectedDate: (date) => set((state) => ({...state, selectedDate: date})),
 }));
 
 export default useGeneralStore;

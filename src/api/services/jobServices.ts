@@ -1,6 +1,6 @@
 import {API_CALENDAR_TIMELINE, API_TIMELINE} from '@api/contants/endpoints';
 import {getRequest} from '@api/helpers/apiClientHelper';
-import { JobType } from '@api/types/Jobs';
+import {JobType} from '@api/types/Jobs';
 
 export type Paginated<T> = {data: T; total: number};
 
