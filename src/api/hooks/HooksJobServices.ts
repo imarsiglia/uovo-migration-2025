@@ -1,6 +1,7 @@
-import { QUERY_KEYS } from '@api/contants/constants';
-import { jobServices } from '@api/services/jobServices';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import {JOBQUEUE_START_DATE, QUERY_KEYS} from '@api/contants/constants';
+import {JobQueueApiProps, jobServices} from '@api/services/jobServices';
+import {keepPreviousData, useQuery} from '@tanstack/react-query';
+import {getFormattedDateWithTimezone} from '@utils/functions';
 
 export const useGetCalendar = (date = new Date()) => {
   const month = date.getMonth() + 1;
@@ -28,5 +29,43 @@ export const useGetTimeline = (date?: string) => {
     // // placeholderData: (prev) => prev,
     placeholderData: keepPreviousData,
     enabled: !!date,
+  });
+};
+
+export const useGetJobQueue = ({
+  totalize = 1,
+  start = 0,
+  limit = 100,
+  filter = '',
+  orderBy,
+  place,
+}: JobQueueApiProps) => {
+  return useQuery({
+    queryKey: [
+      QUERY_KEYS.JOB_QUEUE_LIST,
+      {
+        place,
+        orderBy,
+        filter,
+        totalize,
+        start,
+        limit,
+      },
+    ],
+    queryFn: () =>
+      jobServices.jobqueue({
+        place,
+        orderBy,
+        filter:
+          orderBy === JOBQUEUE_START_DATE
+            ? getFormattedDateWithTimezone(filter, 'YYYY-MM-DD')
+            : filter,
+        totalize,
+        start,
+        limit,
+      }),
+    // staleTime: 5 * 60 * 1000,
+    // gcTime: 1000 * 15,
+    retry: 1,
   });
 };

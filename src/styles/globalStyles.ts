@@ -36,5 +36,43 @@ export const GLOBAL_STYLES = StyleSheet.create({
   bold: {
     fontWeight: 'bold',
   },
+  inputSearch: {
+    borderColor: '#d0d0d0',
+    borderRadius: 10,
+    borderWidth: 0.5,
+    backgroundColor: 'white',
+    fontSize: 10,
+    height: 40,
+    padding: 0,
+    paddingLeft: 10,
+    borderBottomWidth: 0.5,
+  },
+  sizeSearch: {
+    fontSize: 16,
+    color: '#3C424A',
+    opacity: 0.6,
+  },
+   containerInputSearchIcon: {
+    height: '100%',
+    width: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  containerTabContent: {
+    backgroundColor: '#fafafa',
+  },
+  inputDate: {
+    borderColor: '#d0d0d0',
+    borderRadius: 10,
+    borderWidth: 0.5,
+    backgroundColor: 'white',
+    padding: 10,
+    paddingBottom: 0,
+    paddingTop: 0,
+    fontSize: 10,
+    height: 40,
+    paddingRight: 0,
+    borderBottomWidth: 0.5,
+  },
 
 });

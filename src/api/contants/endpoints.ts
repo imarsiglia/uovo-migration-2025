@@ -9,12 +9,14 @@ export const API_REGULAR_LOGIN = `/loginalter`;
 //help desk general
 export const API_CONTACT_US = `/login/helpdesk`;
 export const API_HELPDESK = `/user/helpdesk`;
+export const API__GET_WO_STATUS = `/job/wostatus`;
+export const API__GET_WO_TYPES = `/job/wotypes`;
+export const API__GET_LOCATION_PLACES = `/job/load/locationplaces`;
 
 //jobs
 export const API_CALENDAR_TIMELINE = `/job/calendar`;
 export const API_TIMELINE = `/job/query`;
-
-
+export const API_JOBQUEUE = `/job/queryQueue`;
 
 //NATIONAL SHUTTLE ENDPOINTS
 export const API_GET_LOCATION_PLACES = `${API}${API_CONTEXT}/jobns/load/locationplacesall`

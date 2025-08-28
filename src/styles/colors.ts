@@ -20,7 +20,7 @@ export const COLORS = {
   placeholderInput: '#d0d0d0',
   strokeRed: '#FF0000',
   titleColor: '#3a3a3a',
-  inputTextColor: '#3C424A',
+  inputTextColor: '#5f6369ff',
   statusbar: 'transparent',
   dotColor: '#CA65FF',
   selectedDotColor: '#FFF565',

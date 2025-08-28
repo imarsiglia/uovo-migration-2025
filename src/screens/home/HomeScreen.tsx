@@ -39,6 +39,7 @@ import {useIsFetching, useQueryClient} from '@tanstack/react-query';
 import {QUERY_KEYS} from '@api/contants/constants';
 import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
 import {useMinBusy} from '@hooks/useMinBusy';
+import { JobQueueView } from './JobQueueView';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -187,7 +188,7 @@ export const HomeScreen = () => {
             />
             <Tab.Screen
               name="JobQueue"
-              component={() => <></>}
+              component={JobQueueView}
               options={{tabBarLabel: 'Job Queue'}}
             />
             <Tab.Screen

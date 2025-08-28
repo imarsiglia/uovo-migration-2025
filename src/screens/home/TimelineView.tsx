@@ -1,5 +1,5 @@
 import {COLORS} from '@styles/colors';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {memo, useCallback, useEffect, useMemo, useRef} from 'react';
 import {ActivityIndicator, StyleSheet, View} from 'react-native';
 
 import {
@@ -19,21 +19,20 @@ import {getFormattedDate} from '@utils/functions';
 import {Agenda, DateData} from 'react-native-calendars';
 import {FAIconType} from 'src/types/general';
 import {Label} from '@components/commons/text/Label';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
 
-export const TimelineView = () => {
+export const TimelineViewCmp = () => {
   const refAgenda = useRef<any>(null);
   const sessionUser = useAuth((d) => d.user);
   const {isFilterActive, timelinePressed, selectedDate, setSelectedDate} =
     useGeneralStore();
   const {online} = useOnline();
 
-  const {data: dataCalendar, isLoading: isLoadingCalendar} = useGetCalendar();
+  const {data: dataCalendar} = useGetCalendar();
 
-  const {
-    data: dataTimeline,
-    isLoading: isLoadingTimeline,
-    isRefetching: isRefetchingTimeline,
-  } = useGetTimeline(selectedDate!);
+  const {data: dataTimeline, isLoading: isLoadingTimeline} = useGetTimeline(
+    selectedDate!,
+  );
 
   useEffect(() => {
     collapseAgenda();
@@ -65,10 +64,16 @@ export const TimelineView = () => {
   }
 
   const renderItem = useCallback(
-    (item: JobType & {__dateFmt?: string; statusOwn?: boolean}) =>
+    (
+      item: JobType & {
+        __dateFmt?: string;
+        statusOwn?: boolean;
+        formattedName?: string;
+      },
+    ) =>
       item.type == WO_TYPE_PLACEHOLDER ? (
         <PlaceholderCard
-          title_instructions={item.wo_title}
+          title_instructions={item.instructions}
           instructions={item.wo_title}
           date={item.__dateFmt}
           crUpdate={item.cr_update}
@@ -81,9 +86,7 @@ export const TimelineView = () => {
       ) : (
         <TimelineCard
           id={item.id}
-          name={`${item.wo_order} ${item.client_name?.substring(
-            item.client_name.indexOf(' '),
-          )}`}
+          name={item.formattedName!}
           paused={item.paused}
           prepped={item.prepped}
           statusOwn={item.statusOwn}
@@ -93,7 +96,7 @@ export const TimelineView = () => {
           icon={item.icon}
           iconColor={item.icon_color}
           iconType={item.icon_type as FAIconType}
-          instructions={item.wo_title}
+          instructions={item.instructions}
           item={item.total_items}
           manager={item.account_manager_name}
           onPress={handleItemPress}
@@ -111,25 +114,25 @@ export const TimelineView = () => {
 
   const renderDay = useCallback(() => <></>, []);
   const renderEmptyDate = useCallback(
-    () => <View style={{backgroundColor: '#fafafa', height: '100%'}} />,
+    () => <Wrapper style={{backgroundColor: '#fafafa', height: '100%'}} />,
     [],
   );
   const renderEmptyData = useCallback(
     () => (
-      <View style={styles.emptyData}>
-        {(isLoadingTimeline || isRefetchingTimeline) && (
+      <Wrapper style={styles.emptyData}>
+        {isLoadingTimeline && (
           <ActivityIndicator
             style={{position: 'absolute', top: '30%', left: 0, right: 0}}
             size="large"
             color={COLORS.primary}
           />
         )}
-      </View>
+      </Wrapper>
     ),
-    [isLoadingTimeline, isRefetchingTimeline],
+    [isLoadingTimeline],
   );
 
-  const renderKnob = useCallback(() => <View style={styles.knobAgenda} />, []);
+  const renderKnob = useCallback(() => <Wrapper style={styles.knobAgenda} />, []);
 
   const theme = useMemo(
     () => ({
@@ -180,16 +183,14 @@ export const TimelineView = () => {
         statusOwn: job.crew?.some(
           (x) => x.id_user == sessionUser?.user_id && x.status == PAUSED_STATUS,
         ),
+        formattedName: `${job.wo_order} • ${job.client_name?.substring(
+          job.client_name.indexOf(' '),
+        )}`,
       } as JobType & {__dateFmt: string};
       (acc[key] ??= []).push(withFmt);
       return acc;
     }, {});
   }, [dataTimeline, isFilterActive, sessionUser?.user_id]);
-
-  // if (isLoadingCalendar) {
-  //   return <View style={styles.emptyData} />;
-  //   // <LoadingModal isVisible={loadingInitial} />
-  // }
 
   return (
     <Agenda
@@ -231,3 +232,5 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
+export const TimelineView = memo(TimelineViewCmp);

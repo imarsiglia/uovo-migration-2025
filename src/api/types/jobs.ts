@@ -41,3 +41,9 @@ export type JobType = {
   wo_title: string;
   headcount: number;
 };
+
+export type FormattedJobType = JobType & {
+  __dateFmt?: string;
+  statusOwn?: boolean;
+  formattedName?: string;
+};

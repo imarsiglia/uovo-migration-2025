@@ -3,7 +3,8 @@ import {Alert, Platform} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import * as RNLocalize from 'react-native-localize';
 import moment from 'moment';
-import { AgendaSchedule } from 'react-native-calendars';
+import momentTZ from 'moment-timezone';
+import {AgendaSchedule} from 'react-native-calendars';
 
 export function getFormattedDate(date: string | Date, format?: string) {
   return moment(date).format(format ?? 'DD/MM/YYYY');
@@ -106,7 +107,6 @@ export function showAlertDialogWithOptions(onConfirm: () => void) {
   );
 }
 
-
 export function adaptAgendaItemsToArray(itemsObj: AgendaSchedule) {
   return Object.keys(itemsObj)
     .sort() // ordena por fecha
@@ -117,4 +117,35 @@ export function adaptAgendaItemsToArray(itemsObj: AgendaSchedule) {
         __first: idx === 0, // equivalente a firstItemInDay
       })),
     );
+}
+
+let DEVICE_TZ = 'UTC';
+try {
+  const guessed = momentTZ.tz.guess(); // usa Intl si está disponible
+  if (guessed && guessed !== 'Etc/Unknown') DEVICE_TZ = guessed;
+} catch {
+  /* fallback a UTC */
+}
+
+export const getDeviceTimeZone = () => DEVICE_TZ;
+
+export function getFormattedDateWithTimezone(
+  date: Date | string | number,
+  format = 'DD-MM-YYYY',
+) {
+  // parseZone respeta el offset si viene en el string (ej: "2025-08-27T18:30:00-05:00")
+  // Si no trae offset, lo trata como local y luego lo convierte a la zona del dispositivo.
+  return moment.parseZone(date).tz(DEVICE_TZ).format(format);
+}
+
+export function debounce<F extends (...args: any[]) => void>(callback: F, delay: number): (...args: Parameters<F>) => void {
+  // @ts-ignore
+  let timeoutId: NodeJS.Timeout;
+
+  return (...args: Parameters<F>) => {
+    clearTimeout(timeoutId); // Limpiar el timeout anterior
+    timeoutId = setTimeout(() => {
+      callback(...args); // Ejecutar el callback después del retraso
+    }, delay);
+  };
 }
