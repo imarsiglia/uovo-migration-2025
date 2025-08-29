@@ -1,9 +1,10 @@
+import { NSItemListType } from '@api/types/Jobs';
 import {QueryObserverResult, RefetchOptions} from '@tanstack/react-query';
 import {create} from 'zustand';
 
 export type NationalShuttleStore = {
-  inventoryList?: [];
-  setInventoryList: (val: []) => void;
+  inventoryList?: NSItemListType[];
+  setInventoryList: (val: NSItemListType[]) => void;
   fetchInventory?: () => (options?: RefetchOptions) => Promise<QueryObserverResult<any, Error>>;
   setFetchInventory: (val: () => (options?: RefetchOptions) => Promise<QueryObserverResult<any, Error>>) => void;
   isInventoryMode?: boolean;

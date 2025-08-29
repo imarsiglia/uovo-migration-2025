@@ -5,6 +5,7 @@ import * as RNLocalize from 'react-native-localize';
 import moment from 'moment';
 import momentTZ from 'moment-timezone';
 import {AgendaSchedule} from 'react-native-calendars';
+import { STATUS_NATIONAL_SHUTTLE, StatusNationalShuttleTye } from '@api/contants/constants';
 
 export function getFormattedDate(date: string | Date, format?: string) {
   return moment(date).format(format ?? 'DD/MM/YYYY');
@@ -148,4 +149,12 @@ export function debounce<F extends (...args: any[]) => void>(callback: F, delay:
       callback(...args); // Ejecutar el callback después del retraso
     }, delay);
   };
+}
+
+export function getItemColorStatus(loadStatus: StatusNationalShuttleTye) {
+  return (
+    STATUS_NATIONAL_SHUTTLE[loadStatus]?.color ??
+    loadStatus?.toLowerCase() ??
+    STATUS_NATIONAL_SHUTTLE.DEFAULT.color
+  );
 }

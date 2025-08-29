@@ -20,7 +20,6 @@ apiClient.interceptors.response.use(
   (res) => res,
   (error) => {
     if (error?.response?.status === 401) {
-      console.log('cerrar session interceptor');
       // token vencido o inválido → cerrar sesión
       authState.clear();
     }

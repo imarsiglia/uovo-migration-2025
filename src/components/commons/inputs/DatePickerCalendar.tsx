@@ -15,6 +15,8 @@ import Icon from 'react-native-fontawesome-pro';
 import { getFormattedDate } from '@utils/functions';
 import { COLORS } from '@styles/colors';
 import { Icons } from '@assets/icons/icons';
+import { PressableOpacity } from '@components/commons/buttons/PressableOpacity';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
 
 export const DatePickerCalendar = ({
   selectedDate = new Date(),
@@ -76,8 +78,8 @@ export const DatePickerCalendar = ({
   };
 
   return (
-    <View>
-      <TouchableOpacity
+    <Wrapper>
+      <PressableOpacity
         style={[
           styles.inputText,
           containerStyles,
@@ -93,7 +95,7 @@ export const DatePickerCalendar = ({
           {isToday ? ' (Today)' : ''}
         </Text>
         <Icons.CalendarIcon color={'#4F46E5'} />
-      </TouchableOpacity>
+      </PressableOpacity>
       <Modal isVisible={isVisible} backdropOpacity={0.5}>
         <View
           style={{
@@ -161,7 +163,7 @@ export const DatePickerCalendar = ({
           </View>
         </View>
       </Modal>
-    </View>
+    </Wrapper>
   );
 };
 
@@ -171,7 +173,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderWidth: 0.5,
     borderRadius: 5,
-    borderColor: '#CECECE',
+    borderColor: COLORS.borderInputColor,
     paddingHorizontal: 8,
     height: 40,
     verticalAlign: 'middle',

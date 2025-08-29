@@ -217,9 +217,6 @@ export const JobQueueViewCmp = () => {
     return new Date(getValueByType(JOBQUEUE_START_DATE) ?? Date.now());
   }, [START_DATE]);
 
-  console.log('selectedDate');
-  console.log(JSON.stringify(selectedDate));
-
   return (
     <Wrapper style={[GLOBAL_STYLES.containerTabContent, styles.container]}>
       <Wrapper style={styles.containerFilterHeader}>

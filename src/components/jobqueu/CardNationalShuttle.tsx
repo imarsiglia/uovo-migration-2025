@@ -9,39 +9,10 @@ import { Icons } from '@assets/icons/icons';
 import { SelectableText } from '@components/commons/text/SelectableText';
 import { BolCountVisualize } from '@components/jobs/bol/BolCountVisualize';
 import ButtonWithIcon from '@components/commons/buttons/ButtonWithIcon';
-
-export enum LOAD_STATUS_NS {
-  UNLOADED = 'UNLOADED',
-  LOADED = 'LOADED',
-  NOITEMS = 'NOITEMS',
-  INPROGRESS = 'INPROGRESS',
-}
-
-export type NationalShuttleItemType = {
-  account_manager_email: string;
-  account_manager_name: string;
-  account_manager_phone: string;
-  client_category: string;
-  client_name: string;
-  client_phone: string;
-  cr_update: boolean;
-  day_of_week: number;
-  id: string;
-  instructions: string;
-  job_type_desc: string;
-  job_type_uuid: string;
-  prepped: boolean;
-  start_date: string;
-  wo: string;
-  wo_status: string;
-  wo_title: string;
-  load_status: LOAD_STATUS_NS;
-  bol_sended: boolean;
-  signature_bol_count: number;
-};
+import { LOAD_STATUS_NS, NSJobType } from '../../api/types/Jobs';
 
 type props = {
-  item: NationalShuttleItemType;
+  item: NSJobType;
   goToTopsheet: () => void;
   onInitSignature: () => void;
   onInitEditPieceCount: () => void;

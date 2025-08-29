@@ -1,4 +1,3 @@
-import {GeneralListApi} from '@api/services/generalServices';
 
 export const QUERY_KEYS = {
   CALENDAR: 'calendar_timeline',
@@ -7,6 +6,19 @@ export const QUERY_KEYS = {
   WO_TYPE_LIST: 'wo_type_list',
   LOCATION_PLACES: 'location_places',
   JOB_QUEUE_LIST: 'job_queue_list',
+  NS_LOCATION_PLACES: "ns_location_places",
+  NS_EAST_COAST_PICKUP: "ns_east_coast_pickup",
+  NS_WEST_COAST_PICKUP: "ns_west_coast_pickup",
+  NS_EAST_COAST_DROPOFF: "ns_east_coast_dropoff",
+  NS_WEST_COAST_DROPOFF: "ns_west_coast_dropoff",
+  NS_INVENTORY_EAST_COAST_PICKUP: "ns_inventory_east_coast_pickup",
+  NS_INVENTORY_WEST_COAST_PICKUP: "ns_inventory_west_coast_pickup",
+  NS_INVENTORY_WEST_COAST_DROPOFF: "ns_inventory_west_coast_dropoff",
+  NS_INVENTORY_EAST_COAST_DROPOFF: "ns_inventory_east_coast_dropoff",
+  NS_UNIQUE_ROUTE_PICKUP: "ns_unique_route_pickup",
+  NS_UNIQUE_ROUTE_DROPOFF: "ns_unique_route_dropoff",
+  NS_INVENTORY_UNIQUE_ROUTE_PICKUP: "ns_inventory_unique_route_pickup",
+  NS_INVENTORY_UNIQUE_ROUTE_DROPOFF: "ns_inventory_unique_route_dropoff",
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';
@@ -101,4 +113,34 @@ export const STATUS_NATIONAL_SHUTTLE = {
   DEFAULT: {
     color: 'gray',
   },
-};
+} as const;
+
+export type StatusNationalShuttleTye = (keyof typeof STATUS_NATIONAL_SHUTTLE);
+
+
+export const FILTER_TYPES_ACTIVITY = [
+  {
+    id: NATIONAL_SHUTTLE_TYPE.EAST_COAST_PICKUP,
+    label: 'East Coast Pickup',
+  },
+  {
+    id: NATIONAL_SHUTTLE_TYPE.EAST_COAST_DROPOFF,
+    label: 'East Coast Dropoff',
+  },
+  {
+    id: NATIONAL_SHUTTLE_TYPE.WEST_COAST_PICKUP,
+    label: 'West Coast Pickup',
+  },
+  {
+    id: NATIONAL_SHUTTLE_TYPE.WEST_COAST_DROPOFF,
+    label: 'West Coast Dropoff',
+  },
+  {
+    id: NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_PICKUP,
+    label: 'Unique Route Pickup',
+  },
+  {
+    id: NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_DROPOFF,
+    label: 'Unique Route Dropoff',
+  },
+];

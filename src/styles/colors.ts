@@ -20,10 +20,11 @@ export const COLORS = {
   placeholderInput: '#d0d0d0',
   strokeRed: '#FF0000',
   titleColor: '#3a3a3a',
-  inputTextColor: '#5f6369ff',
+  inputTextColor: '#8B8C8E',
   statusbar: 'transparent',
   dotColor: '#CA65FF',
   selectedDotColor: '#FFF565',
+  borderInputColor: '#CECECE',
 
   // icons
   pausedIcon: '#ffe041',

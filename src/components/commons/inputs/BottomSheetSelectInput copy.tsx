@@ -1,12 +1,11 @@
 import {
   BottomSheetBackdrop,
   BottomSheetFlatList,
-  BottomSheetFlatListMethods,
   BottomSheetFooter,
   BottomSheetModal,
   BottomSheetTextInput,
 } from '@gorhom/bottom-sheet';
-import { COLORS } from '@styles/colors';
+import {COLORS} from '@styles/colors';
 import React, {
   forwardRef,
   memo,
@@ -17,21 +16,12 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {
-  Animated,
-  Easing,
-  InteractionManager,
-  StyleProp,
-  StyleSheet,
-  TextStyle,
-  View,
-  ViewStyle
-} from 'react-native';
+import {StyleProp, StyleSheet, TextStyle, ViewStyle} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CustomPressable } from '../pressable/CustomPressable';
-import { Label } from '../text/Label';
-import { Wrapper } from '../wrappers/Wrapper';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {CustomPressable} from '../pressable/CustomPressable';
+import {Label} from '../text/Label';
+import {Wrapper} from '../wrappers/Wrapper';
 
 // ---- Types ----
 export type Primitive = string | number | boolean | null | undefined;
@@ -83,9 +73,6 @@ function ensureArray(v?: string | string[] | null): string[] {
   if (!v) return [];
   return Array.isArray(v) ? v : [v];
 }
-
-// Altura de fila para scroll preciso (ajústala si tus filas cambian de alto)
-const ROW_HEIGHT = 52;
 
 function useDraftSelection(
   initial: string[],
@@ -147,13 +134,8 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
 ) {
   const insets = useSafeAreaInsets();
   const modalRef = useRef<BottomSheetModal>(null);
-  const listRef = useRef<BottomSheetFlatListMethods>(null); // ref de la FlatList para scroll
   const [query, setQuery] = useState('');
   const [footerH, setFooterH] = useState(0);
-
-  // Visibilidad con animación
-  const listOpacity = useRef(new Animated.Value(0)).current;
-  const [isListVisible, setIsListVisible] = useState(false);
 
   // Normaliza value controlado
   const selected = ensureArray(value);
@@ -189,31 +171,7 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
     }
     const more = selected.length - names.length;
     return more > 0 ? `${names.join(', ')} +${more}` : names.join(', ');
-  }, [
-    selected,
-    options,
-    idKey,
-    labelKey,
-    multiple,
-    placeholder,
-    maxItemsToShow,
-  ]);
-
-  const resetListVisibility = useCallback(() => {
-    listOpacity.setValue(0);
-    setIsListVisible(false);
-  }, [listOpacity]);
-
-  const fadeInList = useCallback(() => {
-    Animated.timing(listOpacity, {
-      toValue: 1,
-      duration: 300,
-      easing: Easing.out(Easing.quad),
-      useNativeDriver: true,
-    }).start(() => {
-      setIsListVisible(true)
-    });
-  }, [listOpacity]);
+  }, [selected, options, idKey, labelKey, multiple, placeholder]);
 
   const open = useCallback(() => {
     // Al abrir, sincroniza borrador con el value controlado actual
@@ -268,62 +226,6 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
     [draft, idKey, labelKey, multiple, toggle],
   );
 
-  /** ------ AUTO-SCROLL AL SELECCIONADO AL ABRIR ------ */
-  const scrollToIndexSafely = useCallback(
-    (index: number) => {
-      if (index < 0) {
-        fadeInList();
-        return;
-      } // nada seleccionado -> solo mostrar
-      try {
-        // Sin animación para que el usuario no vea el “salto”
-        listRef.current?.scrollToIndex({index, animated: false});
-        // Un frame para asegurar layout y luego mostramos
-        requestAnimationFrame(fadeInList);
-      } catch {
-        // Reintentos por si aún no midió
-        requestAnimationFrame(() => {
-          try {
-            listRef.current?.scrollToIndex({index, animated: false});
-            requestAnimationFrame(fadeInList);
-          } catch {
-            setTimeout(() => {
-              try {
-                listRef.current?.scrollToIndex({index, animated: false});
-              } catch {}
-              fadeInList();
-            }, 30);
-          }
-        });
-      }
-    },
-    [fadeInList],
-  );
-
-  // Índice del primer seleccionado (si multiple, el primero)
-  const firstSelectedIndex = useMemo(() => {
-    const firstId = ensureArray(value)[0];
-    if (!firstId) return -1;
-    return options.findIndex((o) => String(o[idKey]) === String(firstId));
-  }, [value, options, idKey]);
-
-  const toggleVisibility = useCallback(
-    (isOpen: boolean) => {
-      if (isOpen) {
-        setQuery(''); // aseguras que filtered == options
-        // Espera a que termine la animación de apertura y el layout
-        InteractionManager.runAfterInteractions(() => {
-          requestAnimationFrame(() => {
-            scrollToIndexSafely(firstSelectedIndex);
-          });
-        });
-      } else {
-        resetListVisibility();
-      }
-    },
-    [firstSelectedIndex],
-  );
-
   return (
     <>
       <CustomPressable
@@ -353,12 +255,11 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
         ref={modalRef}
         snapPoints={snapPoints}
         enablePanDownToClose
-        enableDynamicSizing={false}
+        enableDynamicSizing={false} // usando % en snapPoints => mejor mantener fijo
         keyboardBehavior="extend"
         keyboardBlurBehavior="restore"
         handleStyle={styles.handle}
         backgroundStyle={styles.sheetBg}
-        onChange={(index) => toggleVisibility(index !== -1)} // <- detecta apertura/cierre
         backdropComponent={(props) => (
           <BottomSheetBackdrop
             {...props}
@@ -366,6 +267,7 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
             disappearsOnIndex={-1}
           />
         )}
+        // Footer FIJO SIEMPRE VISIBLE
         footerComponent={(props) => (
           <BottomSheetFooter {...props}>
             <Wrapper
@@ -415,50 +317,24 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
             )}
           </Wrapper>
 
-          <Animated.View
-            style={{flex: 1, opacity: listOpacity}}
-            pointerEvents={isListVisible ? 'auto' : 'none'}>
-            <BottomSheetFlatList
-              ref={listRef}
-              data={filtered}
-              keyExtractor={keyExtractor}
-              renderItem={renderItem}
-              keyboardDismissMode="on-drag"
-              keyboardShouldPersistTaps="handled"
-              nestedScrollEnabled
-              style={{flex: 1}}
-              contentContainerStyle={
-                filtered.length === 0
-                  ? styles.emptyContainer
-                  : {paddingBottom: footerH + insets.bottom + 8}
-              }
-              ListEmptyComponent={
-                <Label style={styles.emptyText}>No results</Label>
-              }
-              // Scroll preciso y robusto
-              getItemLayout={(_, index) => ({
-                length: ROW_HEIGHT,
-                offset: ROW_HEIGHT * index,
-                index,
-              })}
-              initialScrollIndex={20}
-              onScrollToIndexFailed={(info) => {
-                const est = (info.averageItemLength ?? ROW_HEIGHT) * info.index;
-                listRef.current?.scrollToOffset({
-                  offset: est,
-                  animated: false,
-                });
-                setTimeout(() => {
-                  try {
-                    listRef.current?.scrollToIndex({
-                      index: info.index,
-                      animated: true,
-                    });
-                  } catch {}
-                }, 50);
-              }}
-            />
-          </Animated.View>
+          <BottomSheetFlatList
+            data={filtered}
+            keyExtractor={keyExtractor}
+            renderItem={renderItem}
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
+            nestedScrollEnabled // importante en Android para scroll anidado
+            style={{flex: 1}}
+            contentContainerStyle={
+              filtered.length === 0
+                ? styles.emptyContainer
+                : {paddingBottom: footerH + insets.bottom + 8}
+            }
+            ListEmptyComponent={
+              <Label style={styles.emptyText}>No results</Label>
+            }
+            ListFooterComponentStyle={{}}
+          />
         </Wrapper>
       </BottomSheetModal>
     </>
@@ -515,7 +391,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   row: {
-    minHeight: ROW_HEIGHT, // <- ayuda a getItemLayout
     paddingHorizontal: 16,
     paddingVertical: 12,
     flexDirection: 'row',

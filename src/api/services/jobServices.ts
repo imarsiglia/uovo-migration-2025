@@ -5,8 +5,7 @@ import {
 } from '@api/contants/endpoints';
 import {getRequest, postRequest} from '@api/helpers/apiClientHelper';
 import {JobType} from '@api/types/Jobs';
-
-export type Paginated<T> = {data: T; total: number};
+import { Paginated } from '@api/types/Response';
 
 const calendar = async (month: number, year: number): Promise<string[]> => {
   const response = await getRequest<Paginated<string[]>>(

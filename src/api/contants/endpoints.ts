@@ -1,5 +1,3 @@
-import { API, API_CONTEXT } from '@env';
-
 
 //AUTHENTICATION ENDPOINTS
 export const API_LOGIN = `/login`;
@@ -19,23 +17,23 @@ export const API_TIMELINE = `/job/query`;
 export const API_JOBQUEUE = `/job/queryQueue`;
 
 //NATIONAL SHUTTLE ENDPOINTS
-export const API_GET_LOCATION_PLACES = `${API}${API_CONTEXT}/jobns/load/locationplacesall`
-export const API_GET_EAST_COAST_PICKUP = `${API}${API_CONTEXT}/jobns/eastcoastpickup/query`
-export const API_GET_WEST_COAST_PICKUP = `${API}${API_CONTEXT}/jobns/westcoastpickup/query`
-export const API_GET_WEST_COAST_DROPOFF = `${API}${API_CONTEXT}/jobns/westcoastdropoff/query`
-export const API_GET_EAST_COAST_DROPOFF = `${API}${API_CONTEXT}/jobns/eastcoastdropoff/query`
+export const API_GET_LOCATION_PLACES = `/jobns/load/locationplacesall`
+export const API_GET_EAST_COAST_PICKUP = `/jobns/eastcoastpickup/query`
+export const API_GET_WEST_COAST_PICKUP = `/jobns/westcoastpickup/query`
+export const API_GET_WEST_COAST_DROPOFF = `/jobns/westcoastdropoff/query`
+export const API_GET_EAST_COAST_DROPOFF = `/jobns/eastcoastdropoff/query`
 
-export const API_GET_INVENTORY_EAST_COAST_PICKUP = `${API}${API_CONTEXT}/jobns/inventory/eastcoastpickup/query`
-export const API_GET_INVENTORY_WEST_COAST_PICKUP = `${API}${API_CONTEXT}/jobns/inventory/westcoastpickup/query`
-export const API_GET_INVENTORY_WEST_COAST_DROPOFF = `${API}${API_CONTEXT}/jobns/inventory/westcoastdropoff/query`
-export const API_GET_INVENTORY_EAST_COAST_DROPOFF = `${API}${API_CONTEXT}/jobns/inventory/eastcoastdropoff/query`
+export const API_GET_INVENTORY_EAST_COAST_PICKUP = `/jobns/inventory/eastcoastpickup/query`
+export const API_GET_INVENTORY_WEST_COAST_PICKUP = `/jobns/inventory/westcoastpickup/query`
+export const API_GET_INVENTORY_WEST_COAST_DROPOFF = `/jobns/inventory/westcoastdropoff/query`
+export const API_GET_INVENTORY_EAST_COAST_DROPOFF = `/jobns/inventory/eastcoastdropoff/query`
 
 //UNIQUE ROUTE
-export const API_GET_UNIQUE_ROUTE_PICKUP = `${API}${API_CONTEXT}/jobns/uniqueroutepickup/query`
-export const API_GET_UNIQUE_ROUTE_DROPOFF = `${API}${API_CONTEXT}/jobns/uniqueroutedropoff/query`
+export const API_GET_UNIQUE_ROUTE_PICKUP = `/jobns/uniqueroutepickup/query`
+export const API_GET_UNIQUE_ROUTE_DROPOFF = `/jobns/uniqueroutedropoff/query`
 
-export const API_GET_INVENTORY_UNIQUE_ROUTE_PICKUP = `${API}${API_CONTEXT}/jobns/inventory/uniqueroutepickup/query`
-export const API_GET_INVENTORY_UNIQUE_ROUTE_DROPOFF = `${API}${API_CONTEXT}/jobns/inventory/uniqueroutedropoff/query`
+export const API_GET_INVENTORY_UNIQUE_ROUTE_PICKUP = `/jobns/inventory/uniqueroutepickup/query`
+export const API_GET_INVENTORY_UNIQUE_ROUTE_DROPOFF = `/jobns/inventory/uniqueroutedropoff/query`
 
 
 export const SUCCESS_MESSAGES = {

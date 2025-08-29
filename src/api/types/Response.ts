@@ -4,3 +4,10 @@ export interface ApiResponse<T> {
   message: string;
   service: string;
 }
+
+export type Paginated<T> = {data: T; total: number};
+
+export type GeneralListApi = {
+  id: string;
+  name: string;
+};

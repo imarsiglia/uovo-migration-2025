@@ -1,5 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
-import {memo, useEffect, useMemo, useState} from 'react';
+import {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -27,54 +27,26 @@ import {
 } from '@api/hooks/HooksNationalShuttle';
 // import {SendBOLBottomSheet} from '../../components/bottomSheets/SendBOLBottomSheet';
 
-
-// import {useNationalShuttleContext} from '../../provider/NationalShuttleContext';
-// import {useTabHomeContext} from '../../provider/TabHomeContext';
-// import {useUserContext} from '../../provider/UserContext';
 import {isInternet} from '../../utils/internet';
 // import InventoryViewNationalShuttle from '../../components/nationalShuttle/InventoryViewNationalShuttle';
 import {EmptyCard} from '@components/commons/cards/EmptyCard';
 import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
-import CardNationalShuttle, {
-  NationalShuttleItemType,
-} from '@components/jobqueu/CardNationalShuttle';
+import CardNationalShuttle from '@components/jobqueu/CardNationalShuttle';
 import {getFormattedDate} from '@utils/functions';
 import {CustomSwitch} from '@components/commons/switch/CustomSwitch';
-import { BottomSheetSelectInput } from '@components/commons/inputs/BottomSheetSelectInput';
-import { useDebounce } from '@hooks/useDebounce';
+import {BottomSheetSelectInput} from '@components/commons/inputs/BottomSheetSelectInput';
+import {useDebounce} from '@hooks/useDebounce';
 import useGeneralStore from '@store/general';
-import { DatePickerCalendar } from '@components/commons/inputs/DatePickerCalendar';
-import { CustomInputText } from '@components/commons/inputs/CustomInputText';
+import {DatePickerCalendar} from '@components/commons/inputs/DatePickerCalendar';
+import {CustomInputText} from '@components/commons/inputs/CustomInputText';
 import useNationalShuttleStore from '@store/nationalShuttle';
-import { NATIONAL_SHUTTLE_TYPE } from '@api/contants/constants';
-import { COLORS } from '@styles/colors';
-
-const filterTypes = [
-  {
-    id: NATIONAL_SHUTTLE_TYPE.EAST_COAST_PICKUP,
-    label: 'East Coast Pickup',
-  },
-  {
-    id: NATIONAL_SHUTTLE_TYPE.EAST_COAST_DROPOFF,
-    label: 'East Coast Dropoff',
-  },
-  {
-    id: NATIONAL_SHUTTLE_TYPE.WEST_COAST_PICKUP,
-    label: 'West Coast Pickup',
-  },
-  {
-    id: NATIONAL_SHUTTLE_TYPE.WEST_COAST_DROPOFF,
-    label: 'West Coast Dropoff',
-  },
-  {
-    id: NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_PICKUP,
-    label: 'Unique Route Pickup',
-  },
-  {
-    id: NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_DROPOFF,
-    label: 'Unique Route Dropoff',
-  },
-];
+import {FILTER_TYPES_ACTIVITY, NATIONAL_SHUTTLE_TYPE} from '@api/contants/constants';
+import {COLORS} from '@styles/colors';
+import {NSJobType} from '@api/types/Jobs';
+import { PressableOpacity } from '@components/commons/buttons/PressableOpacity';
+import { Label } from '@components/commons/text/Label';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
+import { InventoryViewNationalShuttle } from '@components/nationalshuttle/InventoryViewNationalShuttle';
 
 type FilterType = {
   type: string;
@@ -87,19 +59,21 @@ type FilterTypeKeys = keyof FilterType;
 
 const NationalShuttleViewCmp = () => {
   const {navigate} = useNavigation();
-  const [list, setList] = useState<NationalShuttleItemType[]>([]);
-  const {inventoryList, setInventoryList, setFetchInventory, isInventoryMode, setIsInventoryMode} =
-    useNationalShuttleStore();
-    
-
-  // const [inventoryList, setInventoryList] = useState<NSItemListType[]>([]);
+  const [list, setList] = useState<NSJobType[] | undefined>([]);
+  const {
+    inventoryList,
+    setInventoryList,
+    setFetchInventory,
+    isInventoryMode,
+    setIsInventoryMode,
+  } = useNationalShuttleStore();
 
   //send BOL
   const [isVisibleSendBOL, setIsVisibleSendBOL] = useState(false);
   const [jobDetail, setJobDetail] = useState<any>({});
   const [canFetchJobQueue, setCanFetchJobQueue] = useState(false);
 
-  const activeTab = useGeneralStore(d => d.activeTab)
+  const activeTab = useGeneralStore((d) => d.activeTab);
 
   const [filter, setFilter] = useState<FilterType>({
     type: NATIONAL_SHUTTLE_TYPE.EAST_COAST_PICKUP,
@@ -114,105 +88,105 @@ const NationalShuttleViewCmp = () => {
     useGetLocationPlaces();
 
   const {refetch: getEastCoastPickup, isFetching: isFetchingEastCoast} =
-    useGetEastCoastPickup(
-      `date=${getFormattedDate(filter.date, 'YYYY-MM-DD')}${
-        filter.serviceLocation ? `&location=${filter.serviceLocation}` : ''
-      }${filterWoNumber.trim() == '' ? '' : `&wo_number=${filterWoNumber}`}`,
-    );
+    useGetEastCoastPickup({
+      date: filter.date,
+      location: filter.serviceLocation,
+      wo_number: filterWoNumber,
+    });
 
   const {refetch: getWestCoastPickup, isFetching: isFetchingWestCoastPickup} =
-    useGetWestCoastPickup(
-      `date=${getFormattedDate(filter.date, 'YYYY-MM-DD')}${
-        filter.serviceLocation ? `&location=${filter.serviceLocation}` : ''
-      }${filterWoNumber.trim() == '' ? '' : `&wo_number=${filterWoNumber}`}`,
-    );
+    useGetWestCoastPickup({
+      date: filter.date,
+      location: filter.serviceLocation,
+      wo_number: filterWoNumber,
+    });
 
   const {refetch: getWestCoastDropoff, isFetching: isFetchingWestCoastDropoff} =
-    useGetWestCoastDropoff(
-      `date=${getFormattedDate(filter.date, 'YYYY-MM-DD')}${
-        filter.serviceLocation ? `&location=${filter.serviceLocation}` : ''
-      }${filterWoNumber.trim() == '' ? '' : `&wo_number=${filterWoNumber}`}`,
-    );
+    useGetWestCoastDropoff({
+      date: filter.date,
+      location: filter.serviceLocation,
+      wo_number: filterWoNumber,
+    });
 
   const {refetch: getEastCoastDropoff, isFetching: isFetchingEastCoastDropoff} =
-    useGetEastCoastDropoff(
-      `date=${getFormattedDate(filter.date, 'YYYY-MM-DD')}${
-        filter.serviceLocation ? `&location=${filter.serviceLocation}` : ''
-      }${filterWoNumber.trim() == '' ? '' : `&wo_number=${filterWoNumber}`}`,
-    );
+    useGetEastCoastDropoff({
+      date: filter.date,
+      location: filter.serviceLocation,
+      wo_number: filterWoNumber,
+    });
 
   const {
     refetch: getInventoryEastCoastPickup,
     isFetching: isFetchingInventoryEastCoast,
-  } = useGetInventoryEastCoastPickup(
-    `date=${getFormattedDate(filter.date, 'YYYY-MM-DD')}${
-      filter.serviceLocation ? `&location=${filter.serviceLocation}` : ''
-    }${filterWoNumber.trim() == '' ? '' : `&wo_number=${filterWoNumber}`}`,
-  );
+  } = useGetInventoryEastCoastPickup({
+    date: filter.date,
+    location: filter.serviceLocation,
+    wo_number: filterWoNumber,
+  });
 
   const {
     refetch: getInventoryWestCoastPickup,
     isFetching: isFetchingInventoryWestCoastPickup,
-  } = useGetInventoryWestCoastPickup(
-    `date=${getFormattedDate(filter.date, 'YYYY-MM-DD')}${
-      filter.serviceLocation ? `&location=${filter.serviceLocation}` : ''
-    }${filterWoNumber.trim() == '' ? '' : `&wo_number=${filterWoNumber}`}`,
-  );
+  } = useGetInventoryWestCoastPickup({
+    date: filter.date,
+    location: filter.serviceLocation,
+    wo_number: filterWoNumber,
+  });
 
   const {
     refetch: getInventoryWestCoastDropoff,
     isFetching: isFetchingInventoryWestCoastDropoff,
-  } = useGetInventoryWestCoastDropoff(
-    `date=${getFormattedDate(filter.date, 'YYYY-MM-DD')}${
-      filter.serviceLocation ? `&location=${filter.serviceLocation}` : ''
-    }${filterWoNumber.trim() == '' ? '' : `&wo_number=${filterWoNumber}`}`,
-  );
+  } = useGetInventoryWestCoastDropoff({
+    date: filter.date,
+    location: filter.serviceLocation,
+    wo_number: filterWoNumber,
+  });
 
   const {
     refetch: getInventoryEastCoastDropoff,
     isFetching: isFetchingInventoryEastCoastDropoff,
-  } = useGetInventoryEastCoastDropoff(
-    `date=${getFormattedDate(filter.date, 'YYYY-MM-DD')}${
-      filter.serviceLocation ? `&location=${filter.serviceLocation}` : ''
-    }${filterWoNumber.trim() == '' ? '' : `&wo_number=${filterWoNumber}`}`,
-  );
+  } = useGetInventoryEastCoastDropoff({
+    date: filter.date,
+    location: filter.serviceLocation,
+    wo_number: filterWoNumber,
+  });
 
   //unique route
   const {
     refetch: getUniqueRoutePickup,
     isFetching: isFetchingUniqueRoutePickup,
-  } = useGetUniqueRoutePickup(
-    `date=${getFormattedDate(filter.date, 'YYYY-MM-DD')}${
-      filter.serviceLocation ? `&location=${filter.serviceLocation}` : ''
-    }${filterWoNumber.trim() == '' ? '' : `&wo_number=${filterWoNumber}`}`,
-  );
+  } = useGetUniqueRoutePickup({
+    date: filter.date,
+    location: filter.serviceLocation,
+    wo_number: filterWoNumber,
+  });
 
   const {
     refetch: getUniqueRouteDropoff,
     isFetching: isFetchingUniqueRouteDropoff,
-  } = useGetUniqueRouteDropoff(
-    `date=${getFormattedDate(filter.date, 'YYYY-MM-DD')}${
-      filter.serviceLocation ? `&location=${filter.serviceLocation}` : ''
-    }${filterWoNumber.trim() == '' ? '' : `&wo_number=${filterWoNumber}`}`,
-  );
+  } = useGetUniqueRouteDropoff({
+    date: filter.date,
+    location: filter.serviceLocation,
+    wo_number: filterWoNumber,
+  });
 
   const {
     refetch: getInventoryUniqueRoutePickup,
     isFetching: isFetchingInventoryUniqueRoutePickup,
-  } = useGetInventoryUniqueRoutePickup(
-    `date=${getFormattedDate(filter.date, 'YYYY-MM-DD')}${
-      filter.serviceLocation ? `&location=${filter.serviceLocation}` : ''
-    }${filterWoNumber.trim() == '' ? '' : `&wo_number=${filterWoNumber}`}`,
-  );
+  } = useGetInventoryUniqueRoutePickup({
+    date: filter.date,
+    location: filter.serviceLocation,
+    wo_number: filterWoNumber,
+  });
 
   const {
     refetch: getInventoryUniqueRouteDropoff,
     isFetching: isFetchingInventoryUniqueRouteDropoff,
-  } = useGetInventoryUniqueRouteDropoff(
-    `date=${getFormattedDate(filter.date, 'YYYY-MM-DD')}${
-      filter.serviceLocation ? `&location=${filter.serviceLocation}` : ''
-    }${filterWoNumber.trim() == '' ? '' : `&wo_number=${filterWoNumber}`}`,
-  );
+  } = useGetInventoryUniqueRouteDropoff({
+    date: filter.date,
+    location: filter.serviceLocation,
+    wo_number: filterWoNumber,
+  });
 
   const onChangeFilter = (value: any, key: FilterTypeKeys) => {
     setFilter({...filter, [key]: value});
@@ -283,40 +257,40 @@ const NationalShuttleViewCmp = () => {
       switch (filter.type) {
         case NATIONAL_SHUTTLE_TYPE.EAST_COAST_PICKUP:
           const {data: eastCoastPickup} = await getInventoryEastCoastPickup();
-          setInventoryList(eastCoastPickup);
+          setInventoryList(eastCoastPickup!);
           setFetchInventory(() => getInventoryEastCoastPickup);
           break;
         case NATIONAL_SHUTTLE_TYPE.WEST_COAST_PICKUP:
           const {data: westCoastPickup} = await getInventoryWestCoastPickup();
-          setInventoryList(westCoastPickup);
+          setInventoryList(westCoastPickup!);
           setFetchInventory(() => getInventoryWestCoastPickup);
           break;
         case NATIONAL_SHUTTLE_TYPE.EAST_COAST_DROPOFF:
           const {data: eastCoastDropoff} = await getInventoryEastCoastDropoff();
-          setInventoryList(eastCoastDropoff);
+          setInventoryList(eastCoastDropoff!);
           setFetchInventory(() => getInventoryEastCoastDropoff);
           break;
         case NATIONAL_SHUTTLE_TYPE.WEST_COAST_DROPOFF:
           const {data: weastCoastDropoff} =
             await getInventoryWestCoastDropoff();
-          setInventoryList(weastCoastDropoff);
+          setInventoryList(weastCoastDropoff!);
           setFetchInventory(() => getInventoryWestCoastDropoff);
           break;
         case NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_PICKUP:
           const {data: uniqueRoutePickup} =
             await getInventoryUniqueRoutePickup();
-          setInventoryList(uniqueRoutePickup);
+          setInventoryList(uniqueRoutePickup!);
           break;
         case NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_DROPOFF:
           const {data: uniqueRouteDropoff} =
             await getInventoryUniqueRouteDropoff();
-          setInventoryList(uniqueRouteDropoff);
+          setInventoryList(uniqueRouteDropoff!);
           break;
       }
     }
   }
 
-  const goToTopSheet = async (item: NationalShuttleItemType) => {
+  const goToTopSheet = async (item: NSJobType) => {
     const isConnected = await isInternet();
     let selectedDate = getFormattedDate(filter.date, 'YYYY-MM-DD');
     let scheduleDate = getFormattedDate(
@@ -347,57 +321,46 @@ const NationalShuttleViewCmp = () => {
     });
   };
 
-  function onInitSignature(idJob: string) {
-    setTimeout(() => {
-      // props.dispatch(JobActions.copy({id: idJob}));
+  const onInitSignature = useCallback((idJob: number) => {
+    // props.dispatch(JobActions.copy({id: idJob}));
       //@ts-ignore
       navigate('Signature', {
         refresh: syncro,
       });
-    }, 100);
-  }
+  }, [])
 
-  function onInitEditPieceCount(idJob: string) {
-    setTimeout(() => {
-      // props.dispatch(JobActions.copy({id: idJob}));
-      //@ts-ignore
-      navigate('EditBOL');
-    }, 100);
-  }
+  const onInitEditPieceCount = useCallback((idJob: number) => {
+    // props.dispatch(JobActions.copy({id: idJob}));
+    //@ts-ignore
+    navigate('EditBOL');
+  }, [])
 
-  async function onInitSendBOL(job: NationalShuttleItemType) {
-    setTimeout(() => {
-      setJobDetail(job);
-      setIsVisibleSendBOL(true);
-    }, 400);
-  }
+  const onInitSendBOL = useCallback((job: NSJobType) => {
+    setJobDetail(job);
+    setIsVisibleSendBOL(true);
+  }, []);
 
-  function showFullList() {
+  const showFullList = useCallback(() => {
     //@ts-ignore
     navigate('InventoryNS', {
       initialList: inventoryList,
     });
-  }
-
+  }, []);
   const customLocationPlaces = useMemo(() => {
-    if (locationPlaces?.length > 0) {
-      return [
-        // {value: null, label: 'All locations'},
-        // ...locationPlaces?.map((item) => ({
-        //   value: item.id,
-        //   label: item.name?.trim(),
-        // })),
-      ];
-    } else {
-      return [{value: null, label: 'All locations'}];
-    }
+    return [
+      {id: null, name: 'All locations'},
+      ...(locationPlaces?.map((item) => ({
+        ...item,
+        name: item.name?.trim(),
+      })) ?? []),
+    ];
   }, [locationPlaces]);
 
   return (
-    <View
+    <Wrapper
       style={{display: 'flex', flexGrow: 1, flex: 0, flexDirection: 'column'}}>
       {isLoadingLocationPlaces && <GeneralLoading />}
-      <View
+      <Wrapper
         style={{
           paddingHorizontal: 10,
           display: 'flex',
@@ -409,63 +372,56 @@ const NationalShuttleViewCmp = () => {
           horizontal
           contentContainerStyle={{gap: 10, paddingBottom: 5, paddingTop: 10}}
           showsHorizontalScrollIndicator={false}>
-          {filterTypes.map((option, index) => (
-            <TouchableOpacity
+          {FILTER_TYPES_ACTIVITY.map((option, index) => (
+            <PressableOpacity
               key={index}
               style={[
                 styles.filterType,
                 option.id == filter.type ? styles.selectedType : {},
               ]}
               onPress={() => onChangeFilter(option.id, 'type')}>
-              <Text
+              <Label
                 style={[
                   styles.typeText,
                   option.id == filter.type ? styles.selectedTypeText : {},
                 ]}>
                 {option.label}
-              </Text>
-            </TouchableOpacity>
+              </Label>
+            </PressableOpacity>
           ))}
         </ScrollView>
-        <View style={{display: 'flex', flexDirection: 'row', gap: 10}}>
-          <View style={{flex: 1}}>
+        <Wrapper style={{display: 'flex', flexDirection: 'row', gap: 10}}>
+          <Wrapper style={{flex: 1}}>
             <DatePickerCalendar
               selectedDate={filter.date}
               onSelectDate={(date) => onChangeFilter(date, 'date')}
               containerStyles={{height: 34}}
               inputTextStyles={{fontSize: 12}}
             />
-          </View>
-          <View style={{flex: 1}}>
+          </Wrapper>
+          <Wrapper style={{flex: 1}}>
             <BottomSheetSelectInput
-              searchable={false}
               options={customLocationPlaces}
-              label="Status"
-              placeholder="All"
+              snapPoints={['95%']}
+              label="Search service location"
+              placeholder="Select service location"
               value={filter.serviceLocation}
-              onChange={(val) =>
-                onChangeFilter(val, 'serviceLocation')
-              }
+              onChange={(val) => onChangeFilter(val, 'serviceLocation')}
+              containerStyle={{
+                minHeight: 34,
+              }}
+              inputTextStyle={{fontSize: 12}}
             />
-            {/* <InputSelect
-              options={customLocationPlaces}
-              value={filter.serviceLocation}
-              onSelect={(value) => onChangeFilter(value, 'serviceLocation')}
-              // placeholder="All locations"
-              containerStyles={{height: 34}}
-              inputTextStyles={{fontSize: 12}}
-              noSelectablePlaceholder="Select service location"
-            /> */}
-          </View>
-        </View>
-        <View
+          </Wrapper>
+        </Wrapper>
+        <Wrapper
           style={{
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
             gap: 10,
           }}>
-          <View style={{flex: 1}}>
+          <Wrapper style={{flex: 1}}>
             <CustomInputText
               placeholder="Search WO number..."
               textAlignVertical="center"
@@ -475,13 +431,17 @@ const NationalShuttleViewCmp = () => {
                 fontSize: 12,
                 paddingHorizontal: 8,
                 paddingVertical: 0,
+                borderWidth: 0.5,
+                borderColor: COLORS.borderInputColor,
+                borderRadius: 5,
               }}
               keyboardType="number-pad"
+              placeholderTextColor={COLORS.inputTextColor}
               onChangeText={(text: string) => onChangeFilter(text, 'woNumber')}
             />
-          </View>
+          </Wrapper>
 
-          <View
+          <Wrapper
             style={{
               flex: 1,
             }}>
@@ -491,9 +451,9 @@ const NationalShuttleViewCmp = () => {
               isEnabled={isInventoryMode!}
               onToggle={(val) => setIsInventoryMode(val)}
             />
-          </View>
-        </View>
-      </View>
+          </Wrapper>
+        </Wrapper>
+      </Wrapper>
 
       {(isFetchingEastCoast ||
         isFetchingWestCoastDropoff ||
@@ -511,12 +471,12 @@ const NationalShuttleViewCmp = () => {
       )}
 
       {filter?.serviceLocation == '-1' ? (
-        <View style={{marginTop: 10}}>
+        <Wrapper style={{marginTop: 10}}>
           <EmptyCard text="Select a Route, Date, and Service Location above to view results." />
-        </View>
+        </Wrapper>
       ) : !isInventoryMode ? (
         <FlatList
-          contentContainerStyle={{gap: 20, padding: 10, paddingBottom: 250}}
+          contentContainerStyle={{gap: 20, padding: 10, paddingBottom: 150}}
           style={{marginBottom: 20}}
           data={list}
           ListEmptyComponent={<EmptyCard text="No jobs found" />}
@@ -533,11 +493,10 @@ const NationalShuttleViewCmp = () => {
           )}
         />
       ) : (
-        <></>
-        // <InventoryViewNationalShuttle
-        //   onShowFullList={showFullList}
-        //   list={inventoryList}
-        // />
+        <InventoryViewNationalShuttle
+          onShowFullList={showFullList}
+          list={inventoryList}
+        />
       )}
 
       {/* <SendBOLBottomSheet
@@ -547,7 +506,7 @@ const NationalShuttleViewCmp = () => {
         jobDetail={jobDetail}
         onFinishSendBol={syncro}
       /> */}
-    </View>
+    </Wrapper>
   );
 };
 

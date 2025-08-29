@@ -112,7 +112,6 @@ const DrawImage = (props: Props) => {
 
   const updateImage = (data: string, path: string) => {
     let tempDate = data.replace(/(\r\n|\n|\r)/gm, '');
-    console.log('navigate');
     navigate(
       RoutesNavigation.ContactUs,
       {

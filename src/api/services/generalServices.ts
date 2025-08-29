@@ -7,7 +7,7 @@ import {
   SUCCESS_MESSAGES,
 } from '@api/contants/endpoints';
 import {getRequest, postRequest} from '@api/helpers/apiClientHelper';
-import { Paginated } from './jobServices';
+import { GeneralListApi, Paginated } from '@api/types/Response';
 
 type PropsContactUs = {
   title: string;
@@ -33,10 +33,6 @@ const helpDesk = async (props: PropsHelpDesk): Promise<boolean> => {
   return response.message == SUCCESS_MESSAGES.SUCCESS;
 };
 
-export type GeneralListApi = {
-  id: string;
-  name: string;
-};
 const getWoStatusList = async (): Promise<string[]> => {
   const response = await getRequest<Paginated<string[]>>(API__GET_WO_STATUS);
   return response.body?.data;
