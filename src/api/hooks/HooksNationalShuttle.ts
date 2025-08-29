@@ -1,5 +1,5 @@
 import {useQuery} from '@tanstack/react-query';
-import { NSEndpoints } from '../endpoints/NSEndpoints';
+import {NSEndpoints} from '../endpoints/NSEndpoints';
 
 export const useGetLocationPlaces = () => {
   return useQuery({
@@ -19,7 +19,7 @@ export const useGetEastCoastPickup = (param: string) => {
     gcTime: 0,
     select({data}) {
       return data?.body?.data ?? [];
-    }
+    },
   });
 };
 
@@ -31,7 +31,7 @@ export const useGetWestCoastPickup = (param: string) => {
     gcTime: 0,
     select({data}) {
       return data?.body?.data ?? [];
-    }
+    },
   });
 };
 
@@ -43,7 +43,7 @@ export const useGetWestCoastDropoff = (param: string) => {
     gcTime: 0,
     select({data}) {
       return data?.body?.data ?? [];
-    }
+    },
   });
 };
 
@@ -55,10 +55,9 @@ export const useGetEastCoastDropoff = (param: string) => {
     gcTime: 0,
     select({data}) {
       return data?.body?.data ?? [];
-    }
+    },
   });
 };
-
 
 export const useGetInventoryEastCoastPickup = (param: string) => {
   return useQuery({
@@ -68,7 +67,7 @@ export const useGetInventoryEastCoastPickup = (param: string) => {
     gcTime: 0,
     select({data}) {
       return data?.body?.data ?? [];
-    }
+    },
   });
 };
 
@@ -80,7 +79,7 @@ export const useGetInventoryWestCoastPickup = (param: string) => {
     gcTime: 0,
     select({data}) {
       return data?.body?.data ?? [];
-    }
+    },
   });
 };
 
@@ -92,7 +91,7 @@ export const useGetInventoryWestCoastDropoff = (param: string) => {
     gcTime: 0,
     select({data}) {
       return data?.body?.data ?? [];
-    }
+    },
   });
 };
 
@@ -104,7 +103,7 @@ export const useGetInventoryEastCoastDropoff = (param: string) => {
     gcTime: 0,
     select({data}) {
       return data?.body?.data ?? [];
-    }
+    },
   });
 };
 
@@ -116,7 +115,7 @@ export const useGetUniqueRoutePickup = (param: string) => {
     gcTime: 0,
     select({data}) {
       return data?.body?.data ?? [];
-    }
+    },
   });
 };
 
@@ -128,7 +127,7 @@ export const useGetUniqueRouteDropoff = (param: string) => {
     gcTime: 0,
     select({data}) {
       return data?.body?.data ?? [];
-    }
+    },
   });
 };
 
@@ -137,7 +136,10 @@ export const useGetInventoryUniqueRoutePickup = (param: string) => {
     refetchOnMount: false,
     queryKey: [`inventory_unique_route_pickup`],
     queryFn: () => NSEndpoints.getInventoryUniqueRoutePickup(param),
-    gcTime: 0
+    gcTime: 0,
+    select({data}) {
+      return data?.body?.data ?? [];
+    },
   });
 };
 
@@ -149,6 +151,6 @@ export const useGetInventoryUniqueRouteDropoff = (param: string) => {
     gcTime: 0,
     select({data}) {
       return data?.body?.data ?? [];
-    }
+    },
   });
 };

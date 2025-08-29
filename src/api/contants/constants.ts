@@ -72,3 +72,33 @@ export const DEFAULT_WO_TYPE_LIST: string[] = [
   'Shipping Service',
   'Trash Disposal',
 ];
+
+export const FILTER_WO_ACTIVE = 'WO_ACTIVE';
+
+// NATIONAL SHUTTLE
+export const NATIONAL_SHUTTLE_TYPE = {
+  EAST_COAST_PICKUP: 'east_coast_pickup',
+  WEST_COAST_PICKUP: 'west_coast_pickup',
+  EAST_COAST_DROPOFF: 'east_coast_dropoff',
+  WEST_COAST_DROPOFF: 'west_coast_dropoff',
+  UNIQUE_ROUTE_PICKUP: 'unique_route_pickup',
+  UNIQUE_ROUTE_DROPOFF: 'unique_route_dropoff',
+};
+
+export const STATUS_NATIONAL_SHUTTLE = {
+  UNLOADED: {
+    color: '#FE4F4F',
+  },
+  LOADED: {
+    color: '#4FFE76',
+  },
+  INPROGRESS: {
+    color: '#EEDC42',
+  },
+  NOITEMS: {
+    color: 'transparent',
+  },
+  DEFAULT: {
+    color: 'gray',
+  },
+};

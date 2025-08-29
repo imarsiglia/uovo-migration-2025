@@ -1,4 +1,5 @@
 import {
+  FILTER_WO_ACTIVE,
   JOB_QUEUE_FILTER_LIST,
   JOBQUEUE_CLIENT,
   JOBQUEUE_ORDER_BY_TYPES,
@@ -84,12 +85,11 @@ export const JobQueueViewCmp = () => {
     data: jobqueueLista,
     isLoading: isLoadingJobQueue,
     isRefetching: isRefetchingJobQueue,
-    isFetching,
     refetch,
   } = useGetJobQueue({
     orderBy,
     place: serviceLocation,
-    filter,
+    filter: !isFilterActive ? filter : FILTER_WO_ACTIVE,
   });
 
   const hideDatePicker = useCallback(() => {
@@ -217,8 +217,8 @@ export const JobQueueViewCmp = () => {
     return new Date(getValueByType(JOBQUEUE_START_DATE) ?? Date.now());
   }, [START_DATE]);
 
-  console.log("selectedDate")
-  console.log(JSON.stringify(selectedDate))
+  console.log('selectedDate');
+  console.log(JSON.stringify(selectedDate));
 
   return (
     <Wrapper style={[GLOBAL_STYLES.containerTabContent, styles.container]}>

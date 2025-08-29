@@ -67,7 +67,7 @@ export default function AppProviders({children}: {children: React.ReactNode}) {
             },
           },
           // Limpia el cache persistido si cambias la “versión” de datos:
-          buster: 'app-v4', // cambia a 'app-v2' tras cambios de schema o logout
+          buster: 'app-v5', // cambia a 'app-v2' tras cambios de schema o logout
         }}>
         {children}
       </PersistQueryClientProvider>

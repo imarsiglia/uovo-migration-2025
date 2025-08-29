@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 export function useMinBusy(isActive: boolean, minMs = 1000) {
   const [busy, setBusy] = useState(false);
   const deadlineRef = useRef<number | null>(null);
-  const timerRef = useRef<null>(null);
+  const timerRef = useRef<any>(null);
 
   useEffect(() => {
     const now = Date.now();

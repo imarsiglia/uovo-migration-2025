@@ -1,27 +1,7 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {useCallback, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import {Alert, StyleSheet, View} from 'react-native';
-// import {useTabHomeContext} from '../provider/TabHomeContext';
-// import {useUserContext} from '../provider/UserContext';
-// import mstyles from '../styles/styles';
-// import {COLORS, URL_API} from '../utils/constants';
-// import {fetchData} from '../utils/fetch';
 // import {removeAllStorageOffline} from '../utils/functions';
-// import {isInternet} from '../utils/internet';
-// import {
-//   getFromStorageOffline,
-//   IDS_INVENTORY_KEY_STORAGE,
-//   OFFLINE_MATERIALS_KEY_STORAGE,
-//   PACKING_DETAILS_KEY_STORAGE,
-//   removeMultiFromStorage,
-//   saveToStorageOffline,
-//   TOKEN_KEY_STORAGE,
-//   USER_INFO_KEY_STORAGE,
-// } from '../utils/storage';
-// import JobQueueView from './home/JobQueueView';
-// import TimelineView from './home/TimelineView';
-import {useSharedValue, withTiming} from 'react-native-reanimated';
-// import NationalShuttleView from './home/NationalShuttleView';
 import {HomeFloatingAction} from '@components/floating/HomeFloatingAction';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
@@ -34,27 +14,52 @@ import {TimelineView} from './TimelineView';
 import Icon from 'react-native-fontawesome-pro';
 import useGeneralStore from '@store/general';
 import {ParamListBase, TabNavigationState} from '@react-navigation/native';
-import {useGetCalendar, useGetTimeline} from '@api/hooks/HooksJobServices';
-import {useIsFetching, useQueryClient} from '@tanstack/react-query';
-import {QUERY_KEYS} from '@api/contants/constants';
-import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {
+  useGetCalendar,
+  useGetJobQueue,
+  useGetTimeline,
+} from '@api/hooks/HooksJobServices';
+import {FILTER_WO_ACTIVE} from '@api/contants/constants';
 import {useMinBusy} from '@hooks/useMinBusy';
-import { JobQueueView } from './JobQueueView';
+import {JobQueueView} from './JobQueueView';
+import {useJobQueueStore} from '@store/jobqueue';
+import { NationalShuttleView } from './NationalShuttleView';
 
 const Tab = createMaterialTopTabNavigator();
 
 export const HomeScreen = () => {
-  const {isFilterActive, timelinePressed, setTimelinePressed, setActiveTab} =
-    useGeneralStore();
+  const {
+    isFilterActive,
+    timelinePressed,
+    setTimelinePressed,
+    setActiveTab,
+    activeTab,
+  } = useGeneralStore();
   const selectedDate = useGeneralStore((d) => d.selectedDate);
+  const {
+    orderBy,
+    serviceLocation,
+    getValueByType,
+    CLIENT,
+    START_DATE,
+    STATUS,
+    WOTYPE,
+    WO_NUMBER,
+  } = useJobQueueStore();
   const [isRefetching, setIsRefetching] = useState(false);
-  // const {isFetchingAny, isRefetchingAny, refetchAll} = useRefreshIndicator([
-  //   [QUERY_KEYS.TIMELINE, selectedDate],
-  //   [QUERY_KEYS.CALENDAR],
-  // ]);
 
   const {refetch: refetchCalendar} = useGetCalendar();
   const {refetch: refetchTimeline} = useGetTimeline(selectedDate);
+
+  const filter = useMemo(() => {
+    return getValueByType(orderBy);
+  }, [getValueByType, CLIENT, START_DATE, STATUS, WOTYPE, WO_NUMBER, orderBy]);
+
+  const {refetch: refetchJobQueue} = useGetJobQueue({
+    orderBy,
+    place: serviceLocation,
+    filter: !isFilterActive ? filter : FILTER_WO_ACTIVE,
+  });
 
   const loading = useMinBusy(isRefetching, 1000);
 
@@ -132,11 +137,19 @@ export const HomeScreen = () => {
 
   const syncro = useCallback(() => {
     setIsRefetching(true);
-    return Promise.all([refetchCalendar(), refetchTimeline()])
-      .then(() => {})
-      .catch(() => {})
-      .finally(() => setIsRefetching(false));
-  }, [refetchCalendar, refetchTimeline]);
+    let refetchPromise: Promise<unknown>;
+    switch (activeTab) {
+      case 0: // timeline
+        refetchPromise = Promise.all([refetchCalendar(), refetchTimeline()]);
+        break;
+      case 1: // jobqueue
+        refetchPromise = refetchJobQueue();
+        break;
+      default:
+        refetchPromise = Promise.resolve(); // evita que sea undefined
+    }
+    return refetchPromise.finally(() => setIsRefetching(false));
+  }, [activeTab, refetchCalendar, refetchTimeline, refetchJobQueue]);
 
   return (
     <Wrapper style={GLOBAL_STYLES.safeAreaLight}>
@@ -193,7 +206,7 @@ export const HomeScreen = () => {
             />
             <Tab.Screen
               name="NationalShuttle"
-              component={() => <></>}
+              component={NationalShuttleView}
               options={{tabBarLabel: 'National Shuttle'}}
             />
           </Tab.Navigator>
