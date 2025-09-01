@@ -1,5 +1,9 @@
 import {JOBQUEUE_START_DATE, QUERY_KEYS} from '@api/contants/constants';
-import {JobQueueApiProps, jobServices} from '@api/services/jobServices';
+import {
+  JobQueueApiProps,
+  jobServices,
+  TopSheetApiProps,
+} from '@api/services/jobServices';
 import {keepPreviousData, useQuery} from '@tanstack/react-query';
 import {getFormattedDateWithTimezone} from '@utils/functions';
 
@@ -63,5 +67,17 @@ export const useGetJobQueue = ({
         limit,
       }),
     retry: 1,
+  });
+};
+
+export const useGetTopsheet = (props: TopSheetApiProps) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.TOPSHEET, props],
+    queryFn: () => jobServices.topsheet(props),
+    staleTime: 0,
+    // staleTime: 5 * 60 * 1000,
+    gcTime: 7 * 24 * 60 * 60 * 1000,
+    retry: 1,
+    placeholderData: keepPreviousData,
   });
 };

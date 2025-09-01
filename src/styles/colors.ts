@@ -25,6 +25,8 @@ export const COLORS = {
   dotColor: '#CA65FF',
   selectedDotColor: '#FFF565',
   borderInputColor: '#CECECE',
+  tobTapTextInactive: "#9e9e9e",
+  subtitleColor: '#3C424A',
 
   // icons
   pausedIcon: '#ffe041',

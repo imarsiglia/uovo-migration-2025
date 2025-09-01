@@ -19,9 +19,9 @@ import {getFormattedDate} from '@utils/functions';
 import {Agenda, DateData} from 'react-native-calendars';
 import {FAIconType} from 'src/types/general';
 import {Label} from '@components/commons/text/Label';
-import { Wrapper } from '@components/commons/wrappers/Wrapper';
-import { useCustomNavigation } from '@hooks/useCustomNavigation';
-import { RoutesNavigation } from '@navigation/types';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {RoutesNavigation} from '@navigation/types';
 
 export const TimelineViewCmp = () => {
   const refAgenda = useRef<any>(null);
@@ -29,7 +29,7 @@ export const TimelineViewCmp = () => {
   const {isFilterActive, timelinePressed, selectedDate, setSelectedDate} =
     useGeneralStore();
   const {online} = useOnline();
-  const {navigate} = useCustomNavigation()
+  const {navigate} = useCustomNavigation();
 
   const {data: dataCalendar} = useGetCalendar();
 
@@ -61,7 +61,7 @@ export const TimelineViewCmp = () => {
   }, []);
 
   const handleItemPress = useCallback((id: string) => {
-    navigate(RoutesNavigation.Topsheet)
+    navigate(RoutesNavigation.Topsheet, {id, queue: 0});
   }, []);
 
   function onDayPress(date: DateData) {
@@ -137,7 +137,10 @@ export const TimelineViewCmp = () => {
     [isLoadingTimeline],
   );
 
-  const renderKnob = useCallback(() => <Wrapper style={styles.knobAgenda} />, []);
+  const renderKnob = useCallback(
+    () => <Wrapper style={styles.knobAgenda} />,
+    [],
+  );
 
   const theme = useMemo(
     () => ({

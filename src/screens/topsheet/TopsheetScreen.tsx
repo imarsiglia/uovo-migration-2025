@@ -1,164 +1,220 @@
-import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {useCallback, useMemo, useState} from 'react';
-import {Alert, StyleSheet, View} from 'react-native';
-// import {removeAllStorageOffline} from '../utils/functions';
-import {HomeFloatingAction} from '@components/floating/HomeFloatingAction';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {Wrapper} from '@components/commons/wrappers/Wrapper';
-import {COLORS} from '@styles/colors';
-import {Label} from '@components/commons/text/Label';
-import {URL_API} from '@api/config/apiClient';
+import {FILTER_WO_ACTIVE} from '@api/contants/constants';
+import {useGetJobQueue, useGetTopsheet} from '@api/hooks/HooksJobServices';
+import {BackButton} from '@components/commons/buttons/BackButton';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {SpinningIcon} from '@components/commons/spin/SpinningIcon';
-import Icon from 'react-native-fontawesome-pro';
-import useGeneralStore from '@store/general';
-import {ParamListBase, TabNavigationState} from '@react-navigation/native';
-import {
-  useGetCalendar,
-  useGetJobQueue,
-  useGetTimeline,
-} from '@api/hooks/HooksJobServices';
-import {FILTER_WO_ACTIVE} from '@api/contants/constants';
+import {Label} from '@components/commons/text/Label';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {TeamAvatars} from '@components/jobs/crew/TeamAvatars';
+import TopSheetSkeleton from '@components/skeletons/TopSheetSkeleton';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {useMinBusy} from '@hooks/useMinBusy';
+import {useOnline} from '@hooks/useOnline';
+import {RootStackParamList, RoutesNavigation} from '@navigation/types';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import {
+  ParamListBase,
+  TabNavigationState,
+  useNavigation,
+} from '@react-navigation/native';
+import {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
+import useGeneralStore from '@store/general';
 import {useJobQueueStore} from '@store/jobqueue';
-import {BackButton} from '@components/commons/buttons/BackButton';
+import useTopSheetStore from '@store/topsheet';
+import {COLORS} from '@styles/colors';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {deriveVisualState} from '@utils/functions';
+import {useCallback, useEffect, useMemo, useState} from 'react';
+import {StyleSheet, View} from 'react-native';
+import Icon from 'react-native-fontawesome-pro';
+import {ResumeTopsheet} from './ResumeTopsheet';
 
 const Tab = createMaterialTopTabNavigator();
 
-export const TopsheetScreen = () => {
+type Props = NativeStackScreenProps<RootStackParamList, 'Topsheet'>;
+
+export const TopsheetScreen = ({route}: Props) => {
+  const {online} = useOnline();
+  const {navigate, goBack} = useCustomNavigation();
+  const {setJobDetail, setActiveTab} = useTopSheetStore();
+  const loading = false;
+
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
   const {
-    isFilterActive,
-    timelinePressed,
-    setTimelinePressed,
-    setActiveTab,
-    activeTab,
-  } = useGeneralStore();
-  const selectedDate = useGeneralStore((d) => d.selectedDate);
-  const {
-    orderBy,
-    serviceLocation,
-    getValueByType,
-    CLIENT,
-    START_DATE,
-    STATUS,
-    WOTYPE,
-    WO_NUMBER,
-  } = useJobQueueStore();
-  const [isRefetching, setIsRefetching] = useState(false);
+    params: {id, queue},
+  } = route;
 
-  const {refetch: refetchCalendar} = useGetCalendar();
-  const {refetch: refetchTimeline} = useGetTimeline(selectedDate);
-
-  const filter = useMemo(() => {
-    return getValueByType(orderBy);
-  }, [getValueByType, CLIENT, START_DATE, STATUS, WOTYPE, WO_NUMBER, orderBy]);
-
-  const {refetch: refetchJobQueue} = useGetJobQueue({
-    orderBy,
-    place: serviceLocation,
-    filter: !isFilterActive ? filter : FILTER_WO_ACTIVE,
+  const {data: jobDetail, isLoading} = useGetTopsheet({
+    id,
+    queue,
   });
 
-  const loading = useMinBusy(isRefetching, 1000);
+  useEffect(() => {
+    setJobDetail(jobDetail);
 
-  const onPressTab = useCallback((state: TabNavigationState<ParamListBase>) => {
-    setTimeout(() => {
-      setActiveTab(state.index);
-    }, 100);
-  }, []);
+    return () => {
+      setJobDetail(undefined);
+    };
+  }, [jobDetail]);
 
-  const onPressTimelineTab = useCallback(() => {
-    setTimelinePressed(!timelinePressed);
-  }, [timelinePressed]);
+  // const loading = useMinBusy(isRefetching, 1000);
 
   const syncro = useCallback(() => {
-    setIsRefetching(true);
-    let refetchPromise: Promise<unknown>;
-    switch (activeTab) {
-      case 0: // timeline
-        refetchPromise = Promise.all([refetchCalendar(), refetchTimeline()]);
-        break;
-      case 1: // jobqueue
-        refetchPromise = refetchJobQueue();
-        break;
-      default:
-        refetchPromise = Promise.resolve(); // evita que sea undefined
-    }
-    return refetchPromise.finally(() => setIsRefetching(false));
-  }, [activeTab, refetchCalendar, refetchTimeline, refetchJobQueue]);
+    // setIsRefetching(true);
+    // let refetchPromise: Promise<unknown>;
+    // switch (activeTab) {
+    //   case 0: // timeline
+    //     refetchPromise = Promise.all([refetchCalendar(), refetchTimeline()]);
+    //     break;
+    //   case 1: // jobqueue
+    //     refetchPromise = refetchJobQueue();
+    //     break;
+    //   default:
+    //     refetchPromise = Promise.resolve(); // evita que sea undefined
+    // }
+    // return refetchPromise.finally(() => setIsRefetching(false));
+    // }, [activeTab, refetchCalendar, refetchTimeline, refetchJobQueue]);
+  }, []);
+
+  const {visual, label} = useMemo(
+    () =>
+      deriveVisualState({
+        offline: !online,
+        currentClockInStatus: jobDetail?.current_clock_in?.status,
+        woStatus: jobDetail?.wo_status,
+      }),
+    [online, jobDetail?.current_clock_in?.status, jobDetail?.wo_status],
+  );
+
+  const goToTeamMember = useCallback(() => {
+    navigate(RoutesNavigation.Topsheet, {
+      id,
+      queue,
+      screen: 'TasksTopSheet',
+    } as never);
+  }, [jobDetail?.id]);
+
+  const onPressTab = useCallback((tab: TabNavigationState<ParamListBase>) => {
+    setActiveTab(tab.index);
+  }, [] )
 
   return (
     <Wrapper style={GLOBAL_STYLES.safeAreaLight}>
       <Wrapper style={[{flexGrow: 1, backgroundColor: COLORS.bgWhite}]}>
         <Wrapper style={styles.containerHeader}>
-          <BackButton title="Home" onPress={() => {}} />
-          <Wrapper style={{flexDirection: 'row', alignItems: 'center'}}>
+          <BackButton title="Home" onPress={goBack} />
+          <Wrapper style={styles.containerBtnTop}>
             <PressableOpacity
               disabled={false}
               onPress={syncro}
-              style={[styles.btnSync, {backgroundColor: COLORS.primary}]}>
+              style={GLOBAL_STYLES.btnOptTop}>
               <SpinningIcon size={17} spin={loading} />
+            </PressableOpacity>
+
+            {!loading && true && (
+              <PressableOpacity
+                onPress={() => navigate('VisualizePdf')}
+                style={GLOBAL_STYLES.btnOptTop}>
+                <Icon name="file-pdf" color="white" type="solid" size={15} />
+              </PressableOpacity>
+            )}
+
+            <PressableOpacity
+              onPress={() => navigate('DigitalId', {member: false})}
+              style={GLOBAL_STYLES.btnOptTop}>
+              <Icon name="id-badge" color="white" type="solid" size={15} />
             </PressableOpacity>
           </Wrapper>
         </Wrapper>
 
-        <View style={{flex: 1, flexGrow: 1, height: '100%', width: '100%'}}>
-          <Tab.Navigator
-            initialRouteName="Resume"
-            screenListeners={{
-              state: (e) => {
-                onPressTab(e.data.state);
-              },
-            }}
-            screenOptions={{
-              tabBarScrollEnabled: true,
-              tabBarLabelStyle: styles.tabBarLabelStyle,
-              swipeEnabled: false,
-              tabBarInactiveTintColor: COLORS.gray,
-              tabBarGap: 0,
-              tabBarActiveTintColor: COLORS.terteary,
-              tabBarItemStyle: {width: 'auto', paddingHorizontal: 8},
-              tabBarStyle: styles.tabBarStyle,
-              tabBarIndicatorStyle: {
-                backgroundColor: COLORS.terteary,
-                marginBottom: 10,
-              },
-              tabBarPressColor: COLORS.background,
-            }}>
-            <Tab.Screen
-              name="Resume"
-              component={() => (
-                <Wrapper style={{backgroundColor: 'yellow', flex: 1}}>
-                  <Label>Resume</Label>
+        {isLoading ? (
+          <TopSheetSkeleton />
+        ) : (
+          <>
+            <Wrapper style={styles.containerTopsheet}>
+              <Wrapper
+                style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+                <Label
+                  style={[
+                    GLOBAL_STYLES.title,
+                    GLOBAL_STYLES.bold,
+                    styles.topsheet,
+                  ]}>
+                  {jobDetail?.netsuite_order}
+                </Label>
+                <Wrapper
+                  style={[styles.containerState, containerByVisual[visual]]}>
+                  <Label style={[{fontSize: 12}, textByVisual[visual]]}>
+                    {label}
+                  </Label>
                 </Wrapper>
-              )}
-              options={{tabBarLabel: 'Resume'}}
-              listeners={{
-                tabPress: onPressTimelineTab,
-              }}
-            />
-            <Tab.Screen
-              name="Location"
-              component={() => <></>}
-              options={{tabBarLabel: 'Location'}}
-            />
-            <Tab.Screen
-              name="Inventory"
-              component={() => <></>}
-              options={{tabBarLabel: 'Inventory'}}
-            />
-            <Tab.Screen
-              name="Tasks"
-              component={() => <></>}
-              options={{tabBarLabel: 'Tasks'}}
-            />
-            <Tab.Screen
-              name="Team"
-              component={() => <></>}
-              options={{tabBarLabel: 'Team'}}
-            />
-          </Tab.Navigator>
-        </View>
+              </Wrapper>
+              <TeamAvatars
+                crew={jobDetail?.crew ?? []}
+                onPress={goToTeamMember}
+              />
+            </Wrapper>
+
+            <View style={styles.container}>
+              <Tab.Navigator
+                initialRouteName="ResumeTopSheet"
+                screenListeners={{
+                  state: (e) => {
+                    onPressTab(e.data.state);
+                  },
+                }}
+                screenOptions={{
+                  tabBarScrollEnabled: true,
+                  tabBarLabelStyle: styles.tabBarLabelStyle,
+                  swipeEnabled: false,
+                  tabBarInactiveTintColor: COLORS.tobTapTextInactive,
+                  tabBarGap: 0,
+                  tabBarActiveTintColor: COLORS.terteary,
+                  tabBarItemStyle: {width: 'auto', paddingHorizontal: 8},
+                  tabBarStyle: styles.tabBarStyle,
+                  tabBarIndicatorStyle: {
+                    backgroundColor: COLORS.terteary,
+                    marginBottom: 10,
+                    height: 0.5,
+                  },
+                  tabBarPressColor: COLORS.background,
+                  lazy: true,
+                  tabBarAllowFontScaling: false,
+                }}>
+                <Tab.Screen
+                  name="ResumeTopSheet"
+                  component={ResumeTopsheet}
+                  options={{tabBarLabel: 'Resume'}}
+                />
+                <Tab.Screen
+                  name="LocationTopSheet"
+                  component={() => <></>}
+                  options={{tabBarLabel: 'Location'}}
+                />
+                <Tab.Screen
+                  name="InventoryTopSheet"
+                  component={() => <></>}
+                  options={{tabBarLabel: 'Inventory'}}
+                />
+                <Tab.Screen
+                  name="TasksTopSheet"
+                  component={() => <></>}
+                  options={{tabBarLabel: 'Tasks'}}
+                />
+                <Tab.Screen
+                  name="TeamTopSheet"
+                  component={() => <></>}
+                  options={{tabBarLabel: 'Team'}}
+                />
+              </Tab.Navigator>
+            </View>
+          </>
+        )}
       </Wrapper>
     </Wrapper>
   );
@@ -168,49 +224,24 @@ const styles = StyleSheet.create({
   containerHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center', 
+    alignItems: 'center',
     backgroundColor: 'white',
-  },
-  titleHeader: {
-    fontWeight: 'bold',
-    color: COLORS.titleColor,
-    fontSize: 30,
-  },
-  btnSync: {
-    backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    height: 32,
-    width: 32,
-    borderRadius: 999,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  floatingInfoFilter: {
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    backgroundColor: '#dbdbdb',
-    alignItems: 'center',
-    height: 30,
-    justifyContent: 'center',
-    elevation: 10,
+    paddingLeft: 5,
+    paddingRight: 10,
   },
   tabBarLabelStyle: {
-    // fontSize: 14,
     textTransform: 'capitalize',
     flexWrap: 'nowrap',
     paddingHorizontal: 0,
     fontSize: 15,
-    color: '#9e9e9e',
     fontWeight: 'normal',
+    marginVertical: 0,
   },
   tabBarStyle: {
     paddingHorizontal: 0,
     elevation: 1,
-    borderBottomStartRadius: 10,
-    borderBottomEndRadius: 10,
+    borderBottomStartRadius: 5,
+    borderBottomEndRadius: 5,
     overflow: 'hidden',
     borderBottomWidth: 0.5,
     borderEndWidth: 0.5,
@@ -219,4 +250,73 @@ const styles = StyleSheet.create({
     borderRightColor: 'transparent',
     borderBottomColor: COLORS.border,
   },
+  containerBtnTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  container: {
+    flex: 1,
+    flexGrow: 1,
+    height: '100%',
+    width: '100%',
+  },
+  topsheet: {
+    color: COLORS.titleColor,
+  },
+  containerTopsheet: {
+    paddingHorizontal: 10,
+    backgroundColor: COLORS.white,
+  },
+  offline: {
+    backgroundColor: 'black',
+  },
+  inProgress: {
+    backgroundColor: '#DFFAF4',
+  },
+  paused: {
+    backgroundColor: '#F7F5F4',
+  },
+  finished: {
+    backgroundColor: '#FFDCDC',
+  },
+  text_offline: {
+    color: 'white',
+  },
+  inProgress_text: {
+    color: '#50E3C2',
+  },
+  paused_text: {
+    color: '#959595',
+  },
+  finished_text: {
+    color: '#FF6161',
+  },
+  containerState: {
+    borderRadius: 100,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 3,
+  },
 });
+
+const containerByVisual: Record<
+  'offline' | 'inProgress' | 'paused' | 'finished',
+  any
+> = {
+  offline: styles.offline,
+  inProgress: styles.inProgress,
+  paused: styles.paused,
+  finished: styles.finished,
+};
+
+const textByVisual: Record<
+  'offline' | 'inProgress' | 'paused' | 'finished',
+  any
+> = {
+  offline: styles.text_offline,
+  inProgress: styles.inProgress_text,
+  paused: styles.paused_text,
+  finished: styles.finished_text,
+};

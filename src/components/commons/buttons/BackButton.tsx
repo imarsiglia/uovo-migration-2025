@@ -25,10 +25,9 @@ const styles = StyleSheet.create({
   backBtn: {
     flexDirection: 'row',
     opacity: 0.8,
-    paddingLeft: 5,
-    paddingRight: 5,
     height: 40,
     alignItems: 'center',
+    gap: 2
   },
   backBtnText: {
     color: COLORS.gray,

@@ -28,7 +28,9 @@ import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {PlaceholderCard} from '@components/timeline/PlaceholderCard';
 import {TimelineCard} from '@components/timeline/TimelineCard';
 import {FAIconType} from '@generalTypes/general';
+import { useCustomNavigation } from '@hooks/useCustomNavigation';
 import {useOnline} from '@hooks/useOnline';
+import { RoutesNavigation } from '@navigation/types';
 import {useAuth} from '@store/auth';
 import useGeneralStore from '@store/general';
 import {useJobQueueStore} from '@store/jobqueue';
@@ -67,6 +69,8 @@ export const JobQueueViewCmp = () => {
     WOTYPE,
     WO_NUMBER,
   } = useJobQueueStore();
+
+  const {navigate} = useCustomNavigation()
 
   const filter = useMemo(() => {
     return getValueByType(orderBy);
@@ -131,7 +135,13 @@ export const JobQueueViewCmp = () => {
     // props.dispatch(TopSheetActions.copyWoName(item.formatted_client_name));
   }
 
-  const handleItemPress = useCallback((id: string) => {}, []);
+  const handleItemPress = useCallback((id: string) => {
+    console.log(id)
+    navigate(RoutesNavigation.Topsheet, {
+      id,
+      queue: 1
+    })
+  }, []);
 
   const formattedItems = useMemo(() => {
     if (!jobqueueLista?.length) return [];

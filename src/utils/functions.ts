@@ -5,9 +5,12 @@ import * as RNLocalize from 'react-native-localize';
 import moment from 'moment';
 import momentTZ from 'moment-timezone';
 import {AgendaSchedule} from 'react-native-calendars';
-import { STATUS_NATIONAL_SHUTTLE, StatusNationalShuttleTye } from '@api/contants/constants';
+import { FINALIZED_STATUS, PAUSED_STATUS, STARTED_STATUS, STATUS_NATIONAL_SHUTTLE, StatusNationalShuttleTye } from '@api/contants/constants';
 
-export function getFormattedDate(date: string | Date, format?: string) {
+export function getFormattedDate(date?: string | Date | null, format?: string) {
+  if(!date){
+    return "N/A"
+  }
   return moment(date).format(format ?? 'DD/MM/YYYY');
 }
 
@@ -157,4 +160,32 @@ export function getItemColorStatus(loadStatus: StatusNationalShuttleTye) {
     loadStatus?.toLowerCase() ??
     STATUS_NATIONAL_SHUTTLE.DEFAULT.color
   );
+}
+
+export function deriveVisualState({
+  offline,
+  currentClockInStatus,
+  woStatus,
+}: {
+  offline: boolean;
+  currentClockInStatus?: string | null;
+  woStatus?: string | null;
+}) {
+  if (offline) return { visual: 'offline' as const, label: 'Offline' };
+
+  // Prioriza current_clock_in.status si existe
+  const status = currentClockInStatus ?? woStatus ?? null;
+
+  if (!status) return { visual: 'inProgress' as const, label: 'WO Confirmed' };
+
+  switch (status) {
+    case STARTED_STATUS:
+      return { visual: 'inProgress' as const, label: status };
+    case PAUSED_STATUS:
+      return { visual: 'paused' as const, label: status };
+    case FINALIZED_STATUS:
+      return { visual: 'finished' as const, label: status };
+    default:
+      return { visual: 'inProgress' as const, label: status };
+  }
 }

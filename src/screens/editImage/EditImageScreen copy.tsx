@@ -29,7 +29,6 @@ import RNFS from 'react-native-fs';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditImage'>;
-
 export const EditImageScreen = (props: Props) => {
   const dd: any = undefined;
   return (

@@ -19,6 +19,7 @@ export const QUERY_KEYS = {
   NS_UNIQUE_ROUTE_DROPOFF: "ns_unique_route_dropoff",
   NS_INVENTORY_UNIQUE_ROUTE_PICKUP: "ns_inventory_unique_route_pickup",
   NS_INVENTORY_UNIQUE_ROUTE_DROPOFF: "ns_inventory_unique_route_dropoff",
+  TOPSHEET: 'topsheet',
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';
@@ -37,6 +38,15 @@ export const JOBQUEUE_WOTYPE = 'WOTYPE';
 export const JOBQUEUE_CLIENT = 'CLIENT';
 export const JOBQUEUE_START_DATE = 'START_DATE';
 export const JOBQUEUE_WO_NUMBER = 'WO_NUMBER';
+
+// TOPSHEET CREW MEMBER
+export const STARTED_STATUS_CREW = 'STARTED';
+export const PAUSED_STATUS_CREW = 'PAUSED';
+export const FINALIZED_STATUS_CREW = 'FINALIZED';
+export const STARTED_COLOR_CREW = '#00ff00';
+export const PAUSED_COLOR_CREW = '#ffff00';
+export const FINALIZED_COLOR_CREW = '#ff0000';
+export const INITIAL_COLOR_CREW = '#f3f3f3';
 
 export const JOB_QUEUE_FILTER_LIST = [
   {

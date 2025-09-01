@@ -1,4 +1,5 @@
 import {StyleSheet} from 'react-native';
+import { COLORS } from './colors';
 
 export const GLOBAL_STYLES = StyleSheet.create({
   row: {
@@ -73,6 +74,16 @@ export const GLOBAL_STYLES = StyleSheet.create({
     height: 40,
     paddingRight: 0,
     borderBottomWidth: 0.5,
+  },
+  btnOptTop: {
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    height: 27,
+    width: 27,
+    padding: 5,
+    borderRadius: 50,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 
 });

@@ -1,4 +1,3 @@
-import {useNavigation} from '@react-navigation/native';
 import {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {
   ActivityIndicator,
@@ -40,13 +39,18 @@ import useGeneralStore from '@store/general';
 import {DatePickerCalendar} from '@components/commons/inputs/DatePickerCalendar';
 import {CustomInputText} from '@components/commons/inputs/CustomInputText';
 import useNationalShuttleStore from '@store/nationalShuttle';
-import {FILTER_TYPES_ACTIVITY, NATIONAL_SHUTTLE_TYPE} from '@api/contants/constants';
+import {
+  FILTER_TYPES_ACTIVITY,
+  NATIONAL_SHUTTLE_TYPE,
+} from '@api/contants/constants';
 import {COLORS} from '@styles/colors';
 import {NSJobType} from '@api/types/Jobs';
-import { PressableOpacity } from '@components/commons/buttons/PressableOpacity';
-import { Label } from '@components/commons/text/Label';
-import { Wrapper } from '@components/commons/wrappers/Wrapper';
-import { InventoryViewNationalShuttle } from '@components/nationalshuttle/InventoryViewNationalShuttle';
+import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
+import {Label} from '@components/commons/text/Label';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {InventoryViewNationalShuttle} from '@components/nationalshuttle/InventoryViewNationalShuttle';
+import {RoutesNavigation} from '@navigation/types';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
 
 type FilterType = {
   type: string;
@@ -58,7 +62,7 @@ type FilterType = {
 type FilterTypeKeys = keyof FilterType;
 
 const NationalShuttleViewCmp = () => {
-  const {navigate} = useNavigation();
+  const {navigate} = useCustomNavigation();
   const [list, setList] = useState<NSJobType[] | undefined>([]);
   const {
     inventoryList,
@@ -291,14 +295,15 @@ const NationalShuttleViewCmp = () => {
   }
 
   const goToTopSheet = async (item: NSJobType) => {
-    const isConnected = await isInternet();
-    let selectedDate = getFormattedDate(filter.date, 'YYYY-MM-DD');
-    let scheduleDate = getFormattedDate(
-      item.start_date,
-      'dddd MMM DD [•] HH:mm A MMMM YYYY',
-    );
+    // const isConnected = await isInternet();
+    // let selectedDate = getFormattedDate(filter.date, 'YYYY-MM-DD');
+    // let scheduleDate = getFormattedDate(
+    //   item.start_date,
+    //   'dddd MMM DD [•] HH:mm A MMMM YYYY',
+    // );
+    navigate(RoutesNavigation.Topsheet, {id: item.id.toString(), queue: 0});
     // Tuesday Jul 23 • 07:00 AM July 2024
-    const indexOf = item.client_name.indexOf(' ');
+    // const indexOf = item.client_name.indexOf(' ');
     // pendiente logica
     // props.dispatch(
     //   TopSheetActions.copyWoName(
@@ -306,34 +311,34 @@ const NationalShuttleViewCmp = () => {
     //   ),
     // );
     //@ts-ignore
-    navigate('TopSheet', {
-      job: item.id,
-      wo_name:
-        item.wo +
-        ' •' +
-        item.client_name.substring(indexOf, item.client_name?.length),
-      selectedDate: selectedDate,
-      formattedDate: scheduleDate,
-      refreshStatus: syncro,
-      queue: 1,
-      offline: !isConnected,
-      syncroRequests: (() => {}).bind(this),
-    });
+    // navigate('TopSheet', {
+    //   job: item.id,
+    //   wo_name:
+    //     item.wo +
+    //     ' •' +
+    //     item.client_name.substring(indexOf, item.client_name?.length),
+    //   selectedDate: selectedDate,
+    //   formattedDate: scheduleDate,
+    //   refreshStatus: syncro,
+    //   queue: 1,
+    //   offline: !isConnected,
+    //   syncroRequests: (() => {}).bind(this),
+    // });
   };
 
   const onInitSignature = useCallback((idJob: number) => {
     // props.dispatch(JobActions.copy({id: idJob}));
-      //@ts-ignore
-      navigate('Signature', {
-        refresh: syncro,
-      });
-  }, [])
+    //@ts-ignore
+    navigate('Signature', {
+      refresh: syncro,
+    });
+  }, []);
 
   const onInitEditPieceCount = useCallback((idJob: number) => {
     // props.dispatch(JobActions.copy({id: idJob}));
     //@ts-ignore
     navigate('EditBOL');
-  }, [])
+  }, []);
 
   const onInitSendBOL = useCallback((job: NSJobType) => {
     setJobDetail(job);
