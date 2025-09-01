@@ -6,7 +6,7 @@ import {
   BottomSheetModal,
   BottomSheetTextInput,
 } from '@gorhom/bottom-sheet';
-import { COLORS } from '@styles/colors';
+import {COLORS} from '@styles/colors';
 import React, {
   forwardRef,
   memo,
@@ -25,13 +25,13 @@ import {
   StyleSheet,
   TextStyle,
   View,
-  ViewStyle
+  ViewStyle,
 } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CustomPressable } from '../pressable/CustomPressable';
-import { Label } from '../text/Label';
-import { Wrapper } from '../wrappers/Wrapper';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {CustomPressable} from '../pressable/CustomPressable';
+import {Label} from '../text/Label';
+import {Wrapper} from '../wrappers/Wrapper';
 
 // ---- Types ----
 export type Primitive = string | number | boolean | null | undefined;
@@ -211,7 +211,7 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
       easing: Easing.out(Easing.quad),
       useNativeDriver: true,
     }).start(() => {
-      setIsListVisible(true)
+      setIsListVisible(true);
     });
   }, [listOpacity]);
 
@@ -259,9 +259,16 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
           <Label numberOfLines={1} style={styles.rowLabel}>
             {name}
           </Label>
-          <Wrapper style={[styles.checkbox, checked && styles.checkboxChecked]}>
-            {checked ? <Label style={styles.checkboxIcon}>✓</Label> : null}
-          </Wrapper>
+          {multiple ? (
+            <Wrapper
+              style={[styles.checkbox, checked && styles.checkboxChecked]}>
+              {checked ? <Label style={styles.checkboxIcon}>✓</Label> : null}
+            </Wrapper>
+          ) : (
+            <Wrapper style={[styles.radio, checked && styles.radioChecked]}>
+              {checked ? <Label style={styles.radioIcon}>✓</Label> : null}
+            </Wrapper>
+          )}
         </CustomPressable>
       );
     },
@@ -484,8 +491,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: 'white',
     flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
+    alignItems: 'center'
   },
   inputPressed: {opacity: 0.9},
   disabled: {opacity: 0.5},
@@ -542,6 +548,26 @@ const styles = StyleSheet.create({
     borderColor: COLORS.tertearyDark,
   },
   checkboxIcon: {
+    color: 'white',
+    fontWeight: '900',
+    fontSize: 14,
+    lineHeight: 16,
+  },
+  radio: {
+    width: 22,
+    height: 22,
+    borderRadius: 100,
+    borderWidth: 1.5,
+    borderColor: '#CBD5E1',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
+  },
+  radioChecked: {
+    backgroundColor: COLORS.tertearyDark,
+    borderColor: COLORS.tertearyDark,
+  },
+  radioIcon: {
     color: 'white',
     fontWeight: '900',
     fontSize: 14,

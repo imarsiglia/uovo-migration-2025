@@ -81,8 +81,9 @@ import {getDeviceInfo} from '@utils/functions';
 import {isInternet} from '@utils/internet';
 import {LoginScreen} from '../screens/auth/LoginScreen';
 import {RootStackParamList, RoutesNavigation} from './types';
-import { AccountScreen } from '@screens/account/AccountScreen';
-import { configureFontAwesomePro } from 'react-native-fontawesome-pro';
+import {AccountScreen} from '@screens/account/AccountScreen';
+import {configureFontAwesomePro} from 'react-native-fontawesome-pro';
+import {TopsheetScreen} from '@screens/topsheet/TopsheetScreen';
 // import InventoryNS from '../screens/nationalShuttle/InventoryNS';
 
 // LogBox.ignoreLogs([
@@ -91,7 +92,7 @@ import { configureFontAwesomePro } from 'react-native-fontawesome-pro';
 
 enableScreens(true);
 const Stack = createNativeStackNavigator<RootStackParamList>();
-configureFontAwesomePro()
+configureFontAwesomePro();
 
 export const AppNavigation = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -144,6 +145,11 @@ export const AppNavigation = () => {
             />
             <Stack.Screen name={RoutesNavigation.Home} component={HomeScreen} />
             <Stack.Screen
+              name={RoutesNavigation.Topsheet}
+              component={TopsheetScreen}
+            />
+
+            <Stack.Screen
               name={RoutesNavigation.EditImage}
               component={EditImageScreen}
             />
@@ -159,8 +165,6 @@ export const AppNavigation = () => {
               name={RoutesNavigation.Account}
               component={AccountScreen}
             />
-
-            
           </Stack.Navigator>
         </NavigationContainer>
         // <OfflineComponentSync />

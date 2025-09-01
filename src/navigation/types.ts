@@ -8,6 +8,7 @@ export const RoutesNavigation = {
   LoginEmail: 'LoginEmail',
   HelpDesk: 'HelpDesk',
   Account: 'Account',
+  Topsheet: "Topsheet"
 } as const;
 
 // Union de nombres de ruta: "Home" | "ContactUs" | ...
@@ -30,4 +31,5 @@ export type RootStackParamList = {
   [RoutesNavigation.LoginEmail]: undefined;
   [RoutesNavigation.HelpDesk]: undefined;
   [RoutesNavigation.Account]: undefined;
+  [RoutesNavigation.Topsheet]: undefined;
 };

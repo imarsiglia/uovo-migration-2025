@@ -220,7 +220,7 @@ export const JobQueueViewCmp = () => {
   return (
     <Wrapper style={[GLOBAL_STYLES.containerTabContent, styles.container]}>
       <Wrapper style={styles.containerFilterHeader}>
-        <Wrapper style={{paddingHorizontal: 10}}>
+        <Wrapper style={{paddingHorizontal: 10, position: "relative" }}>
           <BottomSheetSelectInput
             options={locationPlaces ?? []}
             label="Search places"
