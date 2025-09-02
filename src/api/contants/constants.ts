@@ -1,4 +1,3 @@
-
 export const QUERY_KEYS = {
   CALENDAR: 'calendar_timeline',
   TIMELINE: 'job_timeline',
@@ -6,20 +5,22 @@ export const QUERY_KEYS = {
   WO_TYPE_LIST: 'wo_type_list',
   LOCATION_PLACES: 'location_places',
   JOB_QUEUE_LIST: 'job_queue_list',
-  NS_LOCATION_PLACES: "ns_location_places",
-  NS_EAST_COAST_PICKUP: "ns_east_coast_pickup",
-  NS_WEST_COAST_PICKUP: "ns_west_coast_pickup",
-  NS_EAST_COAST_DROPOFF: "ns_east_coast_dropoff",
-  NS_WEST_COAST_DROPOFF: "ns_west_coast_dropoff",
-  NS_INVENTORY_EAST_COAST_PICKUP: "ns_inventory_east_coast_pickup",
-  NS_INVENTORY_WEST_COAST_PICKUP: "ns_inventory_west_coast_pickup",
-  NS_INVENTORY_WEST_COAST_DROPOFF: "ns_inventory_west_coast_dropoff",
-  NS_INVENTORY_EAST_COAST_DROPOFF: "ns_inventory_east_coast_dropoff",
-  NS_UNIQUE_ROUTE_PICKUP: "ns_unique_route_pickup",
-  NS_UNIQUE_ROUTE_DROPOFF: "ns_unique_route_dropoff",
-  NS_INVENTORY_UNIQUE_ROUTE_PICKUP: "ns_inventory_unique_route_pickup",
-  NS_INVENTORY_UNIQUE_ROUTE_DROPOFF: "ns_inventory_unique_route_dropoff",
+  NS_LOCATION_PLACES: 'ns_location_places',
+  NS_EAST_COAST_PICKUP: 'ns_east_coast_pickup',
+  NS_WEST_COAST_PICKUP: 'ns_west_coast_pickup',
+  NS_EAST_COAST_DROPOFF: 'ns_east_coast_dropoff',
+  NS_WEST_COAST_DROPOFF: 'ns_west_coast_dropoff',
+  NS_INVENTORY_EAST_COAST_PICKUP: 'ns_inventory_east_coast_pickup',
+  NS_INVENTORY_WEST_COAST_PICKUP: 'ns_inventory_west_coast_pickup',
+  NS_INVENTORY_WEST_COAST_DROPOFF: 'ns_inventory_west_coast_dropoff',
+  NS_INVENTORY_EAST_COAST_DROPOFF: 'ns_inventory_east_coast_dropoff',
+  NS_UNIQUE_ROUTE_PICKUP: 'ns_unique_route_pickup',
+  NS_UNIQUE_ROUTE_DROPOFF: 'ns_unique_route_dropoff',
+  NS_INVENTORY_UNIQUE_ROUTE_PICKUP: 'ns_inventory_unique_route_pickup',
+  NS_INVENTORY_UNIQUE_ROUTE_DROPOFF: 'ns_inventory_unique_route_dropoff',
   TOPSHEET: 'topsheet',
+  GEOLOCATION_ADDRESS: 'geolocation_address',
+  LOCATION_LETSGO: 'location_letsgo',
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';
@@ -125,8 +126,7 @@ export const STATUS_NATIONAL_SHUTTLE = {
   },
 } as const;
 
-export type StatusNationalShuttleTye = (keyof typeof STATUS_NATIONAL_SHUTTLE);
-
+export type StatusNationalShuttleTye = keyof typeof STATUS_NATIONAL_SHUTTLE;
 
 export const FILTER_TYPES_ACTIVITY = [
   {
@@ -152,5 +152,78 @@ export const FILTER_TYPES_ACTIVITY = [
   {
     id: NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_DROPOFF,
     label: 'Unique Route Dropoff',
+  },
+];
+
+
+// location navigation
+export type LatLng = {lat: number; lng: number};
+
+type IOSNavCandidateType = LatLng & {
+  label?: string;
+};
+
+export type IOSNavCandidate = {
+  id: string; // identificador interno
+  name: string; // texto que verá el usuario
+  scheme: string; // p.ej. 'comgooglemaps://'
+  buildURL: (p: LatLng & {label?: string}) => string; // deep link final
+};
+
+export const CANDIDATES_IOS: IOSNavCandidate[] = [
+  {
+    id: 'google-maps',
+    name: 'Google Maps',
+    scheme: 'comgooglemaps://',
+    buildURL: ({lat, lng, label}: IOSNavCandidateType) =>
+      `comgooglemaps://?daddr=${lat},${lng}&directionsmode=driving${
+        label ? `&q=${encodeURIComponent(label)}` : ''
+      }`,
+  },
+  {
+    id: 'waze',
+    name: 'Waze',
+    scheme: 'waze://',
+    buildURL: ({lat, lng}: IOSNavCandidateType) =>
+      `waze://?ll=${lat},${lng}&navigate=yes`,
+  },
+  {
+    id: 'citymapper',
+    name: 'Citymapper',
+    scheme: 'citymapper://',
+    buildURL: ({lat, lng, label}: IOSNavCandidateType) =>
+      `citymapper://directions?endcoord=${lat},${lng}${
+        label ? `&endname=${encodeURIComponent(label)}` : ''
+      }`,
+  },
+  {
+    id: 'yandex',
+    name: 'Yandex Navigator',
+    scheme: 'yandexnavi://',
+    buildURL: ({lat, lng}: IOSNavCandidateType) =>
+      `yandexnavi://build_route_on_map?lat_to=${lat}&lon_to=${lng}`,
+  },
+  {
+    id: 'sygic',
+    name: 'Sygic',
+    scheme: 'com.sygic.aura://',
+    buildURL: ({lat, lng}: IOSNavCandidateType) =>
+      `com.sygic.aura://coordinate|${lat},${lng}?action=drive`,
+  },
+  {
+    id: 'mapsme',
+    name: 'MAPS.ME',
+    scheme: 'mapsme://',
+    buildURL: ({lat, lng, label}: IOSNavCandidateType) =>
+      `mapsme://route?sll=${lat},${lng}&dll=${lat},${lng}${
+        label ? `&daddr=${encodeURIComponent(label)}` : ''
+      }`,
+  },
+  {
+    id: 'tomtom',
+    name: 'TomTom',
+    scheme: 'tomtomhome://',
+    buildURL: ({lat, lng}: IOSNavCandidateType) =>
+      `tomtomhome://geo:action=show&lat=${lat}&long=${lng}`,
   },
 ];

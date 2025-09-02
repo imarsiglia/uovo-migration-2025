@@ -1,9 +1,9 @@
-import { Alert, Platform } from 'react-native';
+import {Alert, Platform} from 'react-native';
 import {
-    openSettings,
-    PERMISSIONS,
-    requestMultiple,
-    RESULTS
+  openSettings,
+  PERMISSIONS,
+  requestMultiple,
+  RESULTS,
 } from 'react-native-permissions';
 
 export const requestMicrophonePermission = async (): Promise<boolean> => {
@@ -37,6 +37,23 @@ export const requestMicrophonePermission = async (): Promise<boolean> => {
       );
       return false;
     }
+  } catch (error) {
+    console.error('Error al solicitar permisos:', error);
+    return false;
+  }
+};
+
+export const requestAccessFineLocationAndroid = async () => {
+  try {
+    const permissions = [
+      PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+      PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION,
+    ];
+    const statuses = await requestMultiple(permissions);
+    const allGranted = permissions.every(
+      (perm) => statuses[perm] === RESULTS.GRANTED,
+    );
+    return allGranted;
   } catch (error) {
     console.error('Error al solicitar permisos:', error);
     return false;

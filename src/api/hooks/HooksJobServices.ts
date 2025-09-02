@@ -2,9 +2,15 @@ import {JOBQUEUE_START_DATE, QUERY_KEYS} from '@api/contants/constants';
 import {
   JobQueueApiProps,
   jobServices,
+  LetsGoApiProps,
   TopSheetApiProps,
 } from '@api/services/jobServices';
-import {keepPreviousData, useQuery} from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useMutation,
+  UseMutationOptions,
+  useQuery,
+} from '@tanstack/react-query';
 import {getFormattedDateWithTimezone} from '@utils/functions';
 
 export const useGetCalendar = (date = new Date()) => {
@@ -29,7 +35,7 @@ export const useGetTimeline = (date?: string) => {
     // staleTime: 5 * 60 * 1000,
     gcTime: 7 * 24 * 60 * 60 * 1000,
     retry: 1,
-    placeholderData: keepPreviousData,
+    // placeholderData: keepPreviousData,
     enabled: !!date,
   });
 };
@@ -78,6 +84,15 @@ export const useGetTopsheet = (props: TopSheetApiProps) => {
     // staleTime: 5 * 60 * 1000,
     gcTime: 7 * 24 * 60 * 60 * 1000,
     retry: 1,
-    placeholderData: keepPreviousData,
+    placeholderData: undefined,
+  });
+};
+
+export const useLetsGo = (
+  props?: UseMutationOptions<unknown, Error, LetsGoApiProps, unknown>,
+) => {
+  return useMutation({
+    mutationFn: (props: LetsGoApiProps) => jobServices.letsGo(props),
+    ...props,
   });
 };

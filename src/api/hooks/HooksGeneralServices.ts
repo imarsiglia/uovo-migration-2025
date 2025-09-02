@@ -1,5 +1,8 @@
-import {useMutation, useQuery} from '@tanstack/react-query';
-import {generalServices} from '@api/services/generalServices';
+import {keepPreviousData, useMutation, useQuery} from '@tanstack/react-query';
+import {
+  EstimatedTimeByLocationProps,
+  generalServices,
+} from '@api/services/generalServices';
 import {
   DEFAULT_WO_STATUS_LIST,
   DEFAULT_WO_TYPE_LIST,
@@ -50,5 +53,36 @@ export const useGetLocationPlaces = () => {
     ...DEFAULT_PERSISTENCE_CONFIG,
     queryKey: [QUERY_KEYS.LOCATION_PLACES],
     queryFn: generalServices.getLocationPlaces,
+  });
+};
+
+export const useGetLatLong = (address?: string | null) => {
+  return useQuery({
+    ...DEFAULT_PERSISTENCE_CONFIG,
+    queryKey: [QUERY_KEYS.GEOLOCATION_ADDRESS, address],
+    queryFn: () => generalServices.getLatLong(address!),
+    enabled: !!address,
+    retry: 2,
+    placeholderData: undefined
+  });
+};
+
+export const useGetEstimatedTimeByLocation = ({
+  showEstimated,
+  ...props
+}: EstimatedTimeByLocationProps & {showEstimated?: boolean}) => {
+  return useQuery({
+    ...DEFAULT_PERSISTENCE_CONFIG,
+    queryKey: [QUERY_KEYS.GEOLOCATION_ADDRESS, props],
+    queryFn: () => generalServices.getEstimatedTimeByLocation(props),
+    enabled:
+      !!props?.fromLat &&
+      !!props?.fromLng &&
+      !!props?.toLat &&
+      !!props?.toLng &&
+      showEstimated,
+    retry: 2,
+    refetchOnMount: false,
+    placeholderData: undefined
   });
 };

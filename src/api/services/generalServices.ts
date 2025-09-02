@@ -6,8 +6,11 @@ import {
   API_HELPDESK,
   SUCCESS_MESSAGES,
 } from '@api/contants/endpoints';
+import {getFetcher} from '@api/general/fetchers';
 import {getRequest, postRequest} from '@api/helpers/apiClientHelper';
-import { GeneralListApi, Paginated } from '@api/types/Response';
+import {GeneralListApi, Paginated} from '@api/types/Response';
+import {cleanAddress} from '@utils/functions';
+import {API_GOOGLE_MAPS} from '@env';
 
 type PropsContactUs = {
   title: string;
@@ -44,8 +47,64 @@ const getWoTypeList = async (): Promise<string[]> => {
 };
 
 const getLocationPlaces = async (): Promise<GeneralListApi[]> => {
-  const response = await getRequest<Paginated<GeneralListApi[]>>(API__GET_LOCATION_PLACES);
+  const response = await getRequest<Paginated<GeneralListApi[]>>(
+    API__GET_LOCATION_PLACES,
+  );
   return response.body?.data;
+};
+
+const getLatLong = async (address: string) => {
+  const response = await getFetcher(
+    `https://maps.googleapis.com/maps/api/geocode/json?key=${API_GOOGLE_MAPS}&address=${encodeURIComponent(
+      cleanAddress(address)!,
+    )}`,
+  );
+  if (!response.data) {
+    throw new Error('Error en la solicitud');
+  }
+  if (response.data.status !== 'OK') {
+    throw new Error('No se encontraron coordenadas');
+  }
+  const location = response.data.results[0].geometry.location;
+  return {
+    latitude: location.lat,
+    longitude: location.lng,
+  };
+};
+
+export type EstimatedTimeByLocationProps = {
+  fromLat: number;
+  fromLng: number;
+  toLat: number;
+  toLng: number;
+};
+
+const getEstimatedTimeByLocation = async ({
+  fromLat,
+  fromLng,
+  toLat,
+  toLng,
+}: EstimatedTimeByLocationProps) => {
+  try {
+    const response = await getFetcher(
+      `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${fromLat},${fromLng}&destinations=${toLat},${toLng}&key=${API_GOOGLE_MAPS}`,
+    );
+    const element = response?.data?.rows?.[0]?.elements?.[0];
+    const duration = element?.duration;
+
+    if (duration?.value) {
+      const minutes = Math.round(duration.value / 60);
+      return {
+        value: minutes,
+        text: duration.text,
+      };
+    }
+
+    return {value: null, text: null};
+  } catch (error) {
+    console.error('Error getting estimated time:', error);
+    return {value: null, text: null};
+  }
 };
 
 export const generalServices = {
@@ -53,5 +112,7 @@ export const generalServices = {
   helpDesk,
   getWoStatusList,
   getWoTypeList,
-  getLocationPlaces
+  getLocationPlaces,
+  getLatLong,
+  getEstimatedTimeByLocation,
 };

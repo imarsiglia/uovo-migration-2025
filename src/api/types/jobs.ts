@@ -216,3 +216,10 @@ export type LaborCodeType = {
   name: string;
   wo_status_update: string;
 };
+
+export const AddressTypes = {
+  Shipper: 'Shipper',
+  Consignee: 'Consignee',
+} as const;
+
+export type AddressType = typeof AddressTypes[keyof typeof AddressTypes];

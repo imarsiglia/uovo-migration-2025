@@ -1,15 +1,21 @@
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {Alert, Platform} from 'react-native';
+import {Alert, Linking, Platform} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import * as RNLocalize from 'react-native-localize';
 import moment from 'moment';
 import momentTZ from 'moment-timezone';
 import {AgendaSchedule} from 'react-native-calendars';
-import { FINALIZED_STATUS, PAUSED_STATUS, STARTED_STATUS, STATUS_NATIONAL_SHUTTLE, StatusNationalShuttleTye } from '@api/contants/constants';
+import {
+  FINALIZED_STATUS,
+  PAUSED_STATUS,
+  STARTED_STATUS,
+  STATUS_NATIONAL_SHUTTLE,
+  StatusNationalShuttleTye,
+} from '@api/contants/constants';
 
 export function getFormattedDate(date?: string | Date | null, format?: string) {
-  if(!date){
-    return "N/A"
+  if (!date) {
+    return 'N/A';
   }
   return moment(date).format(format ?? 'DD/MM/YYYY');
 }
@@ -142,7 +148,10 @@ export function getFormattedDateWithTimezone(
   return moment.parseZone(date).tz(DEVICE_TZ).format(format);
 }
 
-export function debounce<F extends (...args: any[]) => void>(callback: F, delay: number): (...args: Parameters<F>) => void {
+export function debounce<F extends (...args: any[]) => void>(
+  callback: F,
+  delay: number,
+): (...args: Parameters<F>) => void {
   // @ts-ignore
   let timeoutId: NodeJS.Timeout;
 
@@ -171,21 +180,58 @@ export function deriveVisualState({
   currentClockInStatus?: string | null;
   woStatus?: string | null;
 }) {
-  if (offline) return { visual: 'offline' as const, label: 'Offline' };
+  if (offline) return {visual: 'offline' as const, label: 'Offline'};
 
   // Prioriza current_clock_in.status si existe
   const status = currentClockInStatus ?? woStatus ?? null;
 
-  if (!status) return { visual: 'inProgress' as const, label: 'WO Confirmed' };
+  if (!status) return {visual: 'inProgress' as const, label: 'WO Confirmed'};
 
   switch (status) {
     case STARTED_STATUS:
-      return { visual: 'inProgress' as const, label: status };
+      return {visual: 'inProgress' as const, label: status};
     case PAUSED_STATUS:
-      return { visual: 'paused' as const, label: status };
+      return {visual: 'paused' as const, label: status};
     case FINALIZED_STATUS:
-      return { visual: 'finished' as const, label: status };
+      return {visual: 'finished' as const, label: status};
     default:
-      return { visual: 'inProgress' as const, label: status };
+      return {visual: 'inProgress' as const, label: status};
   }
 }
+
+export function cleanAddress(address: string) {
+  if (!address) {
+    return null;
+  }
+  address = address.replace(
+    /(\b(?:suite|ste|floor|fl|piso|unit|apt|apartment|depto|#)\s*#?\s*\d+\b,?\s*)/gi,
+    '',
+  );
+  address = address.replace(/(\d{5})-\d{4}/, '$1');
+  address = address.replace(/,\s*,/, ',');
+  address = address.trim();
+  return address;
+}
+
+export function formatAddress(address: string | null | undefined) {
+  return address?.replace(/(\r\n|\n|\r)/gm, ' ');
+}
+
+export const openInMaps = (lat: number, lng: number, label?: string) => {
+  const scheme = Platform.select({
+    ios: 'maps:',
+    android: 'geo:',
+  });
+
+  const location = `${lat},${lng}`;
+  const query = label
+    ? `${lat},${lng}(${encodeURIComponent(label)})`
+    : location;
+
+  const url = Platform.select({
+    ios: `${scheme}//?q=${query}`,
+    android: `${scheme}${query}`,
+  });
+
+  Linking.openURL(url!).catch((err) => console.error('Error opening map', err));
+};

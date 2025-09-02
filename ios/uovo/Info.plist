@@ -59,8 +59,26 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-
-  <!-- 🚨 Keep only the permissions specified in `setup_permissions` 🚨 -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>whatsapp</string>
+		<string>waze</string>
+		<string>comgooglemaps</string>
+		<string>com.google.maps</string>
+		<string>mapsme</string>
+		<string>maps.me</string>
+		<string>citymapper</string>
+		<string>yandexnavi</string>
+		<string>tomtomhome</string>
+		<string>com.sygic.aura</string>
+		<string>yandex</string>
+		<string>maps_me</string>
+		<string>sygic</string>
+		<string>tomtom</string>
+		<string>apple_maps</string>
+		<string>google_maps</string>
+	</array>
+  	<!-- 🚨 Keep only the permissions specified in `setup_permissions` 🚨 -->
 	<key>NSCameraUsageDescription</key>
 	<string>App requiere access to your photo library to allow take a photo to process your request</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

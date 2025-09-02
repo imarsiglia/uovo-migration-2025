@@ -31,6 +31,7 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 import {ResumeTopsheet} from './ResumeTopsheet';
+import { LocationTopsheet } from './LocationTopsheet';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -193,7 +194,7 @@ export const TopsheetScreen = ({route}: Props) => {
                 />
                 <Tab.Screen
                   name="LocationTopSheet"
-                  component={() => <></>}
+                  component={LocationTopsheet}
                   options={{tabBarLabel: 'Location'}}
                 />
                 <Tab.Screen

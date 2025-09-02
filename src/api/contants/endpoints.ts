@@ -17,6 +17,7 @@ export const API_TIMELINE = '/job/query';
 export const API_JOBQUEUE = '/job/queryQueue';
 //TOPSHEET
 export const API_TOPSHEET = '/job/topsheet';
+export const API_LOCATION_LETSGO = '/job/letsgo';
 
 //NATIONAL SHUTTLE ENDPOINTS
 export const API_GET_LOCATION_PLACES = '/jobns/load/locationplacesall'
