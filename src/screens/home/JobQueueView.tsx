@@ -238,6 +238,7 @@ export const JobQueueViewCmp = () => {
             idKey="name"
             value={serviceLocation}
             multiple
+            snapPoints={["95%"]}
             onChange={(val, items) => setServiceLocation(val as string[])}
           />
         </Wrapper>

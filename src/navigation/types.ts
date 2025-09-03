@@ -1,3 +1,5 @@
+import { ImageType } from "@generalTypes/images";
+
 // 👉 Constantes reutilizables (sin strings mágicos)
 export const RoutesNavigation = {
   Home: 'Home',
@@ -9,6 +11,9 @@ export const RoutesNavigation = {
   HelpDesk: 'HelpDesk',
   Account: 'Account',
   Topsheet: 'Topsheet',
+  ReportIssue: 'ReportIssue',
+  LocationNotes: 'LocationNotes',
+  SaveLocationNotes: 'SaveLocationNotes',
 } as const;
 
 // Union de nombres de ruta: "Home" | "ContactUs" | ...
@@ -34,5 +39,18 @@ export type RootStackParamList = {
   [RoutesNavigation.Topsheet]: {
     id: string;
     queue: number;
+  };
+  [RoutesNavigation.ReportIssue]: {
+    type: string;
+    idJob: number;
+    editedImage?: ImageType;
+  };
+  [RoutesNavigation.LocationNotes]: {
+    type: string;
+    idJob: number;
+  };
+  [RoutesNavigation.SaveLocationNotes]: {
+    type: string;
+    idJob: number;
   };
 };

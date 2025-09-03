@@ -181,6 +181,7 @@ export const HomeScreen = () => {
               },
             }}
             screenOptions={{
+              lazy: true,
               tabBarLabelStyle: styles.tabBarLabelStyle,
               swipeEnabled: false,
               tabBarInactiveTintColor: COLORS.gray,

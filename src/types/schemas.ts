@@ -35,3 +35,19 @@ export const HelpDeskSchema = yup.object().shape({
 });
 
 export type HelpDeskSchemaType = yup.InferType<typeof HelpDeskSchema>;
+
+export const ReportIssueSchema = yup.object().shape({
+  idProblemType: yup.string().required(DEFAULT_REQUIRED_MESSAGE),
+  description: yup.string().optional().nullable(),
+  photo: yup.string().optional().nullable(),
+});
+
+export type ReportIssueSchemaType = yup.InferType<typeof ReportIssueSchema>;
+
+export const SaveLocationNoteSchema = yup.object().shape({
+  description: yup.string().required(DEFAULT_REQUIRED_MESSAGE),
+});
+
+export type SaveLocationNoteSchemaType = yup.InferType<
+  typeof SaveLocationNoteSchema
+>;

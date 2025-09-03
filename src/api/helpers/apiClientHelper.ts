@@ -1,7 +1,7 @@
 import apiClient from '@api/config/apiClient';
-import {ApiResponse} from '@api/types/Response';
-import {getFromStorage, STORAGE_KEYS} from '@utils/storage';
-import {AxiosRequestConfig} from 'axios';
+import { ApiResponse } from '@api/types/Response';
+import { getFromStorage, STORAGE_KEYS } from '@utils/storage';
+import { AxiosRequestConfig } from 'axios';
 
 export const fetchUserTokenFromStorage = () => {
   return getFromStorage<string>(STORAGE_KEYS.USER_TOKEN);
@@ -40,6 +40,7 @@ export const getRequest = async <T>(
     return response.data;
   } catch (error: any) {
     // handleRequestError(error);
+    // showToastMessage(error?.message || 'Error en la solicitud');
     throw new Error(error?.message || 'Error en la solicitud');
   }
 };

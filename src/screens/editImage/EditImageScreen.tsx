@@ -39,7 +39,7 @@ export const EditImageScreen = (props: Props) => {
 const DrawImage = (props: Props) => {
   const refCanvas = useRef<CanvasControls>(null);
   const {width, height} = useWindowDimensions();
-  const {goBack, navigate} = useCustomNavigation();
+  const {goBack, navigate, getState} = useCustomNavigation();
   const [dimensions, setDimensions] = useState<{
     width: number;
     height: number;
@@ -74,8 +74,9 @@ const DrawImage = (props: Props) => {
         quality: 85,
       });
       if (snapshot?.data) {
+        // goBack();
         navigate(
-          RoutesNavigation.ContactUs,
+          getState().routes[getState().index - 1]?.name as any,
           {
             editedImage: {
               ...props.route.params.photo,

@@ -84,6 +84,9 @@ import {RootStackParamList, RoutesNavigation} from './types';
 import {AccountScreen} from '@screens/account/AccountScreen';
 import {configureFontAwesomePro} from 'react-native-fontawesome-pro';
 import {TopsheetScreen} from '@screens/topsheet/TopsheetScreen';
+import {ReportIssueScreen} from '@screens/location/ReportIssueScreen';
+import {LocationNotesScreen} from '@screens/location/LocationNotesScreen';
+import { SaveLocationNoteScreen } from '@screens/location/SaveLocationNoteScreen';
 // import InventoryNS from '../screens/nationalShuttle/InventoryNS';
 
 // LogBox.ignoreLogs([
@@ -164,6 +167,18 @@ export const AppNavigation = () => {
             <Stack.Screen
               name={RoutesNavigation.Account}
               component={AccountScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.ReportIssue}
+              component={ReportIssueScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.LocationNotes}
+              component={LocationNotesScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.SaveLocationNotes}
+              component={SaveLocationNoteScreen}
             />
           </Stack.Navigator>
         </NavigationContainer>

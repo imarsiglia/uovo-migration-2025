@@ -40,9 +40,9 @@ export const InputPasswordContext= forwardRef(
           name={currentId}
         />
 
-        <InputErrorMsg
+        {/* <InputErrorMsg
           message={getInputIdFormContext(errors, currentId)?.message}
-        />
+        /> */}
       </View>
     );
   },

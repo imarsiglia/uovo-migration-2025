@@ -21,6 +21,7 @@ export const QUERY_KEYS = {
   TOPSHEET: 'topsheet',
   GEOLOCATION_ADDRESS: 'geolocation_address',
   LOCATION_LETSGO: 'location_letsgo',
+  LOCATION_NOTES: 'location_notes',
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';

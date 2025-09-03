@@ -448,7 +448,15 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
                 offset: ROW_HEIGHT * index,
                 index,
               })}
-              initialScrollIndex={20}
+              // initialScrollIndex={20}
+              removeClippedSubviews={false}
+              windowSize={10}
+              maxToRenderPerBatch={20}
+              // onContentSizeChange={() => {
+              //   if (!isListVisible) {
+              //     fadeInList();
+              //   }
+              // }}
               onScrollToIndexFailed={(info) => {
                 const est = (info.averageItemLength ?? ROW_HEIGHT) * info.index;
                 listRef.current?.scrollToOffset({
@@ -491,7 +499,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: 'white',
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   inputPressed: {opacity: 0.9},
   disabled: {opacity: 0.5},
@@ -521,9 +529,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   row: {
-    minHeight: ROW_HEIGHT, // <- ayuda a getItemLayout
+    height: ROW_HEIGHT,
+    // minHeight: ROW_HEIGHT, // <- ayuda a getItemLayout
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    // paddingVertical: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

@@ -34,10 +34,10 @@ export const InputTextContext = ({currentId, isErrorHidden, ...restProps}: Props
         name={currentId}
       />
 
-      <InputErrorMsg
+      {/* <InputErrorMsg
         message={getInputIdFormContext(errors, currentId)?.message}
         isHidden={isErrorHidden}
-      />
+      /> */}
     </View>
   );
 };

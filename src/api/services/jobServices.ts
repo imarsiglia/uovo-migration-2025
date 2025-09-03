@@ -1,9 +1,13 @@
 import {
   API_CALENDAR_TIMELINE,
+  API_GET_LOCATION_NOTES,
   API_JOBQUEUE,
   API_LOCATION_LETSGO,
+  API_LOCATION_REPORT_ISSUE,
+  API_SAVE_LOCATION_NOTES,
   API_TIMELINE,
   API_TOPSHEET,
+  SUCCESS_MESSAGES,
 } from '@api/contants/endpoints';
 import {getRequest, postRequest} from '@api/helpers/apiClientHelper';
 import {JobDetailType, JobType} from '@api/types/Jobs';
@@ -71,10 +75,55 @@ const letsGo = async ({
   return response;
 };
 
+type ReportIssueProps = {
+  idJob: number;
+  idProblemType: string;
+  description?: string | null;
+  attachment?: string | null;
+  destination?: string;
+};
+
+const reportIssueLocation = async (
+  props: ReportIssueProps,
+): Promise<boolean> => {
+  const response = await postRequest(API_LOCATION_REPORT_ISSUE, props);
+  return response.message == SUCCESS_MESSAGES.SUCCESS;
+};
+
+export type LocationNotesApiProps = {
+  idJob: number;
+  type: string;
+};
+const locationNotes = async ({
+  idJob,
+  type,
+}: LocationNotesApiProps): Promise<string> => {
+  const response = await getRequest<string>(
+    `${API_GET_LOCATION_NOTES}?idJob=${idJob}&type=${type.toUpperCase()}`,
+  );
+  return response.body;
+};
+
+export type SaveLocationNoteApiProps = {
+  idJob: number;
+  type: string;
+  description: string;
+};
+
+const saveLocationNotes = async (
+  props: SaveLocationNoteApiProps,
+): Promise<boolean> => {
+  const response = await postRequest(API_SAVE_LOCATION_NOTES, props);
+  return response.message == SUCCESS_MESSAGES.SUCCESS;
+};
+
 export const jobServices = {
   calendar,
   timeline,
   jobqueue,
   topsheet,
   letsGo,
+  reportIssueLocation,
+  locationNotes,
+  saveLocationNotes,
 };

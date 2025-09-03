@@ -36,6 +36,10 @@ import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {formatAddress, openInMaps} from '@utils/functions';
 import {requestAccessFineLocationAndroid} from '@utils/permissions';
 import {showToastMessage} from '@utils/toast';
+import CustomMenu from '@components/commons/menu/CustomMenu';
+import {ReportLocationProblem} from '@components/tosheet/ReportLocationProblem';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {RoutesNavigation} from '@navigation/types';
 
 const INITIAL_DELTAS = {
   latitudeDelta: 0.015,
@@ -47,7 +51,6 @@ export const LocationTopsheet = () => {
     {latitude: number; longitude: number} | undefined
   >();
   const [showEstimated, setShowEstimated] = useState(false);
-
   const [typeAddress, setTypeAddress] = useState<AddressType>(
     AddressTypes.Shipper,
   );
@@ -55,6 +58,7 @@ export const LocationTopsheet = () => {
 
   const showModalDialogVisible = useModalDialogStore((d) => d.showVisible);
   const jobDetail = useTopSheetStore((d) => d.jobDetail);
+  const {navigate} = useCustomNavigation();
 
   const {mutateAsync: requestLetsGo} = useLetsGo({
     onError: () => {
@@ -68,6 +72,20 @@ export const LocationTopsheet = () => {
           message: response.message,
           confirmBtnLabel: 'OK',
           cancelable: false,
+          onConfirm: () =>
+            setTimeout(() => {
+              showModalDialogVisible({
+                modalVisible: true,
+                title: 'Success',
+                message: 'ETA alert sent successfully',
+                type: 'success',
+                cancelable: false,
+                onConfirm: () => {
+                  showNavigationApps();
+                },
+                confirmBtnLabel: 'OK',
+              });
+            }, 300),
         });
       } else if (response?.status == 409) {
         showModalDialogVisible({
@@ -153,10 +171,6 @@ export const LocationTopsheet = () => {
       toLng: coordinate?.longitude,
       showEstimated,
     });
-
-  // Acciones
-  const showLocationNotes = useCallback(() => {}, []);
-  const showReportProblem = useCallback(() => {}, []);
 
   const showNavigationApps = useCallback(() => {
     if (!hasValidAddress || !coordinate) {
@@ -317,6 +331,14 @@ export const LocationTopsheet = () => {
     [typeAddress],
   );
 
+  const showLocationNotes = useCallback(() => {
+    if (typeAddress && formattedAddress && jobDetail?.id)
+      navigate(RoutesNavigation.LocationNotes, {
+        idJob: jobDetail?.id,
+        type: typeAddress,
+      });
+  }, [typeAddress, jobDetail]);
+
   if (!jobDetail) return null;
 
   return (
@@ -473,13 +495,13 @@ export const LocationTopsheet = () => {
         </Wrapper>
 
         <Wrapper style={styles.reportWrap}>
-          <PressableOpacity
-            ref={refBtn}
-            onPress={showReportProblem}
-            style={styles.btnRp}>
-            <Label style={styles.btnOptionLocationText}>Report a problem</Label>
-            <Icon name="ban" color="white" type="solid" size={16} />
-          </PressableOpacity>
+          <CustomMenu
+            title="Report a problem"
+            buttonStyle={styles.btnRp}
+            buttonTextStyle={styles.btnOptionLocationText}
+            icon={<Icon name="ban" color="white" type="solid" size={16} />}>
+            <ReportLocationProblem />
+          </CustomMenu>
         </Wrapper>
 
         <Wrapper style={styles.notesWrap}>
@@ -508,62 +530,6 @@ export const LocationTopsheet = () => {
           </Wrapper>
         </Wrapper>
       </Animated.View>
-
-      {/* {show20Minpopup && (
-                          <Modal
-                            isVisible={show20Minpopup}
-                            style={{alignItems: 'center'}}>
-                            <Wrapper style={GLOBAL_STYLES.modalClockOutHorizontal}>
-                              <Wrapper style={GLOBAL_STYLES.bodyModalClockOut}>
-                                <Label
-                                  style={[
-                                    GLOBAL_STYLES.descModalClockOut,
-                                    {fontWeight: 'bold', fontSize: 16},
-                                  ]}>
-                                  Your ETA will be sent to the client now
-                                </Label>
-                              </Wrapper>
-                              <Wrapper
-                                style={[
-                                  GLOBAL_STYLES.containerOptionsModalClockOutHorizontal,
-                                ]}>
-                                <PressableOpacity
-                                  onPress={() => setShow20Minpopup(false)}
-                                  underlayColor="#08141F21"
-                                  style={[
-                                    GLOBAL_STYLES.btnOptionModalClockOutHorizontal,
-                                  ]}>
-                                  <Label
-                                    style={
-                                      GLOBAL_STYLES.optionModalClockOutHorizontal
-                                    }>
-                                    Cancel
-                                  </Label>
-                                </PressableOpacity>
-                                <PressableOpacity
-                                  onPress={() => {
-                                    // setShow20Minpopup(false);
-                                    openNavigation();
-                                  }}
-                                  style={[
-                                    GLOBAL_STYLES.btnOptionModalClockOutHorizontal,
-                                    {
-                                      borderStartWidth: 1,
-                                      borderLeftColor: '#08141F21',
-                                    },
-                                  ]}>
-                                  <Label
-                                    style={[
-                                      GLOBAL_STYLES.optionModalClockOutHorizontal,
-                                      GLOBAL_STYLES.bold,
-                                    ]}>
-                                    Continue
-                                  </Label>
-                                </PressableOpacity>
-                              </Wrapper>
-                            </Wrapper>
-                          </Modal>
-                        )} */}
     </ScrollView>
   );
 };
@@ -606,6 +572,7 @@ const styles = StyleSheet.create({
     minHeight: '100%',
     paddingHorizontal: 20,
     paddingTop: 10,
+    paddingBottom: 200,
   },
 
   /** Tabs */

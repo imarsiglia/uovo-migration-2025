@@ -1,5 +1,4 @@
-import {FILTER_WO_ACTIVE} from '@api/contants/constants';
-import {useGetJobQueue, useGetTopsheet} from '@api/hooks/HooksJobServices';
+import {useGetTopsheet} from '@api/hooks/HooksJobServices';
 import {BackButton} from '@components/commons/buttons/BackButton';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {SpinningIcon} from '@components/commons/spin/SpinningIcon';
@@ -8,30 +7,20 @@ import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {TeamAvatars} from '@components/jobs/crew/TeamAvatars';
 import TopSheetSkeleton from '@components/skeletons/TopSheetSkeleton';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {useMinBusy} from '@hooks/useMinBusy';
 import {useOnline} from '@hooks/useOnline';
 import {RootStackParamList, RoutesNavigation} from '@navigation/types';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {
-  ParamListBase,
-  TabNavigationState,
-  useNavigation,
-} from '@react-navigation/native';
-import {
-  NativeStackNavigationProp,
-  NativeStackScreenProps,
-} from '@react-navigation/native-stack';
-import useGeneralStore from '@store/general';
-import {useJobQueueStore} from '@store/jobqueue';
+import {ParamListBase, TabNavigationState} from '@react-navigation/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {deriveVisualState} from '@utils/functions';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo} from 'react';
 import {StyleSheet, View} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
+import {LocationTopsheet} from './LocationTopsheet';
 import {ResumeTopsheet} from './ResumeTopsheet';
-import { LocationTopsheet } from './LocationTopsheet';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -41,10 +30,6 @@ export const TopsheetScreen = ({route}: Props) => {
   const {online} = useOnline();
   const {navigate, goBack} = useCustomNavigation();
   const {setJobDetail, setActiveTab} = useTopSheetStore();
-  const loading = false;
-
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const {
     params: {id, queue},
@@ -102,7 +87,7 @@ export const TopsheetScreen = ({route}: Props) => {
 
   const onPressTab = useCallback((tab: TabNavigationState<ParamListBase>) => {
     setActiveTab(tab.index);
-  }, [] )
+  }, []);
 
   return (
     <Wrapper style={GLOBAL_STYLES.safeAreaLight}>
@@ -114,11 +99,12 @@ export const TopsheetScreen = ({route}: Props) => {
               disabled={false}
               onPress={syncro}
               style={GLOBAL_STYLES.btnOptTop}>
-              <SpinningIcon size={17} spin={loading} />
+              <SpinningIcon size={17} spin={isLoading} />
             </PressableOpacity>
 
-            {!loading && true && (
+            {jobDetail?.use_bol && (
               <PressableOpacity
+                disabled={isLoading}
                 onPress={() => navigate('VisualizePdf')}
                 style={GLOBAL_STYLES.btnOptTop}>
                 <Icon name="file-pdf" color="white" type="solid" size={15} />
@@ -126,6 +112,7 @@ export const TopsheetScreen = ({route}: Props) => {
             )}
 
             <PressableOpacity
+              disabled={isLoading}
               onPress={() => navigate('DigitalId', {member: false})}
               style={GLOBAL_STYLES.btnOptTop}>
               <Icon name="id-badge" color="white" type="solid" size={15} />

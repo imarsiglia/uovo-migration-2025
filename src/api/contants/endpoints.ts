@@ -19,6 +19,11 @@ export const API_JOBQUEUE = '/job/queryQueue';
 export const API_TOPSHEET = '/job/topsheet';
 export const API_LOCATION_LETSGO = '/job/letsgo';
 
+// TOPSHEET Location Tab
+export const API_LOCATION_REPORT_ISSUE = '/job/problem';
+export const API_GET_LOCATION_NOTES = '/notes/location/loadContactComments';
+export const API_SAVE_LOCATION_NOTES = '/notes/location/saveContactComments';
+
 //NATIONAL SHUTTLE ENDPOINTS
 export const API_GET_LOCATION_PLACES = '/jobns/load/locationplacesall'
 export const API_GET_EAST_COAST_PICKUP = '/jobns/eastcoastpickup/query'

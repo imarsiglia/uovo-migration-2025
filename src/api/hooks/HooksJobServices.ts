@@ -3,6 +3,7 @@ import {
   JobQueueApiProps,
   jobServices,
   LetsGoApiProps,
+  LocationNotesApiProps,
   TopSheetApiProps,
 } from '@api/services/jobServices';
 import {
@@ -10,8 +11,16 @@ import {
   useMutation,
   UseMutationOptions,
   useQuery,
+  UseQueryOptions,
 } from '@tanstack/react-query';
 import {getFormattedDateWithTimezone} from '@utils/functions';
+
+const DEFAULT_PERSISTENCE_CONFIG = {
+  staleTime: 5 * 60 * 1000,
+  gcTime: 7 * 24 * 60 * 60 * 1000,
+  retry: 1,
+  placeholderData: keepPreviousData,
+};
 
 export const useGetCalendar = (date = new Date()) => {
   const month = date.getMonth() + 1;
@@ -94,5 +103,32 @@ export const useLetsGo = (
   return useMutation({
     mutationFn: (props: LetsGoApiProps) => jobServices.letsGo(props),
     ...props,
+  });
+};
+
+export const useReportIssue = () => {
+  return useMutation({
+    mutationFn: jobServices.reportIssueLocation,
+  });
+};
+
+export const useGetLocationNotes = (
+  props: LocationNotesApiProps,
+  options?: UseQueryOptions<any | undefined, Error> | undefined,
+) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.LOCATION_NOTES, props],
+    queryFn: () => jobServices.locationNotes(props),
+    // staleTime: 0,
+    // gcTime: 7 * 24 * 60 * 60 * 1000,
+    enabled: !!props?.idJob && !!props?.type,
+    ...DEFAULT_PERSISTENCE_CONFIG,
+    ...options,
+  });
+};
+
+export const useSaveLocationNotes = () => {
+  return useMutation({
+    mutationFn: jobServices.saveLocationNotes,
   });
 };
