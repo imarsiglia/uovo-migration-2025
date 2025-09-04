@@ -7,9 +7,9 @@ export const API_REGULAR_LOGIN = '/loginalter';
 //help desk general
 export const API_CONTACT_US = '/login/helpdesk';
 export const API_HELPDESK = '/user/helpdesk';
-export const API__GET_WO_STATUS = '/job/wostatus';
-export const API__GET_WO_TYPES = '/job/wotypes';
-export const API__GET_LOCATION_PLACES = '/job/load/locationplaces';
+export const API_GET_WO_STATUS = '/job/wostatus';
+export const API_GET_WO_TYPES = '/job/wotypes';
+export const API_GET_LOCATION_PLACES = '/job/load/locationplaces';
 
 //jobs
 export const API_CALENDAR_TIMELINE = '/job/calendar';
@@ -29,9 +29,11 @@ export const API_SAVE_LOCATION_NOTES = '/notes/location/saveContactComments';
 export const API_SEND_EMAIL_BOL = '/bol/sendEmail';
 export const API_TASK_COUNT = '/job/task/count';
 
+// digital ID
+export const API_GET_QR_USER = '/user/qr';
 
 //NATIONAL SHUTTLE ENDPOINTS
-export const API_GET_LOCATION_PLACES = '/jobns/load/locationplacesall'
+export const API_GET_NS_LOCATION_PLACES = '/jobns/load/locationplacesall'
 export const API_GET_EAST_COAST_PICKUP = '/jobns/eastcoastpickup/query'
 export const API_GET_WEST_COAST_PICKUP = '/jobns/westcoastpickup/query'
 export const API_GET_WEST_COAST_DROPOFF = '/jobns/westcoastdropoff/query'

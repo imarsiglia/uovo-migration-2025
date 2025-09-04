@@ -44,13 +44,14 @@ import {
   NATIONAL_SHUTTLE_TYPE,
 } from '@api/contants/constants';
 import {COLORS} from '@styles/colors';
-import {NSJobType} from '@api/types/Jobs';
+import {JobDetailType, NSJobType} from '@api/types/Jobs';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {Label} from '@components/commons/text/Label';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {InventoryViewNationalShuttle} from '@components/nationalshuttle/InventoryViewNationalShuttle';
 import {RoutesNavigation} from '@navigation/types';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import { SendBOLBottomSheet } from '@components/bottomSheets/SendBOLBottomSheet';
 
 type FilterType = {
   type: string;
@@ -74,7 +75,7 @@ const NationalShuttleViewCmp = () => {
 
   //send BOL
   const [isVisibleSendBOL, setIsVisibleSendBOL] = useState(false);
-  const [jobDetail, setJobDetail] = useState<any>({});
+  const [jobDetail, setJobDetail] = useState<NSJobType | null>(null);
   const [canFetchJobQueue, setCanFetchJobQueue] = useState(false);
 
   const activeTab = useGeneralStore((d) => d.activeTab);
@@ -341,7 +342,7 @@ const NationalShuttleViewCmp = () => {
   }, []);
 
   const onInitSendBOL = useCallback((job: NSJobType) => {
-    setJobDetail(job);
+    setJobDetail(job)
     setIsVisibleSendBOL(true);
   }, []);
 
@@ -504,13 +505,12 @@ const NationalShuttleViewCmp = () => {
         />
       )}
 
-      {/* <SendBOLBottomSheet
+      <SendBOLBottomSheet
         visible={isVisibleSendBOL}
         handleVisible={setIsVisibleSendBOL}
-        idJob={jobDetail?.id}
-        jobDetail={jobDetail}
+        jobDetail={jobDetail!}
         onFinishSendBol={syncro}
-      /> */}
+      />
     </Wrapper>
   );
 };

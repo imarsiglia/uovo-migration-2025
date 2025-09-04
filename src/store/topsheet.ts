@@ -11,7 +11,7 @@ export type TopSheetStore = {
 export const useTopSheetStore = create<TopSheetStore>((set) => ({
   jobDetail: undefined,
   setJobDetail: (job) => set((state) => ({...state, jobDetail: job})),
-  activeTab: undefined,
+  activeTab: 0,
   setActiveTab: (tab) => set((state) => ({...state, activeTab: tab})),
 }));
 

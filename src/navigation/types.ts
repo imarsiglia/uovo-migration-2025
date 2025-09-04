@@ -1,4 +1,5 @@
-import { ImageType } from "@generalTypes/images";
+import {CrewMemberType} from '@api/types/Jobs';
+import {ImageType} from '@generalTypes/images';
 
 // 👉 Constantes reutilizables (sin strings mágicos)
 export const RoutesNavigation = {
@@ -14,6 +15,8 @@ export const RoutesNavigation = {
   ReportIssue: 'ReportIssue',
   LocationNotes: 'LocationNotes',
   SaveLocationNotes: 'SaveLocationNotes',
+  DigitalId: 'DigitalId',
+  VisualizePdf: 'VisualizePdf'
 } as const;
 
 // Union de nombres de ruta: "Home" | "ContactUs" | ...
@@ -53,4 +56,32 @@ export type RootStackParamList = {
     type: string;
     idJob: number;
   };
+  [RoutesNavigation.DigitalId]: {
+    member?: boolean;
+    person?: CrewMemberType;
+  };
+  [RoutesNavigation.VisualizePdf]: undefined
 };
+
+export const TopSheetRoutesNavigation = {
+  Resume: {
+    name: 'ResumeTopSheet',
+    label: 'Resume',
+  },
+  Location: {
+    name: 'LocationTopSheet',
+    label: 'Location',
+  },
+  Inventory: {
+    name: 'InventoryTopSheet',
+    label: 'Inventory',
+  },
+  Tasks: {
+    name: 'TasksTopSheet',
+    label: 'Tasks',
+  },
+  Team: {
+    name: 'TeamTopSheet',
+    label: 'Team',
+  },
+} as const;

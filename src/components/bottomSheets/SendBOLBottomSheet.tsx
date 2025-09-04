@@ -33,15 +33,19 @@ type PeopleEmail = {
   valid?: boolean;
 };
 
-export const SendBOLBottomSheet = ({
-  handleVisible,
-  visible = false,
-  onFinishSendBol,
-}: {
+type Props = {
+  idJob: number;
   handleVisible: (val: boolean) => void;
   visible: boolean;
   onFinishSendBol?: () => void;
-}) => {
+};
+
+export const SendBOLBottomSheet = ({
+  idJob,
+  handleVisible,
+  visible = false,
+  onFinishSendBol,
+}: Props) => {
   const [emails, setEmails] = useState<PeopleEmail[]>([]);
   const [emailChipText, setEmailChipText] = useState('');
   const [others, setOthers] = useState<PeopleEmail[]>([]);
@@ -209,8 +213,8 @@ export const SendBOLBottomSheet = ({
           force_send_signature_count: forceSignature,
         })
           .then((response: any) => {
-            console.log("response")
-            console.log(JSON.stringify(response))
+            console.log('response');
+            console.log(JSON.stringify(response));
             // if (response.ok) {
             //   if (response.data.message == 'SUCCESS') {
             //     showDialog({

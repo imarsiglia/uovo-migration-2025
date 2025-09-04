@@ -63,7 +63,7 @@ export const useGetLatLong = (address?: string | null) => {
     queryFn: () => generalServices.getLatLong(address!),
     enabled: !!address,
     retry: 2,
-    placeholderData: undefined
+    placeholderData: undefined,
   });
 };
 
@@ -83,6 +83,16 @@ export const useGetEstimatedTimeByLocation = ({
       showEstimated,
     retry: 2,
     refetchOnMount: false,
-    placeholderData: undefined
+    placeholderData: undefined,
+  });
+};
+
+useQuery
+export const useGetQrUser = () => {
+  return useQuery({
+    ...DEFAULT_PERSISTENCE_CONFIG,
+    queryKey: [QUERY_KEYS.QR_USER],
+    queryFn: generalServices.getQrUser,
+    enabled: false
   });
 };

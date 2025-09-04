@@ -1,8 +1,9 @@
 import {
-  API__GET_LOCATION_PLACES,
-  API__GET_WO_STATUS,
-  API__GET_WO_TYPES,
+  API_GET_LOCATION_PLACES,
+  API_GET_WO_STATUS,
+  API_GET_WO_TYPES,
   API_CONTACT_US,
+  API_GET_QR_USER,
   API_HELPDESK,
   SUCCESS_MESSAGES,
 } from '@api/contants/endpoints';
@@ -37,18 +38,18 @@ const helpDesk = async (props: PropsHelpDesk): Promise<boolean> => {
 };
 
 const getWoStatusList = async (): Promise<string[]> => {
-  const response = await getRequest<Paginated<string[]>>(API__GET_WO_STATUS);
+  const response = await getRequest<Paginated<string[]>>(API_GET_WO_STATUS);
   return response.body?.data;
 };
 
 const getWoTypeList = async (): Promise<string[]> => {
-  const response = await getRequest<Paginated<string[]>>(API__GET_WO_TYPES);
+  const response = await getRequest<Paginated<string[]>>(API_GET_WO_TYPES);
   return response.body?.data;
 };
 
 const getLocationPlaces = async (): Promise<GeneralListApi[]> => {
   const response = await getRequest<Paginated<GeneralListApi[]>>(
-    API__GET_LOCATION_PLACES,
+    API_GET_LOCATION_PLACES,
   );
   return response.body?.data;
 };
@@ -107,6 +108,11 @@ const getEstimatedTimeByLocation = async ({
   }
 };
 
+const getQrUser = async (): Promise<string> => {
+  const response = await getRequest<string>(API_GET_QR_USER);
+  return response as unknown as string;
+};
+
 export const generalServices = {
   contactUs,
   helpDesk,
@@ -115,4 +121,5 @@ export const generalServices = {
   getLocationPlaces,
   getLatLong,
   getEstimatedTimeByLocation,
+  getQrUser,
 };

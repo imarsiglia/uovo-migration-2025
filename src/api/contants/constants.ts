@@ -23,6 +23,7 @@ export const QUERY_KEYS = {
   LOCATION_LETSGO: 'location_letsgo',
   LOCATION_NOTES: 'location_notes',
   TASK_COUNT: 'task_count',
+  QR_USER: 'qr_user',
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';

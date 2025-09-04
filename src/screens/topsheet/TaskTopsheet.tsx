@@ -1,3 +1,4 @@
+import { PAUSED_STATUS, STARTED_STATUS } from '@api/contants/constants';
 import {useGetTaskCount} from '@api/hooks/HooksJobServices';
 import {SendBOLBottomSheet} from '@components/bottomSheets/SendBOLBottomSheet';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
@@ -161,5 +162,36 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
     backgroundColor: '#fbfbfb',
+  },
+  buttonTask: {
+    flexDirection: 'row',
+    backgroundColor: '#F7F5F4',
+    height: 70,
+    borderRadius: 20,
+    alignItems: 'center',
+    alignContent: 'center',
+    marginBottom: 15,
+    paddingLeft: 20,
+    paddingRight: 0,
+    justifyContent: 'space-between',
+    overflow: 'hidden',
+  },
+  minPaddingLeft: {
+    paddingLeft: 10,
+  },
+  viewIcon: {
+    backgroundColor: '#A278C2',
+    width: 45,
+    height: 45,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  icon: {
+    alignSelf: 'center',
+  },
+  labelTask: {
+    color: '#464646',
+    fontSize: 14,
   },
 });

@@ -86,7 +86,9 @@ import {configureFontAwesomePro} from 'react-native-fontawesome-pro';
 import {TopsheetScreen} from '@screens/topsheet/TopsheetScreen';
 import {ReportIssueScreen} from '@screens/location/ReportIssueScreen';
 import {LocationNotesScreen} from '@screens/location/LocationNotesScreen';
-import { SaveLocationNoteScreen } from '@screens/location/SaveLocationNoteScreen';
+import {SaveLocationNoteScreen} from '@screens/location/SaveLocationNoteScreen';
+import {DigitalIdScreen} from '@screens/digitalid/DigitalIdScreen';
+import {VisualizePdfScreen} from '@screens/visualizepdf/VisualizePdfScreen';
 // import InventoryNS from '../screens/nationalShuttle/InventoryNS';
 
 // LogBox.ignoreLogs([
@@ -179,6 +181,14 @@ export const AppNavigation = () => {
             <Stack.Screen
               name={RoutesNavigation.SaveLocationNotes}
               component={SaveLocationNoteScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.DigitalId}
+              component={DigitalIdScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.VisualizePdf}
+              component={VisualizePdfScreen}
             />
           </Stack.Navigator>
         </NavigationContainer>

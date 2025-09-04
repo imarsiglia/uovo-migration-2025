@@ -8,7 +8,11 @@ import {TeamAvatars} from '@components/jobs/crew/TeamAvatars';
 import TopSheetSkeleton from '@components/skeletons/TopSheetSkeleton';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {useOnline} from '@hooks/useOnline';
-import {RootStackParamList, RoutesNavigation} from '@navigation/types';
+import {
+  RootStackParamList,
+  RoutesNavigation,
+  TopSheetRoutesNavigation,
+} from '@navigation/types';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {ParamListBase, TabNavigationState} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -16,12 +20,13 @@ import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {deriveVisualState} from '@utils/functions';
-import {useCallback, useEffect, useMemo} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
+import {Animated, StyleSheet, View} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 import {LocationTopsheet} from './LocationTopsheet';
 import {ResumeTopsheet} from './ResumeTopsheet';
-import { TaskTopsheet } from './TaskTopsheet';
+import {TaskTopsheet} from './TaskTopsheet';
+import {TeamTopsheet} from './TeamTopsheet';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -30,7 +35,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Topsheet'>;
 export const TopsheetScreen = ({route}: Props) => {
   const {online} = useOnline();
   const {navigate, goBack} = useCustomNavigation();
-  const {setJobDetail, setActiveTab} = useTopSheetStore();
+  const {setJobDetail, setActiveTab, activeTab} = useTopSheetStore();
 
   const {
     params: {id, queue},
@@ -41,6 +46,10 @@ export const TopsheetScreen = ({route}: Props) => {
     queue,
   });
 
+  const heightAnim = useRef(new Animated.Value(36)).current;
+  const translateY = useRef(new Animated.Value(0)).current; // empieza fuera de pantalla
+  const opacity = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     setJobDetail(jobDetail);
 
@@ -48,6 +57,46 @@ export const TopsheetScreen = ({route}: Props) => {
       setJobDetail(undefined);
     };
   }, [jobDetail]);
+
+  useEffect(() => {
+    if (activeTab == 0) {
+      Animated.parallel([
+        Animated.timing(heightAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: false,
+        }),
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: false,
+        }),
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: false,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(heightAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: false,
+        }),
+        Animated.timing(translateY, {
+          toValue: -30,
+          duration: 300,
+          useNativeDriver: false,
+        }),
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: false,
+        }),
+      ]).start();
+    }
+  }, [activeTab]);
 
   // const loading = useMinBusy(isRefetching, 1000);
 
@@ -82,13 +131,18 @@ export const TopsheetScreen = ({route}: Props) => {
     navigate(RoutesNavigation.Topsheet, {
       id,
       queue,
-      screen: 'TasksTopSheet',
+      screen: TopSheetRoutesNavigation.Team.name,
     } as never);
   }, [jobDetail?.id]);
 
   const onPressTab = useCallback((tab: TabNavigationState<ParamListBase>) => {
     setActiveTab(tab.index);
   }, []);
+
+  const animatedHeight = heightAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 36], // Ajusta 60 por la altura real de tu componente
+  });
 
   return (
     <Wrapper style={GLOBAL_STYLES.safeAreaLight}>
@@ -106,7 +160,7 @@ export const TopsheetScreen = ({route}: Props) => {
             {jobDetail?.use_bol && (
               <PressableOpacity
                 disabled={isLoading}
-                onPress={() => navigate('VisualizePdf')}
+                onPress={() => navigate(RoutesNavigation.VisualizePdf)}
                 style={GLOBAL_STYLES.btnOptTop}>
                 <Icon name="file-pdf" color="white" type="solid" size={15} />
               </PressableOpacity>
@@ -143,15 +197,23 @@ export const TopsheetScreen = ({route}: Props) => {
                   </Label>
                 </Wrapper>
               </Wrapper>
-              <TeamAvatars
-                crew={jobDetail?.crew ?? []}
-                onPress={goToTeamMember}
-              />
+              <Animated.View
+                style={{
+                  transform: [{translateY}],
+                  opacity,
+                  height: animatedHeight,
+                  overflow: 'hidden',
+                }}>
+                <TeamAvatars
+                  crew={jobDetail?.crew ?? []}
+                  onPress={goToTeamMember}
+                />
+              </Animated.View>
             </Wrapper>
 
             <View style={styles.container}>
               <Tab.Navigator
-                initialRouteName="ResumeTopSheet"
+                initialRouteName={TopSheetRoutesNavigation.Resume.name}
                 screenListeners={{
                   state: (e) => {
                     onPressTab(e.data.state);
@@ -176,29 +238,33 @@ export const TopsheetScreen = ({route}: Props) => {
                   tabBarAllowFontScaling: false,
                 }}>
                 <Tab.Screen
-                  name="ResumeTopSheet"
+                  name={TopSheetRoutesNavigation.Resume.name}
+                  options={{tabBarLabel: TopSheetRoutesNavigation.Resume.label}}
                   component={ResumeTopsheet}
-                  options={{tabBarLabel: 'Resume'}}
                 />
                 <Tab.Screen
-                  name="LocationTopSheet"
+                  name={TopSheetRoutesNavigation.Location.name}
+                  options={{
+                    tabBarLabel: TopSheetRoutesNavigation.Location.label,
+                  }}
                   component={LocationTopsheet}
-                  options={{tabBarLabel: 'Location'}}
                 />
                 <Tab.Screen
-                  name="InventoryTopSheet"
+                  name={TopSheetRoutesNavigation.Inventory.name}
+                  options={{
+                    tabBarLabel: TopSheetRoutesNavigation.Inventory.label,
+                  }}
                   component={() => <></>}
-                  options={{tabBarLabel: 'Inventory'}}
                 />
                 <Tab.Screen
-                  name="TasksTopSheet"
+                  name={TopSheetRoutesNavigation.Tasks.name}
+                  options={{tabBarLabel: TopSheetRoutesNavigation.Tasks.label}}
                   component={TaskTopsheet}
-                  options={{tabBarLabel: 'Tasks'}}
                 />
                 <Tab.Screen
-                  name="TeamTopSheet"
-                  component={() => <></>}
-                  options={{tabBarLabel: 'Team'}}
+                  name={TopSheetRoutesNavigation.Team.name}
+                  options={{tabBarLabel: TopSheetRoutesNavigation.Team.label}}
+                  component={TeamTopsheet}
                 />
               </Tab.Navigator>
             </View>

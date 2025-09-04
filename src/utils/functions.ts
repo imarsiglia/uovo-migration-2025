@@ -6,9 +6,15 @@ import moment from 'moment';
 import momentTZ from 'moment-timezone';
 import {AgendaSchedule} from 'react-native-calendars';
 import {
+  FINALIZED_COLOR_CREW,
   FINALIZED_STATUS,
+  INITIAL_COLOR_CREW,
+  PAUSED_COLOR_CREW,
   PAUSED_STATUS,
+  PAUSED_STATUS_CREW,
+  STARTED_COLOR_CREW,
   STARTED_STATUS,
+  STARTED_STATUS_CREW,
   STATUS_NATIONAL_SHUTTLE,
   StatusNationalShuttleTye,
 } from '@api/contants/constants';
@@ -240,4 +246,16 @@ export function isEmail(email: string) {
   const re =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
+}
+
+export function getColorStatusCrewMember(status?: string | null) {
+  var colorStatus =
+    status != null && status != ''
+      ? status.toUpperCase() == STARTED_STATUS_CREW
+        ? STARTED_COLOR_CREW
+        : status.toUpperCase() == PAUSED_STATUS_CREW
+        ? PAUSED_COLOR_CREW
+        : FINALIZED_COLOR_CREW
+      : INITIAL_COLOR_CREW;
+  return colorStatus;
 }

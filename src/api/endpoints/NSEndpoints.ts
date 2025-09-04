@@ -2,7 +2,7 @@ import {getRequest} from '@api/helpers/apiClientHelper';
 import {
   API_GET_EAST_COAST_DROPOFF,
   API_GET_EAST_COAST_PICKUP,
-  API_GET_LOCATION_PLACES,
+  API_GET_NS_LOCATION_PLACES,
   API_GET_WEST_COAST_DROPOFF,
   API_GET_WEST_COAST_PICKUP,
   API_GET_INVENTORY_EAST_COAST_PICKUP,
@@ -30,7 +30,7 @@ const createGetRequest = <T>(baseUrl: string) => (params: NSRequestType) =>
 
 export const NSEndpoints = {
   getLocationPlaces: () =>
-    getRequest<Paginated<GeneralListApi[]>>(API_GET_LOCATION_PLACES),
+    getRequest<Paginated<GeneralListApi[]>>(API_GET_NS_LOCATION_PLACES),
   getEastCoastPickup: createGetRequest<Paginated<NSJobType[]>>(API_GET_EAST_COAST_PICKUP),
   getWestCoastPickup: createGetRequest<Paginated<NSJobType[]>>(API_GET_WEST_COAST_PICKUP),
   getWestCoastDropoff: createGetRequest<Paginated<NSJobType[]>>(API_GET_WEST_COAST_DROPOFF),
