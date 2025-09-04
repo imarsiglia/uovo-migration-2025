@@ -102,7 +102,7 @@ export const SaveLocationNoteScreen = (props: Props) => {
             contentContainerStyle={styles.scrollview}
             keyboardShouldPersistTaps="handled">
             <InputTextContext
-              currentId="description"
+              currentId="value"
               multiline={true}
               label="Body"
               style={styles.inputTextArea}
@@ -111,7 +111,7 @@ export const SaveLocationNoteScreen = (props: Props) => {
             />
 
             <Wrapper style={{top: 0}}>
-              <SpeechFormContext ref={refVoice} name="description" />
+              <SpeechFormContext ref={refVoice} name="value" />
             </Wrapper>
           </KeyboardAwareScrollView>
 

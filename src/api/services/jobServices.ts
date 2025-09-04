@@ -5,12 +5,14 @@ import {
   API_LOCATION_LETSGO,
   API_LOCATION_REPORT_ISSUE,
   API_SAVE_LOCATION_NOTES,
+  API_SEND_EMAIL_BOL,
+  API_TASK_COUNT,
   API_TIMELINE,
   API_TOPSHEET,
   SUCCESS_MESSAGES,
 } from '@api/contants/endpoints';
 import {getRequest, postRequest} from '@api/helpers/apiClientHelper';
-import {JobDetailType, JobType} from '@api/types/Jobs';
+import {JobDetailType, JobType, TaskJobType} from '@api/types/Jobs';
 import {Paginated} from '@api/types/Response';
 
 const calendar = async (month: number, year: number): Promise<string[]> => {
@@ -107,14 +109,54 @@ const locationNotes = async ({
 export type SaveLocationNoteApiProps = {
   idJob: number;
   type: string;
-  description: string;
+  value: string;
 };
 
-const saveLocationNotes = async (
-  props: SaveLocationNoteApiProps,
-): Promise<boolean> => {
-  const response = await postRequest(API_SAVE_LOCATION_NOTES, props);
+const saveLocationNotes = async ({
+  idJob,
+  value,
+  type,
+}: SaveLocationNoteApiProps): Promise<boolean> => {
+  const response = await postRequest(API_SAVE_LOCATION_NOTES, {
+    idJob,
+    value,
+    type: type.toUpperCase(),
+  });
   return response.message == SUCCESS_MESSAGES.SUCCESS;
+};
+
+type SendEmailBOLProps = {
+  idJob: number;
+  destination: string[];
+  force_send?: boolean;
+  force_send_signature_count?: boolean;
+};
+
+const sendEmailBOL = async ({
+  idJob,
+  destination,
+  force_send = false,
+  force_send_signature_count = false,
+}: SendEmailBOLProps): Promise<boolean> => {
+  const response = await postRequest(API_SEND_EMAIL_BOL, {
+    idJob,
+    destination,
+    force_send,
+    force_send_signature_count,
+  });
+  return response.message == SUCCESS_MESSAGES.SUCCESS;
+};
+
+export type TaskCountApiProps = {
+  idJob: number;
+};
+const getTaskCount = async ({
+  idJob,
+}: TaskCountApiProps): Promise<TaskJobType[]> => {
+  const response = await getRequest<TaskJobType[]>(
+    `${API_TASK_COUNT}?idjob=${idJob}`,
+  );
+  return response.body;
 };
 
 export const jobServices = {
@@ -126,4 +168,6 @@ export const jobServices = {
   reportIssueLocation,
   locationNotes,
   saveLocationNotes,
+  sendEmailBOL,
+  getTaskCount,
 };

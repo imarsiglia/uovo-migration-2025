@@ -85,5 +85,42 @@ export const GLOBAL_STYLES = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-
+  containerOptionsModalClockOutHorizontal: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    borderTopWidth: 1,
+    borderTopColor: '#08141F21',
+    marginTop: 10,
+  },
+  modalClockOutHorizontal: {
+    borderRadius: 20,
+    width: '80%',
+    backgroundColor: 'white',
+  },
+  bodyModalClockOut: {
+    padding: 14,
+    paddingLeft: 40,
+    paddingRight: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  btnOptionModalClockOutHorizontal: {
+    minHeight: 50,
+    width: '50%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderTopColor: '#08141F21',
+    padding: 5
+  },
+  optionModalClockOutHorizontal: {
+    fontSize: 16,
+    color: COLORS.primary,
+    textAlign: 'center',
+  },
+  descModalClockOut: {
+    color: '#707070',
+    marginTop: 20,
+    textAlign: 'center',
+  },
 });

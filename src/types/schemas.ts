@@ -45,7 +45,7 @@ export const ReportIssueSchema = yup.object().shape({
 export type ReportIssueSchemaType = yup.InferType<typeof ReportIssueSchema>;
 
 export const SaveLocationNoteSchema = yup.object().shape({
-  description: yup.string().required(DEFAULT_REQUIRED_MESSAGE),
+  value: yup.string().required(DEFAULT_REQUIRED_MESSAGE),
 });
 
 export type SaveLocationNoteSchemaType = yup.InferType<

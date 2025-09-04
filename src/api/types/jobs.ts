@@ -222,4 +222,10 @@ export const AddressTypes = {
   Consignee: 'Consignee',
 } as const;
 
-export type AddressType = typeof AddressTypes[keyof typeof AddressTypes];
+export type AddressType = (typeof AddressTypes)[keyof typeof AddressTypes];
+
+export type TaskJobType = {
+  id: number;
+  description: string;
+  quantity: number;
+};

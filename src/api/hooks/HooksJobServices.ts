@@ -4,6 +4,7 @@ import {
   jobServices,
   LetsGoApiProps,
   LocationNotesApiProps,
+  TaskCountApiProps,
   TopSheetApiProps,
 } from '@api/services/jobServices';
 import {
@@ -130,5 +131,20 @@ export const useGetLocationNotes = (
 export const useSaveLocationNotes = () => {
   return useMutation({
     mutationFn: jobServices.saveLocationNotes,
+  });
+};
+
+export const useSendEmailBOL = () => {
+  return useMutation({
+    mutationFn: jobServices.sendEmailBOL,
+  });
+};
+
+export const useGetTaskCount = (props: TaskCountApiProps) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.TASK_COUNT, props],
+    queryFn: () => jobServices.getTaskCount(props),
+    enabled: !!props?.idJob,
+    ...DEFAULT_PERSISTENCE_CONFIG,
   });
 };

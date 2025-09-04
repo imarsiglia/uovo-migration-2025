@@ -1,22 +1,21 @@
-import {useCallback} from 'react';
+import { useCallback } from 'react';
 import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
-import {useGetLocationNotes} from '@api/hooks/HooksJobServices';
-import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
+import { useGetLocationNotes } from '@api/hooks/HooksJobServices';
+import { GeneralLoading } from '@components/commons/loading/GeneralLoading';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {RootStackParamList, RoutesNavigation} from '@navigation/types';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {COLORS} from '@styles/colors';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import { useCustomNavigation } from '@hooks/useCustomNavigation';
+import { RootStackParamList, RoutesNavigation } from '@navigation/types';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { COLORS } from '@styles/colors';
+import { GLOBAL_STYLES } from '@styles/globalStyles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'LocationNotes'>;
 export const LocationNotesScreen = (props: Props) => {

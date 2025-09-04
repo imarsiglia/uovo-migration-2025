@@ -21,6 +21,7 @@ import {StyleSheet, View} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 import {LocationTopsheet} from './LocationTopsheet';
 import {ResumeTopsheet} from './ResumeTopsheet';
+import { TaskTopsheet } from './TaskTopsheet';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -191,7 +192,7 @@ export const TopsheetScreen = ({route}: Props) => {
                 />
                 <Tab.Screen
                   name="TasksTopSheet"
-                  component={() => <></>}
+                  component={TaskTopsheet}
                   options={{tabBarLabel: 'Tasks'}}
                 />
                 <Tab.Screen

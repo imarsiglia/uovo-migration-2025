@@ -22,6 +22,7 @@ export const QUERY_KEYS = {
   GEOLOCATION_ADDRESS: 'geolocation_address',
   LOCATION_LETSGO: 'location_letsgo',
   LOCATION_NOTES: 'location_notes',
+  TASK_COUNT: 'task_count',
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';

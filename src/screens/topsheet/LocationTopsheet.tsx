@@ -1,7 +1,6 @@
 import Geolocation from '@react-native-community/geolocation';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
-  Alert,
   Animated,
   Easing,
   Platform,
@@ -25,9 +24,12 @@ import {useLetsGo} from '@api/hooks/HooksJobServices';
 import {AddressType, AddressTypes} from '@api/types/Jobs';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {IndicatorLoading} from '@components/commons/loading/IndicatorLoading';
+import CustomMenu from '@components/commons/menu/CustomMenu';
 import {Label} from '@components/commons/text/Label';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {openDirectionsChooser} from '@components/helpers/openDirectionsChooser';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {RoutesNavigation} from '@navigation/types';
 import {loadingWrapperPromise} from '@store/actions';
 import {useModalDialogStore} from '@store/modals';
 import useTopSheetStore from '@store/topsheet';
@@ -36,10 +38,7 @@ import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {formatAddress, openInMaps} from '@utils/functions';
 import {requestAccessFineLocationAndroid} from '@utils/permissions';
 import {showToastMessage} from '@utils/toast';
-import CustomMenu from '@components/commons/menu/CustomMenu';
-import {ReportLocationProblem} from '@components/tosheet/ReportLocationProblem';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {RoutesNavigation} from '@navigation/types';
+import { ReportLocationProblem } from '@components/tosheet/ReportLocationProblem';
 
 const INITIAL_DELTAS = {
   latitudeDelta: 0.015,
@@ -295,7 +294,14 @@ export const LocationTopsheet = () => {
         setShouldOpenModal(false);
       }
     });
-  }, [etaAnim, shouldOpenModal]);
+  }, [
+    etaAnim,
+    shouldOpenModal,
+    openNavigation,
+    estimatedTime,
+    jobDetail,
+    typeAddress,
+  ]);
 
   const hideEta = React.useCallback(() => {
     Animated.timing(etaAnim, {
