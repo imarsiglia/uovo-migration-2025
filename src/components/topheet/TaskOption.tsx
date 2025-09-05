@@ -7,7 +7,7 @@ type Props = {
   icon?: string;
   color?: string;
   name: string;
-  quantity?: string;
+  quantity?: number;
   onPressLeft?: () => void;
   onPressRight?: () => void;
   light?: boolean;

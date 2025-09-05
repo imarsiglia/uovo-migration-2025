@@ -38,7 +38,7 @@ import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {formatAddress, openInMaps} from '@utils/functions';
 import {requestAccessFineLocationAndroid} from '@utils/permissions';
 import {showToastMessage} from '@utils/toast';
-import { ReportLocationProblem } from '@components/tosheet/ReportLocationProblem';
+import { ReportLocationProblem } from '@components/topheet/ReportLocationProblem';
 
 const INITIAL_DELTAS = {
   latitudeDelta: 0.015,

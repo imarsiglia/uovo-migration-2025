@@ -1,7 +1,9 @@
-import { PAUSED_STATUS, STARTED_STATUS } from '@api/contants/constants';
+import {PAUSED_STATUS, STARTED_STATUS} from '@api/contants/constants';
 import {useGetTaskCount} from '@api/hooks/HooksJobServices';
 import {SendBOLBottomSheet} from '@components/bottomSheets/SendBOLBottomSheet';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
+import CustomDropdown from '@components/commons/menu/CustomDropdown';
+import CustomMenu from '@components/commons/menu/CustomMenu';
 import {Label} from '@components/commons/text/Label';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import TaskOption from '@components/topheet/TaskOption';
@@ -80,31 +82,66 @@ export const TaskTopsheet = () => {
             idJob={jobDetail.id}
           />
 
-          <PressableOpacity
-            style={styles.buttonTask}
-            onPress={() => showClientLocation()}
-            // ref={refClientLocation}
-            >
-            <Wrapper style={GLOBAL_STYLES.row}>
-              <Wrapper style={styles.viewIcon}>
-                <Icon
-                  name="forklift"
-                  type="solid"
-                  color="white"
-                  size={23}
-                  style={styles.icon}
-                />
+          <CustomDropdown
+            buttonStyle={styles.buttonTask}
+            button={
+              <Wrapper style={GLOBAL_STYLES.row}>
+                <Wrapper style={styles.viewIcon}>
+                  <Icon
+                    name="forklift"
+                    type="solid"
+                    color="white"
+                    size={23}
+                    style={styles.icon}
+                  />
+                </Wrapper>
+                <Wrapper style={[styles.minPaddingLeft]}>
+                  <Label
+                    style={[GLOBAL_STYLES.bold, styles.labelTask]}
+                    numberOfLines={1}
+                    ellipsizeMode={'tail'}>
+                    Client's location
+                  </Label>
+                </Wrapper>
               </Wrapper>
-              <Wrapper style={[styles.minPaddingLeft]}>
-                <Label
-                  style={[GLOBAL_STYLES.bold, styles.labelTask]}
-                  numberOfLines={1}
-                  ellipsizeMode={'tail'}>
-                  Client's location
-                </Label>
+            }>
+            {({close}) => (
+              <Wrapper
+                style={[
+                  styles.modalClientLocation,
+                  {
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  },
+                ]}>
+                <Label style={{fontSize: 16}}>Client's Location</Label>
+
+                <Wrapper
+                  style={[
+                    GLOBAL_STYLES.row,
+                    {justifyContent: 'space-around', paddingHorizontal: 20, marginTop: 10},
+                  ]}>
+                  <Label
+                    style={{fontWeight: 'bold', fontSize: 17, marginRight: 10}}>
+                    Unit
+                  </Label>
+                  <Label style={{fontSize: 17, maxWidth: '80%'}}>
+                    {jobDetail.client_location}
+                  </Label>
+                </Wrapper>
+
+                <PressableOpacity
+                  onPress={close}
+                  style={{
+                    right: 30,
+                    padding: 5,
+                    alignSelf: "flex-end"
+                  }}>
+                  <Label>Close</Label>
+                </PressableOpacity>
               </Wrapper>
-            </Wrapper>
-          </PressableOpacity>
+            )}
+          </CustomDropdown>
 
           {/* <TaskNoAdd
             description={taskCount[4].description}
@@ -117,7 +154,7 @@ export const TaskTopsheet = () => {
             ]}
           /> */}
 
-            {/* {!loadingService && ( */}
+          {/* {!loadingService && ( */}
           {true && (
             <PressableOpacity
               style={[styles.buttonTask]}
@@ -193,5 +230,11 @@ const styles = StyleSheet.create({
   labelTask: {
     color: '#464646',
     fontSize: 14,
+  },
+  modalClientLocation: {
+    paddingTop: 10,
+    width: '100%',
+    backgroundColor: 'white',
+    borderRadius: 15,
   },
 });
