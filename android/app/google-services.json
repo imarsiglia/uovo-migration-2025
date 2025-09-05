@@ -1,0 +1,130 @@
+{
+  "project_info": {
+    "project_number": "6924787437",
+    "project_id": "uovo-3005f",
+    "storage_bucket": "uovo-3005f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:6924787437:android:e2d0efada9efe2f4f876e4",
+        "android_client_info": {
+          "package_name": "com.uovo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "6924787437-1seolm766dbktmfmrs3p893g173o66a3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.uovo",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "6924787437-msi1jnjtac8ehelp4qu5mhvbhp5g4tsh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.uovo",
+            "certificate_hash": "73045f560697f46897482bc06dd0df02846d66ba"
+          }
+        },
+        {
+          "client_id": "6924787437-q7o02uphq5o9ar2qd52b8nptnmknfnia.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.uovo",
+            "certificate_hash": "120fd13bd5e132468bf52d67b8a35d1e26b02668"
+          }
+        },
+        {
+          "client_id": "6924787437-5p2ib9bvfj2dag82dsat7nelvhr7a3pv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA65hAM5sCPQeYziHvNqM0RFoy51FKrz90"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "6924787437-5p2ib9bvfj2dag82dsat7nelvhr7a3pv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "6924787437-265u6e37ok5msd19und3uo30ae8v5gek.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.uovo"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:6924787437:android:3e0f527b5ceae381f876e4",
+        "android_client_info": {
+          "package_name": "com.uovo.sandbox"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "6924787437-35oo56prm5t0vsccm29vetgsatr8fkiq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.uovo.sandbox",
+            "certificate_hash": "73045f560697f46897482bc06dd0df02846d66ba"
+          }
+        },
+        {
+          "client_id": "6924787437-9411qbv1nl5l3cb3ga7b04b8fjg154ra.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.uovo.sandbox",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "6924787437-cjc0bt40kc7vrmbl6qunfv9dgu4dbvnh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.uovo.sandbox",
+            "certificate_hash": "120fd13bd5e132468bf52d67b8a35d1e26b02668"
+          }
+        },
+        {
+          "client_id": "6924787437-5p2ib9bvfj2dag82dsat7nelvhr7a3pv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA65hAM5sCPQeYziHvNqM0RFoy51FKrz90"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "6924787437-5p2ib9bvfj2dag82dsat7nelvhr7a3pv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "6924787437-265u6e37ok5msd19und3uo30ae8v5gek.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.uovo"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
