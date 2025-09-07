@@ -29,6 +29,15 @@ export const API_SAVE_LOCATION_NOTES = '/notes/location/saveContactComments';
 export const API_SEND_EMAIL_BOL = '/bol/sendEmail';
 export const API_TASK_COUNT = '/job/task/count';
 
+//signatures
+export const API_GET_SIGNATURES = '/signature/query';
+export const API_SAVE_SIGNATURE = '/signature/register';
+
+// notes
+export const API_GET_NOTES = '/notes/query';
+export const API_SAVE_NOTE = '/notes/register';
+export const API_DELETE_NOTE = '/notes/remove';
+
 // digital ID
 export const API_GET_QR_USER = '/user/qr';
 

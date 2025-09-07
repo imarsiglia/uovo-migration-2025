@@ -18,7 +18,7 @@ import {
 import Icon from 'react-native-fontawesome-pro';
 import Modal from 'react-native-modal';
 
-var idBadge = require('@assets/idbadge/bgid-badge.png');
+const idBadge = require('@assets/idbadge/bgid-badge.png');
 
 type Props = NativeStackScreenProps<RootStackParamList, 'DigitalId'>;
 export const DigitalIdScreen = (props: Props) => {
@@ -134,7 +134,7 @@ export const DigitalIdScreen = (props: Props) => {
 
               <View
                 style={[
-                  styles.lateralPadding,
+                  GLOBAL_STYLES.lateralPadding,
                   {
                     flexDirection: 'row',
                     justifyContent: 'space-between',
@@ -198,8 +198,8 @@ export const DigitalIdScreen = (props: Props) => {
           )}
         </View>
 
-        <View style={{paddingLeft: 30, paddingRight: 30, marginTop: 10}}>
-          <View style={[styles.lateralPadding, styles.containerInfo]}>
+        <View style={{paddingHorizontal: 30, marginTop: 10}}>
+          <View style={[GLOBAL_STYLES.lateralPadding, styles.containerInfo]}>
             <Icon name="mobile-alt" color="#979797" type="solid" size={20} />
             <Text style={styles.textInfo}>
               {member
@@ -209,13 +209,13 @@ export const DigitalIdScreen = (props: Props) => {
           </View>
 
           {(!member || (member && user?.user_id == person?.id_user)) && (
-            <View style={[styles.lateralPadding, styles.containerInfo]}>
+            <View style={[GLOBAL_STYLES.lateralPadding, styles.containerInfo]}>
               <Icon name="envelope" color="#979797" type="solid" size={20} />
               <Text style={styles.textInfo}>{user?.user_mail}</Text>
             </View>
           )}
 
-          <View style={[styles.lateralPadding, styles.containerInfo]}>
+          <View style={[GLOBAL_STYLES.lateralPadding, styles.containerInfo]}>
             <Icon name="phone" color="#979797" type="solid" size={20} />
             <Text style={styles.textInfo}>
               {member
@@ -224,7 +224,7 @@ export const DigitalIdScreen = (props: Props) => {
             </Text>
           </View>
 
-          <View style={[styles.lateralPadding, styles.containerInfo]}>
+          <View style={[GLOBAL_STYLES.lateralPadding, styles.containerInfo]}>
             <Icon
               name="map-marker-alt"
               color="#979797"
@@ -268,10 +268,6 @@ export const DigitalIdScreen = (props: Props) => {
 const AVATAR = 90;
 
 const styles = StyleSheet.create({
-  lateralPadding: {
-    paddingLeft: 20,
-    paddingRight: 20,
-  },
   title: {color: '#3a3a3a'},
   name: {
     alignSelf: 'center',
@@ -326,8 +322,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'white',
     borderRadius: 10,
-    paddingLeft: 10,
-    paddingRight: 10,
+    paddingHorizontal: 10,
   },
   youtQR: {
     marginTop: 20,

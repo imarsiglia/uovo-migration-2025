@@ -51,3 +51,19 @@ export const SaveLocationNoteSchema = yup.object().shape({
 export type SaveLocationNoteSchemaType = yup.InferType<
   typeof SaveLocationNoteSchema
 >;
+
+export const PreSaveSignatureSchema = yup.object().shape({
+  name: yup.string().required(DEFAULT_REQUIRED_MESSAGE),
+  ty: yup.string().required(DEFAULT_REQUIRED_MESSAGE),
+});
+
+export type PreSaveSignatureSchemaType = yup.InferType<
+  typeof PreSaveSignatureSchema
+>;
+
+export const SaveNoteSchema = yup.object({
+  title: yup.string().required(DEFAULT_REQUIRED_MESSAGE),
+  description: yup.string().required(DEFAULT_REQUIRED_MESSAGE),
+});
+
+export type SaveNoteSchemaType = yup.InferType<typeof SaveNoteSchema>;

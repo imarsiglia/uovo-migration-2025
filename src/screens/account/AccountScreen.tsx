@@ -42,7 +42,7 @@ export const AccountScreen = () => {
             <Label style={styles.headerTitle}>Home</Label>
           </PressableOpacity>
 
-          <Wrapper style={[styles.lateralPadding, styles.containerTitle]}>
+          <Wrapper style={[styles.GLOBAL_STYLES, styles.containerTitle]}>
             <Label
               style={[
                 GLOBAL_STYLES.title,
@@ -83,7 +83,7 @@ export const AccountScreen = () => {
 
         <PressableOpacity
           style={[
-            styles.lateralPadding,
+            GLOBAL_STYLES.lateralPadding,
             styles.containerOption,
             {marginTop: 30},
           ]}
@@ -100,7 +100,7 @@ export const AccountScreen = () => {
 
         <PressableOpacity
           style={[
-            styles.lateralPadding,
+            GLOBAL_STYLES.lateralPadding,
             styles.containerOption,
             {marginTop: 10},
           ]}
@@ -117,7 +117,7 @@ export const AccountScreen = () => {
 
         <PressableOpacity
           style={[
-            styles.lateralPadding,
+            GLOBAL_STYLES.lateralPadding,
             styles.containerOption,
             {marginTop: 10},
           ]}
@@ -141,10 +141,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     height: '100%',
     backgroundColor: COLORS.bgWhite,
-  },
-  lateralPadding: {
-    paddingLeft: 20,
-    paddingRight: 20,
   },
   center: {
     alignSelf: 'center',

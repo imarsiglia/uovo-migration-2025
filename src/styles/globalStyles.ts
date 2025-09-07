@@ -1,12 +1,12 @@
 import {StyleSheet} from 'react-native';
-import { COLORS } from './colors';
+import {COLORS} from './colors';
 
 export const GLOBAL_STYLES = StyleSheet.create({
   row: {
     display: 'flex',
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 2,
-    alignItems: "center"
+    alignItems: 'center',
   },
   containerBtnOptTop: {
     flexDirection: 'row',
@@ -53,7 +53,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     color: '#3C424A',
     opacity: 0.6,
   },
-   containerInputSearchIcon: {
+  containerInputSearchIcon: {
     height: '100%',
     width: 30,
     alignItems: 'center',
@@ -111,7 +111,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderTopColor: '#08141F21',
-    padding: 5
+    padding: 5,
   },
   optionModalClockOutHorizontal: {
     fontSize: 16,
@@ -122,5 +122,19 @@ export const GLOBAL_STYLES = StyleSheet.create({
     color: '#707070',
     marginTop: 20,
     textAlign: 'center',
+  },
+  titleModalClockOut: {
+    color: '#000000',
+    fontWeight: 'bold',
+    marginBottom: 10,
+    fontSize: 16,
+  },
+  subtitleModalClockOut: {
+    color: '#3C424A',
+    marginBottom: 0,
+    textAlign: 'center',
+  },
+  lateralPadding: {
+    paddingHorizontal: 20,
   },
 });

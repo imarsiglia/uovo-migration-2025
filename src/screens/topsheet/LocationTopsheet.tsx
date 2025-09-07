@@ -1,5 +1,5 @@
 import Geolocation from '@react-native-community/geolocation';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Animated,
   Easing,
@@ -150,7 +150,6 @@ export const LocationTopsheet = () => {
     }),
     [coordinate],
   );
-  const refBtn = React.useRef<View>(null);
   // Region controlada (solo si hay coords)
   const controlledRegion: Region | undefined = useMemo(() => {
     if (!coordinate) return undefined;
@@ -272,9 +271,9 @@ export const LocationTopsheet = () => {
     [estimateTime],
   );
 
-  const etaAnim = React.useRef(new Animated.Value(0)).current;
+  const etaAnim = useRef(new Animated.Value(0)).current;
 
-  const showEta = React.useCallback(() => {
+  const showEta = useCallback(() => {
     Animated.timing(etaAnim, {
       toValue: 1,
       duration: 220,
@@ -303,7 +302,7 @@ export const LocationTopsheet = () => {
     typeAddress,
   ]);
 
-  const hideEta = React.useCallback(() => {
+  const hideEta = useCallback(() => {
     Animated.timing(etaAnim, {
       toValue: 0,
       duration: 220,

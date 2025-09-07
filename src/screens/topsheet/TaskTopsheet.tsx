@@ -8,16 +8,21 @@ import {Label} from '@components/commons/text/Label';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import TaskOption from '@components/topheet/TaskOption';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {RoutesNavigation} from '@navigation/types';
+import { useRoute} from '@react-navigation/native';
 import useTopSheetStore from '@store/topsheet';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {ScrollView, StyleSheet} from 'react-native';
+import {useCallback} from 'react';
+import { ScrollView, StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
 export const TaskTopsheet = () => {
-  const {navigate} = useCustomNavigation();
+  const {navigate, setParams} = useCustomNavigation();
+  const route = useRoute<any>();
   const jobDetail = useTopSheetStore((d) => d.jobDetail);
-
   const {data: taskCount} = useGetTaskCount({idJob: jobDetail?.id!});
+
+  const showBOL = useCallback(() => {}, []);
 
   if (!jobDetail) {
     return <></>;
@@ -44,7 +49,7 @@ export const TaskTopsheet = () => {
             openDialog={true}
             // forwardRef={refBOL}
             onPressLeft={() =>
-              jobDetail?.use_bol ? navigate('Signature') : null
+              jobDetail?.use_bol ? navigate(RoutesNavigation.Signatures) : null
             }
             onPressRight={() => (jobDetail?.use_bol ? showBOL() : null)}
             disabled={!jobDetail?.use_bol}
@@ -66,8 +71,12 @@ export const TaskTopsheet = () => {
             icon="sticky-note"
             color="#F2DA31"
             quantity={taskCount[2].quantity}
-            onPressLeft={() => navigate('Notes')}
-            onPressRight={() => navigate('TakeNotes', {fromList: false})}
+            onPressLeft={() => navigate(RoutesNavigation.Notes)}
+            onPressRight={() =>
+              navigate(RoutesNavigation.SaveNote, {
+                changed: route.params?.changed,
+              })
+            }
             // offline={[NOTES_OFFLINE_VALIDATION]}
             idJob={jobDetail.id}
           />
@@ -119,7 +128,11 @@ export const TaskTopsheet = () => {
                 <Wrapper
                   style={[
                     GLOBAL_STYLES.row,
-                    {justifyContent: 'space-around', paddingHorizontal: 20, marginTop: 10},
+                    {
+                      justifyContent: 'space-around',
+                      paddingHorizontal: 20,
+                      marginTop: 10,
+                    },
                   ]}>
                   <Label
                     style={{fontWeight: 'bold', fontSize: 17, marginRight: 10}}>
@@ -135,7 +148,7 @@ export const TaskTopsheet = () => {
                   style={{
                     right: 30,
                     padding: 5,
-                    alignSelf: "flex-end"
+                    alignSelf: 'flex-end',
                   }}>
                   <Label>Close</Label>
                 </PressableOpacity>

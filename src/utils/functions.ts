@@ -18,6 +18,7 @@ import {
   STATUS_NATIONAL_SHUTTLE,
   StatusNationalShuttleTye,
 } from '@api/contants/constants';
+import Orientation from 'react-native-orientation-locker';
 
 export function getFormattedDate(date?: string | Date | null, format?: string) {
   if (!date) {
@@ -34,11 +35,11 @@ export function getDeviceInfo(): {
   osVersion: string;
   timeZone: string;
 } {
-  var deviceId = DeviceInfo.getDeviceId();
-  let buildNumber = DeviceInfo.getVersion();
-  var systemVersion = DeviceInfo.getSystemVersion();
-  var model = DeviceInfo.getModel();
-  var brand = DeviceInfo.getBrand();
+  const deviceId = DeviceInfo.getDeviceId();
+  const buildNumber = DeviceInfo.getVersion();
+  const systemVersion = DeviceInfo.getSystemVersion();
+  const model = DeviceInfo.getModel();
+  const brand = DeviceInfo.getBrand();
 
   return {
     deviceId,
@@ -248,8 +249,8 @@ export function isEmail(email: string) {
   return re.test(String(email).toLowerCase());
 }
 
-export function getColorStatusCrewMember(status?: string | null) {
-  var colorStatus =
+export function getColorStatusCrewMember(status?: string | null) {
+  const colorStatus =
     status != null && status != ''
       ? status.toUpperCase() == STARTED_STATUS_CREW
         ? STARTED_COLOR_CREW
@@ -258,4 +259,17 @@ export function getColorStatusCrewMember(status?: string | null) {
         : FINALIZED_COLOR_CREW
       : INITIAL_COLOR_CREW;
   return colorStatus;
+}
+
+export function capitalize(word: string) {
+  if (!word) return '';
+  return word[0].toUpperCase() + word.slice(1).toLowerCase();
+}
+
+export function lockToLandscape() {
+  Orientation.lockToLandscape();
+}
+
+export function lockToPortrait() {
+  Orientation.lockToPortrait();
 }

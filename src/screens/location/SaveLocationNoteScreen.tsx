@@ -81,7 +81,7 @@ export const SaveLocationNoteScreen = (props: Props) => {
             <BackButton title="Top sheet" onPress={goBack} />
           </Wrapper>
 
-          <Wrapper style={[styles.lateralPadding, GLOBAL_STYLES.row]}>
+          <Wrapper style={[GLOBAL_STYLES.lateralPadding, GLOBAL_STYLES.row]}>
             <Label
               style={[
                 GLOBAL_STYLES.title,
@@ -147,10 +147,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     height: '100%',
     backgroundColor: COLORS.bgWhite,
-  },
-  lateralPadding: {
-    paddingLeft: 20,
-    paddingRight: 20,
   },
   topsheet: {
     color: COLORS.titleColor,

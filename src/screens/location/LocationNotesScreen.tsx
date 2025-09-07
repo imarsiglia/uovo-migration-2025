@@ -67,7 +67,7 @@ export const LocationNotesScreen = (props: Props) => {
           </View>
         </View>
 
-        <View style={[styles.lateralPadding, GLOBAL_STYLES.row]}>
+        <View style={[GLOBAL_STYLES.lateralPadding, GLOBAL_STYLES.row]}>
           <Text
             style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, styles.topsheet]}>
             Location notes
@@ -157,9 +157,5 @@ const styles = StyleSheet.create({
   },
   topsheet: {
     color: '#3a3a3a',
-  },
-  lateralPadding: {
-    paddingLeft: 20,
-    paddingRight: 20,
   },
 });

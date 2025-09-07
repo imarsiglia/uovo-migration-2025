@@ -1,5 +1,5 @@
 import {COLORS} from '@styles/colors';
-import React, {forwardRef} from 'react';
+import {forwardRef} from 'react';
 import {
   ActivityIndicator,
   PressableProps,

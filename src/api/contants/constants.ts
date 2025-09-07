@@ -24,6 +24,8 @@ export const QUERY_KEYS = {
   LOCATION_NOTES: 'location_notes',
   TASK_COUNT: 'task_count',
   QR_USER: 'qr_user',
+  SIGNATURES: 'signatures',
+  NOTES: 'NOTES',
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';
@@ -158,7 +160,6 @@ export const FILTER_TYPES_ACTIVITY = [
   },
 ];
 
-
 // location navigation
 export type LatLng = {lat: number; lng: number};
 
@@ -228,5 +229,21 @@ export const CANDIDATES_IOS: IOSNavCandidate[] = [
     scheme: 'tomtomhome://',
     buildURL: ({lat, lng}: IOSNavCandidateType) =>
       `tomtomhome://geo:action=show&lat=${lat}&long=${lng}`,
+  },
+];
+
+// signatures
+export const SIGNER_TYPES = [
+  {
+    id: 'SHIPPER',
+    name: 'Shipper',
+  },
+  {
+    id: 'CARRIER',
+    name: 'Carrier',
+  },
+  {
+    id: 'CONSIGNEE',
+    name: 'Consignee',
   },
 ];

@@ -1,4 +1,5 @@
 import {CrewMemberType} from '@api/types/Jobs';
+import { NoteType } from '@api/types/Task';
 import {ImageType} from '@generalTypes/images';
 
 // 👉 Constantes reutilizables (sin strings mágicos)
@@ -16,7 +17,11 @@ export const RoutesNavigation = {
   LocationNotes: 'LocationNotes',
   SaveLocationNotes: 'SaveLocationNotes',
   DigitalId: 'DigitalId',
-  VisualizePdf: 'VisualizePdf'
+  VisualizePdf: 'VisualizePdf',
+  Signatures: 'Signatures',
+  TakeSignature: 'TakeSignature',
+  Notes: 'Notes',
+  SaveNote: 'SaveNote',
 } as const;
 
 // Union de nombres de ruta: "Home" | "ContactUs" | ...
@@ -60,7 +65,18 @@ export type RootStackParamList = {
     member?: boolean;
     person?: CrewMemberType;
   };
-  [RoutesNavigation.VisualizePdf]: undefined
+  [RoutesNavigation.VisualizePdf]: undefined;
+  [RoutesNavigation.Signatures]: undefined;
+  [RoutesNavigation.TakeSignature]: {
+    name: string;
+    type: string;
+    forceSend?: boolean;
+    changed?: number;
+  };
+  [RoutesNavigation.Notes]: undefined;
+  [RoutesNavigation.SaveNote]: {
+    item?: NoteType;
+  };
 };
 
 export const TopSheetRoutesNavigation = {

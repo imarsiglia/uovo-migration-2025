@@ -3,7 +3,7 @@ import {create} from 'zustand';
 
 type ModalDialogContentType = {
   modalVisible: boolean;
-  type?: 'info' | 'error' | 'success';
+  type?: 'info' | 'error' | 'success' | 'warning';
   message?: string | ReactNode;
   title?: string;
   confirmBtnLabel?: string;

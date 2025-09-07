@@ -87,7 +87,6 @@ export const useGetEstimatedTimeByLocation = ({
   });
 };
 
-useQuery
 export const useGetQrUser = () => {
   return useQuery({
     ...DEFAULT_PERSISTENCE_CONFIG,

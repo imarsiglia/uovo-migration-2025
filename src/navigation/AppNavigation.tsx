@@ -89,6 +89,10 @@ import {LocationNotesScreen} from '@screens/location/LocationNotesScreen';
 import {SaveLocationNoteScreen} from '@screens/location/SaveLocationNoteScreen';
 import {DigitalIdScreen} from '@screens/digitalid/DigitalIdScreen';
 import {VisualizePdfScreen} from '@screens/visualizepdf/VisualizePdfScreen';
+import { SignaturesScreen } from '@screens/signatures/SignaturesScreen';
+import { TakeSignatureScreen } from '@screens/signatures/TakeSignatureScreen';
+import { NotesScreen } from '@screens/notes/NotesScreen';
+import { SaveNoteScreen } from '@screens/notes/SaveNoteScreen';
 // import InventoryNS from '../screens/nationalShuttle/InventoryNS';
 
 // LogBox.ignoreLogs([
@@ -189,6 +193,22 @@ export const AppNavigation = () => {
             <Stack.Screen
               name={RoutesNavigation.VisualizePdf}
               component={VisualizePdfScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.Signatures}
+              component={SignaturesScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.TakeSignature}
+              component={TakeSignatureScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.Notes}
+              component={NotesScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.SaveNote}
+              component={SaveNoteScreen}
             />
           </Stack.Navigator>
         </NavigationContainer>

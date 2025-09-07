@@ -84,7 +84,7 @@ export const SendBOLBottomSheet = ({
   }
 
   function initSelectedEmails() {
-    var newList = [];
+    const newList = [];
     if (jobDetail?.shipper_email) {
       const split_shipper_emails = jobDetail.shipper_email.split(';');
       for (let i = 0; i < split_shipper_emails.length; i++) {
@@ -119,14 +119,14 @@ export const SendBOLBottomSheet = ({
   }
 
   function checkEmail(item: PeopleEmail) {
-    var index = emails.findIndex((x) => x.id == item.id);
-    var newList = [...emails];
+    const index = emails.findIndex((x) => x.id == item.id);
+    const newList = [...emails];
     newList[index] = {...newList[index], checked: !newList[index].checked};
     setEmails(newList);
   }
 
   function removeEmail(index: number) {
-    var emailsTemp = [...others];
+    const emailsTemp = [...others];
     emailsTemp.splice(index, 1);
     setOthers(emailsTemp);
   }
@@ -138,7 +138,7 @@ export const SendBOLBottomSheet = ({
           others.push({email: text.trim(), valid: true});
         }
       } else {
-        var splitedText = text.split(' ');
+        const splitedText = text.split(' ');
         splitedText.forEach((element) => {
           if (element.trim() != '' && !checkExistingEmail(text.trim())) {
             others.push({email: element, valid: false});
@@ -165,7 +165,7 @@ export const SendBOLBottomSheet = ({
           others.push({email: emailChipText.trim(), valid: true});
         }
       } else {
-        var splitedText = emailChipText.split(' ');
+        const splitedText = emailChipText.split(' ');
         splitedText.forEach((element) => {
           if (
             element.trim() != '' &&
@@ -186,8 +186,8 @@ export const SendBOLBottomSheet = ({
       setShowResendBol(false);
     }
 
-    var selectedEmails = emails.filter((x) => x.checked);
-    var emailsValidos =
+    const selectedEmails = emails.filter((x) => x.checked);
+    const emailsValidos =
       others.length > 0 && others.some((x) => x.valid == true);
     if (selectedEmails.length == 0 && !emailsValidos) {
       showToastMessage(
@@ -199,11 +199,11 @@ export const SendBOLBottomSheet = ({
     handleVisible(false);
 
     setTimeout(async () => {
-      var mappedEmails = selectedEmails.map((x) => x.email);
-      var othersEmails = others
+      const mappedEmails = selectedEmails.map((x) => x.email);
+      const othersEmails = others
         .filter((x) => x.valid == true)
         .map((x) => x.email);
-      var destinationEmails = mappedEmails.concat(othersEmails);
+      const destinationEmails = mappedEmails.concat(othersEmails);
 
       loadingWrapperPromise(
         mutateAsync({

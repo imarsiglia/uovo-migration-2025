@@ -1,12 +1,12 @@
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
-import {View, StyleSheet, Animated} from 'react-native';
-import {Wrapper} from '../wrappers/Wrapper';
-import {useModalDialogStore} from '@store/modals';
-import {Label} from '../text/Label';
-import {PressableOpacity} from '../buttons/PressableOpacity';
-import {COLORS} from '@styles/colors';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
+import { useModalDialogStore } from '@store/modals';
+import { COLORS } from '@styles/colors';
+import { GLOBAL_STYLES } from '@styles/globalStyles';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Animated, StyleSheet } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
+import { PressableOpacity } from '../buttons/PressableOpacity';
+import { Label } from '../text/Label';
+import { Wrapper } from '../wrappers/Wrapper';
 
 const ICONS_TYPE_NAMES = {
   info: {
@@ -21,6 +21,10 @@ const ICONS_TYPE_NAMES = {
     icon: 'times-circle',
     color: COLORS.error,
   },
+  warning: {
+    icon: 'exclamation-triangle',
+    color: COLORS.warning,
+  }
 };
 
 export const ModalDialog = () => {
@@ -92,15 +96,15 @@ export const ModalDialog = () => {
   return (
     <Wrapper style={styles.overlay}>
       <Animated.View style={[styles.modal, {transform: [{scale}], opacity}]}>
-        <View style={styles.modalClockOutHorizontal}>
+        <Wrapper style={styles.modalClockOutHorizontal}>
           <Wrapper style={{alignSelf: 'center'}}>
             <Icon name={IconColor.icon} size={30} color={IconColor.color} />
           </Wrapper>
 
-          <View style={styles.bodyModalClockOut}>
+          <Wrapper style={styles.bodyModalClockOut}>
             <Label style={styles.descModalClockOut}>{message}</Label>
-          </View>
-          <View style={[styles.containerOptionsModalClockOutHorizontal]}>
+          </Wrapper>
+          <Wrapper style={[styles.containerOptionsModalClockOutHorizontal]}>
             {cancelable && (
               <PressableOpacity
                 onPress={onPressCancel}
@@ -127,8 +131,8 @@ export const ModalDialog = () => {
                 {confirmBtnLabel}
               </Label>
             </PressableOpacity>
-          </View>
-        </View>
+          </Wrapper>
+        </Wrapper>
       </Animated.View>
     </Wrapper>
   );
