@@ -15,7 +15,10 @@ export function showErrorToastMessage(
   duration: number = Toast.SHORT,
   options?: StylesIOS,
 ) {
-  const finalOptions = options ?? {backgroundColor: COLORS.error};
+  const finalOptions = options ?? {
+    backgroundColor: COLORS.error,
+    tapToDismissEnabled: true,
+  };
   Toast.show(message, duration, finalOptions);
 }
 

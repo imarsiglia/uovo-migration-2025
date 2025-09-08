@@ -208,10 +208,6 @@ export const SaveReportMaterialScreen = (props: Props) => {
                       }
                     : undefined
                 }
-                onFocus={() => {
-                  closeAutocomplete();
-                  itemRef.current.open();
-                }}
               />
             </View>
           </View>

@@ -1,10 +1,9 @@
 import {useFocusEffect} from '@react-navigation/native';
-import React, {useCallback, useRef, useState} from 'react';
+import {useCallback, useMemo, useRef, useState, useEffect} from 'react';
 import {
   StyleProp,
   StyleSheet,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
   ViewStyle,
   Dimensions,
@@ -18,169 +17,176 @@ import Animated, {
 } from 'react-native-reanimated';
 
 const PADDING = 8;
+const ARROW = 10; // tamaño base del triángulo
 const {width: SW, height: SH} = Dimensions.get('window');
+
+type Position = 'top' | 'bottom' | 'auto';
 
 type CustomDropdownType = {
   button: React.ReactNode;
   buttonStyle?: StyleProp<ViewStyle>;
-  children?:
-    | React.ReactNode
-    | ((api: { close: () => void }) => React.ReactNode);
+  position?: Position; // 'top' (default) | 'bottom' | 'auto'
+  children?: React.ReactNode | ((api: { close: () => void }) => React.ReactNode);
 };
+
+const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(v, max));
 
 const CustomDropdown = ({
   button,
   children,
   buttonStyle,
+  position = 'top',
 }: CustomDropdownType) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [openKey, setOpenKey] = useState(0);
-  const [buttonLayout, setButtonLayout] = useState({
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0,
-  });
-  const [menuLayout, setMenuLayout] = useState({
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0,
-  });
-  const translateY = useSharedValue(20);
+
+  const [buttonLayout, setButtonLayout] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const [menuLayout, setMenuLayout] = useState({ x: 0, y: 0, width: 0, height: 0 });
+
+  // posición final efectiva (para 'auto' o al cambiar tamaños)
+  const [placement, setPlacement] = useState<Exclude<Position, 'auto'>>(
+    position === 'bottom' ? 'bottom' : 'top'
+  );
+
+  const translateY = useSharedValue(0);
   const opacity = useSharedValue(0);
+
   const buttonRef = useRef<any>(null);
-  const menuRef = useRef(null);
-  const isLocked = useRef(false);
+  const lockRef = useRef(false);
+
+  const decidePlacement = useCallback((desired: Position, btn: typeof buttonLayout, menu: typeof menuLayout) => {
+    if (desired !== 'auto') return desired;
+    const spaceAbove = btn.y - PADDING;
+    const spaceBelow = SH - (btn.y + btn.height) - PADDING;
+    const need = menu.height + ARROW;
+    if (spaceBelow >= need) return 'bottom';
+    if (spaceAbove >= need) return 'top';
+    return spaceBelow >= spaceAbove ? 'bottom' : 'top';
+  }, []);
 
   const toggleModal = () => {
-    if (isLocked.current) return;
-
-    isLocked.current = true;
-    setTimeout(() => {
-      isLocked.current = false;
-    }, 600);
+    if (lockRef.current) return;
+    lockRef.current = true;
+    setTimeout(() => (lockRef.current = false), 600);
 
     if (isModalVisible) {
       closeModal();
     } else {
-      // @ts-ignore
-      buttonRef.current.measure((fx, fy, width, height, px, py) => {
-        setButtonLayout({x: px, y: py, width, height});
-        setOpenKey((k) => k + 1);
+      // Medir botón
+      buttonRef.current?.measure?.((fx: number, fy: number, width: number, height: number, px: number, py: number) => {
+        setButtonLayout({ x: px, y: py, width, height });
+        setOpenKey(k => k + 1);
+        // animación inicial según intención
+        translateY.value = position === 'bottom' ? 8 : -8;
         opacity.value = 0;
-        translateY.value = 20;
         setModalVisible(true);
-        // setModalVisible(true);
-        // openModal();
       });
     }
   };
 
   const openModal = useCallback(() => {
-    opacity.value = withTiming(1, {
-      duration: 300,
-    });
-    translateY.value = withTiming(0, {
-      duration: 300,
-      easing: Easing.inOut(Easing.ease),
-    });
+    opacity.value = withTiming(1, { duration: 200 });
+    translateY.value = withTiming(0, { duration: 220, easing: Easing.inOut(Easing.ease) });
   }, [opacity, translateY]);
 
   const closeModal = useCallback(() => {
-    opacity.value = withTiming(0, {
-      duration: 300,
-    });
-    translateY.value = withTiming(20, {
-      duration: 300,
+    opacity.value = withTiming(0, { duration: 180 });
+    translateY.value = withTiming(placement === 'bottom' ? 8 : -8, {
+      duration: 180,
       easing: Easing.inOut(Easing.ease),
     });
-    setTimeout(() => setModalVisible(false), 300);
-  }, [opacity, translateY]);
+    setTimeout(() => setModalVisible(false), 180);
+  }, [opacity, translateY, placement]);
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{translateY: translateY.value}],
-      opacity: opacity.value,
-    };
-  });
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+    opacity: opacity.value,
+  }));
 
-  const computedTop = Math.max(
+  // Determinar placement cuando tengamos tamaños
+  const effectivePlacement = useMemo(
+    () => decidePlacement(position, buttonLayout, menuLayout),
+    [position, buttonLayout, menuLayout, decidePlacement]
+  );
+
+  useEffect(() => {
+    setPlacement(effectivePlacement);
+  }, [effectivePlacement]);
+
+  // Posición del contenedor (envoltura del menú + se posiciona la flecha dentro)
+  const computedTop =
+    placement === 'top'
+      ? clamp(buttonLayout.y - menuLayout.height, PADDING, SH - menuLayout.height - PADDING)
+      : clamp(buttonLayout.y + buttonLayout.height, PADDING, SH - menuLayout.height - PADDING);
+
+  const computedLeft = clamp(
+    buttonLayout.x + buttonLayout.width / 2 - menuLayout.width / 2,
     PADDING,
-    Math.min(
-      buttonLayout.y - (menuLayout.height),
-      SH - menuLayout.height - PADDING,
-    ),
+    SW - menuLayout.width - PADDING
   );
 
-  const computedLeft = Math.max(
-    PADDING,
-    Math.min(
-      buttonLayout.x + buttonLayout.width / 2 - menuLayout.width / 2 - 20,
-      SW - menuLayout.width - PADDING,
-    ),
-  );
+  // Posición horizontal de la flecha para centrarla respecto al menú
+  const arrowLeft = Math.round(menuLayout.width / 2 - ARROW);
 
-  const renderChildren = React.useMemo(() => {
-  if (typeof children === 'function') {
-    return (children as (api: { close: () => void }) => React.ReactNode)({
-      close: closeModal,
-    });
-  }
-  return children;
-}, [children, closeModal]);
+  const renderChildren = useMemo(() => {
+    if (typeof children === 'function') {
+      return (children as (api: { close: () => void }) => React.ReactNode)({ close: closeModal });
+    }
+    return children;
+  }, [children, closeModal]);
 
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        closeModal();
-      };
-    }, [closeModal]),
-  );
+  useFocusEffect(useCallback(() => () => { closeModal(); }, [closeModal]));
 
   return (
     <>
-      <TouchableOpacity
-        ref={buttonRef}
-        onPress={toggleModal}
-        style={buttonStyle}>
+      <TouchableOpacity ref={buttonRef} onPress={toggleModal} style={buttonStyle}>
         {button}
       </TouchableOpacity>
 
       <Modal
         isVisible={isModalVisible}
         onBackdropPress={closeModal}
+        onBackButtonPress={closeModal}
         backdropOpacity={0.2}
         style={styles.modal}
         animationIn="fadeIn"
         animationOut="fadeOut"
-        animationInTiming={300}
-        animationOutTiming={300}
+        animationInTiming={200}
+        animationOutTiming={180}
         useNativeDriver
         onModalShow={openModal}
-        onModalHide={() => {
-          setMenuLayout({x: 0, y: 0, width: 0, height: 0});
-        }}>
+        onModalHide={() => setMenuLayout({ x: 0, y: 0, width: 0, height: 0 })}
+      >
         <View style={styles.backdrop} pointerEvents="box-none">
           <Animated.View
             key={openKey}
             style={[
               styles.menuContainer,
               animatedStyle,
-              {
-                top: computedTop,
-                left: computedLeft,
-              },
-            ]}>
+              { top: computedTop, left: computedLeft },
+            ]}
+          >
+            {/* Menú */}
             <View
-              ref={menuRef}
               style={styles.menu}
-              onLayout={(event) => {
-                setMenuLayout(event.nativeEvent.layout);
-              }}>
+              onLayout={(e) => setMenuLayout(e.nativeEvent.layout)}
+            >
               {renderChildren}
             </View>
-            <View style={styles.triangle}></View>
+
+            {/* Flecha absoluta (no intercepta toques) */}
+            {menuLayout.width > 0 && (
+              <View
+                pointerEvents="none"
+                style={[
+                  styles.arrowBase,
+                  placement === 'bottom' ? styles.arrowUp : styles.arrowDown,
+                  placement === 'bottom'
+                    ? { top: -ARROW, left: arrowLeft }
+                    : { bottom: -ARROW, left: arrowLeft },
+                ]}
+              />
+            )}
           </Animated.View>
         </View>
       </Modal>
@@ -189,27 +195,12 @@ const CustomDropdown = ({
 };
 
 const styles = StyleSheet.create({
-  modal: {
-    margin: 0,
-    justifyContent: 'flex-start',
-  },
-  backdrop: {
-    flex: 1,
-  },
+  modal: { margin: 0, justifyContent: 'flex-start' },
+  backdrop: { flex: 1 },
   menuContainer: {
     position: 'absolute',
-    alignItems: 'center',
-  },
-  triangle: {
-    width: 0,
-    height: 0,
-    borderLeftWidth: 10,
-    borderRightWidth: 10,
-    borderBottomWidth: 10,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderBottomColor: 'white',
-    transform: [{rotate: '180deg'}],
+    // MUY IMPORTANTE: permitir que la flecha salga fuera
+    overflow: 'visible',
   },
   menu: {
     backgroundColor: 'white',
@@ -217,8 +208,39 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingBottom: 20,
     paddingHorizontal: 10,
-    marginTop: -10,
-    // marginHorizontal: 2
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
+    zIndex: 1,
+  },
+  // Base del triángulo
+  arrowBase: {
+    position: 'absolute',
+    width: 0,
+    height: 0,
+    zIndex: 2,
+    elevation: 7,
+    borderStyle: 'solid',
+  },
+  // Triángulo apuntando hacia ARRIBA (para placement "bottom": el menú está abajo del botón)
+  arrowUp: {
+    borderLeftWidth: ARROW,
+    borderRightWidth: ARROW,
+    borderBottomWidth: ARROW,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: 'white',
+  },
+  // Triángulo apuntando hacia ABAJO (para placement "top": el menú está arriba del botón)
+  arrowDown: {
+    borderLeftWidth: ARROW,
+    borderRightWidth: ARROW,
+    borderTopWidth: ARROW,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderTopColor: 'white',
   },
 });
 

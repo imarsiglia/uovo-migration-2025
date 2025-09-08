@@ -6,6 +6,7 @@ import {
   TaskBaseApiProps,
   taskServices,
 } from '@api/services/taskServices';
+import {IdReportMaterialType} from '@api/types/Task';
 import {keepPreviousData, useMutation, useQuery} from '@tanstack/react-query';
 
 const DEFAULT_PERSISTENCE_CONFIG = {
@@ -30,6 +31,12 @@ export const useSaveSignature = () => {
   });
 };
 
+export const useDeleteSignature = () => {
+  return useMutation({
+    mutationFn: taskServices.deleteSignature,
+  });
+};
+
 export const useGetNotes = (props: TaskBaseApiProps) => {
   return useQuery({
     queryKey: [QUERY_KEYS.NOTES, props],
@@ -51,11 +58,14 @@ export const useDeleteNote = () => {
   });
 };
 
-export const useGetReportMaterials = (props: TaskBaseApiProps) => {
+export const useGetReportMaterials = ({
+  enabled = true,
+  ...props
+}: TaskBaseApiProps & {enabled?: boolean}) => {
   return useQuery({
     queryKey: [QUERY_KEYS.REPORT_MATERIALS, props],
     queryFn: () => taskServices.getReportMaterials(props),
-    enabled: !!props?.idJob,
+    enabled: !!props?.idJob && enabled,
     ...DEFAULT_PERSISTENCE_CONFIG,
   });
 };
@@ -81,9 +91,36 @@ export const useGetReportMaterialsInventory = (
   props: ReportMaterialsInventoryApiProps,
 ) => {
   return useQuery({
-    queryKey: [QUERY_KEYS.REPORT_MATERIALS, props],
+    queryKey: [QUERY_KEYS.REPORT_MATERIALS_INVENTORY, props],
     queryFn: () => taskServices.getReportMaterialsInventory(props),
-    enabled: !!props?.idJob && !!props.filter && props.filter.trim().length > 0,
+    enabled:
+      !!props?.idJob && !!props.filter && props.filter?.trim()?.length > 0,
+    // gcTime: 0,
+    // staleTime: 0
+    // ...DEFAULT_PERSISTENCE_CONFIG,
+  });
+};
+
+export const useRegisterOneReportMaterial = () => {
+  return useMutation({
+    mutationFn: taskServices.registerOneReportMaterial,
+  });
+};
+
+export const useGetWoAttachments = (props: TaskBaseApiProps) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.WO_ATTACHMENTS, props],
+    queryFn: () => taskServices.getWoAttachments(props),
+    enabled: !!props?.idJob,
+    ...DEFAULT_PERSISTENCE_CONFIG,
+  });
+};
+
+export const useGetBOLCount = (props: TaskBaseApiProps) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.BOL_COUNT, props],
+    queryFn: () => taskServices.getBOLCount(props),
+    enabled: !!props?.idJob,
     ...DEFAULT_PERSISTENCE_CONFIG,
   });
 };

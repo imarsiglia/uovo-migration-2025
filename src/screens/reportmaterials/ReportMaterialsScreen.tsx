@@ -28,17 +28,17 @@ import {ScrollView, StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 // import OfflineValidation from '../components/offline/OfflineValidation';
 
-export const ReportMaterialsScreen = (props) => {
+export const ReportMaterialsScreen = () => {
   const [itemExpanded, setItemExpanded] = useState(undefined);
   const [detailList, setDetailList] = useState([]);
   const {navigate, goBack} = useCustomNavigation();
   const {id: idJob} = useTopSheetStore((d) => d.jobDetail);
   const showDialog = useModalDialogStore((d) => d.showVisible);
+
   const {refetchAll} = useRefreshIndicator([
     [QUERY_KEYS.REPORT_MATERIALS, {idJob}],
     [QUERY_KEYS.TASK_COUNT, {idJob}],
   ]);
-
   const {
     data: materials,
     isLoading,
@@ -49,56 +49,57 @@ export const ReportMaterialsScreen = (props) => {
 
   const {mutateAsync: removeMaterialAsync} = useRegisterReportMaterials();
 
-  // function refreshData() {
-  //   getMaterials().then(() => setRefreshDetail(!refreshDetail));
-  // }
-
-  const deleteMaterial = useCallback((item: ReportMaterialType) => {
-    showDialog({
-      modalVisible: true,
-      type: 'warning',
-      message: (
-        <Wrapper style={styles.bodyModalClockOut}>
-          <Label style={styles.titleModalClockOut}>Delete?</Label>
-          <Label style={styles.subtitleModalClockOut}>
-            Name: {item.id_material.name}
-          </Label>
-          <Label style={styles.subtitleModalClockOut}>
-            Unit type: {item.id_material.unit}
-          </Label>
-          <Label style={styles.subtitleModalClockOut}>
-            Quantity: {item.quantity}
-          </Label>
-          <Label style={styles.descModalClockOut}>
-            Are you sure you want to delete the current material?
-          </Label>
-        </Wrapper>
-      ),
-      cancelable: true,
-      onConfirm: () => {
-        const list = materials?.filter((x) => x.id !== item.id) ?? [];
-        loadingWrapperPromise(
-          removeMaterialAsync({
-            idJob,
-            list,
-          })
-            .then((d) => {
-              if (d) {
-                refetchAll();
-                showToastMessage('Material deleted successfully');
-              } else {
+  const deleteMaterial = useCallback(
+    (item: ReportMaterialType) => {
+      showDialog({
+        modalVisible: true,
+        type: 'warning',
+        message: (
+          <Wrapper style={styles.bodyModalClockOut}>
+            <Label style={styles.titleModalClockOut}>Delete?</Label>
+            <Label style={styles.subtitleModalClockOut}>
+              Name: {item.id_material.name}
+            </Label>
+            <Label style={styles.subtitleModalClockOut}>
+              Unit type: {item.id_material.unit}
+            </Label>
+            <Label style={styles.subtitleModalClockOut}>
+              Quantity: {item.quantity}
+            </Label>
+            <Label style={styles.descModalClockOut}>
+              Are you sure you want to delete the current material?
+            </Label>
+          </Wrapper>
+        ),
+        cancelable: true,
+        onConfirm: () => {
+          const list = materials?.filter((x) => x.id !== item.id) ?? [];
+          loadingWrapperPromise(
+            removeMaterialAsync({
+              idJob,
+              list,
+            })
+              .then((d) => {
+                if (d) {
+                  refetchAll();
+                  showToastMessage('Material deleted successfully');
+                } else {
+                  showErrorToastMessage(
+                    'Error while removing material, try again',
+                  );
+                }
+              })
+              .catch(() =>
                 showErrorToastMessage(
                   'Error while removing material, try again',
-                );
-              }
-            })
-            .catch(() =>
-              showErrorToastMessage('Error while removing material, try again'),
-            ),
-        );
-      },
-    });
-  }, []);
+                ),
+              ),
+          );
+        },
+      });
+    },
+    [showDialog, materials, removeMaterialAsync, refetchAll],
+  );
 
   function onSelectCollapse(itemId) {
     if (itemExpanded == itemId) {
@@ -115,7 +116,7 @@ export const ReportMaterialsScreen = (props) => {
 
       <Wrapper style={GLOBAL_STYLES.bgwhite}>
         <Wrapper style={GLOBAL_STYLES.containerBtnOptTop}>
-          <PressableOpacity onPress={() => props.navigation.goBack()}>
+          <PressableOpacity onPress={goBack}>
             <Wrapper style={styles.backBtn}>
               <Icon
                 name="chevron-left"
@@ -233,7 +234,7 @@ export const ReportMaterialsScreen = (props) => {
                         : getFormattedDate(item.updated_date, 'MM/DD/YYYY'),
                   }))
                   ?.map((objeto) => Object.values(objeto))
-                  ?.map((item, index) => (
+                  ?.map((item: any, index) => (
                     <AccordionItem
                       key={`${item?.id}_${index}`}
                       item={item}
@@ -263,35 +264,21 @@ export const ReportMaterialsScreen = (props) => {
                     ]}>
                     <PressableOpacity
                       style={{marginRight: 10}}
-                      onPress={
-                        () =>
-                          navigate(RoutesNavigation.SaveReportMaterials, {
-                            item,
-                          })
-                        // navigate('AddMaterials', {
-                        //   item: item,
-                        //   index: index,
-                        //   list: filterList,
-                        //   fromlist: true,
-                        //   refresh: getMaterials.bind(this),
-                        // })
+                      onPress={() =>
+                        navigate(RoutesNavigation.SaveReportMaterials, {item})
                       }>
                       <Icon
                         name="edit"
-                        color="#00D3ED"
+                        color={COLORS.terteary}
                         size={18}
                         type="solid"
                       />
                     </PressableOpacity>
 
-                    <PressableOpacity
-                      onPress={
-                        () => deleteMaterial(item)
-                        // initDelete(item, index)
-                      }>
+                    <PressableOpacity onPress={() => deleteMaterial(item)}>
                       <Icon
                         name="trash"
-                        color="#00D3ED"
+                        color={COLORS.terteary}
                         size={16}
                         type="solid"
                       />
@@ -331,7 +318,7 @@ export const ReportMaterialsScreen = (props) => {
                 index={index}
                 expanded={item.idItem == itemExpanded}
                 onLoadData={setDetailList}
-                refresh={isFetched}
+                refresh={isRefetching}
               />
             ))}
         </ScrollView>

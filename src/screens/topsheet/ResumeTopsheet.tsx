@@ -3,6 +3,7 @@ import {Label} from '@components/commons/text/Label';
 import {SelectableText} from '@components/commons/text/SelectableText';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {RoutesNavigation} from '@navigation/types';
 import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
@@ -83,7 +84,7 @@ export const ResumeTopsheet = () => {
         }}>
         <PressableOpacity
           style={styles.btnOptionAttachments}
-          onPress={() => navigate('Account')}>
+          onPress={() => navigate(RoutesNavigation.WoAttachmentScreen)}>
           <Label style={styles.btnOptionAttachmentsText}>WO Attachments</Label>
           <Wrapper style={styles.btnOptionAttachmentsCounter}>
             <Label style={styles.btnOptionAttachmentsNumeric}>
@@ -111,7 +112,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgWhite,
     minHeight: '100%',
     paddingHorizontal: 20,
-    paddingTop: 10
+    paddingTop: 10,
   },
   nameBold: {
     color: COLORS.subtitleColor,

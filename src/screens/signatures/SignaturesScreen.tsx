@@ -1,44 +1,55 @@
-import { SIGNER_TYPES } from '@api/contants/constants';
-import { useGetSignatures } from '@api/hooks/HooksTaskServices';
-import { SignatureType } from '@api/types/Task';
-import { Icons } from '@assets/icons/icons';
-import { PressableOpacity } from '@components/commons/buttons/PressableOpacity';
-import { BasicFormProvider } from '@components/commons/form/BasicFormProvider';
-import { ButtonSubmit } from '@components/commons/form/ButtonSubmit';
-import { InputTextContext } from '@components/commons/form/InputTextContext';
-import { SelectRadioButtonContext } from '@components/commons/form/SelectRadioButtonContext';
-import { Label } from '@components/commons/text/Label';
-import MinRoundedView from '@components/commons/view/MinRoundedView';
-import { Wrapper } from '@components/commons/wrappers/Wrapper';
-import { RoutesNavigation } from '@navigation/types';
-import { useRoute } from '@react-navigation/native';
-import useTopSheetStore from '@store/topsheet';
-import { COLORS } from '@styles/colors';
-import { GLOBAL_STYLES } from '@styles/globalStyles';
-import { capitalize } from '@utils/functions';
-import { showErrorToastMessage } from '@utils/toast';
-import { useCallback, useEffect, useState } from 'react';
+import {QUERY_KEYS, SIGNER_TYPES} from '@api/contants/constants';
 import {
-    ActivityIndicator,
-    FlatList,
-    Keyboard,
-    ListRenderItemInfo,
-    StyleSheet
+  useDeleteSignature,
+  useGetSignatures,
+} from '@api/hooks/HooksTaskServices';
+import {SignatureType} from '@api/types/Task';
+import {Icons} from '@assets/icons/icons';
+import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
+import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
+import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
+import {InputTextContext} from '@components/commons/form/InputTextContext';
+import {SelectRadioButtonContext} from '@components/commons/form/SelectRadioButtonContext';
+import {Label} from '@components/commons/text/Label';
+import MinRoundedView from '@components/commons/view/MinRoundedView';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {RoutesNavigation} from '@navigation/types';
+import {useRoute} from '@react-navigation/native';
+import {loadingWrapperPromise} from '@store/actions';
+import {useModalDialogStore} from '@store/modals';
+import useTopSheetStore from '@store/topsheet';
+import {COLORS} from '@styles/colors';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {capitalize} from '@utils/functions';
+import {showErrorToastMessage, showToastMessage} from '@utils/toast';
+import {useCallback, useEffect, useState} from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  Keyboard,
+  ListRenderItemInfo,
+  StyleSheet,
 } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
-import { useCustomNavigation } from 'src/hooks/useCustomNavigation';
+import {useCustomNavigation} from 'src/hooks/useCustomNavigation';
 import {
-    PreSaveSignatureSchema,
-    PreSaveSignatureSchemaType,
+  PreSaveSignatureSchema,
+  PreSaveSignatureSchemaType,
 } from 'src/types/schemas';
 
 const DEFAULT_VALUE_TYPE = SIGNER_TYPES[0].id;
 
 export const SignaturesScreen = () => {
   const {goBack, navigate} = useCustomNavigation();
-  const jobDetail = useTopSheetStore((d) => d.jobDetail);
-  const [forceSend, setForceSend] = useState(false);
+  const {id: idJob} = useTopSheetStore((d) => d.jobDetail);
   const route = useRoute<any>();
+  const showDialog = useModalDialogStore((d) => d.showVisible);
+  const {mutateAsync: deleteAsync} = useDeleteSignature();
+  const {refetchAll} = useRefreshIndicator([[QUERY_KEYS.TASK_COUNT, {idJob}]]);
+
+  const signatureForce = useTopSheetStore((d) => d.signatureForce);
+  const setSignatureForce = useTopSheetStore((d) => d.setSignatureForce);
 
   const {
     data: signatures,
@@ -46,8 +57,8 @@ export const SignaturesScreen = () => {
     isRefetching,
     refetch,
   } = useGetSignatures({
-    idJob: jobDetail.id,
-    forceSend,
+    idJob,
+    forceSend: signatureForce,
   });
 
   useEffect(() => {
@@ -75,11 +86,59 @@ export const SignaturesScreen = () => {
       navigate(RoutesNavigation.TakeSignature, {
         name: props.name!,
         type: props.type!,
-        forceSend,
         changed: route.params?.changed,
       });
     },
-    [navigate, forceSend],
+    [navigate, signatures],
+  );
+
+  console.log('signatures');
+  console.log(signatures);
+
+  const deleteSignature = useCallback(
+    (item: SignatureType) => {
+      Keyboard.dismiss();
+      showDialog({
+        modalVisible: true,
+        cancelable: true,
+        type: 'warning',
+        message: (
+          <Wrapper style={[GLOBAL_STYLES.bodyModalClockOut, {padding: 0}]}>
+            <Label style={GLOBAL_STYLES.titleModalClockOut}>Delete?</Label>
+            <Label style={GLOBAL_STYLES.subtitleModalClockOut}>
+              Name: {item.print_name}
+            </Label>
+            <Label style={GLOBAL_STYLES.subtitleModalClockOut}>
+              Type: {item.type}
+            </Label>
+            <Label style={GLOBAL_STYLES.descModalClockOut}>
+              Are you sure you want to delete the current signature?
+            </Label>
+            <Label style={GLOBAL_STYLES.descModalClockOut}>
+              Once finished you will not be able to make changes.
+            </Label>
+          </Wrapper>
+        ),
+        onConfirm: () => {
+          showDialog({modalVisible: false});
+          loadingWrapperPromise(
+            deleteAsync({id: item.id})
+              .then((d) => {
+                if (d) {
+                  refetchAll();
+                  showToastMessage('Signature removed successfully');
+                } else {
+                  showErrorToastMessage('Error while deleting signatures');
+                }
+              })
+              .catch(() =>
+                showErrorToastMessage('Error while deleting signatures'),
+              ),
+          );
+        },
+      });
+    },
+    [showDialog, deleteAsync, refetchAll],
   );
 
   const renderItem = useCallback(
@@ -89,7 +148,9 @@ export const SignaturesScreen = () => {
           <Wrapper style={styles.viewNotification}>
             <PressableOpacity
               onPress={() =>
-                navigate('VisualizePhoto', {photo: item.signature_data})
+                navigate(RoutesNavigation.BaseImageScreen, {
+                  images: [item.signature_data],
+                })
               }>
               <Label style={[GLOBAL_STYLES.bold, styles.titleNotification]}>
                 {item.print_name}
@@ -100,13 +161,15 @@ export const SignaturesScreen = () => {
               <PressableOpacity
                 style={[styles.iconOption, {marginRight: 5}]}
                 onPress={() =>
-                  navigate('VisualizePhoto', {
-                    photo: item.signature_data,
+                  navigate(RoutesNavigation.BaseImageScreen, {
+                    images: [item.signature_data],
                   })
                 }>
                 <Icon name="eye" type="solid" size={20} color="#00D3ED" />
               </PressableOpacity>
-              <PressableOpacity onPress={() => {}} style={styles.iconOption}>
+              <PressableOpacity
+                onPress={() => deleteSignature(item)}
+                style={styles.iconOption}>
                 <Icon name="trash" type="solid" size={20} color="#00D3ED" />
               </PressableOpacity>
             </Wrapper>
@@ -114,7 +177,7 @@ export const SignaturesScreen = () => {
         </Wrapper>
       );
     },
-    [navigate],
+    [navigate, deleteSignature],
   );
 
   return (
@@ -180,9 +243,9 @@ export const SignaturesScreen = () => {
                 onSubmit={initSaveSignature}
                 style={styles.btnOpenSignature}
                 label="Open space for signature"
-                onInvalid={() =>
-                  showErrorToastMessage('Please, enter the Print Name')
-                }
+                // onInvalid={() =>
+                //   showErrorToastMessage('Please, enter the Print Name')
+                // }
                 icon={<Icon name="signature" color="white" size={16} />}
               />
             </Wrapper>

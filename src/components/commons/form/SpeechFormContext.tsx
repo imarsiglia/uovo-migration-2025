@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   dictation: {
-    color: '#1155CC',
+    color: COLORS.primary,
     fontSize: 14,
     textDecorationLine: 'underline',
   },

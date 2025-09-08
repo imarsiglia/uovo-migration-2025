@@ -3,6 +3,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { View } from 'react-native';
 import { CustomInputText, CustomInputTextProps } from '../inputs/CustomInputText';
 import { InputErrorMsg } from './InputErrorMsg';
+import { COLORS } from '@styles/colors';
 
 type Props = CustomInputTextProps & {
   currentId: string;
@@ -27,7 +28,7 @@ export const InputTextContext = ({currentId, isErrorHidden, ...restProps}: Props
             value={value}
             style={[
               restProps.style,
-              errors[currentId] ? {borderColor: 'red'} : {},
+              errors[currentId] ? {borderColor: COLORS.error} : {},
             ]}
           />
         )}

@@ -28,6 +28,9 @@ export const QUERY_KEYS = {
   NOTES: 'notes',
   REPORT_MATERIALS: 'report_materials',
   HISTORY_REPORT_MATERIALS: 'history_report_materials',
+  REPORT_MATERIALS_INVENTORY: 'report_materials_inventory',
+  WO_ATTACHMENTS: 'wo_attachments',
+  BOL_COUNT: 'bol_count',
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';

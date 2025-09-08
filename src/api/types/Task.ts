@@ -1,8 +1,11 @@
 export type SignatureType = {
-  id: string;
+  id: number;
+  id_job: number;
   print_name: string;
+  id_user: number;
   type: string;
   signature_data: string;
+  signature_timestamp: string;
 };
 
 export type NoteType = {
@@ -30,15 +33,17 @@ export type UserInfoReportMaterialType = {
 };
 
 export type ReportMaterialType = {
-  id: number;
-  id_inventory: number;
-  id_job: number;
-  id_material: IdReportMaterialType;
-  id_user: number;
-  modified: boolean;
-  quantity: number;
-  updated_date: string;
-  user_info: UserInfoReportMaterialType;
+  id?: number;
+  id_inventory?: number;
+  idMaterial?: number;
+  id_job?: number;
+  id_material?: IdReportMaterialType;
+  id_user?: number;
+  modified?: boolean;
+  quantity?: number;
+  updated_date?: string;
+  user_info?: UserInfoReportMaterialType;
+  idUser?: number | null;
 };
 
 export type HistoryReportMaterialType = {
@@ -47,4 +52,17 @@ export type HistoryReportMaterialType = {
   id_event: number;
   operation_desc: string;
   quantity: number;
+};
+
+export type AttachmentType = {
+  id: number;
+  name: string;
+  url: string;
+  file_type: string;
+  size: number;
+};
+
+export type BolCountType = {
+  pbs: string;
+  packageCount: number;
 };

@@ -1,83 +1,129 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 import {
-  AutocompleteDropdownItem,
+  Controller,
+  Control,
+  FieldValues,
+  FieldPath,
+  useFormContext,
+} from 'react-hook-form';
+import {
   IAutocompleteDropdownProps,
+  AutocompleteDropdownItem,
 } from 'react-native-autocomplete-dropdown';
-import { Control, FieldPath, FieldValues, useController, useFormContext } from 'react-hook-form';
-import { CustomAutocomplete } from '../autocomplete/CustomAutocomplete';
+import {CustomAutocomplete} from '../autocomplete/CustomAutocomplete';
+import {COLORS} from '@styles/colors';
+import {Alert} from 'react-native';
+import {Label} from '../text/Label';
 
 type AnyItem = AutocompleteDropdownItem & Record<string, any>;
 
-export type CustomAutocompleteContextProps<TField extends FieldValues> =
-  Omit<IAutocompleteDropdownProps, 'onSelectItem' | 'initialValue'> & {
-    /** Nombre del campo en el form (guardará el item completo por defecto) */
-    name: FieldPath<TField>;
-    /** Control opcional si no usas FormProvider */
-    control?: Control<TField>;
-    /** Extrae el id que representa visualmente al item (default: item.id) */
-    getItemId?: (item: AnyItem | null | undefined) => string | undefined;
-    /**
-     * Transforma el item seleccionado a lo que vas a guardar en el form
-     * default: guarda el item completo
-     */
-    mapToFormValue?: (item: AnyItem | null) => any;
-    /**
-     * Si el valor del form no es el item completo, cómo obtener el id para
-     * que el dropdown muestre el seleccionado.
-     * default: value?.id
-     */
-    getIdFromFormValue?: (value: any) => string | undefined;
-  };
+type DropdownController = {
+  close: () => void;
+  open: () => void;
+  toggle: () => void;
+  clear: () => void;
+  setInputText: (t: string) => void;
+  setItem: (item: {id: string; title?: string} & Record<string, any>) => void;
+};
 
-export function AutocompleteContext<TField extends FieldValues>({
+type Props<T extends FieldValues> = Omit<
+  IAutocompleteDropdownProps,
+  'onSelectItem'
+> & {
+  name: FieldPath<T>;
+  control?: Control<T>;
+  /** Deriva id desde el valor del form (por defecto value.id) */
+  getIdFromFormValue?: (v: any) => string | undefined;
+  /** Deriva label desde el valor del form */
+  getLabelFromFormValue?: (v: any) => string | undefined;
+  /** Transforma el item seleccionado a lo que guardas en el form (default: item completo) */
+  mapToFormValue?: (item: AnyItem | null) => any;
+  /** Acceso al controller interno del dropdown */
+  controllerRef?: (c: DropdownController) => void;
+};
+
+export function AutocompleteContext<T extends FieldValues>({
   name,
   control: controlProp,
-  getItemId = (item) => (item?.id != null ? String(item.id) : undefined),
-  mapToFormValue = (item) => item, // ← guarda el item completo por defecto
   getIdFromFormValue = (v) => (v?.id != null ? String(v.id) : undefined),
-  onSelectItem,
+  getLabelFromFormValue = (v) => v?.title ?? v?.name ?? v?.label,
+  mapToFormValue = (item) => item, // guarda el objeto completo
+  controllerRef,
+  inputContainerStyle,
   ...rest
-}: CustomAutocompleteContextProps<TField>) {
-  const formCtx = useFormContext<TField>();
-  const control = controlProp ?? formCtx.control;
-  const dropdownRef = useRef<any>(null);
+}: Props<T>) {
+  const {control: ctxControl, formState} = useFormContext<T>();
+  const control = controlProp ?? ctxControl;
 
-  const { field } = useController({ name, control });
-
-  // id visual que debe ver el Autocomplete (derivado del valor del form)
-  const selectedId = useMemo(() => getIdFromFormValue(field.value), [field.value, getIdFromFormValue]);
-
-  // Si el valor del form cambia externamente, sincroniza la UI del dropdown
-  useEffect(() => {
-    if (selectedId != null) {
-      dropdownRef.current?.setItem?.(selectedId);
-    } else {
-      // limpia selección si valor es null/undefined
-      dropdownRef.current?.clear?.();
-    }
-  }, [selectedId]);
-
-  const handleSelect = useCallback(
-    (item: AnyItem | null) => {
-      // 1) Guarda en el form (por defecto, el item completo)
-      field.onChange(mapToFormValue(item));
-      // 2) Encadena callback externo si lo pasaron
-      onSelectItem?.(item ?? null);
-    },
-    [field, mapToFormValue, onSelectItem],
-  );
-
-  const initialValue = useMemo(() => selectedId, [selectedId]);
+  const ddCtrlRef = useRef<DropdownController | null>(null);
+  const typingRef = useRef(false); // evita reimponer selección mientras escribe
+  const appliedKeyRef = useRef<string | null>(null); // evita re-aplicar lo mismo
+  const dataVersion = useMemo(() => {
+    const ds = (rest as any).dataSet as AnyItem[] | undefined;
+    return Array.isArray(ds) ? ds.map((x) => x?.id).join('|') : '';
+  }, [(rest as any).dataSet]);
 
   return (
-    <CustomAutocomplete
-      ref={dropdownRef}
-      {...rest}
-      // Para que el dropdown se pinte con el valor actual
-      initialValue={initialValue}
-      onSelectItem={handleSelect}
-      // Si el usuario limpia manualmente, borra el valor del form también
-      onClear={() => field.onChange(null)}
+    <Controller
+      control={control}
+      name={name}
+      render={({field, fieldState}) => {
+        // Derivados del valor actual (objeto completo)
+
+        // Handlers
+        const handleSelect = useCallback(
+          (item: AnyItem | null) => {
+            typingRef.current = false;
+            appliedKeyRef.current = null;
+            field.onChange(mapToFormValue(item));
+          },
+          [field, mapToFormValue],
+        );
+
+        const onChangeTextProp = (rest as any).onChangeText as (
+          t: string,
+        ) => void | undefined;
+
+        const handleChangeText = useCallback(
+          (text: string) => {
+            typingRef.current = true;
+            // si había un valor seleccionado, lo limpiamos para no reimponerlo
+            if (field.value != null) {
+              field.onChange(null);
+            }
+            onChangeTextProp?.(text);
+          },
+          [field, onChangeTextProp],
+        );
+
+        return (
+          <>
+            <CustomAutocomplete
+              {...rest}
+            //   dataSet={
+            //     rest.dataSet ?? rest.initialValue
+            //       ? [{...rest.initialValue}]
+            //       : undefined
+            //   }
+              controller={(c: DropdownController) => {
+                ddCtrlRef.current = c;
+                controllerRef?.(c);
+              }}
+              onSelectItem={handleSelect}
+              onChangeText={handleChangeText}
+              onClear={() => {
+                typingRef.current = false;
+                appliedKeyRef.current = null;
+                field.onChange(null);
+              }}
+              inputContainerStyle={[
+                inputContainerStyle,
+                fieldState.error && {borderColor: COLORS.error, borderWidth: 1},
+              ]}
+            />
+          </>
+        );
+      }}
     />
   );
 }

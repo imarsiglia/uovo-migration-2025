@@ -1,6 +1,7 @@
 import {CrewMemberType} from '@api/types/Jobs';
 import {NoteType, ReportMaterialType} from '@api/types/Task';
 import {ImageType} from '@generalTypes/images';
+import { Base64ImageCarouselProps } from '@screens/commons/BaseImageScreen';
 
 // 👉 Constantes reutilizables (sin strings mágicos)
 export const RoutesNavigation = {
@@ -24,6 +25,9 @@ export const RoutesNavigation = {
   SaveNote: 'SaveNote',
   ReportMaterials: 'ReportMaterials',
   SaveReportMaterials: 'SaveReportMaterials',
+  WoAttachment: 'WoAttachment',
+  BaseImageScreen: 'BaseImageScreen',
+  EditPieceCount: 'EditPieceCount'
 } as const;
 
 // Union de nombres de ruta: "Home" | "ContactUs" | ...
@@ -83,6 +87,9 @@ export type RootStackParamList = {
   [RoutesNavigation.SaveReportMaterials]: {
     item?: ReportMaterialType
   };
+  [RoutesNavigation.BaseImageScreen]: Base64ImageCarouselProps,
+  [RoutesNavigation.WoAttachment]: undefined,
+  [RoutesNavigation.EditPieceCount]: undefined
 };
 
 export const TopSheetRoutesNavigation = {

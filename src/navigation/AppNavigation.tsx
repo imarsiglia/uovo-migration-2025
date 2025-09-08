@@ -94,7 +94,10 @@ import {TakeSignatureScreen} from '@screens/signatures/TakeSignatureScreen';
 import {NotesScreen} from '@screens/notes/NotesScreen';
 import {SaveNoteScreen} from '@screens/notes/SaveNoteScreen';
 import {ReportMaterialsScreen} from '@screens/reportmaterials/ReportMaterialsScreen';
-import { SaveReportMaterialScreen } from '@screens/reportmaterials/SaveReportMaterialScreen';
+import {SaveReportMaterialScreen} from '@screens/reportmaterials/SaveReportMaterialScreen';
+import BaseImageScreen from '@screens/commons/BaseImageScreen';
+import { WoAttachmentScreen } from '@screens/woattachments/WoAttachmentScreen';
+import { EditPieceCountScreen } from '@screens/piececount/EditPieceCountScreen';
 // import InventoryNS from '../screens/nationalShuttle/InventoryNS';
 
 // LogBox.ignoreLogs([
@@ -220,6 +223,23 @@ export const AppNavigation = () => {
               name={RoutesNavigation.SaveReportMaterials}
               component={SaveReportMaterialScreen}
             />
+
+            <Stack.Screen
+              name={RoutesNavigation.WoAttachment}
+              component={WoAttachmentScreen}
+            />
+
+            <Stack.Screen
+              name={RoutesNavigation.EditPieceCount}
+              component={EditPieceCountScreen}
+            />
+
+            {/* visualizar imagenes */}
+            <Stack.Screen
+              name={RoutesNavigation.BaseImageScreen}
+              component={BaseImageScreen}
+            />
+
             
           </Stack.Navigator>
         </NavigationContainer>

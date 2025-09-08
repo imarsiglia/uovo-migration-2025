@@ -1,10 +1,14 @@
 import {
   API_DELETE_NOTE,
+  API_DELETE_SIGNATURE,
+  API_GET_BOL_COUNT,
   API_GET_HISTORY_REPORT_MATERIALS,
   API_GET_NOTES,
   API_GET_REPORT_MATERIALS,
   API_GET_REPORT_MATERIALS_INVENTORY,
   API_GET_SIGNATURES,
+  API_GET_WO_ATTACHMENTS,
+  API_REGISTER_ONE_REPORT_MATERIAL,
   API_REGISTER_REPORT_MATERIALS,
   API_SAVE_NOTE,
   API_SAVE_SIGNATURE,
@@ -13,6 +17,8 @@ import {
 import {getRequest, postRequest} from '@api/helpers/apiClientHelper';
 import {Paginated} from '@api/types/Response';
 import {
+  AttachmentType,
+  BolCountType,
   HistoryReportMaterialType,
   IdReportMaterialType,
   NoteType,
@@ -52,6 +58,11 @@ const saveSignature = async (
     signatureDatetime: new Date().toISOString().split(',')[0],
     ...props,
   });
+  return response.message === SUCCESS_MESSAGES.SUCCESS;
+};
+
+const deleteSignature = async ({id}: {id: number}): Promise<boolean> => {
+  const response = await postRequest(`${API_DELETE_SIGNATURE}/${id}`);
   return response.message === SUCCESS_MESSAGES.SUCCESS;
 };
 
@@ -128,9 +139,45 @@ const getReportMaterialsInventory = async ({
   return response.body?.data ?? [];
 };
 
+export type RegisterOneReportMaterialApiProps = {
+  id?: number;
+  idJob: number;
+  idMaterial: number;
+  quantity: number;
+  idUser: number;
+};
+
+const registerOneReportMaterial = async (
+  props: RegisterOneReportMaterialApiProps,
+): Promise<boolean> => {
+  const response = await postRequest(API_REGISTER_ONE_REPORT_MATERIAL, props);
+  return response.message === SUCCESS_MESSAGES.SUCCESS;
+};
+
+const getWoAttachments = async ({
+  idJob,
+}: TaskBaseApiProps): Promise<AttachmentType[]> => {
+  const response = await getRequest<Paginated<AttachmentType[]>>(
+    `${API_GET_WO_ATTACHMENTS}?idJob=${idJob}`,
+  );
+  console.log('response get wo attachments...');
+  console.log(JSON.stringify(response));
+  return response.body?.data ?? [];
+};
+
+const getBOLCount = async ({
+  idJob,
+}: TaskBaseApiProps): Promise<BolCountType> => {
+  const response = await getRequest<BolCountType>(
+    `${API_GET_BOL_COUNT}?idJob=${idJob}`,
+  );
+  return response.body;
+};
+
 export const taskServices = {
   signatures,
   saveSignature,
+  deleteSignature,
   getNotes,
   saveNote,
   deleteNote,
@@ -138,4 +185,7 @@ export const taskServices = {
   registerReportMaterials,
   getHistoryReportMaterials,
   getReportMaterialsInventory,
+  registerOneReportMaterial,
+  getWoAttachments,
+  getBOLCount,
 };

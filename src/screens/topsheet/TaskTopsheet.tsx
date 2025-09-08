@@ -12,17 +12,20 @@ import {RoutesNavigation} from '@navigation/types';
 import {useRoute} from '@react-navigation/native';
 import useTopSheetStore from '@store/topsheet';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {useCallback} from 'react';
+import {useCallback, useState} from 'react';
 import {ScrollView, StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
 export const TaskTopsheet = () => {
-  const {navigate, setParams} = useCustomNavigation();
+  const {navigate} = useCustomNavigation();
   const route = useRoute<any>();
   const jobDetail = useTopSheetStore((d) => d.jobDetail);
   const {data: taskCount} = useGetTaskCount({idJob: jobDetail?.id!});
+  const [visible, setVisible] = useState(false);
 
-  const showBOL = useCallback(() => {}, []);
+  const showBOL = useCallback(() => {
+    setVisible(!visible);
+  }, [visible, setVisible]);
 
   if (!jobDetail) {
     return <></>;
@@ -51,11 +54,44 @@ export const TaskTopsheet = () => {
             onPressLeft={() =>
               jobDetail?.use_bol ? navigate(RoutesNavigation.Signatures) : null
             }
-            onPressRight={() => (jobDetail?.use_bol ? showBOL() : null)}
+            // onPressRight={() => (jobDetail?.use_bol ? showBOL() : null)}
             disabled={!jobDetail?.use_bol}
             // offline={[SIGNATURE_OFFLINE_VALIDATION, JOB_BOL_OFFLINE_VALIDATION]}
             idJob={jobDetail.id}
+            isMenuRight
+            // @ts-ignore
+            menuRight={({close}) => (
+              <Wrapper style={styles.menu}>
+                <PressableOpacity
+                  style={styles.menuItem}
+                  onPress={() => {
+                    close();
+                    navigate(RoutesNavigation.EditPieceCount);
+                  }}>
+                  <Label style={styles.menuTitle}>Edit Piece Count</Label>
+                </PressableOpacity>
+                <PressableOpacity
+                  style={styles.menuItem}
+                  onPress={() => {
+                    close();
+                    navigate(RoutesNavigation.Signatures);
+                  }}>
+                  <Label style={styles.menuTitle}>Signature</Label>
+                </PressableOpacity>
+                <PressableOpacity
+                  style={styles.menuItem}
+                  onPress={() => {
+                    close();
+                    setTimeout(() => {
+                      showBOL();
+                    }, 600);
+                  }}>
+                  <Label style={styles.menuTitle}>Send BOL</Label>
+                </PressableOpacity>
+              </Wrapper>
+            )}
           />
+
           <TaskOption
             name={taskCount[1].description}
             icon="image"
@@ -86,7 +122,7 @@ export const TaskTopsheet = () => {
             color="#E95818"
             quantity={taskCount[3].quantity}
             onPressLeft={() => navigate(RoutesNavigation.ReportMaterials)}
-            onPressRight={() => navigate('AddMaterials', {fromList: false})}
+            onPressRight={() => navigate(RoutesNavigation.SaveReportMaterials)}
             // offline={[MATERIAL_OFFLINE_VALIDATION]}
             idJob={jobDetail.id}
           />
@@ -202,7 +238,11 @@ export const TaskTopsheet = () => {
         </Wrapper>
       </ScrollView>
 
-      {/* <SendBOLBottomSheet /> */}
+      <SendBOLBottomSheet
+        idJob={jobDetail.id}
+        handleVisible={showBOL}
+        visible={visible}
+      />
     </Wrapper>
   );
 };
@@ -249,5 +289,20 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: 'white',
     borderRadius: 15,
+  },
+  menu: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 15,
+    minWidth: 160,
+  },
+  menuItem: {
+    height: 40,
+    justifyContent: 'center',
+  },
+  menuTitle: {
+    color: '#3C424A',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });

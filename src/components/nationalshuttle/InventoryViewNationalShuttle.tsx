@@ -345,9 +345,6 @@ export const RowNS = ({
   isFullList?: boolean;
   onPress: () => void;
 }) => {
-
-  console.log("getItemColorStatus")
-  console.log(getItemColorStatus(item.load_status))
   return (
     <View style={{flexDirection: 'row'}}>
       <ColumnNS

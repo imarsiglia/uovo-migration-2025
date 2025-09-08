@@ -1,3 +1,4 @@
+import {QUERY_KEYS} from '@api/contants/constants';
 import {useSaveSignature} from '@api/hooks/HooksTaskServices';
 import {BackButton} from '@components/commons/buttons/BackButton';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
@@ -10,6 +11,7 @@ import {
   CanvasControls,
 } from '@equinor/react-native-skia-draw';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
 import {RootStackParamList} from '@navigation/types';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {ImageFormat} from '@shopify/react-native-skia';
@@ -39,11 +41,16 @@ export const TakeSignatureScreen = (props: Props) => {
 };
 
 const _TakeSignatureScreen = (props: Props) => {
-  const {name, type, changed = 0, forceSend = false} = props.route.params;
+  const {name, type} = props.route.params;
 
   const {goBack, getState, goBackAndUpdate} = useCustomNavigation();
   const {mutateAsync} = useSaveSignature();
-  const {id} = useTopSheetStore((d) => d.jobDetail);
+  const {id: idJob} = useTopSheetStore((d) => d.jobDetail);
+  const signatureForce = useTopSheetStore((d) => d.signatureForce);
+  const {refetchAll} = useRefreshIndicator([
+    [QUERY_KEYS.SIGNATURES, {idJob, forceSend: signatureForce}],
+    [QUERY_KEYS.TASK_COUNT, {idJob}],
+  ]);
   const refCanvas = useRef<CanvasControls>(null);
 
   useEffect(() => {
@@ -92,7 +99,7 @@ const _TakeSignatureScreen = (props: Props) => {
 
     loadingWrapperPromise(
       mutateAsync({
-        idJob: id,
+        idJob,
         force_send: false,
         printName: name,
         type,
@@ -100,9 +107,8 @@ const _TakeSignatureScreen = (props: Props) => {
       })
         .then((d) => {
           if (d) {
-            goBackAndUpdate({
-              changed: (changed ?? 0) + 1,
-            });
+            refetchAll();
+            goBack();
           } else {
             showErrorToastMessage('Could not save the signature');
           }
@@ -116,11 +122,9 @@ const _TakeSignatureScreen = (props: Props) => {
   }, [
     blankFP,
     fingerprint,
-    forceSend,
-    id,
+    idJob,
     name,
     type,
-    changed,
     goBackAndUpdate,
     getState,
     mutateAsync,
