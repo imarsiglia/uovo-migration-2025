@@ -1,5 +1,5 @@
 import {CrewMemberType} from '@api/types/Jobs';
-import { NoteType } from '@api/types/Task';
+import {NoteType, ReportMaterialType} from '@api/types/Task';
 import {ImageType} from '@generalTypes/images';
 
 // 👉 Constantes reutilizables (sin strings mágicos)
@@ -22,6 +22,8 @@ export const RoutesNavigation = {
   TakeSignature: 'TakeSignature',
   Notes: 'Notes',
   SaveNote: 'SaveNote',
+  ReportMaterials: 'ReportMaterials',
+  SaveReportMaterials: 'SaveReportMaterials',
 } as const;
 
 // Union de nombres de ruta: "Home" | "ContactUs" | ...
@@ -76,6 +78,10 @@ export type RootStackParamList = {
   [RoutesNavigation.Notes]: undefined;
   [RoutesNavigation.SaveNote]: {
     item?: NoteType;
+  };
+  [RoutesNavigation.ReportMaterials]: undefined;
+  [RoutesNavigation.SaveReportMaterials]: {
+    item?: ReportMaterialType
   };
 };
 

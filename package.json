@@ -62,6 +62,7 @@
     "react-native-android-location-enabler": "^3.0.1",
     "react-native-autocomplete-dropdown": "^5.0.0",
     "react-native-calendar-picker": "^8.0.5",
+    "react-native-collapsible": "^1.6.2",
     "react-native-device-info": "^14.0.4",
     "react-native-dotenv": "^3.4.11",
     "react-native-fs": "^2.20.0",

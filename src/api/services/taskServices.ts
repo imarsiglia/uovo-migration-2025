@@ -1,14 +1,24 @@
 import {
-    API_DELETE_NOTE,
+  API_DELETE_NOTE,
+  API_GET_HISTORY_REPORT_MATERIALS,
   API_GET_NOTES,
+  API_GET_REPORT_MATERIALS,
+  API_GET_REPORT_MATERIALS_INVENTORY,
   API_GET_SIGNATURES,
+  API_REGISTER_REPORT_MATERIALS,
   API_SAVE_NOTE,
   API_SAVE_SIGNATURE,
   SUCCESS_MESSAGES,
 } from '@api/contants/endpoints';
 import {getRequest, postRequest} from '@api/helpers/apiClientHelper';
 import {Paginated} from '@api/types/Response';
-import {NoteType, SignatureType} from '@api/types/Task';
+import {
+  HistoryReportMaterialType,
+  IdReportMaterialType,
+  NoteType,
+  ReportMaterialType,
+  SignatureType,
+} from '@api/types/Task';
 
 export type TaskBaseApiProps = {
   idJob: number;
@@ -70,10 +80,62 @@ const deleteNote = async ({id}: {id: number}): Promise<boolean> => {
   return response.message === SUCCESS_MESSAGES.SUCCESS;
 };
 
+const getReportMaterials = async ({
+  idJob,
+}: TaskBaseApiProps): Promise<ReportMaterialType[]> => {
+  const response = await getRequest<Paginated<ReportMaterialType[]>>(
+    `${API_GET_REPORT_MATERIALS}?idJob=${idJob}`,
+  );
+  return response.body?.data ?? [];
+};
+
+export type RegisterReportMaterialsApiProps = {
+  list: ReportMaterialType[];
+} & TaskBaseApiProps;
+
+const registerReportMaterials = async (
+  props: RegisterReportMaterialsApiProps,
+): Promise<boolean> => {
+  const response = await postRequest(API_REGISTER_REPORT_MATERIALS, props);
+  return response.message === SUCCESS_MESSAGES.SUCCESS;
+};
+
+export type HistoryReportMaterialsApiProps = {
+  idJob: number;
+  id: number;
+};
+const getHistoryReportMaterials = async ({
+  idJob,
+  id,
+}: HistoryReportMaterialsApiProps): Promise<HistoryReportMaterialType[]> => {
+  const response = await getRequest<Paginated<HistoryReportMaterialType[]>>(
+    `${API_GET_HISTORY_REPORT_MATERIALS}?idJob=${idJob}&idMaterial=${id}`,
+  );
+  return response.body?.data ?? [];
+};
+
+export type ReportMaterialsInventoryApiProps = {
+  idJob: number;
+  filter: string;
+};
+const getReportMaterialsInventory = async ({
+  idJob,
+  filter,
+}: ReportMaterialsInventoryApiProps): Promise<IdReportMaterialType[]> => {
+  const response = await getRequest<Paginated<IdReportMaterialType[]>>(
+    `${API_GET_REPORT_MATERIALS_INVENTORY}?downloadAll=0&idJob=${idJob}&filter=${filter}`,
+  );
+  return response.body?.data ?? [];
+};
+
 export const taskServices = {
   signatures,
   saveSignature,
   getNotes,
   saveNote,
-  deleteNote
+  deleteNote,
+  getReportMaterials,
+  registerReportMaterials,
+  getHistoryReportMaterials,
+  getReportMaterialsInventory,
 };

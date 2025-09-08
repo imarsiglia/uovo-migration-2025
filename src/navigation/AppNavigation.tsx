@@ -89,10 +89,12 @@ import {LocationNotesScreen} from '@screens/location/LocationNotesScreen';
 import {SaveLocationNoteScreen} from '@screens/location/SaveLocationNoteScreen';
 import {DigitalIdScreen} from '@screens/digitalid/DigitalIdScreen';
 import {VisualizePdfScreen} from '@screens/visualizepdf/VisualizePdfScreen';
-import { SignaturesScreen } from '@screens/signatures/SignaturesScreen';
-import { TakeSignatureScreen } from '@screens/signatures/TakeSignatureScreen';
-import { NotesScreen } from '@screens/notes/NotesScreen';
-import { SaveNoteScreen } from '@screens/notes/SaveNoteScreen';
+import {SignaturesScreen} from '@screens/signatures/SignaturesScreen';
+import {TakeSignatureScreen} from '@screens/signatures/TakeSignatureScreen';
+import {NotesScreen} from '@screens/notes/NotesScreen';
+import {SaveNoteScreen} from '@screens/notes/SaveNoteScreen';
+import {ReportMaterialsScreen} from '@screens/reportmaterials/ReportMaterialsScreen';
+import { SaveReportMaterialScreen } from '@screens/reportmaterials/SaveReportMaterialScreen';
 // import InventoryNS from '../screens/nationalShuttle/InventoryNS';
 
 // LogBox.ignoreLogs([
@@ -210,6 +212,15 @@ export const AppNavigation = () => {
               name={RoutesNavigation.SaveNote}
               component={SaveNoteScreen}
             />
+            <Stack.Screen
+              name={RoutesNavigation.ReportMaterials}
+              component={ReportMaterialsScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.SaveReportMaterials}
+              component={SaveReportMaterialScreen}
+            />
+            
           </Stack.Navigator>
         </NavigationContainer>
         // <OfflineComponentSync />

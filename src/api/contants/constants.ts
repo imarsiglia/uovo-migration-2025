@@ -25,7 +25,9 @@ export const QUERY_KEYS = {
   TASK_COUNT: 'task_count',
   QR_USER: 'qr_user',
   SIGNATURES: 'signatures',
-  NOTES: 'NOTES',
+  NOTES: 'notes',
+  REPORT_MATERIALS: 'report_materials',
+  HISTORY_REPORT_MATERIALS: 'history_report_materials',
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';

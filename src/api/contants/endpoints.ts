@@ -38,6 +38,11 @@ export const API_GET_NOTES = '/notes/query';
 export const API_SAVE_NOTE = '/notes/register';
 export const API_DELETE_NOTE = '/notes/remove';
 
+export const API_GET_REPORT_MATERIALS = '/material/register/query';
+export const API_REGISTER_REPORT_MATERIALS = '/material/register';
+export const API_GET_HISTORY_REPORT_MATERIALS = '/material/history';
+export const API_GET_REPORT_MATERIALS_INVENTORY = '/material/query';
+
 // digital ID
 export const API_GET_QR_USER = '/user/qr';
 

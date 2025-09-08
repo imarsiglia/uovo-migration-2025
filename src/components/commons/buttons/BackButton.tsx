@@ -1,4 +1,3 @@
-import React from 'react';
 import {PressableOpacity} from './PressableOpacity';
 import {Wrapper} from '../wrappers/Wrapper';
 import {Label} from '../text/Label';
@@ -7,10 +6,10 @@ import {StyleSheet} from 'react-native';
 import {COLORS} from '@styles/colors';
 
 type Props = {
-  title: string;
+  title?: string;
   onPress: () => void;
 };
-export const BackButton = ({title, onPress}: Props) => {
+export const BackButton = ({title = "Back", onPress}: Props) => {
   return (
     <PressableOpacity onPress={onPress}>
       <Wrapper style={styles.backBtn}>

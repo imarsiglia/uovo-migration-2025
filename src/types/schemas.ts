@@ -1,3 +1,4 @@
+import { IdReportMaterialType } from '@api/types/Task';
 import * as yup from 'yup';
 
 const DEFAULT_REQUIRED_MESSAGE = 'This field is required';
@@ -67,3 +68,10 @@ export const SaveNoteSchema = yup.object({
 });
 
 export type SaveNoteSchemaType = yup.InferType<typeof SaveNoteSchema>;
+
+export const SaveReportMaterialSchema = yup.object().shape({
+  material: yup.mixed<IdReportMaterialType>().required(DEFAULT_REQUIRED_MESSAGE),
+  quantity: yup.number().required(DEFAULT_REQUIRED_MESSAGE),
+});
+
+export type SaveReportMaterialSchemaType = yup.InferType<typeof SaveReportMaterialSchema>;

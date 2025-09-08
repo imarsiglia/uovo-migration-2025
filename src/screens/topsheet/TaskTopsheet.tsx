@@ -9,11 +9,11 @@ import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import TaskOption from '@components/topheet/TaskOption';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {RoutesNavigation} from '@navigation/types';
-import { useRoute} from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
 import useTopSheetStore from '@store/topsheet';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {useCallback} from 'react';
-import { ScrollView, StyleSheet} from 'react-native';
+import {ScrollView, StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
 export const TaskTopsheet = () => {
@@ -85,7 +85,7 @@ export const TaskTopsheet = () => {
             icon="box-full"
             color="#E95818"
             quantity={taskCount[3].quantity}
-            onPressLeft={() => navigate('ReportMaterials')}
+            onPressLeft={() => navigate(RoutesNavigation.ReportMaterials)}
             onPressRight={() => navigate('AddMaterials', {fromList: false})}
             // offline={[MATERIAL_OFFLINE_VALIDATION]}
             idJob={jobDetail.id}

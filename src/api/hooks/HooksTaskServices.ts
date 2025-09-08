@@ -1,5 +1,7 @@
 import {QUERY_KEYS} from '@api/contants/constants';
 import {
+  HistoryReportMaterialsApiProps,
+  ReportMaterialsInventoryApiProps,
   SignaturesApiProps,
   TaskBaseApiProps,
   taskServices,
@@ -46,5 +48,42 @@ export const useSaveNote = () => {
 export const useDeleteNote = () => {
   return useMutation({
     mutationFn: taskServices.deleteNote,
+  });
+};
+
+export const useGetReportMaterials = (props: TaskBaseApiProps) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.REPORT_MATERIALS, props],
+    queryFn: () => taskServices.getReportMaterials(props),
+    enabled: !!props?.idJob,
+    ...DEFAULT_PERSISTENCE_CONFIG,
+  });
+};
+
+export const useRegisterReportMaterials = () => {
+  return useMutation({
+    mutationFn: taskServices.registerReportMaterials,
+  });
+};
+
+export const useGetHistoryReportMaterials = (
+  props: HistoryReportMaterialsApiProps,
+) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.HISTORY_REPORT_MATERIALS, props],
+    queryFn: () => taskServices.getHistoryReportMaterials(props),
+    ...DEFAULT_PERSISTENCE_CONFIG,
+    enabled: false,
+  });
+};
+
+export const useGetReportMaterialsInventory = (
+  props: ReportMaterialsInventoryApiProps,
+) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.REPORT_MATERIALS, props],
+    queryFn: () => taskServices.getReportMaterialsInventory(props),
+    enabled: !!props?.idJob && !!props.filter && props.filter.trim().length > 0,
+    ...DEFAULT_PERSISTENCE_CONFIG,
   });
 };

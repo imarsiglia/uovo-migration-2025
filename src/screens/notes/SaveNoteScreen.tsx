@@ -1,52 +1,42 @@
-import {QUERY_KEYS} from '@api/contants/constants';
-import {useHelpDeskService} from '@api/hooks/HooksGeneralServices';
-import {useSaveNote} from '@api/hooks/HooksTaskServices';
-import {Icons} from '@assets/icons/icons';
+import { QUERY_KEYS } from '@api/contants/constants';
+import { useSaveNote } from '@api/hooks/HooksTaskServices';
+import { Icons } from '@assets/icons/icons';
+import { BackButton } from '@components/commons/buttons/BackButton';
+import { BasicFormProvider } from '@components/commons/form/BasicFormProvider';
+import { ButtonSubmit } from '@components/commons/form/ButtonSubmit';
+import { InputTextContext } from '@components/commons/form/InputTextContext';
 import {
-  ImageOptionSheet,
-  RBSheetRef,
-} from '@components/commons/bottomsheets/ImageOptionSheet';
-import {BackButton} from '@components/commons/buttons/BackButton';
-import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
-import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
-import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
-import {InputTextContext} from '@components/commons/form/InputTextContext';
-import {
-  SpeechFormContext,
-  SpeechFormInputRef,
+    SpeechFormContext,
+    SpeechFormInputRef,
 } from '@components/commons/form/SpeechFormContext';
-import {CustomPressable} from '@components/commons/pressable/CustomPressable';
-import {Label} from '@components/commons/text/Label';
+import { Label } from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import {Wrapper} from '@components/commons/wrappers/Wrapper';
-import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
-import {RootStackParamList, RoutesNavigation} from '@navigation/types';
-import {useRoute} from '@react-navigation/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {loadingWrapperPromise} from '@store/actions';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
+import { useRefreshIndicator } from '@hooks/useRefreshIndicator';
+import { RootStackParamList } from '@navigation/types';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { loadingWrapperPromise } from '@store/actions';
 import useTopSheetStore from '@store/topsheet';
-import {COLORS} from '@styles/colors';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {showErrorToastMessage, showToastMessage} from '@utils/toast';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {ActivityIndicator, Image, Keyboard, StyleSheet} from 'react-native';
-import type {Image as ImageType} from 'react-native-image-crop-picker';
+import { COLORS } from '@styles/colors';
+import { GLOBAL_STYLES } from '@styles/globalStyles';
+import { showErrorToastMessage } from '@utils/toast';
+import { useCallback, useRef } from 'react';
+import { StyleSheet } from 'react-native';
 import {
-  KeyboardAwareScrollView,
-  KeyboardStickyView,
+    KeyboardAwareScrollView,
+    KeyboardStickyView,
 } from 'react-native-keyboard-controller';
-import {useCustomNavigation} from 'src/hooks/useCustomNavigation';
+import { useCustomNavigation } from 'src/hooks/useCustomNavigation';
 import {
-  HelpDeskSchema,
-  HelpDeskSchemaType,
-  SaveNoteSchemaType,
+    HelpDeskSchema,
+    SaveNoteSchemaType
 } from 'src/types/schemas';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SaveNote'>;
 
 export const SaveNoteScreen = (props: Props) => {
-  const {item} = props.route.params;
-  const {goBack, goBackAndUpdate} = useCustomNavigation();
+  const item = props.route.params?.item;
+  const {goBack} = useCustomNavigation();
   const {id: idJob} = useTopSheetStore((d) => d.jobDetail);
 
   const {refetchAll} = useRefreshIndicator([
@@ -63,7 +53,7 @@ export const SaveNoteScreen = (props: Props) => {
       loadingWrapperPromise(
         mutateAsync({
           idJob,
-          id: item.id ?? null,
+          id: item?.id ?? null,
           title: props.title,
           description: props.description,
         })
@@ -108,8 +98,8 @@ export const SaveNoteScreen = (props: Props) => {
         <BasicFormProvider
           schema={HelpDeskSchema}
           defaultValue={{
-            title: item.title,
-            description: item.description,
+            title: item?.title,
+            description: item?.description,
           }}>
           <KeyboardAwareScrollView
             bottomOffset={220}
