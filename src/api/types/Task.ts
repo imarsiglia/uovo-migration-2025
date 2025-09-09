@@ -1,3 +1,5 @@
+import { LaborCodeType } from "./Jobs";
+
 export type SignatureType = {
   id: number;
   id_job: number;
@@ -65,4 +67,24 @@ export type AttachmentType = {
 export type BolCountType = {
   pbs: string;
   packageCount: number;
+};
+
+export type LaborReportType = {
+  added_manually: number;
+  clock_in: string | null;
+  clock_out: string | null;
+  confirmed: null;
+  custom_date_report: null;
+  id: number | null;
+  id_job: number;
+  id_user: number;
+  labor_code: LaborCodeType;
+  status: string;
+  user_name: string;
+  worked_hour: null | string;
+};
+
+export type EmployeeType = {
+  id: string;
+  name: string;
 };

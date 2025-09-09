@@ -1,61 +1,68 @@
-import {useHelpDeskService} from '@api/hooks/HooksGeneralServices';
-import {useGetBOLCount} from '@api/hooks/HooksTaskServices';
+import {QUERY_KEYS} from '@api/contants/constants';
+import {useGetBOLCount, useSaveBOLCount} from '@api/hooks/HooksTaskServices';
 import {Icons} from '@assets/icons/icons';
-import {
-  ImageOptionSheet,
-  RBSheetRef,
-} from '@components/commons/bottomsheets/ImageOptionSheet';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
 import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
 import {InputTextContext} from '@components/commons/form/InputTextContext';
 import {SelectRadioButtonContext} from '@components/commons/form/SelectRadioButtonContext';
-import {SpeechFormInputRef} from '@components/commons/form/SpeechFormContext';
 import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
-import {RoutesNavigation} from '@navigation/types';
+import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
 import {useRoute} from '@react-navigation/native';
+import {loadingWrapperPromise} from '@store/actions';
 import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {getDeviceInfoAsString} from '@utils/functions';
-import {onLaunchCamera, onSelectImage} from '@utils/image';
-import {showToastMessage} from '@utils/toast';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {ActivityIndicator, Alert, Keyboard, StyleSheet} from 'react-native';
-import type {Image as ImageType} from 'react-native-image-crop-picker';
+import {showErrorToastMessage, showToastMessage} from '@utils/toast';
+import {useCallback} from 'react';
+import {Keyboard, StyleSheet} from 'react-native';
 import {
   KeyboardAwareScrollView,
   KeyboardStickyView,
 } from 'react-native-keyboard-controller';
 import {useCustomNavigation} from 'src/hooks/useCustomNavigation';
-import {HelpDeskSchemaType, PieceCountSchema} from 'src/types/schemas';
+import {PieceCountSchema, PieceCountSchemaType} from 'src/types/schemas';
 
 export const EditPieceCountScreen = () => {
-  const {goBack, navigate} = useCustomNavigation();
-  const route = useRoute<any>();
+  const {goBack} = useCustomNavigation();
   const {id: idJob} = useTopSheetStore((d) => d.jobDetail);
 
-  const {mutateAsync, isPending} = useHelpDeskService();
-
-  const {data, isLoading} = useGetBOLCount({
+  const {mutateAsync} = useSaveBOLCount();
+  const {data, isLoading, refetch} = useGetBOLCount({
     idJob,
   });
 
-  console.log('data bol count');
-  console.log(data);
-
-  const saveReport = useCallback((props: HelpDeskSchemaType) => {
+  const saveReport = useCallback((props: PieceCountSchemaType) => {
     Keyboard.dismiss();
+    loadingWrapperPromise(
+      mutateAsync({
+        idJob,
+        packageCount: parseInt(props.packageCount),
+        pbs: props.pbs,
+      }),
+    )
+      .then((d) => {
+        if (d) {
+          refetch();
+          showToastMessage('BOL updated successfully');
+          goBack();
+        } else {
+          showErrorToastMessage('Error while updating BOL');
+        }
+      })
+      .catch(() => showErrorToastMessage('Error while updating BOL'));
   }, []);
+
+  if (isLoading) {
+    return <GeneralLoading />;
+  }
 
   return (
     <Wrapper style={GLOBAL_STYLES.safeAreaLight}>
       <Wrapper style={[styles.container]}>
-        {isLoading && <GeneralLoading />}
-
         <Wrapper style={GLOBAL_STYLES.bgwhite}>
           <Wrapper style={GLOBAL_STYLES.containerBtnOptTop}>
             <PressableOpacity onPress={goBack}>
@@ -87,8 +94,8 @@ export const EditPieceCountScreen = () => {
         <BasicFormProvider
           schema={PieceCountSchema}
           defaultValue={{
-            packageCount: data.packageCount?.toString(),
-            pbs: data.pbs,
+            packageCount: data?.packageCount?.toString(),
+            pbs: data?.pbs,
           }}>
           <KeyboardAwareScrollView
             bottomOffset={220}

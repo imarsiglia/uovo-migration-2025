@@ -20,12 +20,23 @@ export const TaskTopsheet = () => {
   const {navigate} = useCustomNavigation();
   const route = useRoute<any>();
   const jobDetail = useTopSheetStore((d) => d.jobDetail);
+  const setToClockout = useTopSheetStore((d) => d.setToClockout);
   const {data: taskCount} = useGetTaskCount({idJob: jobDetail?.id!});
   const [visible, setVisible] = useState(false);
 
   const showBOL = useCallback(() => {
     setVisible(!visible);
   }, [visible, setVisible]);
+
+  const goToLaborReport = useCallback(() => {
+    setToClockout('1');
+    navigate(RoutesNavigation.LaborReport);
+  }, [navigate]);
+
+  const goToClockIn = useCallback(() => {
+    setToClockout('1');
+    navigate(RoutesNavigation.LaborReport);
+  }, [navigate]);
 
   if (!jobDetail) {
     return <></>;
@@ -97,8 +108,8 @@ export const TaskTopsheet = () => {
             icon="image"
             color="#7966E0"
             quantity={taskCount[1].quantity}
-            onPressLeft={() => navigate('Images')}
-            onPressRight={() => navigate('TakeImages', {fromList: false})}
+            onPressLeft={() => navigate(RoutesNavigation.Account)}
+            onPressRight={() => navigate(RoutesNavigation.Account, {fromList: false})}
             // offline={[IMAGES_OFFLINE_VALIDATION]}
             idJob={jobDetail?.id!}
           />
@@ -108,11 +119,7 @@ export const TaskTopsheet = () => {
             color="#F2DA31"
             quantity={taskCount[2].quantity}
             onPressLeft={() => navigate(RoutesNavigation.Notes)}
-            onPressRight={() =>
-              navigate(RoutesNavigation.SaveNote, {
-                changed: route.params?.changed,
-              })
-            }
+            onPressRight={() => navigate(RoutesNavigation.SaveNote)}
             // offline={[NOTES_OFFLINE_VALIDATION]}
             idJob={jobDetail.id}
           />
@@ -207,14 +214,15 @@ export const TaskTopsheet = () => {
           {true && (
             <PressableOpacity
               style={[styles.buttonTask]}
-              onPress={() =>
-                goToLaborReport(
-                  jobDetail.current_clock_in != null &&
-                    (jobDetail.current_clock_in?.status == STARTED_STATUS ||
-                      jobDetail.current_clock_in?.status == PAUSED_STATUS)
-                    ? 0
-                    : 1,
-                )
+              onPress={
+                goToLaborReport
+                // goToLaborReport(
+                //   jobDetail.current_clock_in != null &&
+                //     (jobDetail.current_clock_in?.status == STARTED_STATUS ||
+                //       jobDetail.current_clock_in?.status == PAUSED_STATUS)
+                //     ? 0
+                //     : 1,
+                // )
               }>
               <Wrapper style={GLOBAL_STYLES.row}>
                 <Wrapper

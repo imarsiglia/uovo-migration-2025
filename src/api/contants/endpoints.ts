@@ -52,6 +52,12 @@ export const API_GET_WO_ATTACHMENTS = '/job/files';
 // editbol
 export const API_GET_BOL_COUNT = '/job/bolparams'
 
+// labor report
+export const API_GET_LABOR_REPORTS = '/clockin/status/manually';
+export const API_REGISTER_LABOR_REPORT = '/clockin/register';
+export const API_GET_EMPLOYEES = '/user/load/employee';
+export const API_GET_LABOR_CODES = '/clockin/laborcodes'
+
 // digital ID
 export const API_GET_QR_USER = '/user/qr';
 

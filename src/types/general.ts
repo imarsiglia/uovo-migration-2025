@@ -16,3 +16,5 @@ export type AgendaItem = {
 };
 
 export type FAIconType = 'solid' | 'light' | 'regular' | 'brands' | undefined
+
+export type BooleanStringType = '0' | '1';

@@ -66,6 +66,8 @@ export function AutocompleteContext<T extends FieldValues>({
       control={control}
       name={name}
       render={({field, fieldState}) => {
+        // Derivados del valor actual (objeto completo)
+
         // Handlers
         const handleSelect = useCallback(
           (item: AnyItem | null) => {
@@ -83,12 +85,13 @@ export function AutocompleteContext<T extends FieldValues>({
         const handleChangeText = useCallback(
           (text: string) => {
             typingRef.current = true;
-            // if (field.value != null) {
-            //   field.onChange(null);
-            // }
+            // si había un valor seleccionado, lo limpiamos para no reimponerlo
+            if (field.value != null) {
+              field.onChange(null);
+            }
             onChangeTextProp?.(text);
           },
-          [onChangeTextProp],
+          [field, onChangeTextProp],
         );
 
         return (
@@ -110,6 +113,7 @@ export function AutocompleteContext<T extends FieldValues>({
                 inputContainerStyle,
                 fieldState.error && {borderColor: COLORS.error, borderWidth: 1},
               ]}
+              useFilter={false}
             />
           </>
         );

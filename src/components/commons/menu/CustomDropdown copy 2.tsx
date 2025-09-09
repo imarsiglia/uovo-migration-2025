@@ -1,35 +1,33 @@
 import {useFocusEffect} from '@react-navigation/native';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useMemo, useRef, useState, useEffect} from 'react';
 import {
-  Dimensions,
   StyleProp,
   StyleSheet,
   TouchableOpacity,
   View,
   ViewStyle,
-  StyleSheet as RNStyleSheet,
+  Dimensions,
 } from 'react-native';
-import {Portal} from '@gorhom/portal';
+import Modal from 'react-native-modal';
 import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-
-type Position = 'top' | 'bottom' | 'auto';
+import {Portal} from '@gorhom/portal';
 
 const PADDING = 8;
-const ARROW = 10;
+const ARROW = 10; // tamaño base del triángulo
 const {width: SW, height: SH} = Dimensions.get('window');
+
+type Position = 'top' | 'bottom' | 'auto';
 
 type CustomDropdownType = {
   button: React.ReactNode;
   buttonStyle?: StyleProp<ViewStyle>;
   position?: Position; // 'top' (default) | 'bottom' | 'auto'
   children?: React.ReactNode | ((api: {close: () => void}) => React.ReactNode);
-  /** Opcional: nombre del host del portal (por defecto 'root') */
-  hostName?: string;
 };
 
 const clamp = (v: number, min: number, max: number) =>
@@ -40,9 +38,8 @@ const CustomDropdown = ({
   children,
   buttonStyle,
   position = 'top',
-  hostName = 'root',
 }: CustomDropdownType) => {
-  const [isVisible, setVisible] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
   const [openKey, setOpenKey] = useState(0);
 
   const [buttonLayout, setButtonLayout] = useState({
@@ -58,16 +55,16 @@ const CustomDropdown = ({
     height: 0,
   });
 
+  // posición final efectiva (para 'auto' o al cambiar tamaños)
   const [placement, setPlacement] = useState<Exclude<Position, 'auto'>>(
     position === 'bottom' ? 'bottom' : 'top',
   );
 
-  const buttonRef = useRef<any>(null);
-  const lockRef = useRef(false);
-
-  // Animación
   const translateY = useSharedValue(0);
   const opacity = useSharedValue(0);
+
+  const buttonRef = useRef<any>(null);
+  const lockRef = useRef(false);
 
   const decidePlacement = useCallback(
     (desired: Position, btn: typeof buttonLayout, menu: typeof menuLayout) => {
@@ -82,15 +79,15 @@ const CustomDropdown = ({
     [],
   );
 
-  const toggle = () => {
+  const toggleModal = () => {
     if (lockRef.current) return;
     lockRef.current = true;
     setTimeout(() => (lockRef.current = false), 600);
 
-    if (isVisible) {
-      close();
+    if (isModalVisible) {
+      closeModal();
     } else {
-      // Medir el botón ANTES de abrir
+      // Medir botón
       buttonRef.current?.measure?.(
         (
           fx: number,
@@ -101,18 +98,17 @@ const CustomDropdown = ({
           py: number,
         ) => {
           setButtonLayout({x: px, y: py, width, height});
-          setOpenKey((k: number) => k + 1);
-
-          // Estado inicial de la animación
+          setOpenKey((k) => k + 1);
+          // animación inicial según intención
           translateY.value = position === 'bottom' ? 8 : -8;
           opacity.value = 0;
-          setVisible(true);
+          setModalVisible(true);
         },
       );
     }
   };
 
-  const openAnim = useCallback(() => {
+  const openModal = useCallback(() => {
     opacity.value = withTiming(1, {duration: 200});
     translateY.value = withTiming(0, {
       duration: 220,
@@ -120,33 +116,31 @@ const CustomDropdown = ({
     });
   }, [opacity, translateY]);
 
-  const close = useCallback(() => {
+  const closeModal = useCallback(() => {
     opacity.value = withTiming(0, {duration: 180});
     translateY.value = withTiming(placement === 'bottom' ? 8 : -8, {
       duration: 180,
       easing: Easing.inOut(Easing.ease),
     });
-    setTimeout(() => setVisible(false), 180);
+    setTimeout(() => setModalVisible(false), 180);
   }, [opacity, translateY, placement]);
-
-  // Abrir la animación cuando ya montó el portal
-  useEffect(() => {
-    if (isVisible) openAnim();
-  }, [isVisible, openKey, openAnim]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{translateY: translateY.value}],
     opacity: opacity.value,
   }));
 
-  // Recalcular placement cuando tengamos tamaños
+  // Determinar placement cuando tengamos tamaños
   const effectivePlacement = useMemo(
     () => decidePlacement(position, buttonLayout, menuLayout),
     [position, buttonLayout, menuLayout, decidePlacement],
   );
-  useEffect(() => setPlacement(effectivePlacement), [effectivePlacement]);
 
-  // Posición del menú
+  useEffect(() => {
+    setPlacement(effectivePlacement);
+  }, [effectivePlacement]);
+
+  // Posición del contenedor (envoltura del menú + se posiciona la flecha dentro)
   const computedTop =
     placement === 'top'
       ? clamp(
@@ -166,114 +160,131 @@ const CustomDropdown = ({
     SW - menuLayout.width - PADDING,
   );
 
+  // Posición horizontal de la flecha para centrarla respecto al menú
   const arrowLeft = Math.round(menuLayout.width / 2 - ARROW);
 
   const renderChildren = useMemo(() => {
     if (typeof children === 'function') {
       return (children as (api: {close: () => void}) => React.ReactNode)({
-        close,
+        close: closeModal,
       });
     }
     return children;
-  }, [children, close]);
+  }, [children, closeModal]);
 
-  // Cerrar al cambiar de pantalla
   useFocusEffect(
-    useCallback(() => {
-      return () => close();
-    }, [close]),
+    useCallback(
+      () => () => {
+        closeModal();
+      },
+      [closeModal],
+    ),
   );
 
   return (
     <>
-      <TouchableOpacity ref={buttonRef} onPress={toggle} style={buttonStyle}>
+      <TouchableOpacity
+        ref={buttonRef}
+        onPress={toggleModal}
+        style={buttonStyle}>
         {button}
       </TouchableOpacity>
 
-      {isVisible && (
-        <Portal hostName={hostName}>
-          <View style={styles.portalRoot} pointerEvents="box-none">
-            {/* Backdrop: toca para cerrar */}
-            <TouchableOpacity
-              style={RNStyleSheet.absoluteFill}
-              onPress={close}
-            />
+      {isModalVisible && <Portal></Portal>}
+      <Modal
+        isVisible={isModalVisible}
+        onBackdropPress={closeModal}
+        onBackButtonPress={closeModal}
+        backdropOpacity={0.2}
+        style={styles.modal}
+        animationIn="fadeIn"
+        animationOut="fadeOut"
+        animationInTiming={200}
+        animationOutTiming={180}
+        useNativeDriver
+        onModalShow={openModal}
+        onModalHide={() => setMenuLayout({x: 0, y: 0, width: 0, height: 0})}>
+        <View style={styles.backdrop} pointerEvents="box-none">
+          <Animated.View
+            key={openKey}
+            style={[
+              styles.menuContainer,
+              animatedStyle,
+              {top: computedTop, left: computedLeft},
+            ]}>
+            {/* Menú */}
+            <View
+              style={styles.menu}
+              onLayout={(e) => setMenuLayout(e.nativeEvent.layout)}>
+              {renderChildren}
+            </View>
 
-            {/* Contenedor del menú */}
-            <Animated.View
-              style={[
-                styles.menuContainer,
-                {top: computedTop, left: computedLeft},
-                animatedStyle,
-              ]}
-              pointerEvents="box-none">
+            {/* Flecha absoluta (no intercepta toques) */}
+            {menuLayout.width > 0 && (
               <View
-                style={styles.menu}
-                onLayout={(e) => setMenuLayout(e.nativeEvent.layout)}>
-                {renderChildren}
-              </View>
-
-              {/* Flecha */}
-              {menuLayout.width > 0 && (
-                <View
-                  pointerEvents="none"
-                  style={[
-                    styles.arrowBase,
-                    placement === 'bottom' ? styles.arrowUp : styles.arrowDown,
-                    placement === 'bottom'
-                      ? {top: -ARROW, left: arrowLeft}
-                      : {bottom: -ARROW, left: arrowLeft},
-                  ]}
-                />
-              )}
-            </Animated.View>
-          </View>
-        </Portal>
-      )}
+                pointerEvents="none"
+                style={[
+                  styles.arrowBase,
+                  placement === 'bottom' ? styles.arrowUp : styles.arrowDown,
+                  placement === 'bottom'
+                    ? {top: -ARROW, left: arrowLeft}
+                    : {bottom: -ARROW, left: arrowLeft},
+                ]}
+              />
+            )}
+          </Animated.View>
+        </View>
+      </Modal>
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  portalRoot: {
-    ...RNStyleSheet.absoluteFillObject,
-    justifyContent: 'flex-start',
-  },
+  modal: {margin: 0, justifyContent: 'flex-start'},
+  backdrop: {flex: 1},
   menuContainer: {
     position: 'absolute',
-    overflow: 'visible', // importante para que se vea la flecha
+    // MUY IMPORTANTE: permitir que la flecha salga fuera
+    overflow: 'visible',
   },
   menu: {
     backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 8,
-    minWidth: 180,
-    // sombra
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingBottom: 20,
+    paddingHorizontal: 10,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 6},
     shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 8,
+    shadowRadius: 8,
+    shadowOffset: {width: 0, height: 4},
+    elevation: 6,
+    zIndex: 1,
   },
+  // Base del triángulo
   arrowBase: {
     position: 'absolute',
     width: 0,
     height: 0,
+    zIndex: 2,
+    elevation: 7,
+    borderStyle: 'solid',
+  },
+  // Triángulo apuntando hacia ARRIBA (para placement "bottom": el menú está abajo del botón)
+  arrowUp: {
     borderLeftWidth: ARROW,
     borderRightWidth: ARROW,
-  },
-  // Triángulo hacia ARRIBA (menú debajo del botón)
-  arrowUp: {
+    borderBottomWidth: ARROW,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderBottomWidth: ARROW,
     borderBottomColor: 'white',
   },
-  // Triángulo hacia ABAJO (menú arriba del botón)
+  // Triángulo apuntando hacia ABAJO (para placement "top": el menú está arriba del botón)
   arrowDown: {
+    borderLeftWidth: ARROW,
+    borderRightWidth: ARROW,
+    borderTopWidth: ARROW,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderTopWidth: ARROW,
     borderTopColor: 'white',
   },
 });

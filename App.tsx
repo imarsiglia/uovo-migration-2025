@@ -19,8 +19,9 @@ import {AppNavigation} from './src/navigation/AppNavigation';
 import {ColorScheme, EDSProvider, useEDS} from '@equinor/mad-components';
 import {KeyboardProvider} from 'react-native-keyboard-controller';
 import AppProviders from '@providers/AppProviders';
-import { ModalDialog } from '@components/commons/modals/ModalDialog';
-import { ModalLoading } from '@components/commons/modals/ModalLoading';
+import {ModalDialog} from '@components/commons/modals/ModalDialog';
+import {ModalLoading} from '@components/commons/modals/ModalLoading';
+import {PortalHost} from '@gorhom/portal';
 
 // import EditDeleteModal from './src/components/conditionReport/EditDeleteModal';
 // import EditModal from './src/components/conditionReport/EditModal';
@@ -123,14 +124,15 @@ const App = () => {
                       <InventoryProvider> */}
               <SafeAreaProvider>
                 <AppNavigation />
+                <PortalHost name="root" />
               </SafeAreaProvider>
               {/* </InventoryProvider>
                     </NationalShuttleProvider>
                   </TabHomeProvider> */}
               {/* </UserProvider> */}
               {/* </ModalProvider> */}
-              <ModalDialog/>
-              <ModalLoading/>
+              <ModalDialog />
+              <ModalLoading />
             </EDSProvider>
           </KeyboardProvider>
         </AppProviders>

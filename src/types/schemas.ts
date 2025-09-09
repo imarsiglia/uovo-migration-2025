@@ -1,4 +1,5 @@
-import {IdReportMaterialType} from '@api/types/Task';
+import {LaborCodeType} from '@api/types/Jobs';
+import {EmployeeType, IdReportMaterialType} from '@api/types/Task';
 import * as yup from 'yup';
 
 const DEFAULT_REQUIRED_MESSAGE = 'This field is required';
@@ -156,3 +157,85 @@ export const PieceCountSchema = yup.object().shape({
 });
 
 export type PieceCountSchemaType = yup.InferType<typeof PieceCountSchema>;
+
+// export const AddLaborSchema = yup.object().shape({
+//   hours: yup
+//     .number()
+//     .max(999, "Hours can't be superior to 999")
+//     .min(0, "Hours can't be inferior than 0")
+//     .required(DEFAULT_REQUIRED_MESSAGE),
+//   pbs: yup
+//     .number()
+//     .max(59, "Minutes can't be superior to 59")
+//     .min(0, "Minutes can't be inferior than 0")
+//     .required(DEFAULT_REQUIRED_MESSAGE),
+// });
+
+export const AddLaborSchema = yup
+  .object({
+    handler: yup.mixed<EmployeeType & {title: string}>().required(DEFAULT_REQUIRED_MESSAGE),
+    code: yup.string().required(DEFAULT_REQUIRED_MESSAGE),
+    hours: yup
+      .number()
+      .transform((val, orig) => {
+        // Vacío -> undefined (para permitir la validación combinada)
+        if (orig === '' || orig === null || typeof orig === 'undefined')
+          return undefined;
+        return Number.isFinite(val) ? val : NaN;
+      })
+      .typeError('Hours must be a number')
+      .integer('Hours must be an integer')
+      .min(0, "Hours can't be inferior than 0")
+      .max(999, "Hours can't be superior to 999")
+      .nullable(),
+    minutes: yup
+      .number()
+      .transform((val, orig) => {
+        if (orig === '' || orig === null || typeof orig === 'undefined')
+          return undefined;
+        return Number.isFinite(val) ? val : NaN;
+      })
+      .typeError('Minutes must be a number')
+      .integer('Minutes must be an integer')
+      .min(0, "Minutes can't be inferior than 0")
+      .max(59, "Minutes can't be superior to 59")
+      .nullable(),
+  })
+  // Autorrelleno: si uno es válido y el otro no, rellenar con 0
+  .transform((current) => {
+    if (!current) return current;
+    const hoursValid =
+      Number.isInteger(current.hours) &&
+      current.hours >= 0 &&
+      current.hours <= 999;
+
+    const minutesValid =
+      Number.isInteger(current.pbs) && current.pbs >= 0 && current.pbs <= 59;
+
+    if (hoursValid && !minutesValid) {
+      return {...current, pbs: 0};
+    }
+    if (minutesValid && !hoursValid) {
+      return {...current, hours: 0};
+    }
+    return current;
+  })
+  // Regla combinada: al menos uno válido
+  .test(
+    'at-least-one',
+    'Provide at least Hours or Minutes (integers).',
+    (value) => {
+      if (!value) return false;
+      const hoursValid =
+        Number.isInteger(value.hours) && value.hours >= 0 && value.hours <= 999;
+
+      const minutesValid =
+        Number.isInteger(value.minutes) &&
+        value.minutes >= 0 &&
+        value.minutes <= 59;
+
+      return hoursValid || minutesValid;
+    },
+  );
+
+export type AddLaborSchemaType = yup.InferType<typeof AddLaborSchema>;

@@ -1,6 +1,8 @@
 import {QUERY_KEYS} from '@api/contants/constants';
 import {
+  EmployeesApiProps,
   HistoryReportMaterialsApiProps,
+  LaborReportsApiProps,
   ReportMaterialsInventoryApiProps,
   SignaturesApiProps,
   TaskBaseApiProps,
@@ -16,7 +18,10 @@ const DEFAULT_PERSISTENCE_CONFIG = {
   placeholderData: keepPreviousData,
 };
 
-export const useGetSignatures = (props: SignaturesApiProps) => {
+export const useGetSignatures = ({
+  enabled = true,
+  ...props
+}: SignaturesApiProps & {enabled?: boolean}) => {
   return useQuery({
     queryKey: [QUERY_KEYS.SIGNATURES, props],
     queryFn: () => taskServices.signatures(props),
@@ -121,6 +126,49 @@ export const useGetBOLCount = (props: TaskBaseApiProps) => {
     queryKey: [QUERY_KEYS.BOL_COUNT, props],
     queryFn: () => taskServices.getBOLCount(props),
     enabled: !!props?.idJob,
+    ...DEFAULT_PERSISTENCE_CONFIG,
+  });
+};
+
+export const useSaveBOLCount = () => {
+  return useMutation({
+    mutationFn: taskServices.saveBOLCount,
+  });
+};
+
+export const useGetLaborReports = ({
+  enabled = true,
+  ...props
+}: LaborReportsApiProps & {enabled?: boolean}) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.LABOR_REPORTS, props],
+    queryFn: () => taskServices.getLaborReports(props),
+    enabled: !!props?.idJob && !!props.toClockout && enabled,
+    ...DEFAULT_PERSISTENCE_CONFIG,
+  });
+};
+
+export const useRegisterLaborReport = () => {
+  return useMutation({
+    mutationFn: taskServices.registerLaborReport,
+  });
+};
+
+export const useGetEmployees = (props: EmployeesApiProps) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.EMPLOYEES, props],
+    queryFn: () => taskServices.getEmployees(props),
+    enabled: !!props.filter && props.filter?.trim()?.length > 0,
+    // gcTime: 0,
+    // staleTime: 0
+    // ...DEFAULT_PERSISTENCE_CONFIG,
+  });
+};
+
+export const useGetLaborCodes = () => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.LABOR_CODES],
+    queryFn: taskServices.getLaborCodes,
     ...DEFAULT_PERSISTENCE_CONFIG,
   });
 };

@@ -2,12 +2,16 @@ import {
   API_DELETE_NOTE,
   API_DELETE_SIGNATURE,
   API_GET_BOL_COUNT,
+  API_GET_EMPLOYEES,
   API_GET_HISTORY_REPORT_MATERIALS,
+  API_GET_LABOR_CODES,
+  API_GET_LABOR_REPORTS,
   API_GET_NOTES,
   API_GET_REPORT_MATERIALS,
   API_GET_REPORT_MATERIALS_INVENTORY,
   API_GET_SIGNATURES,
   API_GET_WO_ATTACHMENTS,
+  API_REGISTER_LABOR_REPORT,
   API_REGISTER_ONE_REPORT_MATERIAL,
   API_REGISTER_REPORT_MATERIALS,
   API_SAVE_NOTE,
@@ -15,16 +19,21 @@ import {
   SUCCESS_MESSAGES,
 } from '@api/contants/endpoints';
 import {getRequest, postRequest} from '@api/helpers/apiClientHelper';
+import {LaborCodeType} from '@api/types/Jobs';
 import {Paginated} from '@api/types/Response';
 import {
   AttachmentType,
   BolCountType,
+  EmployeeType,
   HistoryReportMaterialType,
   IdReportMaterialType,
+  LaborReportType,
   NoteType,
   ReportMaterialType,
   SignatureType,
 } from '@api/types/Task';
+import {UserType} from '@api/types/User';
+import {BooleanStringType} from '@generalTypes/general';
 
 export type TaskBaseApiProps = {
   idJob: number;
@@ -174,6 +183,65 @@ const getBOLCount = async ({
   return response.body;
 };
 
+type SaveBOLCountApiProps = {
+  pbs: string;
+  packageCount: number;
+} & TaskBaseApiProps;
+const saveBOLCount = async (props: SaveBOLCountApiProps): Promise<boolean> => {
+  const response = await postRequest(API_GET_BOL_COUNT, props);
+  return response.message === SUCCESS_MESSAGES.SUCCESS;
+};
+
+export type LaborReportsApiProps = {
+  toClockout: '0' | '1';
+} & TaskBaseApiProps;
+const getLaborReports = async ({
+  idJob,
+  toClockout,
+}: LaborReportsApiProps): Promise<LaborReportType[]> => {
+  const response = await getRequest<Paginated<LaborReportType[]>>(
+    `${API_GET_LABOR_REPORTS}?idjob=${idJob}&toclockout=${toClockout}`,
+  );
+  return response.body?.data ?? [];
+};
+
+export type DeleteLaborReportApiProps = {
+  idJob: number;
+  confirm: BooleanStringType;
+  list: LaborReportType[];
+  queue: BooleanStringType;
+  preventEditCurrentClock: boolean;
+};
+
+const registerLaborReport = async (
+  props: DeleteLaborReportApiProps,
+): Promise<boolean> => {
+  const response = await postRequest(API_REGISTER_LABOR_REPORT, props);
+  console.log("response")
+  console.log(JSON.stringify(response))
+  return response.message === SUCCESS_MESSAGES.SUCCESS;
+};
+
+export type EmployeesApiProps = {
+  filter: string;
+};
+
+const getEmployees = async ({
+  filter,
+}: EmployeesApiProps): Promise<EmployeeType[]> => {
+  const response = await getRequest<Paginated<EmployeeType[]>>(
+    `${API_GET_EMPLOYEES}?query=${filter}`,
+  );
+  return response.body?.data ?? [];
+};
+
+const getLaborCodes = async (): Promise<LaborCodeType[]> => {
+  const response = await getRequest<Paginated<LaborCodeType[]>>(
+    API_GET_LABOR_CODES,
+  );
+  return response.body?.data ?? [];
+};
+
 export const taskServices = {
   signatures,
   saveSignature,
@@ -188,4 +256,9 @@ export const taskServices = {
   registerOneReportMaterial,
   getWoAttachments,
   getBOLCount,
+  saveBOLCount,
+  getLaborReports,
+  registerLaborReport,
+  getEmployees,
+  getLaborCodes,
 };

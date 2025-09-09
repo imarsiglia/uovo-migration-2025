@@ -1,7 +1,8 @@
 import {CrewMemberType} from '@api/types/Jobs';
-import {NoteType, ReportMaterialType} from '@api/types/Task';
+import {LaborReportType, NoteType, ReportMaterialType} from '@api/types/Task';
+import {BooleanStringType} from '@generalTypes/general';
 import {ImageType} from '@generalTypes/images';
-import { Base64ImageCarouselProps } from '@screens/commons/BaseImageScreen';
+import {Base64ImageCarouselProps} from '@screens/commons/BaseImageScreen';
 
 // 👉 Constantes reutilizables (sin strings mágicos)
 export const RoutesNavigation = {
@@ -27,7 +28,9 @@ export const RoutesNavigation = {
   SaveReportMaterials: 'SaveReportMaterials',
   WoAttachment: 'WoAttachment',
   BaseImageScreen: 'BaseImageScreen',
-  EditPieceCount: 'EditPieceCount'
+  EditPieceCount: 'EditPieceCount',
+  LaborReport: 'LaborReport',
+  AddLaborReport: 'AddLaborReport',
 } as const;
 
 // Union de nombres de ruta: "Home" | "ContactUs" | ...
@@ -52,7 +55,7 @@ export type RootStackParamList = {
   [RoutesNavigation.Account]: undefined;
   [RoutesNavigation.Topsheet]: {
     id: string;
-    queue: number;
+    queue: BooleanStringType;
   };
   [RoutesNavigation.ReportIssue]: {
     type: string;
@@ -85,11 +88,15 @@ export type RootStackParamList = {
   };
   [RoutesNavigation.ReportMaterials]: undefined;
   [RoutesNavigation.SaveReportMaterials]: {
-    item?: ReportMaterialType
+    item?: ReportMaterialType;
   };
-  [RoutesNavigation.BaseImageScreen]: Base64ImageCarouselProps,
-  [RoutesNavigation.WoAttachment]: undefined,
-  [RoutesNavigation.EditPieceCount]: undefined
+  [RoutesNavigation.BaseImageScreen]: Base64ImageCarouselProps;
+  [RoutesNavigation.WoAttachment]: undefined;
+  [RoutesNavigation.EditPieceCount]: undefined;
+  [RoutesNavigation.LaborReport]: undefined;
+  [RoutesNavigation.AddLaborReport]: {
+    item?: LaborReportType;
+  };
 };
 
 export const TopSheetRoutesNavigation = {

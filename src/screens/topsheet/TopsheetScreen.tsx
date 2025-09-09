@@ -27,6 +27,7 @@ import {LocationTopsheet} from './LocationTopsheet';
 import {ResumeTopsheet} from './ResumeTopsheet';
 import {TaskTopsheet} from './TaskTopsheet';
 import {TeamTopsheet} from './TeamTopsheet';
+import {ClockinButton} from '@components/clockin/ClockinButton';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -35,7 +36,8 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Topsheet'>;
 export const TopsheetScreen = ({route}: Props) => {
   const {online} = useOnline();
   const {navigate, goBack} = useCustomNavigation();
-  const {setJobDetail, setActiveTab, activeTab} = useTopSheetStore();
+  const {setJobDetail, setActiveTab, activeTab, setIsJobQueue} =
+    useTopSheetStore();
 
   const {
     params: {id, queue},
@@ -57,6 +59,13 @@ export const TopsheetScreen = ({route}: Props) => {
       setJobDetail(undefined);
     };
   }, [jobDetail]);
+
+  useEffect(() => {
+    setIsJobQueue(queue);
+    return () => {
+      setIsJobQueue(undefined);
+    };
+  }, [queue]);
 
   useEffect(() => {
     if (activeTab == 0) {
@@ -268,6 +277,18 @@ export const TopsheetScreen = ({route}: Props) => {
                 />
               </Tab.Navigator>
             </View>
+
+            <Wrapper
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                width: '100%',
+                paddingVertical: 5,
+                backgroundColor: 'white',
+                paddingHorizontal: 20,
+              }}>
+              <ClockinButton />
+            </Wrapper>
           </>
         )}
       </Wrapper>

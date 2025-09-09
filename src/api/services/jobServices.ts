@@ -14,6 +14,7 @@ import {
 import {getRequest, postRequest} from '@api/helpers/apiClientHelper';
 import {JobDetailType, JobType, TaskJobType} from '@api/types/Jobs';
 import {Paginated} from '@api/types/Response';
+import {BooleanStringType} from '@generalTypes/general';
 
 const calendar = async (month: number, year: number): Promise<string[]> => {
   const response = await getRequest<Paginated<string[]>>(
@@ -45,7 +46,7 @@ const jobqueue = async (props: JobQueueApiProps): Promise<JobType[]> => {
 
 export type TopSheetApiProps = {
   id: string;
-  queue: number;
+  queue: BooleanStringType;
 };
 const topsheet = async ({
   id,

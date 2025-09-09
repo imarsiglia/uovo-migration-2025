@@ -8,7 +8,7 @@ import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {getFormattedDate} from '@utils/functions';
-import React, {useMemo} from 'react';
+import {useMemo} from 'react';
 import {Platform, ScrollView, StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
@@ -84,7 +84,7 @@ export const ResumeTopsheet = () => {
         }}>
         <PressableOpacity
           style={styles.btnOptionAttachments}
-          onPress={() => navigate(RoutesNavigation.WoAttachmentScreen)}>
+          onPress={() => navigate(RoutesNavigation.WoAttachment)}>
           <Label style={styles.btnOptionAttachmentsText}>WO Attachments</Label>
           <Wrapper style={styles.btnOptionAttachmentsCounter}>
             <Label style={styles.btnOptionAttachmentsNumeric}>

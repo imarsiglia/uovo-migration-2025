@@ -149,7 +149,11 @@ export const getDeviceTimeZone = () => DEVICE_TZ;
 export function getFormattedDateWithTimezone(
   date: Date | string | number,
   format = 'DD-MM-YYYY',
+  errorMessage?: string,
 ) {
+  if (!date && errorMessage) {
+    return errorMessage;
+  }
   // parseZone respeta el offset si viene en el string (ej: "2025-08-27T18:30:00-05:00")
   // Si no trae offset, lo trata como local y luego lo convierte a la zona del dispositivo.
   return moment.parseZone(date).tz(DEVICE_TZ).format(format);
@@ -272,4 +276,10 @@ export function lockToLandscape() {
 
 export function lockToPortrait() {
   Orientation.lockToPortrait();
+}
+
+export function formatWorkedHours(hours?: number, minutes?: number) {
+  return `${String(hours ?? 0).padStart(2, '0')}:${String(
+    minutes ?? 0,
+  ).padStart(2, '0')}:00`;
 }

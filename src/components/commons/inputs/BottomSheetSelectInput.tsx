@@ -7,7 +7,7 @@ import {
   BottomSheetTextInput,
 } from '@gorhom/bottom-sheet';
 import {COLORS} from '@styles/colors';
-import React, {
+import {
   forwardRef,
   memo,
   useCallback,
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
   placeholderText: {color: '#9CA3AF'},
 
   handle: {borderTopLeftRadius: 16, borderTopRightRadius: 16},
-  sheetBg: {backgroundColor: 'white', flex: 1},
+  sheetBg: {backgroundColor: 'white', flex: 1, zIndex: 999999999999999},
 
   header: {paddingHorizontal: 16, gap: 15, paddingTop: 10},
   headerTitle: {

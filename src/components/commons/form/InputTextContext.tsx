@@ -17,7 +17,7 @@ export const InputTextContext = ({currentId, isErrorHidden, ...restProps}: Props
   } = useFormContext();
 
   return (
-    <View>
+    <>
       <Controller
         control={control}
         render={({field: {onChange, onBlur, value}}) => (
@@ -39,6 +39,6 @@ export const InputTextContext = ({currentId, isErrorHidden, ...restProps}: Props
         message={getInputIdFormContext(errors, currentId)?.message}
         isHidden={isErrorHidden}
       /> */}
-    </View>
+    </>
   );
 };

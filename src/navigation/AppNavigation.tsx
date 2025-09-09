@@ -96,8 +96,10 @@ import {SaveNoteScreen} from '@screens/notes/SaveNoteScreen';
 import {ReportMaterialsScreen} from '@screens/reportmaterials/ReportMaterialsScreen';
 import {SaveReportMaterialScreen} from '@screens/reportmaterials/SaveReportMaterialScreen';
 import BaseImageScreen from '@screens/commons/BaseImageScreen';
-import { WoAttachmentScreen } from '@screens/woattachments/WoAttachmentScreen';
-import { EditPieceCountScreen } from '@screens/piececount/EditPieceCountScreen';
+import {WoAttachmentScreen} from '@screens/woattachments/WoAttachmentScreen';
+import {EditPieceCountScreen} from '@screens/piececount/EditPieceCountScreen';
+import {LaborReportScreen} from '@screens/laborreport/LaborReportScreen';
+import { AddLaborReportScreen } from '@screens/laborreport/AddLaborReportScreen';
 // import InventoryNS from '../screens/nationalShuttle/InventoryNS';
 
 // LogBox.ignoreLogs([
@@ -234,13 +236,21 @@ export const AppNavigation = () => {
               component={EditPieceCountScreen}
             />
 
+            <Stack.Screen
+              name={RoutesNavigation.LaborReport}
+              component={LaborReportScreen}
+            />
+
+            <Stack.Screen
+              name={RoutesNavigation.AddLaborReport}
+              component={AddLaborReportScreen}
+            />
+
             {/* visualizar imagenes */}
             <Stack.Screen
               name={RoutesNavigation.BaseImageScreen}
               component={BaseImageScreen}
             />
-
-            
           </Stack.Navigator>
         </NavigationContainer>
         // <OfflineComponentSync />

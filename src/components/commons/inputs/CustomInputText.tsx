@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderWidth: 0.5,
     borderRadius: 10,
-    borderColor: COLORS.gray,
+    borderColor: COLORS.borderInputColor,
     color: COLORS.inputTextColor,
     height: 40
   },

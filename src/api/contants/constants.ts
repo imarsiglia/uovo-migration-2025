@@ -31,6 +31,9 @@ export const QUERY_KEYS = {
   REPORT_MATERIALS_INVENTORY: 'report_materials_inventory',
   WO_ATTACHMENTS: 'wo_attachments',
   BOL_COUNT: 'bol_count',
+  LABOR_REPORTS: 'labor_reports',
+  EMPLOYEES: 'employees',
+  LABOR_CODES: 'labor_codes',
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';
