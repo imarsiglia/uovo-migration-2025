@@ -28,9 +28,9 @@ import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {PlaceholderCard} from '@components/timeline/PlaceholderCard';
 import {TimelineCard} from '@components/timeline/TimelineCard';
 import {FAIconType} from '@generalTypes/general';
-import { useCustomNavigation } from '@hooks/useCustomNavigation';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {useOnline} from '@hooks/useOnline';
-import { RoutesNavigation } from '@navigation/types';
+import {RoutesNavigation} from '@navigation/types';
 import {useAuth} from '@store/auth';
 import useGeneralStore from '@store/general';
 import {useJobQueueStore} from '@store/jobqueue';
@@ -70,7 +70,7 @@ export const JobQueueViewCmp = () => {
     WO_NUMBER,
   } = useJobQueueStore();
 
-  const {navigate} = useCustomNavigation()
+  const {navigate} = useCustomNavigation();
 
   const filter = useMemo(() => {
     return getValueByType(orderBy);
@@ -108,7 +108,7 @@ export const JobQueueViewCmp = () => {
     if (!filter) {
       return 'Start Date';
     }
-    return getFormattedDateWithTimezone(filter, 'MMM DD [•] YYYY');
+    return getFormattedDate(filter, 'MMM DD [•] YYYY');
   }, [START_DATE]);
 
   const handleConfirm = useCallback((date: Date | null) => {
@@ -136,11 +136,10 @@ export const JobQueueViewCmp = () => {
   }
 
   const handleItemPress = useCallback((id: string) => {
-    console.log(id)
     navigate(RoutesNavigation.Topsheet, {
       id,
-      queue: 1
-    })
+      queue: 1,
+    });
   }, []);
 
   const formattedItems = useMemo(() => {
@@ -230,7 +229,7 @@ export const JobQueueViewCmp = () => {
   return (
     <Wrapper style={[GLOBAL_STYLES.containerTabContent, styles.container]}>
       <Wrapper style={styles.containerFilterHeader}>
-        <Wrapper style={{paddingHorizontal: 10, position: "relative" }}>
+        <Wrapper style={{paddingHorizontal: 10, position: 'relative'}}>
           <BottomSheetSelectInput
             options={locationPlaces ?? []}
             label="Search places"
@@ -238,7 +237,7 @@ export const JobQueueViewCmp = () => {
             idKey="name"
             value={serviceLocation}
             multiple
-            snapPoints={["95%"]}
+            snapPoints={['95%']}
             onChange={(val, items) => setServiceLocation(val as string[])}
           />
         </Wrapper>

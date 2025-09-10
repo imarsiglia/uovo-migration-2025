@@ -7,12 +7,13 @@ import {
 import {
   useClockIn,
   useClockout,
-  useGetTopsheet,
   usePauseJob,
-  useResumeJob,
 } from '@api/hooks/HooksJobServices';
-import {useGetLaborCodes} from '@api/hooks/HooksTaskServices';
-import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
+import {
+  useGetLaborCodes,
+  useRegisterLaborReport,
+} from '@api/hooks/HooksTaskServices';
+import {LaborReportType} from '@api/types/Task';
 import {RoundedButton} from '@components/commons/buttons/RoundedButton';
 import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
 import {BottomSheetSelectInputContext} from '@components/commons/form/BottomSheetSelectInputContext';
@@ -30,54 +31,30 @@ import {useModalDialogStore} from '@store/modals';
 import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {showErrorToastMessage} from '@utils/toast';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {showErrorToastMessage, showToastMessage} from '@utils/toast';
+import {useCallback, useMemo} from 'react';
 import {StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
-export const ClockinButton = () => {
-  const [fetched, setFetched] = useState(false);
-  const {navigate} = useCustomNavigation();
+type Props = {
+  list: LaborReportType[];
+};
+export const ClockinButtonLaborReport = ({list}: Props) => {
   const selectedDate = useGeneralStore((d) => d.selectedDate);
-  const {jobDetail, isJobQueue, setToClockout} = useTopSheetStore();
+  const {toClockout, jobDetail, isJobQueue} = useTopSheetStore();
   const showDialog = useModalDialogStore((d) => d.showVisible);
   const {data: laborCodes, isLoading} = useGetLaborCodes();
   const {mutateAsync: clockInAsync} = useClockIn();
-  const {mutateAsync: pauseJobAsync} = usePauseJob();
   const {mutateAsync: clockoutAsync} = useClockout();
-  const {mutateAsync: resumeJobAsync} = useResumeJob();
+  const {mutateAsync: registerLaborReportAsync} = useRegisterLaborReport();
 
-  const {refetch: refetchJobDetail, isRefetching: isRefetchingTopsheet} =
-    useGetTopsheet({
-      id: jobDetail?.id?.toString(),
-      queue: isJobQueue,
-    });
+  const {goBackToIndex, goBack} = useCustomNavigation();
 
   const {refetchAll, isRefetchingAny} = useRefreshIndicator([
     [QUERY_KEYS.TOPSHEET, {id: jobDetail?.id?.toString(), queue: isJobQueue}],
+    [QUERY_KEYS.LABOR_REPORTS, {idJob: jobDetail.id, toClockout}],
     [QUERY_KEYS.TIMELINE, selectedDate],
   ]);
-
-  const goToLaborReport = useCallback(() => {
-    setToClockout(1);
-    navigate(RoutesNavigation.LaborReport);
-  }, [navigate, setToClockout]);
-
-  const refetchTopsheet = useCallback(() => {
-    loadingWrapperPromise(
-      refetchAll()
-        .then(async () => {
-          refetchJobDetail()
-            .then((d) => {
-              if (d?.data?.current_clock_in?.status === FINALIZED_STATUS) {
-                goToLaborReport();
-              }
-            })
-            .catch(() => {});
-        })
-        .catch(() => {}),
-    );
-  }, [refetchAll, refetchJobDetail, goToLaborReport]);
 
   const clockIn = useCallback(
     (props: ClockInSchemaType) => {
@@ -89,7 +66,9 @@ export const ClockinButton = () => {
         })
           .then((d) => {
             if (d) {
-              refetchTopsheet();
+              refetchAll();
+              showToastMessage('Job started');
+              goBack();
             } else {
               showErrorToastMessage('An error has ocurred');
             }
@@ -99,27 +78,8 @@ export const ClockinButton = () => {
           }),
       );
     },
-    [jobDetail?.id, isJobQueue, refetchTopsheet, clockInAsync],
+    [jobDetail, isJobQueue, refetchAll],
   );
-
-  const pauseJob = useCallback(() => {
-    loadingWrapperPromise(
-      pauseJobAsync({
-        idJob: jobDetail.id,
-        queue: isJobQueue,
-      })
-        .then((d) => {
-          if (d) {
-            refetchTopsheet();
-          } else {
-            showErrorToastMessage('An error has ocurred');
-          }
-        })
-        .catch(() => {
-          showErrorToastMessage('An error has ocurred');
-        }),
-    );
-  }, [jobDetail?.id, isJobQueue, refetchTopsheet, pauseJobAsync]);
 
   const clockout = useCallback(() => {
     showDialog({
@@ -152,7 +112,8 @@ export const ClockinButton = () => {
           })
             .then((d) => {
               if (d) {
-                refetchTopsheet();
+                refetchAll();
+                showToastMessage('Job finished successfully');
               } else {
                 showErrorToastMessage('An error has ocurred');
               }
@@ -163,38 +124,7 @@ export const ClockinButton = () => {
         );
       },
     });
-  }, [showDialog, jobDetail, isJobQueue, refetchTopsheet, clockoutAsync]);
-
-  const resumeJob = useCallback(() => {
-    loadingWrapperPromise(
-      resumeJobAsync({
-        idJob: jobDetail.id,
-        queue: isJobQueue,
-      })
-        .then((d) => {
-          if (d) {
-            refetchTopsheet();
-          } else {
-            showErrorToastMessage('An error has ocurred');
-          }
-        })
-        .catch(() => {
-          showErrorToastMessage('An error has ocurred');
-        }),
-    );
-  }, [resumeJobAsync, jobDetail?.id, isJobQueue, refetchTopsheet]);
-
-  const canClockin = useMemo(() => {
-    if (jobDetail) {
-      return (
-        !jobDetail.current_clock_in ||
-        (jobDetail.current_clock_in &&
-          jobDetail.current_clock_in?.status == FINALIZED_STATUS)
-      );
-    } else {
-      return false;
-    }
-  }, [jobDetail?.current_clock_in]);
+  }, [showDialog, jobDetail, isJobQueue, clockoutAsync, refetchAll]);
 
   const isActive = useMemo(() => {
     return (
@@ -203,9 +133,52 @@ export const ClockinButton = () => {
     );
   }, [jobDetail?.current_clock_in]);
 
-  const isStarted = useMemo(() => {
-    return jobDetail?.current_clock_in?.status == STARTED_STATUS;
+  const isFinalized = useMemo(() => {
+    return jobDetail?.current_clock_in?.status == FINALIZED_STATUS;
   }, [jobDetail?.current_clock_in]);
+
+  const isUndefined = useMemo(() => {
+    return !jobDetail?.current_clock_in?.status;
+  }, [jobDetail?.current_clock_in]);
+
+  const confirmJob = useCallback(() => {
+    loadingWrapperPromise(
+      registerLaborReportAsync({
+        idJob: jobDetail.id,
+        queue: isJobQueue,
+        preventEditCurrentClock: false,
+        confirm: 1,
+        list: list?.map((x) => ({
+          ...x,
+          laborCode: x.labor_code,
+          addedManually: x.added_manually,
+          workedHours: x.worked_hour,
+          userName: x.user_name,
+        })),
+      })
+        .then((d) => {
+          if (d) {
+            refetchAll();
+            // removeAndRefresh();
+            showToastMessage('Job confirmed successfully');
+            goBackToIndex(2);
+          } else {
+            showErrorToastMessage('An error occurred while confirming');
+          }
+        })
+        .catch(() =>
+          showErrorToastMessage('An error occurred while confirming'),
+        ),
+    );
+  }, [
+    registerLaborReportAsync,
+    list,
+    jobDetail?.id,
+    isJobQueue,
+    refetchAll,
+    // removeAndRefresh,
+    goBackToIndex,
+  ]);
 
   if (isLoading) {
     return <></>;
@@ -213,7 +186,7 @@ export const ClockinButton = () => {
 
   return (
     <>
-      {canClockin && (
+      {isUndefined && (
         <CustomDropdown
           button={
             <Wrapper style={styles.button}>
@@ -236,15 +209,6 @@ export const ClockinButton = () => {
                   <Wrapper style={{width: 54}}></Wrapper>
                   <Label style={styles.titleLaborCode}>Labor report</Label>
                   <Wrapper style={[GLOBAL_STYLES.row, {gap: 10}]}>
-                    <PressableOpacity
-                      style={GLOBAL_STYLES.btnOptTop}
-                      onPress={() => {
-                        goToLaborReport();
-                        close();
-                      }}>
-                      <Icon name="eye" color="white" type="solid" size={15} />
-                    </PressableOpacity>
-
                     <ButtonSubmit
                       onSubmit={(data) => {
                         clockIn(data);
@@ -294,48 +258,34 @@ export const ClockinButton = () => {
       )}
 
       {isActive && (
-        <Wrapper style={{flexDirection: 'row', gap: 5}}>
-          {isStarted ? (
-            <RoundedButton
-              onPress={pauseJob}
-              label="Pause job"
-              icon={<Icon name="pause" color="white" size={14} />}
-              style={styles.activeButton}
-            />
-          ) : (
-            <RoundedButton
-              onPress={resumeJob}
-              label="Resume job"
-              icon={<Icon name="step-forward" color="white" size={14} />}
-              style={styles.activeButton}
-            />
-          )}
-
+        <Wrapper style={styles.containerButton}>
           <RoundedButton
             onPress={clockout}
             label="Clock out"
-            icon={<Icon name="stop" color={COLORS.primary} size={14} />}
-            style={[
-              styles.activeButton,
-              {
-                backgroundColor: COLORS.white,
-                borderColor: COLORS.primary,
-                borderWidth: 1,
-              },
-            ]}
-            labelStyles={{color: COLORS.primary}}
+            icon={<Icon name="stop" color={COLORS.white} size={14} />}
+            style={styles.activeButton}
           />
         </Wrapper>
       )}
 
-      {(isRefetchingAny || isRefetchingTopsheet) && (
+      {isFinalized && (
+        <Wrapper style={styles.containerButton}>
+          <RoundedButton
+            onPress={confirmJob}
+            label="Confirm"
+            icon={<Icon name="check-circle" color={COLORS.white} size={14} />}
+            style={styles.activeButton}
+          />
+        </Wrapper>
+      )}
+
+      {isRefetchingAny && (
         <Wrapper
           style={{
             position: 'absolute',
             width: '120%',
             backgroundColor: 'transparent',
             minHeight: 60,
-            zIndex: 1,
           }}
         />
       )}
@@ -391,6 +341,10 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   activeButton: {
-    flex: 0.5,
+    flex: 1,
+  },
+  containerButton: {
+    flexDirection: 'row',
+    gap: 5,
   },
 });

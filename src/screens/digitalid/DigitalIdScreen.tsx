@@ -1,5 +1,6 @@
 import {useGetQrUser} from '@api/hooks/HooksGeneralServices';
 import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
+import {CustomModal} from '@components/commons/modals/CustomModal';
 import {RootStackParamList} from '@navigation/types';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useAuth} from '@store/auth';

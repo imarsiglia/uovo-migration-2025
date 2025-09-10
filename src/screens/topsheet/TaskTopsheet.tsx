@@ -12,7 +12,7 @@ import {RoutesNavigation} from '@navigation/types';
 import {useRoute} from '@react-navigation/native';
 import useTopSheetStore from '@store/topsheet';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {useCallback, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import {ScrollView, StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
@@ -28,13 +28,20 @@ export const TaskTopsheet = () => {
     setVisible(!visible);
   }, [visible, setVisible]);
 
+  const toClockOut = useMemo(() => {
+    return (
+      jobDetail.current_clock_in?.status == STARTED_STATUS ||
+      jobDetail.current_clock_in?.status == PAUSED_STATUS
+    );
+  }, [jobDetail?.current_clock_in]);
+
   const goToLaborReport = useCallback(() => {
-    setToClockout('1');
+    setToClockout(toClockOut ? 0 : 1);
     navigate(RoutesNavigation.LaborReport);
-  }, [navigate]);
+  }, [navigate, toClockOut]);
 
   const goToClockIn = useCallback(() => {
-    setToClockout('1');
+    setToClockout(1);
     navigate(RoutesNavigation.LaborReport);
   }, [navigate]);
 
@@ -53,7 +60,7 @@ export const TaskTopsheet = () => {
           style={{
             paddingLeft: 20,
             paddingRight: 20,
-            paddingBottom: 100,
+            paddingBottom: 60,
           }}>
           <TaskOption
             name={taskCount[0].description}
@@ -109,7 +116,9 @@ export const TaskTopsheet = () => {
             color="#7966E0"
             quantity={taskCount[1].quantity}
             onPressLeft={() => navigate(RoutesNavigation.Account)}
-            onPressRight={() => navigate(RoutesNavigation.Account, {fromList: false})}
+            onPressRight={() =>
+              navigate(RoutesNavigation.Account, {fromList: false})
+            }
             // offline={[IMAGES_OFFLINE_VALIDATION]}
             idJob={jobDetail?.id!}
           />
@@ -214,16 +223,7 @@ export const TaskTopsheet = () => {
           {true && (
             <PressableOpacity
               style={[styles.buttonTask]}
-              onPress={
-                goToLaborReport
-                // goToLaborReport(
-                //   jobDetail.current_clock_in != null &&
-                //     (jobDetail.current_clock_in?.status == STARTED_STATUS ||
-                //       jobDetail.current_clock_in?.status == PAUSED_STATUS)
-                //     ? 0
-                //     : 1,
-                // )
-              }>
+              onPress={goToLaborReport}>
               <Wrapper style={GLOBAL_STYLES.row}>
                 <Wrapper
                   style={[styles.viewIcon, {backgroundColor: '#4cabf7'}]}>

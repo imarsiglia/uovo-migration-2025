@@ -1,4 +1,3 @@
-
 //AUTHENTICATION ENDPOINTS
 export const API_LOGIN = '/login';
 export const API_REFRESH_TOKEN = '/user/refreshtoken';
@@ -29,6 +28,9 @@ export const API_SAVE_LOCATION_NOTES = '/notes/location/saveContactComments';
 export const API_SEND_EMAIL_BOL = '/bol/sendEmail';
 export const API_TASK_COUNT = '/job/task/count';
 
+// member team
+export const API_REMOVE_TEAM_MEMBER = '/job/team/remove';
+
 //signatures
 export const API_GET_SIGNATURES = '/signature/query';
 export const API_SAVE_SIGNATURE = '/signature/register';
@@ -50,39 +52,49 @@ export const API_REGISTER_ONE_REPORT_MATERIAL = '/material/register/one';
 export const API_GET_WO_ATTACHMENTS = '/job/files';
 
 // editbol
-export const API_GET_BOL_COUNT = '/job/bolparams'
+export const API_GET_BOL_COUNT = '/job/bolparams';
 
 // labor report
 export const API_GET_LABOR_REPORTS = '/clockin/status/manually';
 export const API_REGISTER_LABOR_REPORT = '/clockin/register';
 export const API_GET_EMPLOYEES = '/user/load/employee';
-export const API_GET_LABOR_CODES = '/clockin/laborcodes'
+export const API_GET_LABOR_CODES = '/clockin/laborcodes';
+
+// clock in /clock out
+export const API_CLOCK_IN_START = '/clockin/start';
+export const API_CLOCK_IN_PAUSE = '/clockin/pause';
+export const API_CLOCK_IN_STOP = '/clockin/stop';
+export const API_CLOCK_RESUME = '/clockin/resume';
 
 // digital ID
 export const API_GET_QR_USER = '/user/qr';
 
 //NATIONAL SHUTTLE ENDPOINTS
-export const API_GET_NS_LOCATION_PLACES = '/jobns/load/locationplacesall'
-export const API_GET_EAST_COAST_PICKUP = '/jobns/eastcoastpickup/query'
-export const API_GET_WEST_COAST_PICKUP = '/jobns/westcoastpickup/query'
-export const API_GET_WEST_COAST_DROPOFF = '/jobns/westcoastdropoff/query'
-export const API_GET_EAST_COAST_DROPOFF = '/jobns/eastcoastdropoff/query'
+export const API_GET_NS_LOCATION_PLACES = '/jobns/load/locationplacesall';
+export const API_GET_EAST_COAST_PICKUP = '/jobns/eastcoastpickup/query';
+export const API_GET_WEST_COAST_PICKUP = '/jobns/westcoastpickup/query';
+export const API_GET_WEST_COAST_DROPOFF = '/jobns/westcoastdropoff/query';
+export const API_GET_EAST_COAST_DROPOFF = '/jobns/eastcoastdropoff/query';
 
-export const API_GET_INVENTORY_EAST_COAST_PICKUP = '/jobns/inventory/eastcoastpickup/query'
-export const API_GET_INVENTORY_WEST_COAST_PICKUP = '/jobns/inventory/westcoastpickup/query'
-export const API_GET_INVENTORY_WEST_COAST_DROPOFF = '/jobns/inventory/westcoastdropoff/query'
-export const API_GET_INVENTORY_EAST_COAST_DROPOFF = '/jobns/inventory/eastcoastdropoff/query'
+export const API_GET_INVENTORY_EAST_COAST_PICKUP =
+  '/jobns/inventory/eastcoastpickup/query';
+export const API_GET_INVENTORY_WEST_COAST_PICKUP =
+  '/jobns/inventory/westcoastpickup/query';
+export const API_GET_INVENTORY_WEST_COAST_DROPOFF =
+  '/jobns/inventory/westcoastdropoff/query';
+export const API_GET_INVENTORY_EAST_COAST_DROPOFF =
+  '/jobns/inventory/eastcoastdropoff/query';
 
 //UNIQUE ROUTE
-export const API_GET_UNIQUE_ROUTE_PICKUP = '/jobns/uniqueroutepickup/query'
-export const API_GET_UNIQUE_ROUTE_DROPOFF = '/jobns/uniqueroutedropoff/query'
+export const API_GET_UNIQUE_ROUTE_PICKUP = '/jobns/uniqueroutepickup/query';
+export const API_GET_UNIQUE_ROUTE_DROPOFF = '/jobns/uniqueroutedropoff/query';
 
-export const API_GET_INVENTORY_UNIQUE_ROUTE_PICKUP = '/jobns/inventory/uniqueroutepickup/query'
-export const API_GET_INVENTORY_UNIQUE_ROUTE_DROPOFF = '/jobns/inventory/uniqueroutedropoff/query'
-
+export const API_GET_INVENTORY_UNIQUE_ROUTE_PICKUP =
+  '/jobns/inventory/uniqueroutepickup/query';
+export const API_GET_INVENTORY_UNIQUE_ROUTE_DROPOFF =
+  '/jobns/inventory/uniqueroutedropoff/query';
 
 export const SUCCESS_MESSAGES = {
-  OPERACION_EXITOSA : "Operación exitosa",
-  SUCCESS: "SUCCESS"
-}
-
+  OPERACION_EXITOSA: 'Operación exitosa',
+  SUCCESS: 'SUCCESS',
+};

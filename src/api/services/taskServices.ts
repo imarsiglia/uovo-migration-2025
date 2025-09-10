@@ -33,7 +33,7 @@ import {
   SignatureType,
 } from '@api/types/Task';
 import {UserType} from '@api/types/User';
-import {BooleanStringType} from '@generalTypes/general';
+import {BooleanNumberType} from '@generalTypes/general';
 
 export type TaskBaseApiProps = {
   idJob: number;
@@ -193,7 +193,7 @@ const saveBOLCount = async (props: SaveBOLCountApiProps): Promise<boolean> => {
 };
 
 export type LaborReportsApiProps = {
-  toClockout: '0' | '1';
+  toClockout: BooleanNumberType;
 } & TaskBaseApiProps;
 const getLaborReports = async ({
   idJob,
@@ -207,9 +207,9 @@ const getLaborReports = async ({
 
 export type DeleteLaborReportApiProps = {
   idJob: number;
-  confirm: BooleanStringType;
+  confirm: BooleanNumberType;
   list: LaborReportType[];
-  queue: BooleanStringType;
+  queue: BooleanNumberType;
   preventEditCurrentClock: boolean;
 };
 
@@ -217,8 +217,6 @@ const registerLaborReport = async (
   props: DeleteLaborReportApiProps,
 ): Promise<boolean> => {
   const response = await postRequest(API_REGISTER_LABOR_REPORT, props);
-  console.log("response")
-  console.log(JSON.stringify(response))
   return response.message === SUCCESS_MESSAGES.SUCCESS;
 };
 

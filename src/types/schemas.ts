@@ -158,22 +158,11 @@ export const PieceCountSchema = yup.object().shape({
 
 export type PieceCountSchemaType = yup.InferType<typeof PieceCountSchema>;
 
-// export const AddLaborSchema = yup.object().shape({
-//   hours: yup
-//     .number()
-//     .max(999, "Hours can't be superior to 999")
-//     .min(0, "Hours can't be inferior than 0")
-//     .required(DEFAULT_REQUIRED_MESSAGE),
-//   pbs: yup
-//     .number()
-//     .max(59, "Minutes can't be superior to 59")
-//     .min(0, "Minutes can't be inferior than 0")
-//     .required(DEFAULT_REQUIRED_MESSAGE),
-// });
-
 export const AddLaborSchema = yup
   .object({
-    handler: yup.mixed<EmployeeType & {title: string}>().required(DEFAULT_REQUIRED_MESSAGE),
+    handler: yup
+      .mixed<EmployeeType & {title: string}>()
+      .required(DEFAULT_REQUIRED_MESSAGE),
     code: yup.string().required(DEFAULT_REQUIRED_MESSAGE),
     hours: yup
       .number()
@@ -239,3 +228,9 @@ export const AddLaborSchema = yup
   );
 
 export type AddLaborSchemaType = yup.InferType<typeof AddLaborSchema>;
+
+export const ClockInSchema = yup.object().shape({
+  code: yup.string().required(DEFAULT_REQUIRED_MESSAGE),
+});
+
+export type ClockInSchemaType = yup.InferType<typeof ClockInSchema>;

@@ -1,9 +1,14 @@
 import {
   API_CALENDAR_TIMELINE,
+  API_CLOCK_IN_PAUSE,
+  API_CLOCK_IN_START,
+  API_CLOCK_IN_STOP,
+  API_CLOCK_RESUME,
   API_GET_LOCATION_NOTES,
   API_JOBQUEUE,
   API_LOCATION_LETSGO,
   API_LOCATION_REPORT_ISSUE,
+  API_REMOVE_TEAM_MEMBER,
   API_SAVE_LOCATION_NOTES,
   API_SEND_EMAIL_BOL,
   API_TASK_COUNT,
@@ -14,7 +19,8 @@ import {
 import {getRequest, postRequest} from '@api/helpers/apiClientHelper';
 import {JobDetailType, JobType, TaskJobType} from '@api/types/Jobs';
 import {Paginated} from '@api/types/Response';
-import {BooleanStringType} from '@generalTypes/general';
+import {BooleanNumberType} from '@generalTypes/general';
+import {TaskBaseApiProps} from './taskServices';
 
 const calendar = async (month: number, year: number): Promise<string[]> => {
   const response = await getRequest<Paginated<string[]>>(
@@ -46,7 +52,7 @@ const jobqueue = async (props: JobQueueApiProps): Promise<JobType[]> => {
 
 export type TopSheetApiProps = {
   id: string;
-  queue: BooleanStringType;
+  queue: BooleanNumberType;
 };
 const topsheet = async ({
   id,
@@ -160,6 +166,56 @@ const getTaskCount = async ({
   return response.body;
 };
 
+export type ClockInApiProps = {
+  laborCode: string;
+  queue: BooleanNumberType;
+} & TaskBaseApiProps;
+const clockIn = async (props: ClockInApiProps): Promise<boolean> => {
+  const response = await postRequest(API_CLOCK_IN_START, {
+    ...props,
+    start: new Date().toISOString().split('.')[0],
+  });
+  return response.message == SUCCESS_MESSAGES.SUCCESS;
+};
+
+export type PauseJobApiProps = {
+  queue: BooleanNumberType;
+} & TaskBaseApiProps;
+const pauseJob = async (props: PauseJobApiProps): Promise<boolean> => {
+  const response = await postRequest(API_CLOCK_IN_PAUSE, {
+    ...props,
+    pause: new Date().toISOString().split('.')[0],
+  });
+  return response.message == SUCCESS_MESSAGES.SUCCESS;
+};
+
+const clockout = async (props: PauseJobApiProps): Promise<boolean> => {
+  const response = await postRequest(API_CLOCK_IN_STOP, {
+    ...props,
+    stop: new Date().toISOString().split('.')[0],
+  });
+  return response.message == SUCCESS_MESSAGES.SUCCESS;
+};
+
+const resumeJob = async (props: PauseJobApiProps): Promise<boolean> => {
+  const response = await postRequest(API_CLOCK_RESUME, {
+    ...props,
+    resume: new Date().toISOString().split('.')[0],
+  });
+  return response.message == SUCCESS_MESSAGES.SUCCESS;
+};
+
+export type RemoveMemberTeamApiProps = {
+  idUser: number;
+  jobQueue: BooleanNumberType;
+} & TaskBaseApiProps;
+const removeMemberTeam = async (
+  props: RemoveMemberTeamApiProps,
+): Promise<boolean> => {
+  const response = await postRequest(API_REMOVE_TEAM_MEMBER, props);
+  return response.message == SUCCESS_MESSAGES.SUCCESS;
+};
+
 export const jobServices = {
   calendar,
   timeline,
@@ -171,4 +227,9 @@ export const jobServices = {
   saveLocationNotes,
   sendEmailBOL,
   getTaskCount,
+  clockIn,
+  pauseJob,
+  clockout,
+  resumeJob,
+  removeMemberTeam,
 };

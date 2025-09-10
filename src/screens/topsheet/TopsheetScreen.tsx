@@ -43,7 +43,12 @@ export const TopsheetScreen = ({route}: Props) => {
     params: {id, queue},
   } = route;
 
-  const {data: jobDetail, isLoading} = useGetTopsheet({
+  const {
+    data: jobDetail,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useGetTopsheet({
     id,
     queue,
   });
@@ -110,6 +115,7 @@ export const TopsheetScreen = ({route}: Props) => {
   // const loading = useMinBusy(isRefetching, 1000);
 
   const syncro = useCallback(() => {
+    refetch();
     // setIsRefetching(true);
     // let refetchPromise: Promise<unknown>;
     // switch (activeTab) {
@@ -160,10 +166,10 @@ export const TopsheetScreen = ({route}: Props) => {
           <BackButton title="Home" onPress={goBack} />
           <Wrapper style={styles.containerBtnTop}>
             <PressableOpacity
-              disabled={false}
+              disabled={isLoading || isRefetching}
               onPress={syncro}
               style={GLOBAL_STYLES.btnOptTop}>
-              <SpinningIcon size={17} spin={isLoading} />
+              <SpinningIcon size={17} spin={isRefetching} />
             </PressableOpacity>
 
             {jobDetail?.use_bol && (
@@ -285,7 +291,7 @@ export const TopsheetScreen = ({route}: Props) => {
                 width: '100%',
                 paddingVertical: 5,
                 backgroundColor: 'white',
-                paddingHorizontal: 20,
+                paddingHorizontal: 10,
               }}>
               <ClockinButton />
             </Wrapper>

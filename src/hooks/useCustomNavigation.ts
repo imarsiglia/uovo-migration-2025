@@ -1,6 +1,7 @@
 import {
   CommonActions,
   NavigationProp,
+  StackActions,
   useNavigation,
 } from '@react-navigation/native';
 import {RootStackParamList, RouteName} from 'src/navigation/types';
@@ -29,9 +30,14 @@ export const useCustomNavigation = () => {
     );
   }
 
+  function goBackToIndex(pop: number) {
+    navigation.dispatch(StackActions.pop(pop));
+  }
+
   return {
     ...navigation,
     resetTo,
     goBackAndUpdate,
+    goBackToIndex,
   };
 };

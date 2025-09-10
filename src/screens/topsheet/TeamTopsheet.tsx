@@ -1,23 +1,85 @@
+import {QUERY_KEYS} from '@api/contants/constants';
+import {useRemoveMemberTeam} from '@api/hooks/HooksJobServices';
 import {CrewMemberType} from '@api/types/Jobs';
 import SearchInput from '@components/commons/inputs/SearchInput';
+import {SwipeableListProvider} from '@components/commons/swipeable/SwipeableRow';
+import {Label} from '@components/commons/text/Label';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import CrewMember from '@components/topheet/CrewMember';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
 import {RoutesNavigation} from '@navigation/types';
+import {loadingWrapperPromise} from '@store/actions';
 import {useAuth} from '@store/auth';
+import {useModalDialogStore} from '@store/modals';
 import useTopSheetStore from '@store/topsheet';
-import {showToastMessage} from '@utils/toast';
-import React, {useCallback, useMemo, useState} from 'react';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {showErrorToastMessage, showToastMessage} from '@utils/toast';
+import {useCallback, useMemo, useState} from 'react';
 import {Keyboard, ScrollView, StyleSheet} from 'react-native';
 
 export const TeamTopsheet = () => {
   const jobDetail = useTopSheetStore((d) => d.jobDetail);
+  const isJobQueue = useTopSheetStore((d) => d.isJobQueue);
   const userSession = useAuth((d) => d.user);
   const {navigate} = useCustomNavigation();
+  const showDialog = useModalDialogStore((d) => d.showVisible);
+  const {mutateAsync: removeMemberTeam} = useRemoveMemberTeam();
+  const {refetchAll} = useRefreshIndicator([
+    [QUERY_KEYS.TOPSHEET, {id: jobDetail?.id?.toString(), queue: isJobQueue}],
+  ]);
 
   const [filter, setFilter] = useState('');
 
-  const initRemoveUser = useCallback((item: CrewMemberType) => {}, []);
+  const initRemoveUser = useCallback(
+    (item: CrewMemberType) => {
+      Keyboard.dismiss();
+      showDialog({
+        modalVisible: true,
+        type: 'warning',
+        cancelable: true,
+        message: (
+          <Wrapper
+            style={[GLOBAL_STYLES.bodyModalClockOut, {paddingHorizontal: 0}]}>
+            <Label style={GLOBAL_STYLES.titleModalClockOut}>REMOVE USER?</Label>
+            <Label style={GLOBAL_STYLES.subtitleModalClockOut}>
+              Name: {item.name} {item.lastname}
+            </Label>
+            <Label style={GLOBAL_STYLES.descModalClockOut}>
+              Are you sure you want to remove this user?
+            </Label>
+            <Label style={GLOBAL_STYLES.descModalClockOut}>
+              Once finished you will not be able to make changes.
+            </Label>
+          </Wrapper>
+        ),
+        onConfirm: () => {
+          showDialog({
+            modalVisible: false,
+          });
+          loadingWrapperPromise(
+            removeMemberTeam({
+              idJob: jobDetail?.id,
+              idUser: item.id_user,
+              jobQueue: isJobQueue,
+            })
+              .then((d) => {
+                if (d) {
+                  showToastMessage('User removed successfully');
+                  refetchAll();
+                } else {
+                  showErrorToastMessage('Error while removing user');
+                }
+              })
+              .catch(() => {
+                showErrorToastMessage('Error while removing user');
+              }),
+          );
+        },
+      });
+    },
+    [showDialog, jobDetail?.id, isJobQueue, removeMemberTeam, refetchAll],
+  );
 
   const doCall = useCallback((phone?: string) => {
     if (phone) {
@@ -62,85 +124,40 @@ export const TeamTopsheet = () => {
             value={filter}
             onChange={(d) => setFilter(d as string)}
           />
-          {/* <Input
-            inputStyle={mstyles.sizeSearch}
-            inputContainerStyle={mstyles.inputSearch}
-            value={filterTeam}
-            onChangeText={(text) => setFilterTeam(text)}
-            rightIcon={
-              <TouchableOpacity
-                style={mstyles.containerInputSearchIcon}
-                onPress={() => filterMembers()}>
-                <Icon name="search" size={16} color="#959595" />
-              </TouchableOpacity>
-            }></Input> */}
         </Wrapper>
 
-        <ScrollView
-          bounces={false}
-          style={{
-            flex: 1,
-            paddingLeft: 20,
-            paddingRight: 20,
-            paddingTop: 10,
-            marginBottom: 65,
-            height: '100%',
-          }}>
-          {filteredCrew?.map((item, index) => {
-            return (
-              <Wrapper key={index}>
-                <CrewMember
-                  item={item}
-                  currentUser={userSession?.user_id}
-                  onPressProfile={() =>
-                    navigate(RoutesNavigation.DigitalId, {
-                      member: true,
-                      person: item,
-                    })
-                  }
-                  onPressCall={() => doCall(item.phone)}
-                  onRemoveUser={() => initRemoveUser(item)}
-                />
-              </Wrapper>
-            );
-          })}
-        </ScrollView>
+        <SwipeableListProvider>
+          <ScrollView
+            bounces={false}
+            style={{
+              flex: 1,
+              paddingLeft: 20,
+              paddingRight: 20,
+              paddingTop: 10,
+              marginBottom: 65,
+              height: '100%',
+            }}>
+            {filteredCrew?.map((item, index) => {
+              return (
+                <Wrapper key={index}>
+                  <CrewMember
+                    item={item}
+                    currentUser={userSession?.user_id}
+                    onPressProfile={() =>
+                      navigate(RoutesNavigation.DigitalId, {
+                        member: true,
+                        person: item,
+                      })
+                    }
+                    onPressCall={() => doCall(item.phone)}
+                    onRemoveUser={() => initRemoveUser(item)}
+                  />
+                </Wrapper>
+              );
+            })}
+          </ScrollView>
+        </SwipeableListProvider>
       </Wrapper>
-      {/* {props.jobDetail && (
-        <Modal isVisible={showRemoveUser}>
-          <Wrapper style={styles.modalClockOut}>
-            <Wrapper style={styles.bodyModalClockOut}>
-              <Text style={styles.titleModalClockOut}>REMOVE USER?</Text>
-              <Text style={styles.subtitleModalClockOut}>
-                Name: {selectedUser}
-              </Text>
-              <Text style={styles.descModalClockOut}>
-                Are you sure you want to remove this user?
-              </Text>
-              <Text style={styles.descModalClockOut}>
-                Once finished you will not be able to make changes.
-              </Text>
-            </Wrapper>
-
-            <Wrapper style={[styles.containerOptionsModalClockOut]}>
-              <TouchableHighlight
-                onPress={() => setShowRemoveUser(false)}
-                underlayColor="#08141F21"
-                style={[styles.btnOptionModalClockOut]}>
-                <Text style={styles.optionModalClockOut}>Cancel</Text>
-              </TouchableHighlight>
-              <TouchableHighlight
-                onPress={() => removeUser()}
-                underlayColor="#08141F21"
-                style={[styles.btnOptionModalClockOut, styles.borderFull]}>
-                <Text style={[styles.optionModalClockOut, mstyles.bold]}>
-                  Ok
-                </Text>
-              </TouchableHighlight>
-            </Wrapper>
-          </Wrapper>
-        </Modal>
-      )} */}
     </>
   );
 };

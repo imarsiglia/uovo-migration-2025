@@ -1,6 +1,6 @@
 import {CrewMemberType} from '@api/types/Jobs';
 import {LaborReportType, NoteType, ReportMaterialType} from '@api/types/Task';
-import {BooleanStringType} from '@generalTypes/general';
+import {BooleanNumberType} from '@generalTypes/general';
 import {ImageType} from '@generalTypes/images';
 import {Base64ImageCarouselProps} from '@screens/commons/BaseImageScreen';
 
@@ -55,7 +55,7 @@ export type RootStackParamList = {
   [RoutesNavigation.Account]: undefined;
   [RoutesNavigation.Topsheet]: {
     id: string;
-    queue: BooleanStringType;
+    queue: BooleanNumberType;
   };
   [RoutesNavigation.ReportIssue]: {
     type: string;

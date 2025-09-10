@@ -99,7 +99,10 @@ import BaseImageScreen from '@screens/commons/BaseImageScreen';
 import {WoAttachmentScreen} from '@screens/woattachments/WoAttachmentScreen';
 import {EditPieceCountScreen} from '@screens/piececount/EditPieceCountScreen';
 import {LaborReportScreen} from '@screens/laborreport/LaborReportScreen';
-import { AddLaborReportScreen } from '@screens/laborreport/AddLaborReportScreen';
+import {AddLaborReportScreen} from '@screens/laborreport/AddLaborReportScreen';
+import {ModalDialog} from '@components/commons/modals/ModalDialog';
+import {ModalLoading} from '@components/commons/modals/ModalLoading';
+import {PortalHost} from '@gorhom/portal';
 // import InventoryNS from '../screens/nationalShuttle/InventoryNS';
 
 // LogBox.ignoreLogs([
@@ -252,6 +255,9 @@ export const AppNavigation = () => {
               component={BaseImageScreen}
             />
           </Stack.Navigator>
+          <ModalDialog />
+          <ModalLoading />
+          <PortalHost name="root" />
         </NavigationContainer>
         // <OfflineComponentSync />
         // <OfflineCompSecondSync />

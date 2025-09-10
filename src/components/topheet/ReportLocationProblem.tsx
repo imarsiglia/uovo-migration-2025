@@ -5,7 +5,7 @@ import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {RoutesNavigation} from '@navigation/types';
 import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
-import React, {useCallback} from 'react';
+import {useCallback} from 'react';
 import {StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-start',
     marginTop: 15,
-    gap: 5,
+    gap: 5
   },
   btnOptionLocationText: {
     color: 'white',

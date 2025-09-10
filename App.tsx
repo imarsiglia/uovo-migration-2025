@@ -124,15 +124,12 @@ const App = () => {
                       <InventoryProvider> */}
               <SafeAreaProvider>
                 <AppNavigation />
-                <PortalHost name="root" />
               </SafeAreaProvider>
               {/* </InventoryProvider>
                     </NationalShuttleProvider>
                   </TabHomeProvider> */}
               {/* </UserProvider> */}
               {/* </ModalProvider> */}
-              <ModalDialog />
-              <ModalLoading />
             </EDSProvider>
           </KeyboardProvider>
         </AppProviders>

@@ -16,6 +16,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import {TouchableWithoutFeedback} from '@gorhom/bottom-sheet';
 
 type Position = 'top' | 'bottom' | 'auto';
 
@@ -192,45 +193,49 @@ const CustomDropdown = ({
 
       {isVisible && (
         <Portal hostName={hostName}>
-          <View style={styles.portalRoot} pointerEvents="box-none">
-            {/* Backdrop: toca para cerrar */}
-            <TouchableOpacity
-              style={[
-                RNStyleSheet.absoluteFill,
-                {backgroundColor: '#00000070'},
-              ]}
-              onPress={close}
-            />
+          <TouchableWithoutFeedback style={ RNStyleSheet.absoluteFill}>
+            <View style={styles.portalRoot} pointerEvents="box-none">
+              {/* Backdrop: toca para cerrar */}
+              <TouchableOpacity
+                style={[
+                  RNStyleSheet.absoluteFill,
+                  {backgroundColor: '#00000070'},
+                ]}
+                // onPress={close}
+              />
 
-            {/* Contenedor del menú */}
-            <Animated.View
-              style={[
-                styles.menuContainer,
-                {top: computedTop, left: computedLeft},
-                animatedStyle,
-              ]}
-              pointerEvents="box-none">
-              <View
-                style={styles.menu}
-                onLayout={(e) => setMenuLayout(e.nativeEvent.layout)}>
-                {renderChildren}
-              </View>
-
-              {/* Flecha */}
-              {menuLayout.width > 0 && (
+              {/* Contenedor del menú */}
+              <Animated.View
+                style={[
+                  styles.menuContainer,
+                  {top: computedTop, left: computedLeft},
+                  animatedStyle,
+                ]}
+                pointerEvents="auto">
                 <View
-                  pointerEvents="none"
-                  style={[
-                    styles.arrowBase,
-                    placement === 'bottom' ? styles.arrowUp : styles.arrowDown,
-                    placement === 'bottom'
-                      ? {top: -ARROW, left: arrowLeft}
-                      : {bottom: -ARROW, left: arrowLeft},
-                  ]}
-                />
-              )}
-            </Animated.View>
-          </View>
+                  style={styles.menu}
+                  onLayout={(e) => setMenuLayout(e.nativeEvent.layout)}>
+                  {renderChildren}
+                </View>
+
+                {/* Flecha */}
+                {menuLayout.width > 0 && (
+                  <View
+                    pointerEvents="none"
+                    style={[
+                      styles.arrowBase,
+                      placement === 'bottom'
+                        ? styles.arrowUp
+                        : styles.arrowDown,
+                      placement === 'bottom'
+                        ? {top: -ARROW, left: arrowLeft}
+                        : {bottom: -ARROW, left: arrowLeft},
+                    ]}
+                  />
+                )}
+              </Animated.View>
+            </View>
+          </TouchableWithoutFeedback>
         </Portal>
       )}
     </>
@@ -245,6 +250,8 @@ const styles = StyleSheet.create({
   menuContainer: {
     position: 'absolute',
     overflow: 'visible', // importante para que se vea la flecha
+    zIndex: 99999999999,
+    elevation: 8,
   },
   menu: {
     backgroundColor: 'white',

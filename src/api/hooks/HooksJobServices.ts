@@ -39,8 +39,8 @@ export const useGetCalendar = (date = new Date()) => {
 
 export const useGetTimeline = (date?: string) => {
   return useQuery({
-    queryKey: [QUERY_KEYS.CALENDAR, date],
-    queryFn: () => jobServices.timeline(date!),
+    queryKey: [QUERY_KEYS.TIMELINE, date],
+    queryFn: () => jobServices.timeline(date),
     staleTime: 0,
     // staleTime: 5 * 60 * 1000,
     gcTime: 7 * 24 * 60 * 60 * 1000,
@@ -146,5 +146,35 @@ export const useGetTaskCount = (props: TaskCountApiProps) => {
     queryFn: () => jobServices.getTaskCount(props),
     enabled: !!props?.idJob,
     ...DEFAULT_PERSISTENCE_CONFIG,
+  });
+};
+
+export const useClockIn = () => {
+  return useMutation({
+    mutationFn: jobServices.clockIn,
+  });
+};
+
+export const usePauseJob = () => {
+  return useMutation({
+    mutationFn: jobServices.pauseJob,
+  });
+};
+
+export const useClockout = () => {
+  return useMutation({
+    mutationFn: jobServices.clockout,
+  });
+};
+
+export const useResumeJob = () => {
+  return useMutation({
+    mutationFn: jobServices.resumeJob,
+  });
+};
+
+export const useRemoveMemberTeam = () => {
+  return useMutation({
+    mutationFn: jobServices.removeMemberTeam,
   });
 };

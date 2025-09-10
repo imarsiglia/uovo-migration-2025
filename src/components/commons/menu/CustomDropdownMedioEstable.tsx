@@ -195,10 +195,7 @@ const CustomDropdown = ({
           <View style={styles.portalRoot} pointerEvents="box-none">
             {/* Backdrop: toca para cerrar */}
             <TouchableOpacity
-              style={[
-                RNStyleSheet.absoluteFill,
-                {backgroundColor: '#00000070'},
-              ]}
+              style={RNStyleSheet.absoluteFill}
               onPress={close}
             />
 
@@ -208,8 +205,7 @@ const CustomDropdown = ({
                 styles.menuContainer,
                 {top: computedTop, left: computedLeft},
                 animatedStyle,
-              ]}
-              pointerEvents="box-none">
+              ]}>
               <View
                 style={styles.menu}
                 onLayout={(e) => setMenuLayout(e.nativeEvent.layout)}>

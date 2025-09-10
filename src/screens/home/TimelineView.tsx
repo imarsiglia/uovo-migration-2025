@@ -22,6 +22,7 @@ import {Label} from '@components/commons/text/Label';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {RoutesNavigation} from '@navigation/types';
+import {IndicatorLoading} from '@components/commons/loading/IndicatorLoading';
 
 export const TimelineViewCmp = () => {
   const refAgenda = useRef<any>(null);
@@ -33,9 +34,11 @@ export const TimelineViewCmp = () => {
 
   const {data: dataCalendar} = useGetCalendar();
 
-  const {data: dataTimeline, isLoading: isLoadingTimeline} = useGetTimeline(
-    selectedDate!,
-  );
+  const {
+    data: dataTimeline,
+    isLoading: isLoadingTimeline,
+    isRefetching,
+  } = useGetTimeline(selectedDate!);
 
   useEffect(() => {
     collapseAgenda();
@@ -201,21 +204,33 @@ export const TimelineViewCmp = () => {
   }, [dataTimeline, isFilterActive, sessionUser?.user_id]);
 
   return (
-    <Agenda
-      ref={refAgenda}
-      markedDates={markedDates}
-      items={formattedItems}
-      onDayPress={onDayPress}
-      pastScrollRange={6}
-      futureScrollRange={12}
-      renderDay={renderDay}
-      renderEmptyDate={renderEmptyDate}
-      renderKnob={renderKnob}
-      renderItem={renderItem}
-      renderEmptyData={renderEmptyData}
-      theme={theme}
-      style={styles.agenda}
-    />
+    <>
+      <Agenda
+        ref={refAgenda}
+        markedDates={markedDates}
+        items={formattedItems}
+        onDayPress={onDayPress}
+        pastScrollRange={6}
+        futureScrollRange={12}
+        renderDay={renderDay}
+        renderEmptyDate={renderEmptyDate}
+        renderKnob={renderKnob}
+        renderItem={renderItem}
+        renderEmptyData={renderEmptyData}
+        theme={theme}
+        style={styles.agenda}
+      />
+      {/* {isRefetching && (
+        <IndicatorLoading
+          containerStyle={{
+            position: "absolute",
+            alignSelf: "center",
+            top: "30%",
+          }}
+          activityIndicatorProps={{color: COLORS.primary, size: 'large'}}
+        />
+      )} */}
+    </>
   );
 };
 

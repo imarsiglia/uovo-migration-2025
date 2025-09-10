@@ -1,42 +1,82 @@
-import { useIsFetching, useQueryClient } from '@tanstack/react-query';
-import { useCallback } from 'react';
+import {useIsFetching, useQueryClient} from '@tanstack/react-query';
+import {useCallback, useMemo} from 'react';
 
 type Key = readonly unknown[];
 
-/** Compara dos queryKeys por igualdad estricta posición a posición */
-function keyEquals(a: readonly unknown[], b: readonly unknown[]) {
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
-  return true;
+/** Comparación profunda (arrays/objetos/primitivos) */
+function deepEqual(a: any, b: any): boolean {
+  if (a === b) return true;
+  if (typeof a !== typeof b) return false;
+  if (a && b && typeof a === 'object') {
+    // Arrays
+    if (Array.isArray(a)) {
+      if (!Array.isArray(b) || a.length !== b.length) return false;
+      for (let i = 0; i < a.length; i++)
+        if (!deepEqual(a[i], b[i])) return false;
+      return true;
+    }
+    // Objetos planos
+    const aKeys = Object.keys(a);
+    const bKeys = Object.keys(b);
+    if (aKeys.length !== bKeys.length) return false;
+    for (const k of aKeys) if (!deepEqual(a[k], (b as any)[k])) return false;
+    return true;
+  }
+  return false;
 }
 
 export function useRefreshIndicator(keys: Key[]) {
   const qc = useQueryClient();
 
-  // Cualquier fetch (primer load o refetch) de alguna key objetivo
+  // Memo para no recrear predicados en cada render
+  const matchesAnyKey = useMemo(
+    () => (qk: readonly unknown[]) => keys.some((k) => deepEqual(qk, k)),
+    [keys],
+  );
+
+  // Cualquier fetch (primer load o refetch)
   const fetchingCount = useIsFetching({
-    predicate: (q) =>
-      keys.some((k) => keyEquals(q.queryKey as readonly unknown[], k)) &&
-      q.state.fetchStatus === 'fetching',
+    predicate: (q) => matchesAnyKey(q.queryKey as readonly unknown[]),
   });
   const isFetchingAny = fetchingCount > 0;
 
   // Solo refetch (ya había data antes)
   const refetchingCount = useIsFetching({
     predicate: (q) =>
-      keys.some((k) => keyEquals(q.queryKey as readonly unknown[], k)) &&
+      matchesAnyKey(q.queryKey as readonly unknown[]) &&
+      // está haciendo fetch
       q.state.fetchStatus === 'fetching' &&
-      q.state.data !== undefined,
+      // ya había data antes (v5: dataUpdatedAt > 0)
+      ((q.state as any).dataUpdatedAt > 0 || q.state.data !== undefined),
   });
   const isRefetchingAny = refetchingCount > 0;
 
   const refetchAll = useCallback(async () => {
     await Promise.all(
       keys.map((k) =>
-        qc.refetchQueries({ queryKey: k as any, type: 'active' })
-      )
+        qc.refetchQueries({
+          queryKey: k as any,
+          type: 'active', // solo montadas
+          exact: true, // coincidencia exacta con la key
+        }),
+      ),
     );
   }, [qc, keys]);
 
-  return { isFetchingAny, isRefetchingAny, refetchAll };
+  // const removeAndRefresh = useCallback(async () => {
+  //   await Promise.all(
+  //     keys.map(async (k) => {
+  //       // 1. Cancelar cualquier query activa
+  //       await qc.cancelQueries({queryKey: k, type: 'active', exact: true});
+  //       // 2. Remover del cache
+  //       qc.removeQueries({queryKey: k, exact: true});
+  //       // 3. Prefetch (volver a consultar los datos)
+  //       await qc.prefetchQuery({queryKey: k});
+  //     }),
+  //   );
+  // }, [qc, keys]);
+
+  return {isFetchingAny, isRefetchingAny, refetchAll, 
+    // removeAndRefresh
+  };
 }

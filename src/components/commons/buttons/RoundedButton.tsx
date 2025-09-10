@@ -15,7 +15,7 @@ import {PressableOpacity} from './PressableOpacity';
 import {IndicatorLoading} from '../loading/IndicatorLoading';
 
 export type RoundedButtonProps = {
-  label: string;
+  label?: string;
   icon?: React.ReactNode;
   labelStyles?: StyleProp<TextStyle>;
   buttonStyles?: StyleProp<ViewStyle>;
@@ -58,9 +58,11 @@ export const RoundedButton = forwardRef(
         ) : (
           <>
             {icon && <Wrapper style={styles.containerIcon}>{icon}</Wrapper>}
-            <Label style={[{color: COLORS.white}, styles.label, labelStyles]}>
-              {label}
-            </Label>
+            {label && (
+              <Label style={[{color: COLORS.white}, styles.label, labelStyles]}>
+                {label}
+              </Label>
+            )}
           </>
         )}
       </PressableOpacity>

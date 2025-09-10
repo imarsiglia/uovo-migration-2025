@@ -116,13 +116,13 @@ export const SaveReportMaterialScreen = (props: Props) => {
                   goBack();
                 } else {
                   showErrorToastMessage(
-                    'Error while saving material, try againƒ',
+                    'Error while saving material, try again',
                   );
                 }
               })
               .catch(() =>
                 showErrorToastMessage(
-                  'Error while saving material, try againƒ',
+                  'Error while saving material, try again',
                 ),
               ),
           );

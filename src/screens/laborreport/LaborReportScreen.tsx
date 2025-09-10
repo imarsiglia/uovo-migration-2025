@@ -10,6 +10,7 @@ import {
   useRegisterLaborReport,
 } from '@api/hooks/HooksTaskServices';
 import {LaborReportType, NoteType} from '@api/types/Task';
+import {ClockinButtonLaborReport} from '@components/clockin/ClockinButtonLaborReport';
 import {BackButton} from '@components/commons/buttons/BackButton';
 import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 import {
@@ -27,7 +28,7 @@ import {useModalDialogStore} from '@store/modals';
 import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {getFormattedDateWithTimezone} from '@utils/functions';
+import {getFormattedDate} from '@utils/functions';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import {useCallback, useMemo} from 'react';
 import {
@@ -67,11 +68,10 @@ export const LaborReportScreen = () => {
 
   const preventEditCurrentClock = useMemo(() => {
     return (
-      jobDetail.current_clock_in != null &&
-      (jobDetail.current_clock_in.status == STARTED_STATUS ||
-        jobDetail.current_clock_in.status == PAUSED_STATUS)
+      jobDetail?.current_clock_in?.status == STARTED_STATUS ||
+      jobDetail?.current_clock_in?.status == PAUSED_STATUS
     );
-  }, [jobDetail]);
+  }, [jobDetail?.current_clock_in]);
 
   const initRemove = useCallback(
     ({id, labor_code, worked_hour}: LaborReportType) => {
@@ -104,7 +104,7 @@ export const LaborReportScreen = () => {
             mutateAsync({
               idJob: jobDetail.id,
               queue: isJobQueue,
-              confirm: '0',
+              confirm: 0,
               preventEditCurrentClock,
               list: list
                 ?.filter((x) => x.id !== id)
@@ -137,6 +137,7 @@ export const LaborReportScreen = () => {
       showDialog,
       jobDetail,
       isJobQueue,
+      refetch,
       refetchAll,
       preventEditCurrentClock,
     ],
@@ -204,11 +205,7 @@ export const LaborReportScreen = () => {
                     Timestamp
                   </Text>
                   <Text style={styles.subtitleNotification}>
-                    {getFormattedDateWithTimezone(
-                      item.clock_in,
-                      'YYYY/MM/DD [•] HH:mm A',
-                      'N/A',
-                    )}
+                    {getFormattedDate(item.clock_in, 'YYYY/MM/DD [•] hh:mm A')}
                   </Text>
                 </Wrapper>
               </View>
@@ -266,8 +263,21 @@ export const LaborReportScreen = () => {
           windowSize={7}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[styles.scrollNotifications]}
+          // style={styles.scrollNotifications}
         />
       </SwipeableListProvider>
+
+      <Wrapper
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          width: '100%',
+          paddingVertical: 5,
+          backgroundColor: 'white',
+          paddingHorizontal: 10,
+        }}>
+        <ClockinButtonLaborReport list={list} />
+      </Wrapper>
     </View>
   );
 };
@@ -281,7 +291,7 @@ const styles = StyleSheet.create({
   },
   scrollNotifications: {
     paddingTop: 10,
-    marginBottom: 5,
+    paddingBottom: 70,
     paddingHorizontal: 15,
     gap: 10,
   },

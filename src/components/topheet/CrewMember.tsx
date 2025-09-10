@@ -1,8 +1,9 @@
-import { CrewMemberType } from '@api/types/Jobs';
-import { getColorStatusCrewMember } from '@utils/functions';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {CrewMemberType} from '@api/types/Jobs';
+import {SwipeableRow} from '@components/commons/swipeable/SwipeableRow';
+import {getColorStatusCrewMember} from '@utils/functions';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
-import { Swipeable } from 'react-native-gesture-handler';
+import {Swipeable} from 'react-native-gesture-handler';
 
 type Props = {
   onPressProfile: () => void;
@@ -19,22 +20,21 @@ const CrewMember = ({
   onRemoveUser,
   currentUser,
 }: Props) => {
-
-  const rightActions = () => {
+  const rightActions = (close: () => void) => {
     return (
       <>
-        {currentUser != item.id_user && !item.leader && (
-          <TouchableOpacity
-            style={[
-              styles.borderRadiusLeft,
-              styles.swipeableView,
-              styles.backgroundRemove,
-            ]}
-            onPress={() => onRemoveUser()}>
-            <Icon name="trash-alt" size={25} color="white" type="solid" />
-          </TouchableOpacity>
-        )}
-
+        <TouchableOpacity
+          style={[
+            currentUser != item.id_user ? null : styles.borderRadiusLeft,
+            styles.swipeableView,
+            styles.backgroundBadge,
+          ]}
+          onPress={() => {
+            onPressProfile();
+            close();
+          }}>
+          <Icon name="address-card" size={25} color="white" type="solid" />
+        </TouchableOpacity>
         {currentUser != item.id_user && (
           <TouchableOpacity
             style={[
@@ -42,27 +42,35 @@ const CrewMember = ({
               styles.swipeableView,
               styles.backgroundPhone,
             ]}
-            onPress={() => onPressCall()}>
+            onPress={() => {
+              onPressCall();
+              close();
+            }}>
             <Icon name="phone-alt" size={25} color="white" type="solid" />
           </TouchableOpacity>
         )}
 
-        <TouchableOpacity
-          style={[
-            currentUser != item.id_user ? null : styles.borderRadiusLeft,
-            styles.swipeableView,
-            styles.backgroundBadge,
-          ]}
-          onPress={() => onPressProfile()}>
-          <Icon name="address-card" size={25} color="white" type="solid" />
-        </TouchableOpacity>
+        {currentUser != item.id_user && !item.leader && (
+          <TouchableOpacity
+            style={[
+              styles.borderRadiusLeft,
+              styles.swipeableView,
+              styles.backgroundRemove,
+            ]}
+            onPress={() => {
+              onRemoveUser();
+              close();
+            }}>
+            <Icon name="trash-alt" size={25} color="white" type="solid" />
+          </TouchableOpacity>
+        )}
       </>
     );
   };
 
   return (
     <View style={styles.container}>
-      <Swipeable renderRightActions={() => rightActions()}>
+      <SwipeableRow rightActions={(close) => rightActions(close)}>
         <View style={styles.subContainer}>
           <View style={styles.paddingHorizontal}>
             {item.photo && (
@@ -109,7 +117,7 @@ const CrewMember = ({
             </Text>
           </View>
         </View>
-      </Swipeable>
+      </SwipeableRow>
     </View>
   );
 };

@@ -9,37 +9,33 @@ import {
   useGetLaborReports,
   useRegisterLaborReport,
 } from '@api/hooks/HooksTaskServices';
-import {BackButton} from '@components/commons/buttons/BackButton';
-import {AutocompleteContext} from '@components/commons/form/AutocompleteContext';
-import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
-import {BottomSheetSelectInputContext} from '@components/commons/form/BottomSheetSelectInputContext';
-import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
-import {InputTextContext} from '@components/commons/form/InputTextContext';
-import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
-import {Label} from '@components/commons/text/Label';
+import { BackButton } from '@components/commons/buttons/BackButton';
+import { AutocompleteContext } from '@components/commons/form/AutocompleteContext';
+import { BasicFormProvider } from '@components/commons/form/BasicFormProvider';
+import { BottomSheetSelectInputContext } from '@components/commons/form/BottomSheetSelectInputContext';
+import { ButtonSubmit } from '@components/commons/form/ButtonSubmit';
+import { InputTextContext } from '@components/commons/form/InputTextContext';
+import { GeneralLoading } from '@components/commons/loading/GeneralLoading';
+import { Label } from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
 import {
   AddLaborSchema,
-  AddLaborSchemaType,
-  SaveReportMaterialSchemaType,
+  AddLaborSchemaType
 } from '@generalTypes/schemas';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
-import {RootStackParamList} from '@navigation/types';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {loadingWrapperPromise} from '@store/actions';
-import {useAuth} from '@store/auth';
-import {useModalDialogStore} from '@store/modals';
+import { useCustomNavigation } from '@hooks/useCustomNavigation';
+import { useRefreshIndicator } from '@hooks/useRefreshIndicator';
+import { RootStackParamList } from '@navigation/types';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { loadingWrapperPromise } from '@store/actions';
+import { useModalDialogStore } from '@store/modals';
 import useTopSheetStore from '@store/topsheet';
-import {COLORS} from '@styles/colors';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {useQueryClient} from '@tanstack/react-query';
-import {formatWorkedHours} from '@utils/functions';
-import {showErrorToastMessage, showToastMessage} from '@utils/toast';
-import {useCallback, useMemo, useRef, useState} from 'react';
-import {Alert} from 'react-native';
-import {StyleSheet, Text, View} from 'react-native';
+import { COLORS } from '@styles/colors';
+import { GLOBAL_STYLES } from '@styles/globalStyles';
+import { formatWorkedHours } from '@utils/functions';
+import { showErrorToastMessage, showToastMessage } from '@utils/toast';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddLaborReport'>;
@@ -73,15 +69,12 @@ export const AddLaborReportScreen = (props: Props) => {
     [QUERY_KEYS.LABOR_REPORTS, {idJob: jobDetail.id, toClockout}],
   ]);
 
-  const {invalidateQueries} = useQueryClient();
-
   const preventEditCurrentClock = useMemo(() => {
     return (
-      jobDetail.current_clock_in != null &&
-      (jobDetail.current_clock_in.status == STARTED_STATUS ||
-        jobDetail.current_clock_in.status == PAUSED_STATUS)
+      jobDetail?.current_clock_in?.status == STARTED_STATUS ||
+      jobDetail?.current_clock_in?.status == PAUSED_STATUS
     );
-  }, [jobDetail]);
+  }, [jobDetail?.current_clock_in]);
 
   const confirmSaveLaborReport = useCallback(
     (props: AddLaborSchemaType) => {
@@ -92,7 +85,7 @@ export const AddLaborReportScreen = (props: Props) => {
         if (itemToEdit) {
           return registerLaborReport({
             idJob: jobDetail.id,
-            confirm: '0',
+            confirm: 0,
             preventEditCurrentClock,
             queue: isJobQueue,
             list: [
@@ -122,7 +115,7 @@ export const AddLaborReportScreen = (props: Props) => {
         } else {
           return registerLaborReport({
             idJob: jobDetail.id,
-            confirm: '0',
+            confirm: 0,
             preventEditCurrentClock,
             queue: isJobQueue,
             list: [

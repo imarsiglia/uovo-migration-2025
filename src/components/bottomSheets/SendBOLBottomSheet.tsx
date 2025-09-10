@@ -1,6 +1,7 @@
 import {useSendEmailBOL} from '@api/hooks/HooksJobServices';
 import {RBSheetRef} from '@components/commons/bottomsheets/ImageOptionSheet';
 import {IndicatorLoading} from '@components/commons/loading/IndicatorLoading';
+import {CustomModal} from '@components/commons/modals/CustomModal';
 import {loadingWrapperPromise} from '@store/actions';
 import {useModalDialogStore} from '@store/modals';
 import useTopSheetStore from '@store/topsheet';
@@ -421,7 +422,9 @@ export const SendBOLBottomSheet = ({
       </RBSheet>
 
       {/* modal para confirmar reenvío de bol */}
-      <Modal isVisible={showResendBol} style={{alignItems: 'center'}}>
+      <CustomModal
+        visible={showResendBol}
+        onClose={() => setShowResendBol(false)}>
         <View style={GLOBAL_STYLES.modalClockOutHorizontal}>
           <View style={GLOBAL_STYLES.bodyModalClockOut}>
             <Text
@@ -480,7 +483,10 @@ export const SendBOLBottomSheet = ({
             </TouchableHighlight>
           </View>
         </View>
-      </Modal>
+      </CustomModal>
+      {/* <Modal isVisible={showResendBol} style={{alignItems: 'center'}}>
+        
+      </Modal> */}
     </>
   );
 };
