@@ -7,7 +7,8 @@ export const SPEECH_EVENTS = {
   TEST: 'onTestEvent',
 } as const;
 
-export type SpeechVoiceType = (typeof SPEECH_EVENTS)[keyof typeof SPEECH_EVENTS];
+export type SpeechVoiceType =
+  (typeof SPEECH_EVENTS)[keyof typeof SPEECH_EVENTS];
 
 export type AgendaItem = {
   id: string;
@@ -15,6 +16,14 @@ export type AgendaItem = {
   time?: string; // opcional
 };
 
-export type FAIconType = 'solid' | 'light' | 'regular' | 'brands' | undefined
+export type FAIconType = 'solid' | 'light' | 'regular' | 'brands' | undefined;
 
 export type BooleanNumberType = 0 | 1;
+export type BooleanStringType = '0' | '1';
+
+export const INVENTORY_ORDER_TYPE = {
+  ASC: 'ASC',
+  DESC: 'DESC',
+} as const;
+
+export type InventoryFilterOrderType = 'ASC' | 'DESC';

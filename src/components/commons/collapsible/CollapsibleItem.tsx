@@ -1,12 +1,12 @@
 import React = require('react');
-import {StyleProp, ViewProps} from 'react-native';
+import {StyleProp, ViewStyle} from 'react-native';
 import Collapsible from 'react-native-collapsible';
 
 type Props = {
   collapsed?: boolean;
   duration?: number;
   children: React.ReactNode;
-  style?: StyleProp<ViewProps>;
+  style?: StyleProp<ViewStyle>;
 };
 
 export const CollapsibleItem = ({

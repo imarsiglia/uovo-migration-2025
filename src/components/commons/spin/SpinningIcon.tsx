@@ -12,7 +12,7 @@ type Props = {
 export const SpinningIcon = ({
   color = 'white',
   size = 20,
-  spin = true,
+  spin = false,
 }: Props) => {
   const rotateAnim = useRef(new Animated.Value(0)).current;
 

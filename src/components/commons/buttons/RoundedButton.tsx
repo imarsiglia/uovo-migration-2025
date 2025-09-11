@@ -41,6 +41,7 @@ export const RoundedButton = forwardRef(
         style={[
           {
             backgroundColor: COLORS.primary,
+            opacity: rest.disabled ? 0.3 : 1,
           },
           styles.button,
           rest.style as StyleProp<ViewStyle>,

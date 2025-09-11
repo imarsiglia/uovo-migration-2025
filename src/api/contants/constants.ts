@@ -34,6 +34,7 @@ export const QUERY_KEYS = {
   LABOR_REPORTS: 'labor_reports',
   EMPLOYEES: 'employees',
   LABOR_CODES: 'labor_codes',
+  JOB_INVENTORY: 'job_inventory',
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';
@@ -255,3 +256,10 @@ export const SIGNER_TYPES = [
     name: 'Consignee',
   },
 ];
+
+export const INVENTORY_STATUS_TYPES = {
+  LOCKED_BY: 'LOCKED BY',
+  COMPLETED_BY: 'COMPLETED BY',
+  PROCESSING_BY: 'PROCESSING BY',
+  READY_TO_TRANSPORT: 'READY TO TRANSPORT'
+} as const;

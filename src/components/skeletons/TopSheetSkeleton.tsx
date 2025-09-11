@@ -1,5 +1,4 @@
-// JobSkeleton.tsx
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {
   Animated,
   Easing,

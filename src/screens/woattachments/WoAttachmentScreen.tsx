@@ -130,8 +130,7 @@ const styles = StyleSheet.create({
   },
   containerSearchQueue: {
     marginTop: 10,
-    paddingLeft: 5,
-    paddingRight: 5,
+    paddingHorizontal: 10,
     paddingBottom: 0,
     height: 45,
   },

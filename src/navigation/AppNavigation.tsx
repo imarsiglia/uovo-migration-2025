@@ -103,6 +103,8 @@ import {AddLaborReportScreen} from '@screens/laborreport/AddLaborReportScreen';
 import {ModalDialog} from '@components/commons/modals/ModalDialog';
 import {ModalLoading} from '@components/commons/modals/ModalLoading';
 import {PortalHost} from '@gorhom/portal';
+import {InventoryScreen} from '@screens/inventory/InventoryScreen';
+import {AddInventoryScreen} from '@screens/inventory/AddInventoryScreen';
 // import InventoryNS from '../screens/nationalShuttle/InventoryNS';
 
 // LogBox.ignoreLogs([
@@ -247,6 +249,16 @@ export const AppNavigation = () => {
             <Stack.Screen
               name={RoutesNavigation.AddLaborReport}
               component={AddLaborReportScreen}
+            />
+
+            <Stack.Screen
+              name={RoutesNavigation.Inventory}
+              component={InventoryScreen}
+            />
+
+            <Stack.Screen
+              name={RoutesNavigation.AddInventory}
+              component={AddInventoryScreen}
             />
 
             {/* visualizar imagenes */}

@@ -28,6 +28,7 @@ import {ResumeTopsheet} from './ResumeTopsheet';
 import {TaskTopsheet} from './TaskTopsheet';
 import {TeamTopsheet} from './TeamTopsheet';
 import {ClockinButton} from '@components/clockin/ClockinButton';
+import {InventoryTopsheet} from './InventoryTopsheet';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -169,7 +170,7 @@ export const TopsheetScreen = ({route}: Props) => {
               disabled={isLoading || isRefetching}
               onPress={syncro}
               style={GLOBAL_STYLES.btnOptTop}>
-              <SpinningIcon size={17} spin={isRefetching} />
+              <SpinningIcon size={16} spin={isRefetching} />
             </PressableOpacity>
 
             {jobDetail?.use_bol && (
@@ -269,7 +270,7 @@ export const TopsheetScreen = ({route}: Props) => {
                   options={{
                     tabBarLabel: TopSheetRoutesNavigation.Inventory.label,
                   }}
-                  component={() => <></>}
+                  component={InventoryTopsheet}
                 />
                 <Tab.Screen
                   name={TopSheetRoutesNavigation.Tasks.name}

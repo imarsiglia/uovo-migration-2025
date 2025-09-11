@@ -63,20 +63,72 @@ export function useRefreshIndicator(keys: Key[]) {
     );
   }, [qc, keys]);
 
-  // const removeAndRefresh = useCallback(async () => {
-  //   await Promise.all(
-  //     keys.map(async (k) => {
-  //       // 1. Cancelar cualquier query activa
-  //       await qc.cancelQueries({queryKey: k, type: 'active', exact: true});
-  //       // 2. Remover del cache
-  //       qc.removeQueries({queryKey: k, exact: true});
-  //       // 3. Prefetch (volver a consultar los datos)
-  //       await qc.prefetchQuery({queryKey: k});
-  //     }),
-  //   );
-  // }, [qc, keys]);
+  const removeAndRefresh = useCallback(async () => {
+    await Promise.all(
+      keys.map(async (k) => {
+        // 1. Cancelar cualquier query activa
+        await qc.cancelQueries({queryKey: k});
+        // 2. Remover del cache
+        qc.removeQueries({queryKey: k});
+        // 3. Prefetch (volver a consultar los datos)
+        await qc.invalidateQueries({queryKey: k});
+        await qc.prefetchQuery({queryKey: k});
+      }),
+    );
+  }, [qc, keys]);
 
-  return {isFetchingAny, isRefetchingAny, refetchAll, 
-    // removeAndRefresh
+  const hardRefresh = useCallback(async (key: string, activeProps: any) => {
+    // 1) Cortar requests previos (evita que pisen la data nueva)
+    await qc.cancelQueries({queryKey: [key]});
+
+    // 2) (Opcional) limpiar caches inactivos
+    qc.removeQueries({queryKey: [key], type: 'inactive'});
+
+    // 4) Forzar que el activo se actualice con datos frescos
+    await qc.invalidateQueries({queryKey: [key, activeProps], exact: true});
+    await qc.refetchQueries({
+      queryKey: [key, activeProps],
+      exact: true,
+      type: 'active',
+    });
+  }, []);
+
+  const hardRefreshMany = useCallback(async () => {
+    if (!keys.length) return;
+
+    // 1) Cancelar TODOS los fetch en curso por prefijo (en paralelo)
+    await Promise.all(keys.map(([key]) => qc.cancelQueries({queryKey: [key]})));
+
+    // 2) Remover caches INACTIVOS por prefijo (sin tocar los montados)
+    keys.forEach(([key]) => {
+      qc.removeQueries({queryKey: [key], type: 'inactive'});
+    });
+
+    // 3) Invalidate de las variantes activas (exact)
+    // await Promise.all(
+    //   keys.map(([key, activeProps]) =>
+    //     qc.invalidateQueries({queryKey: [key, activeProps], exact: true}),
+    //   ),
+    // );
+
+    // 4) Refetch de las variantes activas montadas
+    await Promise.all(
+      keys.map(([key, activeProps]) =>
+        qc.refetchQueries({
+          queryKey: [key, activeProps],
+          exact: true,
+          type: 'active',
+        }),
+      ),
+    );
+  }, [qc, keys]);
+
+  return {
+    isFetchingAny,
+    isRefetchingAny,
+    refetchAll,
+    removeAndRefresh,
+    hardRefresh,
+    hardRefreshMany
   };
 }

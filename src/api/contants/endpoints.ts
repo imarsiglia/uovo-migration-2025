@@ -69,6 +69,13 @@ export const API_CLOCK_RESUME = '/clockin/resume';
 // digital ID
 export const API_GET_QR_USER = '/user/qr';
 
+//inventory
+export const API_GET_JOB_INVENTORY = '/job/inventory';
+export const API_UPDATE_INVENTORY_STATUS = '/inventory/status/update';
+export const API_UPDATE_ALL_INVENTORY_STATUS = '/inventory/status/update/all';
+export const API_PREPARE_INVENTORY = 'job/prepped';
+export const API_DELETE_INVENTORY_ITEM = 'inventory/netsuite/remove';
+
 //NATIONAL SHUTTLE ENDPOINTS
 export const API_GET_NS_LOCATION_PLACES = '/jobns/load/locationplacesall';
 export const API_GET_EAST_COAST_PICKUP = '/jobns/eastcoastpickup/query';
