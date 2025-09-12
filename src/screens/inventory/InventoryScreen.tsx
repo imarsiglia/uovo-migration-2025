@@ -44,12 +44,17 @@ export const InventoryScreen = () => {
   const {goBack, navigate} = useCustomNavigation();
   const sessionUser = useAuth((d) => d.user);
   const jobDetail = useTopSheetStore((d) => d.jobDetail);
-  const {orderFilter, orderType, topSheetFilter} = useInventoryStore();
+  const {
+    orderFilter,
+    orderType,
+    topSheetFilter,
+    inventoryFilter,
+    setInventoryFilter,
+  } = useInventoryStore();
   const showDialog = useModalDialogStore((d) => d.showVisible);
   const {online} = useOnline();
 
-  const [filter, setFilter] = useState('');
-  const [tempFilter, setTempFilter] = useState('');
+  const [tempFilter, setTempFilter] = useState<string | undefined>('');
   const [showFilter, setShowFilter] = useState(false);
 
   const {hardRefreshMany} = useRefreshIndicator([
@@ -66,7 +71,7 @@ export const InventoryScreen = () => {
       QUERY_KEYS.JOB_INVENTORY,
       {
         idJob: jobDetail?.id,
-        filter: filter,
+        filter: inventoryFilter,
         orderFilter,
         orderType,
       },
@@ -74,8 +79,8 @@ export const InventoryScreen = () => {
   ]);
 
   const {data: inventory, isRefetching} = useGetJobInventory({
-    idJob: jobDetail?.id,
-    filter: filter,
+    idJob: jobDetail?.id!,
+    filter: inventoryFilter,
     orderFilter,
     orderType,
   });
@@ -126,7 +131,7 @@ export const InventoryScreen = () => {
   const onCheckAll = useCallback(() => {
     let mStatus: string | null = null;
     if (
-      inventory?.length > 0 &&
+      inventory?.length! > 0 &&
       inventory?.every((x) =>
         x.status?.toUpperCase()?.includes(INVENTORY_STATUS_TYPES.LOCKED_BY),
       )
@@ -136,14 +141,18 @@ export const InventoryScreen = () => {
       mStatus = INVENTORY_STATUS_TYPES.LOCKED_BY;
     }
     updateAllInventoryStatus({
-      idJob: jobDetail?.id,
-      status: mStatus,
+      idJob: jobDetail?.id!,
+      status: mStatus!,
     }).then(async () => {
       refetchAll();
     });
   }, [jobDetail?.id, inventory, updateAllInventoryStatus, refetchAll]);
 
-  const onViewDetail = useCallback((item: JobInventoryType) => {}, []);
+  const onViewDetail = useCallback((item: JobInventoryType) => {
+    navigate(RoutesNavigation.ItemDetail, {
+      id: item.id,
+    });
+  }, []);
 
   const onCheckItem = useCallback(
     async (item: JobInventoryType) => {
@@ -188,7 +197,7 @@ export const InventoryScreen = () => {
         }
         await updateInventoryStatus({
           idInventory: item.id,
-          status: mStatus,
+          status: mStatus!,
         });
         await refetchAll();
       }
@@ -198,7 +207,7 @@ export const InventoryScreen = () => {
   );
 
   const status = useMemo(() => {
-    return jobDetail.current_clock_in?.status ?? jobDetail.wo_status;
+    return jobDetail?.current_clock_in?.status ?? jobDetail?.wo_status;
   }, [jobDetail?.current_clock_in, jobDetail?.wo_status]);
 
   const isDisabled = useMemo(() => {
@@ -206,7 +215,7 @@ export const InventoryScreen = () => {
   }, [status]);
 
   const search = useCallback(() => {
-    setFilter(tempFilter?.trim());
+    setInventoryFilter(tempFilter?.trim());
     setShowFilter(false);
   }, [tempFilter]);
 
@@ -227,23 +236,23 @@ export const InventoryScreen = () => {
 
   const initSearch = useCallback(() => {
     setShowFilter(true);
-    setTempFilter(filter);
+    setTempFilter(inventoryFilter);
     setTimeout(() => {
       if (refsearch.current) {
         refsearch.current.blur();
         refsearch.current.focus();
       }
     }, 200);
-  }, [filter, setShowFilter, setTempFilter, refsearch?.current]);
+  }, [setInventoryFilter, setShowFilter, setTempFilter, refsearch?.current]);
 
   const clearFilter = useCallback(() => {
     setTempFilter('');
-    setFilter('');
-  }, [setTempFilter, setFilter]);
+    setInventoryFilter('');
+  }, [setTempFilter, setInventoryFilter]);
 
   const searched = useMemo(() => {
-    return filter?.trim()?.length > 0;
-  }, [filter]);
+    return inventoryFilter?.trim()?.length! > 0;
+  }, [inventoryFilter]);
 
   const onDeleteItem = useCallback(
     (item: JobInventoryType) => {
@@ -291,7 +300,7 @@ export const InventoryScreen = () => {
         });
         loadingWrapperPromise(
           prepareInventory({
-            idJob: jobDetail?.id,
+            idJob: jobDetail?.id!,
           })
             .then((d) => {
               if (d) {
@@ -452,7 +461,7 @@ export const InventoryScreen = () => {
           <PressableOpacity
             style={[GLOBAL_STYLES.row, styles.tagFilter]}
             onPress={clearFilter}>
-            <Label style={styles.textFilter}>"{filter.trim()}"</Label>
+            <Label style={styles.textFilter}>"{inventoryFilter?.trim()}"</Label>
             <Icon name="times-circle" type="solid" color="white" size={12} />
           </PressableOpacity>
         </Wrapper>
@@ -467,7 +476,7 @@ export const InventoryScreen = () => {
           <Wrapper style={{flexDirection: 'row'}}>
             <HeaderInventory
               id="ID"
-              showSecondaryId={jobDetail.show_secondary_inv_id}
+              showSecondaryId={jobDetail?.show_secondary_inv_id}
               clientInvDisplay="Title"
               clientRef="Client Ref"
               location="Location"
@@ -477,7 +486,7 @@ export const InventoryScreen = () => {
               condition="Condition"
               status="Status"
               disabled={isInventoryDisabled}
-              showCheck={inventory?.length > 0}
+              showCheck={inventory?.length! > 0}
               checked={allChecked}
               onCheckAll={onCheckAll}
               deleteBtn="Delete"
@@ -492,7 +501,7 @@ export const InventoryScreen = () => {
                   key={index}
                   id={item.clientinv}
                   id2={item.clientinv2}
-                  showSecondaryId={jobDetail.show_secondary_inv_id}
+                  showSecondaryId={jobDetail?.show_secondary_inv_id}
                   clientInvDisplay={item.clientinv_display}
                   clientRef={item.clientref}
                   location={item.fromlocation_display}
@@ -508,7 +517,7 @@ export const InventoryScreen = () => {
                   disabled={isInventoryDisabled}
                   status={item.status ?? 'Pending'}
                   checked={
-                    item.status &&
+                    !!item.status &&
                     item.status?.trim() != '' &&
                     (item.status
                       ?.toUpperCase()

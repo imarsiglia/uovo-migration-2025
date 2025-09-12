@@ -1,13 +1,17 @@
 import {
+  API_ADD_INVENTORY_ITEM,
   API_DELETE_INVENTORY_ITEM,
+  API_GET_INVENTORY_ITEM_DETAIL,
   API_GET_JOB_INVENTORY,
   API_PREPARE_INVENTORY,
+  API_SEARCH_FULL_INVENTORY,
+  API_SEARCH_INVENTORY_ITEM,
   API_UPDATE_ALL_INVENTORY_STATUS,
   API_UPDATE_INVENTORY_STATUS,
   SUCCESS_MESSAGES,
 } from '@api/contants/endpoints';
 import {getRequest, postRequest} from '@api/helpers/apiClientHelper';
-import {JobInventoryType} from '@api/types/Inventory';
+import {JobInventoryType, MinimalInventoryType} from '@api/types/Inventory';
 import {Paginated} from '@api/types/Response';
 import {InventoryFilterOrderType} from '@generalTypes/general';
 import {TaskBaseApiProps} from './taskServices';
@@ -24,7 +28,6 @@ const getJobInventory = async ({
   orderFilter,
   filter = '',
 }: GetJobInventoryApiProps): Promise<JobInventoryType[]> => {
-  console.log("get job inventory")
   const response = await getRequest<Paginated<JobInventoryType[]>>(
     `${API_GET_JOB_INVENTORY}?idjob=${idJob}&start=0&limit=200&totalize=1&filter=${filter.trim()}` +
       (orderType != undefined && orderFilter != undefined
@@ -36,7 +39,7 @@ const getJobInventory = async ({
 
 export type InventoryStatusApiProps = {
   idInventory: number;
-  status: string;
+  status: string | null;
 };
 
 const updateInventoryStatus = async (
@@ -47,7 +50,7 @@ const updateInventoryStatus = async (
 };
 
 export type AllInventoryStatusApiProps = {
-  status: string;
+  status: string | null;
 } & TaskBaseApiProps;
 
 const updateAllInventoryStatus = async (
@@ -75,10 +78,64 @@ const deleteItem = async ({
   return response.message == SUCCESS_MESSAGES.SUCCESS;
 };
 
+export type SearchInventoryItemApiProps = {
+  filter?: string;
+  type?: string;
+} & TaskBaseApiProps;
+
+const searchInventoryItem = async ({
+  idJob,
+  filter = '',
+  type = '',
+}: SearchInventoryItemApiProps): Promise<string[]> => {
+  const response = await getRequest<Paginated<string[]>>(
+    `${API_SEARCH_INVENTORY_ITEM}?idjob=${idJob}&filter=${filter.trim()}&type=${type.trim()}`,
+  );
+  return response.body.data;
+};
+
+const searchFullInventory = async ({
+  idJob,
+  filter = '',
+  type = '',
+}: SearchInventoryItemApiProps): Promise<MinimalInventoryType[]> => {
+  const response = await getRequest<Paginated<MinimalInventoryType[]>>(
+    `${API_SEARCH_FULL_INVENTORY}?idjob=${idJob}&filter=${filter.trim()}&type=${type.trim()}`,
+  );
+  return response.body.data;
+};
+
+export type AddInventoryItemApiProps = {
+  idInventory: string;
+} & TaskBaseApiProps;
+
+const addInventoryItem = async (
+  props: AddInventoryItemApiProps,
+): Promise<boolean> => {
+  const response = await postRequest(API_ADD_INVENTORY_ITEM, props);
+  return response.message == SUCCESS_MESSAGES.SUCCESS;
+};
+
+export type InventoryItemDetailApiProps = {
+  id?: number;
+};
+const getInventoryItemDetail = async ({
+  id,
+}: InventoryItemDetailApiProps): Promise<JobInventoryType> => {
+  const response = await getRequest<JobInventoryType>(
+    `${API_GET_INVENTORY_ITEM_DETAIL}/${id}`,
+  );
+  return response.body;
+};
+
 export const inventoryServices = {
   getJobInventory,
   updateInventoryStatus,
   updateAllInventoryStatus,
   prepareInventory,
   deleteItem,
+  searchInventoryItem,
+  searchFullInventory,
+  addInventoryItem,
+  getInventoryItemDetail
 };

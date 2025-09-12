@@ -38,8 +38,8 @@ type Props = {
   artistName: string;
   packingDetailsDisplay: string;
   status: string;
-  actions: boolean;
-  checked: boolean;
+  actions?: boolean | null;
+  checked?: boolean;
   disabled: boolean;
   viewDetail: () => void;
   onCheck: () => Promise<Boolean>;
@@ -48,9 +48,9 @@ type Props = {
   packedWidth: string;
   hasConditionReport: BooleanStringType;
   hasConditionCheck: BooleanStringType;
-  user: UserType;
-  showSecondaryId: boolean;
-  id2: string;
+  user: UserType | null;
+  showSecondaryId?: boolean;
+  id2?: string | null;
   deleteBtn?: () => void;
 };
 
@@ -115,7 +115,7 @@ const RowInventory = ({
                     ?.includes(
                       INVENTORY_STATUS_TYPES.LOCKED_BY +
                         ' ' +
-                        (user.user_name + ' ' + user.user_last_name)
+                        (user?.user_name + ' ' + user?.user_last_name)
                           .toUpperCase()
                           .trim(),
                     ))

@@ -11,6 +11,8 @@ export type InventoryStore = {
   setOrderFilter: (val: any) => void;
   topSheetFilter?: string;
   setTopSheetFilter: (val: any) => void;
+  inventoryFilter?: string;
+  setInventoryFilter: (val: any) => void;
 };
 
 export const useInventoryStore = create<InventoryStore>((set) => ({
@@ -18,8 +20,10 @@ export const useInventoryStore = create<InventoryStore>((set) => ({
   setOrderType: (val) => set((state) => ({...state, orderType: val})),
   orderFilter: undefined,
   setOrderFilter: (val) => set((state) => ({...state, orderFilter: val})),
-  topSheetFilter: undefined,
+  topSheetFilter: '',
   setTopSheetFilter: (val) => set((state) => ({...state, topSheetFilter: val})),
+  inventoryFilter: '',
+  setInventoryFilter: (val) => set((state) => ({...state, inventoryFilter: val})),
 }));
 
 export default useInventoryStore;

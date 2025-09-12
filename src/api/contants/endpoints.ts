@@ -74,7 +74,14 @@ export const API_GET_JOB_INVENTORY = '/job/inventory';
 export const API_UPDATE_INVENTORY_STATUS = '/inventory/status/update';
 export const API_UPDATE_ALL_INVENTORY_STATUS = '/inventory/status/update/all';
 export const API_PREPARE_INVENTORY = 'job/prepped';
-export const API_DELETE_INVENTORY_ITEM = 'inventory/netsuite/remove';
+export const API_DELETE_INVENTORY_ITEM = '/inventory/netsuite/remove';
+// add inventory
+export const API_SEARCH_FULL_INVENTORY = '/inventory/netsuite/search';
+export const API_SEARCH_INVENTORY_ITEM = '/inventory/netsuite/search/autocomplete';
+export const API_ADD_INVENTORY_ITEM = '/inventory/netsuite/add';
+
+// item detail inventory
+export const API_GET_INVENTORY_ITEM_DETAIL = '/job/inventory/individual';
 
 //NATIONAL SHUTTLE ENDPOINTS
 export const API_GET_NS_LOCATION_PLACES = '/jobns/load/locationplacesall';

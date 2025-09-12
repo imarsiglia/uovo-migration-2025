@@ -42,9 +42,9 @@ type Props = {
   disabled: boolean;
   condition: string;
   showCheck: boolean;
-  checked: boolean;
+  checked?: boolean;
   onCheckAll: () => void;
-  showSecondaryId: boolean;
+  showSecondaryId?: boolean;
   deleteBtn?: string;
 };
 

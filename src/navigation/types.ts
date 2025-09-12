@@ -33,6 +33,7 @@ export const RoutesNavigation = {
   AddLaborReport: 'AddLaborReport',
   Inventory: 'Inventory',
   AddInventory: 'AddInventory',
+  ItemDetail: 'ItemDetail',
 } as const;
 
 // Union de nombres de ruta: "Home" | "ContactUs" | ...
@@ -99,8 +100,11 @@ export type RootStackParamList = {
   [RoutesNavigation.AddLaborReport]: {
     item?: LaborReportType;
   };
-  [RoutesNavigation.Inventory];
-  [RoutesNavigation.AddInventory];
+  [RoutesNavigation.Inventory]: undefined;
+  [RoutesNavigation.AddInventory]: undefined;
+  [RoutesNavigation.ItemDetail]: {
+    id?: number;
+  };
 };
 
 export const TopSheetRoutesNavigation = {

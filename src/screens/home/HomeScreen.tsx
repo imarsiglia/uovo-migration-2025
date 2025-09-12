@@ -163,7 +163,7 @@ export const HomeScreen = () => {
             </Label>
             <Wrapper style={{flexDirection: 'row', alignItems: 'center'}}>
               <PressableOpacity
-                disabled={false}
+                disabled={isRefetching}
                 onPress={syncro}
                 style={[styles.btnSync, {backgroundColor: COLORS.primary}]}>
                 <SpinningIcon size={17} spin={loading} />

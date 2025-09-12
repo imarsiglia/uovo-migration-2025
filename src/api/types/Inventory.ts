@@ -1,4 +1,4 @@
-import { BooleanStringType } from "@generalTypes/general";
+import {BooleanStringType} from '@generalTypes/general';
 
 export type JobInventoryType = {
   additional_info: string;
@@ -8,7 +8,7 @@ export type JobInventoryType = {
   artist_id: string;
   child_parent_count: string;
   clientinv: string;
-  clientinv2: null;
+  clientinv2?: string | null;
   clientinv_display: string;
   clientref: string;
   current_packing_detail: string;
@@ -33,7 +33,7 @@ export type JobInventoryType = {
   parent_url: string;
   plain_id_job: number;
   provenance: null;
-  status: string | null;
+  status: string | null;
   unpacked_cubit_foot: string;
   unpacked_height: string;
   unpacked_length: string;
@@ -42,4 +42,12 @@ export type JobInventoryType = {
   url: string;
   weight: string;
   year: string;
+  parent_id?: string;
+};
+
+export type MinimalInventoryType = {
+  artist_name?: string;
+  client_ref_id?: string;
+  inventory_id?: string;
+  title?: string;
 };

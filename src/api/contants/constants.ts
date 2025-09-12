@@ -35,6 +35,9 @@ export const QUERY_KEYS = {
   EMPLOYEES: 'employees',
   LABOR_CODES: 'labor_codes',
   JOB_INVENTORY: 'job_inventory',
+  SEARCH_FULL_INVENTORY: 'search_full_inventory',
+  SEARCH_INVENTORY_ITEM: 'search_inventory_item',
+  INVENTORY_ITEM_DETAIL: 'inventory_item_detail',
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';

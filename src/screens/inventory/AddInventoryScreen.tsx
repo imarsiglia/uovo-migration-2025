@@ -1,34 +1,42 @@
+import {QUERY_KEYS} from '@api/contants/constants';
+import {
+  useAddInventoryItem,
+  useSearchFullInventory,
+  useSearchInventoryItem,
+} from '@api/hooks/HooksInventoryServices';
+import {MinimalInventoryType} from '@api/types/Inventory';
+import {CustomAutocomplete} from '@components/commons/autocomplete/CustomAutocomplete';
 import {BackButton} from '@components/commons/buttons/BackButton';
-import {AutocompleteContext} from '@components/commons/form/AutocompleteContext';
-import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
-import {BottomSheetSelectInputContext} from '@components/commons/form/BottomSheetSelectInputContext';
-import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
+import {RoundedButton} from '@components/commons/buttons/RoundedButton';
+import {BottomSheetSelectInput} from '@components/commons/inputs/BottomSheetSelectInput';
 import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import HeaderInventoryAdd from '@components/inventory/HeaderInventoryAdd';
 import RowInventoryAdd from '@components/inventory/RowInventoryAdd';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {loadingWrapperPromise} from '@store/actions';
+import useInventoryStore from '@store/inventory';
+import {useModalDialogStore} from '@store/modals';
+import useTopSheetStore from '@store/topsheet';
+import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {
-  ActivityIndicator,
-  Dimensions,
+  Alert,
   FlatList,
   Keyboard,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableHighlight,
   TouchableOpacity,
   View,
 } from 'react-native';
-import Icon, {configureFontAwesomePro} from 'react-native-fontawesome-pro';
+import {IAutocompleteDropdownRef} from 'react-native-autocomplete-dropdown';
+import Icon from 'react-native-fontawesome-pro';
 import Modal from 'react-native-modal';
-import Orientation from 'react-native-orientation-locker';
-import RNPickerSelect from 'react-native-picker-select';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import Toast from 'react-native-simple-toast';
 
 const CRITERIA_LIST = [
   {name: 'ID', id: 'id'},
@@ -38,356 +46,263 @@ const CRITERIA_LIST = [
 ];
 
 export const AddInventoryScreen = () => {
-  //const [filter, setFilter] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [orderFilter, setOrderFilter] = useState(null);
-  const [orderType, setOrderType] = useState(null);
-  const [clearOrder, setClearOrder] = useState(false);
-  const [loadingInventory, setLoadingInventory] = useState(false);
-  const [inventoryList, setInventoryList] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+  const {id} = useTopSheetStore((d) => d.jobDetail);
+  const [type, setType] = useState('');
+  const [filter, setFilter] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState('');
 
-  const itemRef = useRef<any>(null);
+  const itemRef = useRef<IAutocompleteDropdownRef | null>(null);
+  const {goBack} = useCustomNavigation();
+  const showDialog = useModalDialogStore((d) => d.showVisible);
+  const {topSheetFilter, inventoryFilter, orderFilter, orderType} =
+    useInventoryStore();
 
-  //ADD ITEM FILTER
-  const [addItemFilter, setaddItemFilter] = useState('');
-  const [selectedId, setSelectedId] = useState(null);
+  const [showTable, setShowTable] = useState(false);
 
-  const [creteriaFilter, setCreteriaFilter] = useState('');
+  const {data: autocompleteItems} = useSearchInventoryItem({
+    idJob: id,
+    type,
+    filter,
+  });
 
-  const [query, setQuery] = useState('');
-  const [item, setItem] = useState({});
-  const [items, setItems] = useState([]);
-  const [renderTable, setRenderTable] = useState(false);
-  const [hideResultList, setHideResultList] = useState(false);
+  const {
+    data: inventoryList,
+    refetch,
+    isRefetching,
+  } = useSearchFullInventory({
+    idJob: id,
+    type,
+    filter: selectedFilter,
+    enabled: false,
+  });
 
-  const ListItems = [
-    {label: 'ID', value: 'id'},
-    {label: 'Client Ref ID', value: 'ref'},
-    {label: 'Title', value: 'title'},
-    {label: 'Artist name', value: 'artist'},
-  ];
+  const {mutateAsync: addInventoryAsync} = useAddInventoryItem();
 
-  const {width, height} = Dimensions.get('window');
+  const {hardRefreshMany} = useRefreshIndicator([
+    [
+      QUERY_KEYS.JOB_INVENTORY,
+      {
+        idJob: id,
+        filter: topSheetFilter,
+        orderFilter,
+        orderType,
+      },
+    ],
+    [
+      QUERY_KEYS.JOB_INVENTORY,
+      {
+        idJob: id,
+        filter: inventoryFilter,
+        orderFilter,
+        orderType,
+      },
+    ],
+  ]);
 
   useEffect(() => {
-    // Orientation.lockToLandscape();
-    //addItemFilter(false);
-  }, []);
-
-  // useEffect(() => {
-  //   return () => {
-  //     props.route.params.refreshResume(false, true);
-  //   };
-  // }, []);
-
-  const orderBy = (orderType, filterType) => {
-    // console.log("order by");
-  };
-
-  const onCheckAll = () => {
-    // console.log("on check all");
-  };
-
-  const fData = () => {
-    // console.log("on refresh");
-  };
-
-  const onCheckItem = (id, index) => {};
-
-  const agregarItem = async () => {
-    Keyboard.dismiss();
-    // setShowModal(false);
-    // setLoading(true);
-    // const response = await fetchData.Post('resources/inventory/netsuite/add', {
-    //   idInventory: selectedId,
-    //   idJob: props.jobDetail.id,
-    // });
-    // if (response.ok) {
-    //   if (response.data.message === 'SUCCESS') {
-    //     setLoading(false);
-    //     props.navigation.goBack();
-    //   } else {
-    //     setLoading(false);
-    //   }
-    // } else {
-    //   setLoading(false);
-    //   Toast.show('An error occurred while adding item', Toast.LONG, [
-    //     'UIAlertController',
-    //   ]);
-    // }
-  };
+    setFilter('');
+    if (itemRef?.current) {
+      itemRef.current.setInputText('');
+      itemRef.current.clear();
+    }
+  }, [type]);
 
   const addItemSearch = async () => {
     Keyboard.dismiss();
-    // const isConnected = await isInternet();
-    // if (isConnected) {
-    //   setLoading(true);
-    //   const response = await fetchData.Get(
-    //     'resources/inventory/netsuite/search?idjob=' +
-    //       props.jobDetail.id +
-    //       '&filter=' +
-    //       query +
-    //       '&type=' +
-    //       creteriaFilter.trim(),
-    //   );
-
-    //   if (response.ok) {
-    //     if (response.data.message === 'SUCCESS') {
-    //       setInventoryList(response.data.body.data);
-    //       // console.log("RESPONSE");
-    //       // console.log(JSON.stringify(response.data));
-    //       setLoading(false);
-    //     } else {
-    //       setLoading(false);
-    //       Toast.show('An error occurred while loading inventory', Toast.LONG, [
-    //         'UIAlertController',
-    //       ]);
-    //       // console.log("SERVIDOR NO DISPONIBLE")
-    //     }
-    //   } else {
-    //     setLoading(false);
-    //     Toast.show('An error occurred while loading inventory', Toast.LONG, [
-    //       'UIAlertController',
-    //     ]);
-    //     // console.log("SERVIDOR NO DISPONIBLE 2")
-    //   }
-    // } else {
-    //   Toast.show('Check your internet connection', Toast.LONG, [
-    //     'UIAlertController',
-    //   ]);
-    // }
-    // setRenderTable(true);
-    // setHideResultList(true);
+    refetch().then(() => {
+      setShowTable(true);
+    });
   };
 
-  const filter = async (query) => {
-    // if (query.length < 1) {
-    //   setTimeout(function () {
-    //     setItems([]);
-    //   }, 500);
-    //   return;
-    // }
-    // const response = await fetchData.Get(
-    //   'resources/inventory/netsuite/search/autocomplete?idjob=' +
-    //     props.jobDetail.id +
-    //     '&filter=' +
-    //     query +
-    //     '&type=' +
-    //     creteriaFilter.trim(),
-    // );
-    // if (response.ok) {
-    //   if (response.data.message == 'SUCCESS') {
-    //     setItems(response.data.body.data);
-    //   }
-    // }
+  const onCheckItem = async (query) => {
+    setFilter(query?.trim());
   };
 
-  const selectItem = (id) => {
-    setSelectedId(id);
-    setShowModal(true);
+  const onInitAdd = (item: MinimalInventoryType) => {
+    showDialog({
+      modalVisible: true,
+      type: 'info',
+      cancelable: true,
+      message: (
+        <View style={[styles.bodyModalClockOut, {paddingHorizontal: 0}]}>
+          <Text style={styles.titleModalClockOut}>
+            Do you want to add this item to inventory?
+          </Text>
+        </View>
+      ),
+      onConfirm: () => {
+        showDialog({
+          modalVisible: false,
+        });
+        loadingWrapperPromise(
+          addInventoryAsync({
+            idJob: id,
+            idInventory: item.inventory_id,
+          })
+            .then((d) => {
+              if (d) {
+                hardRefreshMany();
+                showToastMessage('Item added successfully');
+                goBack();
+              } else {
+                showErrorToastMessage('An error occurred while adding item');
+              }
+            })
+            .catch(() => {
+              showErrorToastMessage('An error occurred while adding item');
+            }),
+        );
+      },
+    });
   };
 
-  const checkItem = (text) => {
-    setQuery(text);
-    if (text.trim().length > 2) {
-      filter(text.trim());
+  const closeAutocomplete = useCallback(() => {
+    if (itemRef?.current) {
+      itemRef.current.close();
     }
-    setHideResultList(false);
-    setRenderTable(false);
-  };
-
-  const selectItemList = (item) => {
-    setItem(item);
-    setQuery(item);
-    setRenderTable(true);
-    setHideResultList(true);
-  };
-
-  const closeAutocomplete = useCallback(() => {}, []);
+  }, [itemRef?.current]);
 
   return (
-    <SafeAreaView style={GLOBAL_STYLES.safeAreaLight}>
-      <View>
-        <View style={[styles.container]}>
-          {loading && (
-            <View style={GLOBAL_STYLES.backgroundLoading}>
-              <ActivityIndicator size="large" color={'#487EFD'} />
-            </View>
-          )}
+    <View style={[styles.container]}>
+      <View style={[styles.container]}>
+        <View
+          style={[
+            GLOBAL_STYLES.containerBtnOptTop,
+            {backgroundColor: 'white'},
+          ]}>
+          <BackButton onPress={goBack} />
 
-          <View
-            style={[
-              GLOBAL_STYLES.containerBtnOptTop,
-              {backgroundColor: 'white'},
-            ]}>
-            <BackButton onPress={() => {}} />
-
-            <View style={[styles.lateralPadding]}>
-              <Text
-                style={[
-                  GLOBAL_STYLES.title,
-                  GLOBAL_STYLES.bold,
-                  styles.topsheet,
-                ]}>
-                New Item
-              </Text>
-            </View>
-
-            <View style={[styles.lateralPadding, {width: 50}]}></View>
+          <View style={[styles.lateralPadding]}>
+            <Text
+              style={[
+                GLOBAL_STYLES.title,
+                GLOBAL_STYLES.bold,
+                styles.topsheet,
+              ]}>
+              New Item
+            </Text>
           </View>
 
-          <MinRoundedView />
-
-          <BasicFormProvider>
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                paddingHorizontal: 10,
-                gap: 10,
-                paddingTop: 10,
-                alignItems: 'center',
-              }}>
-              <Wrapper style={{flex: 0.3}}>
-                <BottomSheetSelectInputContext
-                  currentId="criteria_filter"
-                  placeholder="Select an option"
-                  options={CRITERIA_LIST}
-                  label="Search"
-                  snapPoints={['95%']}
-                  searchable={false}
-                  containerStyle={{
-                    borderColor: "#d0d0d0",
-                    borderRadius: 10
-                  }}
-                />
-              </Wrapper>
-
-              <Wrapper style={{flex: 0.7}}>
-                <AutocompleteContext
-                  name="items"
-                  dataSet={items?.map((x) => ({
-                    ...x,
-                    id: x.id.toString(),
-                    title: x.name,
-                  }))}
-                  textInputProps={{
-                    placeholder: 'Search an item',
-                  }}
-                  controllerRef={(controller) => {
-                    itemRef.current = controller;
-                  }}
-                  onChangeText={checkItem}
-                  onFocus={() => {
-                    closeAutocomplete();
-                    itemRef.current.open();
-                  }}
-                />
-              </Wrapper>
-
-              <ButtonSubmit
-                style={[
-                  {
-                    width: 30,
-                    backgroundColor: "transparent",
-                    paddingHorizontal: 0,
-                    minHeight: 0
-                  },
-                ]}
-                onSubmit={addItemSearch}
-                icon={<Icon name="search" size={16} color="#959595" />}
-              />
-            </View>
-          </BasicFormProvider>
-
-          {renderTable && (
-            <View style={[styles.containerTable]}>
-              <ScrollView
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-                keyboardShouldPersistTaps="handled"
-                contentContainerStyle={{width: '100%'}}
-                style={[
-                  styles.table,
-                  {elevation: 0.5, borderRadius: 12, borderColor: '#d0d0d0'},
-                ]}>
-                <View style={[GLOBAL_STYLES.alignItems, styles.containerList]}>
-                  <HeaderInventoryAdd
-                    sortBy={orderBy.bind(this)}
-                    clearOrder={clearOrder}
-                    setClearOrder={setClearOrder.bind(this)}
-                    orderFilter={orderFilter}
-                    orderByGlobal={orderType}
-                  />
-
-                  {
-                    <FlatList
-                      style={styles.rowInventoryContainer}
-                      contentContainerStyle={{
-                        width: '100%',
-                        backgroundColor: 'white',
-                        borderBottomStartRadius: 12,
-                        borderBottomEndRadius: 12,
-                        overflow: 'hidden',
-                      }}
-                      data={inventoryList}
-                      renderItem={({item, index}) => (
-                        <RowInventoryAdd
-                          key={index}
-                          item={item}
-                          onAddItem={() => selectItem(item.inventory_id)}
-                          onCheck={() => {}}
-                        />
-                      )}
-                      keyExtractor={(item, index) => index.toString()}
-                      onRefresh={fData}
-                      refreshing={loadingInventory}
-                    />
-                  }
-                </View>
-              </ScrollView>
-            </View>
-          )}
+          <View style={[styles.lateralPadding, {width: 50}]}></View>
         </View>
-        <Modal
-          deviceWidth={Platform.OS == 'android' ? width : null}
-          isVisible={showModal}
-          style={{width: '100%'}}
-          backdropOpacity={0.7}>
-          <View style={[styles.modalClockOut]}>
-            <View style={styles.bodyModalClockOut}>
-              <Text style={styles.titleModalClockOut}>
-                Do you want to add this item to inventory?
-              </Text>
-            </View>
 
-            <View style={[styles.containerOptionsModalClockOut]}>
-              <TouchableOpacity
-                onPress={() => agregarItem()}
-                style={[styles.btnOption, {marginRight: 20}]}>
-                <Text style={styles.optionModalClockOut}>Yes</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setShowModal(false)}
-                style={[styles.btnOption]}>
-                <Text style={[styles.optionModalClockOut]}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
+        <MinRoundedView />
+
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            paddingHorizontal: 10,
+            gap: 10,
+            paddingTop: 10,
+            alignItems: 'center',
+          }}>
+          <Wrapper style={{flex: 0.3}}>
+            <BottomSheetSelectInput
+              onChange={(val) => setType(val as string)}
+              placeholder="Select an option"
+              options={CRITERIA_LIST}
+              label="Select an option"
+              snapPoints={['95%']}
+              searchable={false}
+              containerStyle={{
+                borderColor: '#d0d0d0',
+                borderRadius: 10,
+                borderWidth: 0.5,
+              }}
+              value={type}
+            />
+          </Wrapper>
+
+          <Wrapper style={{flex: 0.7}}>
+            <CustomAutocomplete
+              dataSet={autocompleteItems?.map((x) => ({
+                id: x,
+                title: x,
+              }))}
+              textInputProps={{
+                placeholder: 'Search an item',
+              }}
+              controller={(c) => {
+                itemRef.current = c;
+              }}
+              onChangeText={onCheckItem}
+              onFocus={() => {
+                closeAutocomplete();
+                itemRef.current.open();
+              }}
+              onClear={() => {
+                setFilter('');
+              }}
+              onSelectItem={(item) => setSelectedFilter(item?.id)}
+            />
+          </Wrapper>
+
+          <RoundedButton
+            style={[
+              {
+                width: 30,
+                backgroundColor: 'transparent',
+                paddingHorizontal: 0,
+                minHeight: 0,
+              },
+            ]}
+            onPress={addItemSearch}
+            icon={<Icon name="search" size={16} color="#959595" />}
+          />
+        </View>
+
+        {showTable && (
+          <View style={[styles.containerTable]}>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={{width: '100%'}}
+              style={[
+                styles.table,
+                {elevation: 0.5, borderRadius: 12, borderColor: '#d0d0d0'},
+              ]}>
+              <View style={[GLOBAL_STYLES.alignItems, styles.containerList]}>
+                <HeaderInventoryAdd />
+
+                <FlatList
+                  style={styles.rowInventoryContainer}
+                  contentContainerStyle={{
+                    width: '100%',
+                    backgroundColor: 'white',
+                    borderBottomStartRadius: 12,
+                    borderBottomEndRadius: 12,
+                    overflow: 'hidden',
+                  }}
+                  data={inventoryList}
+                  renderItem={({item, index}) => (
+                    <RowInventoryAdd
+                      key={index}
+                      item={item}
+                      onAddItem={() => onInitAdd(item)}
+                      onCheck={() => {}}
+                    />
+                  )}
+                  keyExtractor={(item) => item.inventory_id?.toString()}
+                  refreshing={isRefetching}
+                  onRefresh={refetch}
+                />
+              </View>
+            </ScrollView>
           </View>
-        </Modal>
-        {loading && <GeneralLoading />}
+        )}
       </View>
-    </SafeAreaView>
+      {isRefetching && <GeneralLoading />}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 0,
-    flexGrow: 1,
+    flex: 1,
     height: '100%',
-    backgroundColor: '#fbfbfb',
+    backgroundColor: COLORS.bgWhite,
   },
   lateralPadding: {
     paddingLeft: 20,
@@ -447,18 +362,17 @@ const styles = StyleSheet.create({
   containerTable: {
     paddingLeft: 10,
     paddingRight: 10,
-    marginTop: 20,
-    //paddingBottom: 10,
+    marginTop: 10,
     flex: 1,
-    shadowColor: '#000',
+    shadowColor: '#00000050',
     shadowOffset: {
-      width: 2,
-      height: 8,
+      width: 1,
+      height: 2,
     },
     shadowOpacity: 0.2,
     shadowRadius: 30.14,
-
     elevation: 5,
+    paddingBottom: 10,
   },
   table: {
     backgroundColor: 'transparent',

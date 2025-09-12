@@ -3,60 +3,56 @@ import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
 import PropTypes from 'prop-types';
 import Icon from 'react-native-fontawesome-pro';
 
-const HeaderInventoryAdd = ({
-  sortBy,
-  clearOrder,
-  setClearOrder,
-  orderFilter,
-  orderByGlobal,
-}) => {
-  const [orderBy, setOrderBy] = React.useState('');
-  const [orderType, setOrderType] = React.useState('ASC');
+type Props = {};
 
-  React.useEffect(() => {
-    if (clearOrder) {
-      setOrderBy('');
-      setOrderType('ASC');
-      setClearOrder(false);
-    }
-  });
+const HeaderInventoryAdd = (props: Props) => {
+  // const [orderBy, setOrderBy] = React.useState('');
+  // const [orderType, setOrderType] = React.useState('ASC');
 
-  const BtnSort = ({filterType, marked}) => {
-    return (
-      <TouchableOpacity onPress={() => sort(filterType)}>
-        <Icon
-          name="sort"
-          size={14}
-          type="solid"
-          style={{padding: 5}}
-          color={marked == true ? '#03d3ed' : 'black'}></Icon>
-      </TouchableOpacity>
-    );
-  };
+  // React.useEffect(() => {
+  //   if (clearOrder) {
+  //     setOrderBy('');
+  //     setOrderType('ASC');
+  //     setClearOrder(false);
+  //   }
+  // });
 
-  function sort(filterType) {
-    setOrderBy(filterType);
-    if (
-      orderBy == filterType ||
-      (orderFilter != null && orderFilter == filterType)
-    ) {
-      var orderTypeTemp = 'DESC';
-      if (
-        orderType == 'DESC' ||
-        (orderByGlobal != null && orderByGlobal == 'DESC')
-      ) {
-        setOrderType('ASC');
-        orderTypeTemp = 'ASC';
-      } else {
-        setOrderType('DESC');
-        orderTypeTemp = 'DESC';
-      }
-      sortBy(orderTypeTemp, filterType);
-    } else {
-      setOrderType('ASC');
-      sortBy('ASC', filterType);
-    }
-  }
+  // const BtnSort = ({filterType, marked}) => {
+  //   return (
+  //     <TouchableOpacity onPress={() => sort(filterType)}>
+  //       <Icon
+  //         name="sort"
+  //         size={14}
+  //         type="solid"
+  //         style={{padding: 5}}
+  //         color={marked == true ? '#03d3ed' : 'black'}></Icon>
+  //     </TouchableOpacity>
+  //   );
+  // };
+
+  // function sort(filterType) {
+  //   setOrderBy(filterType);
+  //   if (
+  //     orderBy == filterType ||
+  //     (orderFilter != null && orderFilter == filterType)
+  //   ) {
+  //     var orderTypeTemp = 'DESC';
+  //     if (
+  //       orderType == 'DESC' ||
+  //       (orderByGlobal != null && orderByGlobal == 'DESC')
+  //     ) {
+  //       setOrderType('ASC');
+  //       orderTypeTemp = 'ASC';
+  //     } else {
+  //       setOrderType('DESC');
+  //       orderTypeTemp = 'DESC';
+  //     }
+  //     sortBy(orderTypeTemp, filterType);
+  //   } else {
+  //     setOrderType('ASC');
+  //     sortBy('ASC', filterType);
+  //   }
+  // }
 
   return (
     <View style={styles.container}>
@@ -68,19 +64,19 @@ const HeaderInventoryAdd = ({
 
       <View style={[styles.containerColumn, {width: '15%'}]}>
         <Text style={[styles.column]}>Inventory ID</Text>
-        {sortBy && (
+        {/* {sortBy && (
           <BtnSort
             filterType="id"
             marked={
               orderBy == 'id' || (orderFilter != null && orderFilter == 'id')
             }
           />
-        )}
+        )} */}
       </View>
 
       <View style={[styles.containerColumn, {width: '20%'}]}>
         <Text style={[styles.column]}>Client Ref ID</Text>
-        {sortBy && (
+        {/* {sortBy && (
           <BtnSort
             filterType="clientref"
             marked={
@@ -88,12 +84,12 @@ const HeaderInventoryAdd = ({
               (orderFilter != null && orderFilter == 'clientref')
             }
           />
-        )}
+        )} */}
       </View>
 
       <View style={[styles.containerColumn, {width: '20%'}]}>
         <Text style={[styles.column]}>Artist Name</Text>
-        {sortBy && (
+        {/* {sortBy && (
           <BtnSort
             filterType="artist"
             marked={
@@ -101,12 +97,12 @@ const HeaderInventoryAdd = ({
               (orderFilter != null && orderFilter == 'artist')
             }
           />
-        )}
+        )} */}
       </View>
 
       <View style={[styles.containerColumn, {width: '25%'}]}>
         <Text style={[styles.column]}>Title</Text>
-        {sortBy && (
+        {/* {sortBy && (
           <BtnSort
             filterType="title"
             marked={
@@ -114,7 +110,7 @@ const HeaderInventoryAdd = ({
               (orderFilter != null && orderFilter == 'title')
             }
           />
-        )}
+        )} */}
       </View>
 
       <View
