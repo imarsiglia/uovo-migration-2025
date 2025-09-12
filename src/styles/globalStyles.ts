@@ -137,4 +137,13 @@ export const GLOBAL_STYLES = StyleSheet.create({
   lateralPadding: {
     paddingHorizontal: 20,
   },
+  alignItems: {
+    alignItems: 'center',
+  },
+  autocompleteText: {
+    paddingLeft: 0,
+    paddingRight: 0,
+    fontSize: 12,
+    color: 'black',
+  },
 });

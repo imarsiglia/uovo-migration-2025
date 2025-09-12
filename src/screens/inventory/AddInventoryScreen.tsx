@@ -1,4 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import {BackButton} from '@components/commons/buttons/BackButton';
+import {AutocompleteContext} from '@components/commons/form/AutocompleteContext';
+import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
+import {BottomSheetSelectInputContext} from '@components/commons/form/BottomSheetSelectInputContext';
+import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
+import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
+import MinRoundedView from '@components/commons/view/MinRoundedView';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import HeaderInventoryAdd from '@components/inventory/HeaderInventoryAdd';
+import RowInventoryAdd from '@components/inventory/RowInventoryAdd';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Dimensions,
@@ -10,20 +21,21 @@ import {
   Text,
   TouchableHighlight,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
-import Icon, { configureFontAwesomePro } from 'react-native-fontawesome-pro';
+import Icon, {configureFontAwesomePro} from 'react-native-fontawesome-pro';
 import Modal from 'react-native-modal';
 import Orientation from 'react-native-orientation-locker';
 import RNPickerSelect from 'react-native-picker-select';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import Toast from 'react-native-simple-toast';
-import { connect } from 'react-redux';
-import HeaderInventoryAdd from '../components/headerInventoryAdd';
-import RowInventoryAdd from '../components/rowInventoryAdd';
-import mstyles from '../styles/styles';
-import { fetchData } from '../utils/fetch';
-import { isInternet } from '../utils/internet';
+
+const CRITERIA_LIST = [
+  {name: 'ID', id: 'id'},
+  {name: 'Client Ref ID', id: 'ref'},
+  {name: 'Title', id: 'title'},
+  {name: 'Artist name', id: 'artist'},
+];
 
 export const AddInventoryScreen = () => {
   //const [filter, setFilter] = useState("");
@@ -34,6 +46,8 @@ export const AddInventoryScreen = () => {
   const [loadingInventory, setLoadingInventory] = useState(false);
   const [inventoryList, setInventoryList] = useState([]);
   const [showModal, setShowModal] = useState(false);
+
+  const itemRef = useRef<any>(null);
 
   //ADD ITEM FILTER
   const [addItemFilter, setaddItemFilter] = useState('');
@@ -57,15 +71,15 @@ export const AddInventoryScreen = () => {
   const {width, height} = Dimensions.get('window');
 
   useEffect(() => {
-    Orientation.lockToLandscape();
+    // Orientation.lockToLandscape();
     //addItemFilter(false);
   }, []);
 
-  useEffect(() => {
-    return () => {
-      props.route.params.refreshResume(false, true);
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     props.route.params.refreshResume(false, true);
+  //   };
+  // }, []);
 
   const orderBy = (orderType, filterType) => {
     // console.log("order by");
@@ -83,104 +97,98 @@ export const AddInventoryScreen = () => {
 
   const agregarItem = async () => {
     Keyboard.dismiss();
-    setShowModal(false);
-    setLoading(true);
-    const response = await fetchData.Post('resources/inventory/netsuite/add', {
-      idInventory: selectedId,
-      idJob: props.jobDetail.id,
-    });
-    if (response.ok) {
-      if (response.data.message === 'SUCCESS') {
-        setLoading(false);
-        props.navigation.goBack();
-      } else {
-        setLoading(false);
-      }
-    } else {
-      setLoading(false);
-      Toast.show('An error occurred while adding item', Toast.LONG, [
-        'UIAlertController',
-      ]);
-    }
+    // setShowModal(false);
+    // setLoading(true);
+    // const response = await fetchData.Post('resources/inventory/netsuite/add', {
+    //   idInventory: selectedId,
+    //   idJob: props.jobDetail.id,
+    // });
+    // if (response.ok) {
+    //   if (response.data.message === 'SUCCESS') {
+    //     setLoading(false);
+    //     props.navigation.goBack();
+    //   } else {
+    //     setLoading(false);
+    //   }
+    // } else {
+    //   setLoading(false);
+    //   Toast.show('An error occurred while adding item', Toast.LONG, [
+    //     'UIAlertController',
+    //   ]);
+    // }
   };
 
   const addItemSearch = async () => {
     Keyboard.dismiss();
-    const isConnected = await isInternet();
-    if (isConnected) {
-      setLoading(true);
-      const response = await fetchData.Get(
-        'resources/inventory/netsuite/search?idjob=' +
-          props.jobDetail.id +
-          '&filter=' +
-          query +
-          '&type=' +
-          creteriaFilter.trim(),
-      );
+    // const isConnected = await isInternet();
+    // if (isConnected) {
+    //   setLoading(true);
+    //   const response = await fetchData.Get(
+    //     'resources/inventory/netsuite/search?idjob=' +
+    //       props.jobDetail.id +
+    //       '&filter=' +
+    //       query +
+    //       '&type=' +
+    //       creteriaFilter.trim(),
+    //   );
 
-      if (response.ok) {
-        if (response.data.message === 'SUCCESS') {
-          setInventoryList(response.data.body.data);
-          // console.log("RESPONSE");
-          // console.log(JSON.stringify(response.data));
-          setLoading(false);
-        } else {
-          setLoading(false);
-          Toast.show('An error occurred while loading inventory', Toast.LONG, [
-            'UIAlertController',
-          ]);
-          // console.log("SERVIDOR NO DISPONIBLE")
-        }
-      } else {
-        setLoading(false);
-        Toast.show('An error occurred while loading inventory', Toast.LONG, [
-          'UIAlertController',
-        ]);
-        // console.log("SERVIDOR NO DISPONIBLE 2")
-      }
-    } else {
-      Toast.show('Check your internet connection', Toast.LONG, [
-        'UIAlertController',
-      ]);
-    }
-    setRenderTable(true);
-    setHideResultList(true);
+    //   if (response.ok) {
+    //     if (response.data.message === 'SUCCESS') {
+    //       setInventoryList(response.data.body.data);
+    //       // console.log("RESPONSE");
+    //       // console.log(JSON.stringify(response.data));
+    //       setLoading(false);
+    //     } else {
+    //       setLoading(false);
+    //       Toast.show('An error occurred while loading inventory', Toast.LONG, [
+    //         'UIAlertController',
+    //       ]);
+    //       // console.log("SERVIDOR NO DISPONIBLE")
+    //     }
+    //   } else {
+    //     setLoading(false);
+    //     Toast.show('An error occurred while loading inventory', Toast.LONG, [
+    //       'UIAlertController',
+    //     ]);
+    //     // console.log("SERVIDOR NO DISPONIBLE 2")
+    //   }
+    // } else {
+    //   Toast.show('Check your internet connection', Toast.LONG, [
+    //     'UIAlertController',
+    //   ]);
+    // }
+    // setRenderTable(true);
+    // setHideResultList(true);
   };
 
-  const filter = async query => {
-    if (query.length < 1) {
-      setTimeout(function () {
-        setItems([]);
-      }, 500);
-      return;
-    }
-    //const response = await fetchData.Get("resources/user/load/employee?query=" + query);
-    const response = await fetchData.Get(
-      'resources/inventory/netsuite/search/autocomplete?idjob=' +
-        props.jobDetail.id +
-        '&filter=' +
-        query +
-        '&type=' +
-        creteriaFilter.trim(),
-    );
-    // console.log(props.jobDetail.id);
-    // console.log(query)
-    // console.log(creteriaFilter)
-    // console.log(response)
-    if (response.ok) {
-      if (response.data.message == 'SUCCESS') {
-        setItems(response.data.body.data);
-        // console.log(response.data.body.data)
-      }
-    }
+  const filter = async (query) => {
+    // if (query.length < 1) {
+    //   setTimeout(function () {
+    //     setItems([]);
+    //   }, 500);
+    //   return;
+    // }
+    // const response = await fetchData.Get(
+    //   'resources/inventory/netsuite/search/autocomplete?idjob=' +
+    //     props.jobDetail.id +
+    //     '&filter=' +
+    //     query +
+    //     '&type=' +
+    //     creteriaFilter.trim(),
+    // );
+    // if (response.ok) {
+    //   if (response.data.message == 'SUCCESS') {
+    //     setItems(response.data.body.data);
+    //   }
+    // }
   };
 
-  const selectItem = id => {
+  const selectItem = (id) => {
     setSelectedId(id);
     setShowModal(true);
   };
 
-  const checkItem = text => {
+  const checkItem = (text) => {
     setQuery(text);
     if (text.trim().length > 2) {
       filter(text.trim());
@@ -189,49 +197,39 @@ export const AddInventoryScreen = () => {
     setRenderTable(false);
   };
 
-  const selectItemList = item => {
-    //var sublist = items.filter(x => x.toUpperCase() == item.toUpperCase());
-    // console.log(items);
-    //setItems(sublist);
+  const selectItemList = (item) => {
     setItem(item);
     setQuery(item);
     setRenderTable(true);
     setHideResultList(true);
   };
 
-  const onBlurItem = () => {
-    setQuery(item.name ? item.name : '');
-    setItems([]);
-  };
-
-  const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
+  const closeAutocomplete = useCallback(() => {}, []);
 
   return (
-    <SafeAreaView style={mstyles.safeAreaLight}>
+    <SafeAreaView style={GLOBAL_STYLES.safeAreaLight}>
       <View>
         <View style={[styles.container]}>
           {loading && (
-            <View style={mstyles.backgroundLoading}>
+            <View style={GLOBAL_STYLES.backgroundLoading}>
               <ActivityIndicator size="large" color={'#487EFD'} />
             </View>
           )}
 
           <View
-            style={[mstyles.containerBtnOptTop, {backgroundColor: 'white'}]}>
-            <TouchableOpacity onPress={() => props.navigation.goBack()}>
-              <View style={styles.backBtn}>
-                <Icon
-                  name="chevron-left"
-                  color="#959595"
-                  type="light"
-                  size={15}
-                />
-                <Text style={styles.backBtnText}>Back</Text>
-              </View>
-            </TouchableOpacity>
+            style={[
+              GLOBAL_STYLES.containerBtnOptTop,
+              {backgroundColor: 'white'},
+            ]}>
+            <BackButton onPress={() => {}} />
 
             <View style={[styles.lateralPadding]}>
-              <Text style={[mstyles.title, mstyles.bold, styles.topsheet]}>
+              <Text
+                style={[
+                  GLOBAL_STYLES.title,
+                  GLOBAL_STYLES.bold,
+                  styles.topsheet,
+                ]}>
                 New Item
               </Text>
             </View>
@@ -241,85 +239,67 @@ export const AddInventoryScreen = () => {
 
           <MinRoundedView />
 
-          <View
-            style={{
-              marginTop: 30,
-              height: 45,
-              display: 'flex',
-              flexDirection: 'row',
-              marginLeft: 10,
-            }}>
-            <View style={{width: '30%', marginRight: 10}}>
-              <RNPickerSelect
-                items={ListItems}
-                value={creteriaFilter}
-                onValueChange={value => setCreteriaFilter(value)}
-                style={{
-                  ...pickerSelectStyles,
-                  iconContainer: {
-                    top: 13,
-                    right: 10,
-                  },
-                }}
-                placeholder={{
-                  label: 'Select an option',
-                  value: '',
-                }}
-                fixAndroidTouchableBug={Platform.OS == 'android'}
-                useNativeAndroidPickerStyle={false}
-                textInputProps={{}}
-                key={value => value.toString()}
-                Icon={() => {
-                  return (
-                    <Icon
-                      name="angle-down"
-                      size={16}
-                      color="#959595"
-                      style={{}}
-                    />
-                  );
-                }}
-              />
-            </View>
+          <BasicFormProvider>
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                paddingHorizontal: 10,
+                gap: 10,
+                paddingTop: 10,
+                alignItems: 'center',
+              }}>
+              <Wrapper style={{flex: 0.3}}>
+                <BottomSheetSelectInputContext
+                  currentId="criteria_filter"
+                  placeholder="Select an option"
+                  options={CRITERIA_LIST}
+                  label="Search"
+                  snapPoints={['95%']}
+                  searchable={false}
+                  containerStyle={{
+                    borderColor: "#d0d0d0",
+                    borderRadius: 10
+                  }}
+                />
+              </Wrapper>
 
-            <View style={{width: '63%', marginRight: 10, position: 'relative'}}>
-              <Autocomplete
-                clearButtonMode="while-editing"
-                onBlur={() => onBlurItem()}
-                defaultValue={query}
-                data={items}
-                scrollEnabled={true}
-                disableFullscreenUI={false}
-                onChangeText={(text) => checkItem(text)}
-                hideResults={hideResultList}
-                listStyle={styles.autocompleteList}
-                placeholder="Search an item"
-                placeholderTextColor="#d0d0d0"
-                inputContainerStyle={styles.inputSearch}
-                style={mstyles.autocompleteText}
-                renderItem={({item, i}) => (
-                  <TouchableHighlight
-                    key={i}
-                    onPress={() => selectItemList(item)}
-                    underlayColor="#d0d0d0"
-                    style={{height: 30, justifyContent: 'center'}}>
-                    <Text numberOfLines={1}>{item}</Text>
-                  </TouchableHighlight>
-                )}
-                flatListProps={{
-                  keyboardShouldPersistTaps: 'always',
-                  
-                }}
+              <Wrapper style={{flex: 0.7}}>
+                <AutocompleteContext
+                  name="items"
+                  dataSet={items?.map((x) => ({
+                    ...x,
+                    id: x.id.toString(),
+                    title: x.name,
+                  }))}
+                  textInputProps={{
+                    placeholder: 'Search an item',
+                  }}
+                  controllerRef={(controller) => {
+                    itemRef.current = controller;
+                  }}
+                  onChangeText={checkItem}
+                  onFocus={() => {
+                    closeAutocomplete();
+                    itemRef.current.open();
+                  }}
+                />
+              </Wrapper>
+
+              <ButtonSubmit
+                style={[
+                  {
+                    width: 30,
+                    backgroundColor: "transparent",
+                    paddingHorizontal: 0,
+                    minHeight: 0
+                  },
+                ]}
+                onSubmit={addItemSearch}
+                icon={<Icon name="search" size={16} color="#959595" />}
               />
             </View>
-            <View style={{width: '7%'}}>
-              <TouchableOpacity
-                style={mstyles.containerInputSearchIcon}
-                onPress={() => addItemSearch()}>
-                <Icon name="search" size={16} color="#959595" />
-              </TouchableOpacity>
-            </View>
-          </View>
+          </BasicFormProvider>
 
           {renderTable && (
             <View style={[styles.containerTable]}>
@@ -332,16 +312,11 @@ export const AddInventoryScreen = () => {
                   styles.table,
                   {elevation: 0.5, borderRadius: 12, borderColor: '#d0d0d0'},
                 ]}>
-                <View style={[mstyles.alignItems, styles.containerList]}>
+                <View style={[GLOBAL_STYLES.alignItems, styles.containerList]}>
                   <HeaderInventoryAdd
                     sortBy={orderBy.bind(this)}
                     clearOrder={clearOrder}
                     setClearOrder={setClearOrder.bind(this)}
-                    showCheck={
-                      inventoryList != null ? inventoryList.length > 0 : false
-                    }
-                    checked={false}
-                    onCheckAll={onCheckAll.bind(this)}
                     orderFilter={orderFilter}
                     orderByGlobal={orderType}
                   />
@@ -361,8 +336,8 @@ export const AddInventoryScreen = () => {
                         <RowInventoryAdd
                           key={index}
                           item={item}
-                          checked={false}
                           onAddItem={() => selectItem(item.inventory_id)}
+                          onCheck={() => {}}
                         />
                       )}
                       keyExtractor={(item, index) => index.toString()}
@@ -401,46 +376,11 @@ export const AddInventoryScreen = () => {
             </View>
           </View>
         </Modal>
-        {loading && (
-          <View style={mstyles.backgroundLoading}>
-            <ActivityIndicator size="large" color={'#487EFD'} />
-          </View>
-        )}
+        {loading && <GeneralLoading />}
       </View>
     </SafeAreaView>
   );
 };
-
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-    borderWidth: 0.3,
-    borderColor: '#959595',
-    borderRadius: 8,
-    // color: 'black',
-    paddingRight: 15, // to ensure the text is never behind the icon
-    width: '100%',
-    height: 40,
-    color: '#3C424A',
-    backgroundColor: 'white',
-  },
-  inputAndroid: {
-    fontSize: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-    borderWidth: 0.3,
-    borderColor: '#959595',
-    borderRadius: 8,
-    // color: 'black',
-    paddingRight: 15, // to ensure the text is never behind the icon
-    width: '100%',
-    height: 40,
-    color: '#3C424A',
-    backgroundColor: 'white',
-  },
-});
 
 const styles = StyleSheet.create({
   container: {

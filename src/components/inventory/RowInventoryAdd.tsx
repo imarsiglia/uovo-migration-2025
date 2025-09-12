@@ -2,13 +2,14 @@ import * as React from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import PropTypes from "prop-types";
 import Icon from "react-native-fontawesome-pro";
-import { CheckBox } from 'react-native-elements';
+
+type Props = {
+    
+}
 
 const RowInventoryAdd = ({
     item,
-    checked,
     onCheck,
-    processing,
     onAddItem }) => {
 
     const [loading, setLoading] = React.useState(false);
@@ -28,17 +29,6 @@ const RowInventoryAdd = ({
 
     return (
         <View style={styles.container}>
-            {false &&
-                <CheckBox
-                    checked={checked}
-                    onPress={() => check()}
-                    iconType="font-awesome"
-                    wrapperStyle={{ width: 40 }}
-                    checkedIcon={<Icon name="check-square" type="solid" color="#00D3ED" />}
-                    uncheckedIcon={<Icon name="square" type="solid" color="#EBEDF3" />}
-                    containerStyle={[styles.columnCheckBox, { width: 30, padding: 0, margin: 0 }]}
-                />
-            }
 
             <View style={[styles.containerColumn, {width: "15%"}]}>
                 <Text style={[styles.column]}>{item.inventory_id}</Text>
