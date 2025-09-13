@@ -1,13 +1,8 @@
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
+import {Label} from '@components/commons/text/Label';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  PressableProps,
-} from 'react-native';
+import {PressableProps, StyleSheet, Text, View} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 // import OfflineValidation from './offline/OfflineValidation';
 
@@ -17,7 +12,6 @@ type Props = {
   name?: string;
   onPress?: () => void;
   light?: boolean;
-  forwardRef?: React.Ref<View> | undefined;
   offline?: string;
   idJob?: number;
   idInventory?: number;
@@ -28,7 +22,6 @@ const TaskOne = ({
   name,
   onPress,
   light,
-  forwardRef,
   offline,
   idJob,
   idInventory,
@@ -84,13 +77,12 @@ const TaskOne = ({
 
   return (
     <PressableOpacity
-      ref={forwardRef}
       style={styles.container}
       onPress={() => (onPress ? onPress() : null)}
       {...rest}>
-      <View style={[styles.viewName, {width: '80%'}]}>
-        <View style={[GLOBAL_STYLES.row, {width: '100%'}]}>
-          <View style={styles.viewIcon}>
+      <Wrapper style={[styles.viewName, {width: '80%'}]}>
+        <Wrapper style={[GLOBAL_STYLES.row, {width: '100%'}]}>
+          <Wrapper style={styles.viewIcon}>
             <Icon
               name={icon}
               type="solid"
@@ -98,27 +90,27 @@ const TaskOne = ({
               size={23}
               style={styles.icon}
             />
-          </View>
-          <View
+          </Wrapper>
+          <Wrapper
             style={[
               styles.minPadding,
               {flexDirection: 'row', alignItems: 'center', gap: 5},
             ]}>
-            <Text style={[GLOBAL_STYLES.bold, styles.name]}>{name}</Text>
+            <Label style={[GLOBAL_STYLES.bold, styles.name]}>{name}</Label>
             {/* <OfflineValidation
               idInventory={idInventory}
               offline={offline}
               idJob={idJob}
             /> */}
-          </View>
-        </View>
-      </View>
+          </Wrapper>
+        </Wrapper>
+      </Wrapper>
 
-      <View style={GLOBAL_STYLES.row}>
-        <View style={styles.btnAdd}>
+      <Wrapper style={GLOBAL_STYLES.row}>
+        <Wrapper style={styles.btnAdd}>
           <Icon name="angle-right" type="light" size={26} color="#959595" />
-        </View>
-      </View>
+        </Wrapper>
+      </Wrapper>
     </PressableOpacity>
   );
 };

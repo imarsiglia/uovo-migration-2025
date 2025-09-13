@@ -1,13 +1,7 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect} from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  Animated,
   BackHandler,
-  Dimensions,
-  Keyboard,
   Linking,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,11 +10,6 @@ import {
   View,
 } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
-import Modal from 'react-native-modal';
-import Orientation from 'react-native-orientation-locker';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import Toast from 'react-native-simple-toast';
-// import TaskOne from '../components/task_one';
 import {useFocusEffect} from '@react-navigation/native';
 import {lockToPortrait} from '@utils/functions';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
@@ -29,14 +18,20 @@ import MinRoundedView from '@components/commons/view/MinRoundedView';
 import {COLORS} from '@styles/colors';
 import TaskOne from '@components/inventory/TaskOne';
 import useTopSheetStore from '@store/topsheet';
-import {useGetInventoryItemDetail} from '@api/hooks/HooksInventoryServices';
+import {
+  useDeleteItem,
+  useGetInventoryItemDetail,
+} from '@api/hooks/HooksInventoryServices';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {RootStackParamList} from '@navigation/types';
+import {RootStackParamList, RoutesNavigation} from '@navigation/types';
 import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 import {ButtonSyncro} from '@components/commons/syncro/ButtonSyncro';
 import {JobInventoryType} from '@api/types/Inventory';
 import CustomDropdown from '@components/commons/menu/CustomDropdown';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {BackButton} from '@components/commons/buttons/BackButton';
+import {useModalDialogStore} from '@store/modals';
+import {loadingWrapperPromise} from '@store/actions';
 
 var itemLoaded = false;
 
@@ -44,11 +39,12 @@ type Props = NativeStackScreenProps<RootStackParamList, 'ItemDetail'>;
 export const ItemDetailScreen = (props: Props) => {
   //Modal options report
   //Client pick
-  const refReportPick = useRef(null);
-  const viewReportPick = useRef(null);
 
+  const showDialog = useModalDialogStore((d) => d.showVisible);
   const jobDetail = useTopSheetStore((d) => d.jobDetail);
-  const {goBack, navigate} = useCustomNavigation();
+  const {goBack, navigate, goBackToIndex} = useCustomNavigation();
+
+  const {mutateAsync: deleteItemAsync} = useDeleteItem();
 
   const {id} = props.route.params;
 
@@ -60,22 +56,6 @@ export const ItemDetailScreen = (props: Props) => {
   } = useGetInventoryItemDetail({
     id,
   });
-
-  const [reportPick, setReportPick] = useState(false);
-  const [positionFormRp, setPositionFormRp] = useState({
-    x: 0,
-    y: 0,
-    height: 0,
-    width: 0,
-  });
-
-  const {width} = Dimensions.get('window');
-
-  const [loading, setLoading] = useState(false);
-  const [syncroning, setSyncroning] = useState(false);
-
-  const [modalDelete, setModalDelete] = useState(false);
-
   useEffect(() => {
     lockToPortrait();
     // async function init() {
@@ -88,6 +68,7 @@ export const ItemDetailScreen = (props: Props) => {
   }, []);
 
   const goToBack = useCallback(() => {
+    goBack();
     // if (props.route.params.nsItem) {
     //   props.navigation.pop(2);
     // } else {
@@ -131,57 +112,6 @@ export const ItemDetailScreen = (props: Props) => {
     //   },
     // });
   };
-
-  const [fadeAnim, setFadeAnim] = useState(new Animated.Value(0));
-  const [fadeAnimDialog, setFadeAnimDialog] = useState(new Animated.Value(0));
-
-  const getItemDetail = useCallback(() => {
-    // async (sync) => {
-    //   const isConnected = await isInternet();
-    //   if (isConnected) {
-    //     if (!sync) {
-    //       setLoading(true);
-    //     } else {
-    //       setSyncroning(true);
-    //     }
-    //     const response = await fetchData.Get(
-    //       'resources/job/inventory/individual/' +
-    //         props.route.params.itemDetail.id,
-    //     );
-    //     if (response?.ok) {
-    //       if (response.data.message == 'SUCCESS') {
-    //         await updateItemDetail(response.data.body);
-    //         if (!sync) {
-    //           setLoading(false);
-    //         } else {
-    //           itemLoaded = true;
-    //           setSyncroning(false);
-    //         }
-    //         if (!itemLoaded) {
-    //           itemLoaded = true;
-    //         }
-    //       } else {
-    //         if (!sync) {
-    //           setLoading(false);
-    //         } else {
-    //           setSyncroning(false);
-    //         }
-    //         Toast.show('An error occurred while loading item', Toast.LONG, [
-    //           'UIAlertController',
-    //         ]);
-    //       }
-    //     } else {
-    //       if (!sync) {
-    //         setLoading(false);
-    //       } else {
-    //         setSyncroning(false);
-    //       }
-    //       Toast.show('An error occurred while loading item', Toast.LONG, [
-    //         'UIAlertController',
-    //       ]);
-    //     }
-    //   }
-  }, []);
 
   const updateItemDetail = async (item: JobInventoryType) => {
     // setItemDetail(item);
@@ -294,352 +224,284 @@ export const ItemDetailScreen = (props: Props) => {
         Linking.openURL(url);
       } catch (error) {
         showToastMessage('Could not open URL');
-        // console.log(error);
       }
     } else {
       showErrorToastMessage('Invalid URL');
     }
   };
 
-  //props.route.params.itemDetail.id
   const deleteItem = async () => {
-    Keyboard.dismiss();
-    // setModalDelete(false);
-    // setLoading(true);
-    // const response = await fetchData.Post(
-    //   'resources/inventory/netsuite/remove/' + props.route.params.itemDetail.id,
-    // );
-    // if (response.ok) {
-    //   if (response.data.message === 'SUCCESS') {
-    //     setLoading(false);
-    //     props.navigation.goBack();
-    //   } else {
-    //     setLoading(false);
-    //   }
-    // } else {
-    //   setLoading(false);
-    //   Toast.show('An error occurred while adding item', Toast.LONG, [
-    //     'UIAlertController',
-    //   ]);
-    // }
+    if (id) {
+      showDialog({
+        modalVisible: true,
+        cancelable: true,
+        type: 'warning',
+        message: 'Are you sure you want to remove this item?',
+        onConfirm: () => {
+          loadingWrapperPromise(
+            deleteItemAsync({
+              id,
+            })
+              .then((d) => {
+                if (d) {
+                  showToastMessage('Item removed successfully');
+                } else {
+                  showErrorToastMessage('An error occurred while adding item');
+                }
+              })
+              .catch(() => {
+                showErrorToastMessage('An error occurred while adding item');
+              }),
+          );
+        },
+      });
+    }
   };
 
-  const initDeleteItem = useCallback(() => {}, [id]);
-
-  const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
-
-  console.log(currentItem);
+  const onInitTakeDimensions = useCallback(() => {
+    if(currentItem)
+    navigate(RoutesNavigation.TakeDimensions, {
+      item: currentItem
+    })
+  }, [currentItem])
 
   return (
-    <>
-      <View style={[styles.container]}>
-        {isLoading && <GeneralLoading />}
+    <View style={[styles.container]}>
+      {isLoading && <GeneralLoading />}
 
-        <View
-          style={[
-            {backgroundColor: 'white'},
-            GLOBAL_STYLES.containerBtnOptTop,
-          ]}>
-          <TouchableOpacity onPress={goToBack}>
-            <View style={styles.backBtn}>
-              <Icon
-                name="chevron-left"
-                color="#959595"
-                type="light"
-                size={15}
-              />
-              <Text style={styles.backBtnText}>
-                {/* {props.route.params.nsItem || props.route.params.parent
+      <View
+        style={[{backgroundColor: 'white'}, GLOBAL_STYLES.containerBtnOptTop]}>
+        {/* <TouchableOpacity onPress={goToBack}>
+          <View style={styles.backBtn}>
+            <Icon name="chevron-left" color="#959595" type="light" size={15} />
+            <Text style={styles.backBtnText}>
+              {props.route.params.nsItem || props.route.params.parent
                   ? 'Back'
                   : props.route.params.fromtopsheet
                   ? 'Tasks'
-                  : 'Inventory'} */}
-              </Text>
-            </View>
-          </TouchableOpacity>
-
-          <View style={[styles.lateralPadding, styles.row]}>
-            <Text
-              style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, {fontSize: 20}]}>
-              Inventory Detail
+                  : 'Inventory'}
             </Text>
           </View>
+        </TouchableOpacity> */}
+        <BackButton title="Back" onPress={goToBack} />
 
-          <View style={{flexDirection: 'row', width: 40}}>
-            <ButtonSyncro isRefetching={isRefetching} onPress={refetch} />
+        <View style={[styles.lateralPadding, styles.row]}>
+          <Text
+            style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, {fontSize: 20}]}>
+            Inventory Detail
+          </Text>
+        </View>
+
+        <View style={{flexDirection: 'row', width: 40}}>
+          <ButtonSyncro isRefetching={isRefetching} onPress={refetch} />
+        </View>
+      </View>
+
+      <MinRoundedView />
+
+      <ScrollView style={{marginTop: 10}}>
+        <View style={{paddingHorizontal: 10}}>
+          <View style={[styles.containerItemDetail]}>
+            {rowItemDetail({
+              title: 'ID',
+              description: currentItem?.clientinv,
+            })}
+            {rowItemDetail({
+              title: 'Client Ref ID',
+              description: currentItem?.clientref,
+            })}
+            {rowItemDetail({
+              title: 'Location',
+              description: currentItem?.fromlocation_display,
+            })}
+
+            {rowItemDetail({
+              title: 'Dimensions',
+              description: `${currentItem?.packed_height} x ${currentItem?.packed_length} x ${currentItem?.packed_width}`,
+            })}
+
+            {rowItemDetail({
+              title: 'Title',
+              description: currentItem?.clientinv_display,
+            })}
+
+            {rowItemDetail({
+              title: 'Artist',
+              description:
+                !!currentItem?.artist && currentItem?.artist != 'null'
+                  ? currentItem?.artist
+                  : '',
+            })}
+
+            {rowItemDetail({
+              title: 'Packing detail',
+              description: currentItem?.packing_details_display,
+            })}
+
+            {rowItemDetail({
+              title: 'Art type',
+              description: currentItem?.art_type,
+            })}
+
+            {rowItemDetail({
+              title: 'Additional info',
+              description: currentItem?.additional_info,
+            })}
+
+            {rowItemDetail({
+              title: 'Weight',
+              description: currentItem?.weight,
+            })}
+
+            <View
+              style={[
+                styles.row,
+                styles.rowItemDetail,
+                {borderBottomWidth: 0},
+              ]}>
+              <View style={styles.leftColumn}>
+                <Text style={[styles.lightText, styles.minVerticalPadding]}>
+                  Parent
+                </Text>
+              </View>
+              <View style={styles.rightColumn}>
+                {currentItem?.parent ? (
+                  currentItem?.parent_id ? (
+                    // Parent on WO
+                    <TouchableOpacity onPress={() => navigateToParent()}>
+                      <Text
+                        style={[
+                          styles.normalText,
+                          {
+                            color: COLORS.primary,
+                            textDecorationLine: 'underline',
+                          },
+                        ]}>
+                        {currentItem?.parent}
+                      </Text>
+                    </TouchableOpacity>
+                  ) : (
+                    // Parent not on WO
+                    <Text style={[styles.normalText]}>
+                      {currentItem?.parent} (Parent not on WO)
+                    </Text>
+                  )
+                ) : (
+                  <Text style={styles.normalText}>N/A</Text>
+                )}
+              </View>
+            </View>
           </View>
         </View>
 
-        <MinRoundedView />
+        <View style={{marginTop: 15, paddingRight: 10, paddingLeft: 10}}>
+          <TaskOne
+            name="Take dimensions"
+            icon="ruler"
+            color="#3ABD6C"
+            light={true}
+            onPress={onInitTakeDimensions}
+            // offline={[TAKE_DIMENSION_OFFLINE_VALIDATION]}
+            // idJob={props.jobDetail.id}
+            // idInventory={props.route.params.itemDetail.id}
+          />
 
-        <ScrollView style={{marginTop: 15}}>
-          <View style={{paddingRight: 10, paddingLeft: 10}}>
-            <View style={[styles.containerItemDetail]}>
-              {rowItemDetail({
-                title: 'ID',
-                description: currentItem?.clientinv,
-              })}
-              {rowItemDetail({
-                title: 'Client Ref ID',
-                description: currentItem?.clientref,
-              })}
-              {rowItemDetail({
-                title: 'Location',
-                description: currentItem?.fromlocation_display,
-              })}
+          <CustomDropdown
+            button={
+              <TaskOne
+                name="Reports"
+                icon="clipboard-list"
+                color="#E9DC18"
+                light={true}
+                pointerEvents="none"
+              />
+            }>
+            {({close}) => (
+              <View style={[styles.modalRp]}>
+                <TouchableHighlight
+                  activeOpacity={0.6}
+                  underlayColor="#DDDDDD"
+                  style={[
+                    styles.containerOptionPickReport,
+                    styles.borderBottom,
+                  ]}
+                  onPress={
+                    () => {
+                      close();
+                    }
+                    // navigate('ConditionReport', {
+                    //   fromReports: false,
+                    //   updateItem: updateItemDetail.bind(this),
+                    //   item: currentItem,
+                    // })
+                  }>
+                  <Text style={[styles.optionReport]}>Condition Report</Text>
+                </TouchableHighlight>
 
-              {rowItemDetail({
-                title: 'Dimensions',
-                description: `${currentItem?.packed_height} x ${currentItem?.packed_length} x ${currentItem?.packed_width}`,
-              })}
-
-              {rowItemDetail({
-                title: 'Title',
-                description: currentItem?.clientinv_display,
-              })}
-
-              {rowItemDetail({
-                title: 'Artist',
-                description:
-                  !!currentItem?.artist && currentItem?.artist != 'null'
-                    ? currentItem?.artist
-                    : '',
-              })}
-
-              {rowItemDetail({
-                title: 'Packing detail',
-                description: currentItem?.packing_details_display,
-              })}
-
-              {rowItemDetail({
-                title: 'Art type',
-                description: currentItem?.art_type,
-              })}
-
-              {rowItemDetail({
-                title: 'Additional info',
-                description: currentItem?.additional_info,
-              })}
-
-              {rowItemDetail({
-                title: 'Weight',
-                description: currentItem?.weight,
-              })}
-
-              <View
-                style={[
-                  styles.row,
-                  styles.rowItemDetail,
-                  {borderBottomWidth: 0},
-                ]}>
-                <View style={styles.leftColumn}>
-                  <Text style={[styles.lightText, styles.minVerticalPadding]}>
-                    Parent
-                  </Text>
-                </View>
-                <View style={styles.rightColumn}>
-                  {currentItem?.parent ? (
-                    currentItem?.parent_id ? (
-                      // Parent on WO
-                      <TouchableOpacity onPress={() => navigateToParent()}>
-                        <Text
-                          style={[
-                            styles.normalText,
-                            {
-                              color: COLORS.primary,
-                              textDecorationLine: 'underline',
-                            },
-                          ]}>
-                          {currentItem?.parent}
-                        </Text>
-                      </TouchableOpacity>
-                    ) : (
-                      // Parent not on WO
-                      <Text style={[styles.normalText]}>
-                        {currentItem?.parent} (Parent not on WO)
-                      </Text>
-                    )
-                  ) : (
-                    <Text style={styles.normalText}>N/A</Text>
-                  )}
-                </View>
+                <TouchableHighlight
+                  activeOpacity={0.6}
+                  underlayColor="#DDDDDD"
+                  style={[styles.containerOptionPickReport]}
+                  onPress={
+                    () => {
+                      close();
+                    }
+                    // navigate('ConditionCheck', {
+                    //   fromReports: false,
+                    //   updateItem: updateItemDetail.bind(this),
+                    //   item: currentItem,
+                    // })
+                  }>
+                  <Text style={[styles.optionReport]}>Condition Check</Text>
+                </TouchableHighlight>
               </View>
-              {/* {rowItemDetail('Parent', itemDetail.child_parent_count, true)} */}
-            </View>
-          </View>
+            )}
+          </CustomDropdown>
 
-          <View style={{marginTop: 15, paddingRight: 10, paddingLeft: 10}}>
-            <TaskOne
-              name="Take dimensions"
-              icon="ruler"
-              color="#3ABD6C"
-              light={true}
-              onPress={
-                () => {}
-                // navigate('TakeDimensions', {
-                //   item: currentItem,
-                //   updateItem: updateItemDetail.bind(this),
-                // })
-              }
-              // offline={[TAKE_DIMENSION_OFFLINE_VALIDATION]}
-              // idJob={props.jobDetail.id}
-              // idInventory={props.route.params.itemDetail.id}
-            />
-
-            <CustomDropdown
-              button={
-                <TaskOne
-                  forwardRef={refReportPick}
-                  name="Reports"
-                  icon="clipboard-list"
-                  color="#E9DC18"
-                  light={true}
-                  pointerEvents="none"
-                />
-              }>
-              {({close}) => (
-                <View ref={viewReportPick} style={[styles.modalRp]}>
-                  <TouchableHighlight
-                    activeOpacity={0.6}
-                    underlayColor="#DDDDDD"
-                    style={[
-                      styles.containerOptionPickReport,
-                      styles.borderBottom,
-                    ]}
-                    onPress={
-                      () => {
-                        close();
-                      }
-                      // navigate('ConditionReport', {
-                      //   fromReports: false,
-                      //   updateItem: updateItemDetail.bind(this),
-                      //   item: currentItem,
-                      // })
-                    }>
-                    <Text style={[styles.optionReport]}>Condition Report</Text>
-                  </TouchableHighlight>
-
-                  <TouchableHighlight
-                    activeOpacity={0.6}
-                    underlayColor="#DDDDDD"
-                    style={[styles.containerOptionPickReport]}
-                    onPress={
-                      () => {
-                        close();
-                      }
-                      // navigate('ConditionCheck', {
-                      //   fromReports: false,
-                      //   updateItem: updateItemDetail.bind(this),
-                      //   item: currentItem,
-                      // })
-                    }>
-                    <Text style={[styles.optionReport]}>Condition Check</Text>
-                  </TouchableHighlight>
-                </View>
-              )}
-            </CustomDropdown>
-
-            <TaskOne
-              name="Tasks"
-              icon="file-invoice"
-              color="#eb5d22"
-              light={true}
-              onPress={() => goToTasks()}
-            />
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                gap: 5,
-                marginBottom: 20,
-              }}>
+          <TaskOne
+            name="Tasks"
+            icon="file-invoice"
+            color="#eb5d22"
+            light={true}
+            onPress={() => goToTasks()}
+          />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              gap: 5,
+              marginBottom: 20,
+            }}>
+            <TouchableOpacity
+              style={[
+                GLOBAL_STYLES.row,
+                styles.btnGoToNetsuite,
+                {alignSelf: 'flex-start', marginTop: 10, width: '50%'},
+              ]}
+              onPress={() => goToNetsuite(currentItem?.url)}>
+              <Text style={{color: 'white', fontSize: 13, marginRight: 10}}>
+                Go to Netsuite
+              </Text>
+              <Icon name="globe-americas" size={17} color="white" />
+            </TouchableOpacity>
+            {true && (
               <TouchableOpacity
                 style={[
                   GLOBAL_STYLES.row,
-                  styles.btnGoToNetsuite,
+                  styles.btnDeleteItem,
                   {alignSelf: 'flex-start', marginTop: 10, width: '50%'},
                 ]}
-                onPress={() => goToNetsuite(currentItem?.url)}>
+                onPress={deleteItem}>
                 <Text style={{color: 'white', fontSize: 13, marginRight: 10}}>
-                  Go to Netsuite
+                  Remove
                 </Text>
-                <Icon name="globe-americas" size={17} color="white" />
+                <Icon name="trash-alt" size={17} color="white" />
               </TouchableOpacity>
-              {true && (
-                <TouchableOpacity
-                  style={[
-                    GLOBAL_STYLES.row,
-                    styles.btnDeleteItem,
-                    {alignSelf: 'flex-start', marginTop: 10, width: '50%'},
-                  ]}
-                  onPress={initDeleteItem}>
-                  <Text style={{color: 'white', fontSize: 13, marginRight: 10}}>
-                    Remove
-                  </Text>
-                  <Icon name="trash-alt" size={17} color="white" />
-                </TouchableOpacity>
-              )}
-            </View>
+            )}
           </View>
-        </ScrollView>
-      </View>
-
-      <Animated.View
-        style={[
-          {
-            width: '50%',
-            opacity: fadeAnimDialog,
-            zIndex: reportPick ? 5100 : -1,
-            position: 'absolute',
-            top: positionFormRp.y - positionFormRp.height - 40,
-            left: positionFormRp.x,
-            right: 0,
-            paddingLeft: 15,
-            paddingRight: 15,
-          },
-        ]}>
-        <View ref={viewReportPick} style={[styles.modalRp]}>
-          <TouchableHighlight
-            activeOpacity={0.6}
-            underlayColor="#DDDDDD"
-            style={[styles.containerOptionPickReport, styles.borderBottom]}
-            onPress={
-              () => {}
-              // navigate('ConditionReport', {
-              //   fromReports: false,
-              //   updateItem: updateItemDetail.bind(this),
-              //   item: currentItem,
-              // })
-            }>
-            <Text style={[styles.optionReport]}>Condition Report</Text>
-          </TouchableHighlight>
-
-          <TouchableHighlight
-            activeOpacity={0.6}
-            underlayColor="#DDDDDD"
-            style={[styles.containerOptionPickReport]}
-            onPress={
-              () => {}
-              // navigate('ConditionCheck', {
-              //   fromReports: false,
-              //   updateItem: updateItemDetail.bind(this),
-              //   item: currentItem,
-              // })
-            }>
-            <Text style={[styles.optionReport]}>Condition Check</Text>
-          </TouchableHighlight>
         </View>
-        <View
-          style={[
-            styles.triangle,
-            {
-              alignSelf: 'flex-end',
-              right: 15,
-              transform: [{translateX: 0}, {rotate: '180deg'}],
-            },
-          ]}></View>
-      </Animated.View>
-    </>
+      </ScrollView>
+    </View>
   );
 };
 

@@ -1,3 +1,4 @@
+import {JobInventoryType} from '@api/types/Inventory';
 import {CrewMemberType} from '@api/types/Jobs';
 import {LaborReportType, NoteType, ReportMaterialType} from '@api/types/Task';
 import {BooleanNumberType} from '@generalTypes/general';
@@ -34,6 +35,7 @@ export const RoutesNavigation = {
   Inventory: 'Inventory',
   AddInventory: 'AddInventory',
   ItemDetail: 'ItemDetail',
+  TakeDimensions: 'TakeDimensions',
 } as const;
 
 // Union de nombres de ruta: "Home" | "ContactUs" | ...
@@ -104,6 +106,9 @@ export type RootStackParamList = {
   [RoutesNavigation.AddInventory]: undefined;
   [RoutesNavigation.ItemDetail]: {
     id?: number;
+  };
+  [RoutesNavigation.TakeDimensions]: {
+    item: JobInventoryType;
   };
 };
 
