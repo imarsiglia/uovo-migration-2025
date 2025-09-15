@@ -7,6 +7,7 @@ import {
   API_SEARCH_FULL_INVENTORY,
   API_SEARCH_INVENTORY_ITEM,
   API_UPDATE_ALL_INVENTORY_STATUS,
+  API_UPDATE_INVENTORY_ITEM_DETAIL,
   API_UPDATE_INVENTORY_STATUS,
   SUCCESS_MESSAGES,
 } from '@api/contants/endpoints';
@@ -128,6 +129,26 @@ const getInventoryItemDetail = async ({
   return response.body;
 };
 
+export type UpdateInventoryDetailApiProps = {
+  idInventory: number;
+  additional_info?: string;
+  packed_height?: string;
+  packed_length?: string;
+  packed_width?: string;
+  un_packed_height?: string;
+  un_packed_length?: string;
+  un_packed_width?: string;
+  weight?: string;
+  current_packing_detail_id?: string;
+  current_packing_detail?: string;
+};
+const updateInventoryItemDetail = async (
+  props: UpdateInventoryDetailApiProps,
+): Promise<boolean> => {
+  const response = await postRequest(API_UPDATE_INVENTORY_ITEM_DETAIL, props);
+  return response.message == SUCCESS_MESSAGES.SUCCESS;
+};
+
 export const inventoryServices = {
   getJobInventory,
   updateInventoryStatus,
@@ -137,5 +158,6 @@ export const inventoryServices = {
   searchInventoryItem,
   searchFullInventory,
   addInventoryItem,
-  getInventoryItemDetail
+  getInventoryItemDetail,
+  updateInventoryItemDetail,
 };

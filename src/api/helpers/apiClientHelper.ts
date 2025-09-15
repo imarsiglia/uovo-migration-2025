@@ -1,7 +1,7 @@
 import apiClient from '@api/config/apiClient';
 import {ApiResponse} from '@api/types/Response';
 import {getFromStorage, STORAGE_KEYS} from '@utils/storage';
-import {AxiosRequestConfig} from 'axios';
+import axios, {AxiosRequestConfig} from 'axios';
 
 export const fetchUserTokenFromStorage = () => {
   return getFromStorage<string>(STORAGE_KEYS.USER_TOKEN);
@@ -27,9 +27,11 @@ export const postRequest = async <T>(
       statusText: response.statusText,
     };
   } catch (error: any) {
-    console.log(JSON.stringify(error))
+    if (axios.isAxiosError(error)) {
+      throw error;
+    }
     // handleRequestError(error);
-    throw new Error(error?.message || 'Error en la solicitud');
+    throw new Error(error ?? 'Error en la solicitud');
   }
 };
 

@@ -1,15 +1,18 @@
-
-
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 import DropdownMenu from '@components/commons/menu/DropdownMenu';
-import { getFormattedDate } from '@utils/functions';
-import { StatusJob } from './StatusJob';
-import { Icons } from '@assets/icons/icons';
-import { SelectableText } from '@components/commons/text/SelectableText';
-import { BolCountVisualize } from '@components/jobs/bol/BolCountVisualize';
+import {getFormattedDate} from '@utils/functions';
+import {StatusJob} from './StatusJob';
+import {Icons} from '@assets/icons/icons';
+import {SelectableText} from '@components/commons/text/SelectableText';
+import {BolCountVisualize} from '@components/jobs/bol/BolCountVisualize';
 import ButtonWithIcon from '@components/commons/buttons/ButtonWithIcon';
-import { LOAD_STATUS_NS, NSJobType } from '../../api/types/Jobs';
+import {LOAD_STATUS_NS, NSJobType} from '../../api/types/Jobs';
+import CustomDropdown from '@components/commons/menu/CustomDropdown';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {COLORS} from '@styles/colors';
+import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
+import {Label} from '@components/commons/text/Label';
 
 type props = {
   item: NSJobType;
@@ -123,17 +126,25 @@ const CardNationalShuttle = ({
         <Text style={{fontSize: 14, marginBottom: 5, fontWeight: '500'}}>
           Dispatcher notes:
         </Text>
-        <SelectableText style={{fontSize: 13, color: '#707070', paddingBottom: 20}}>
+        <SelectableText
+          style={{fontSize: 13, color: '#707070', paddingBottom: 20}}>
           {item.instructions || 'N/A'}
         </SelectableText>
       </ScrollView>
 
-      <View style={{display: 'flex', flexDirection: 'row', flex: 1, justifyContent: "space-between", alignItems: "center"}}>
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          flex: 1,
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
         <View
           style={{
             display: 'flex',
-            flexDirection: "row",
-            alignItems: "center",
+            flexDirection: 'row',
+            alignItems: 'center',
             flex: 1,
             gap: 10,
           }}>
@@ -142,7 +153,48 @@ const CardNationalShuttle = ({
             label="Top sheet"
             icon={<Icon name="eye" type="solid" size={18} color="white" />}
           />
-          <DropdownMenu
+
+          <CustomDropdown
+            button={
+              <Wrapper style={[styles.buttonBOL]}>
+                <Text style={[styles.buttonText]}>BOL</Text>
+                <Icons.DocumentIcon />
+              </Wrapper>
+            }>
+            {({close}) => (
+              <Wrapper style={styles.menu}>
+                <PressableOpacity
+                  style={styles.menuItem}
+                  onPress={() => {
+                    close();
+                    setTimeout(() => {
+                      onInitEditPieceCount();
+                    }, 600);
+                  }}>
+                  <Label style={styles.menuTitle}>Edit Piece Count</Label>
+                </PressableOpacity>
+                <PressableOpacity
+                  style={styles.menuItem}
+                  onPress={() => {
+                    close();
+                    onInitSignature();
+                  }}>
+                  <Label style={styles.menuTitle}>Signature</Label>
+                </PressableOpacity>
+                <PressableOpacity
+                  style={styles.menuItem}
+                  onPress={() => {
+                    close();
+                    setTimeout(() => {
+                      onInitSendBOL();
+                    }, 600);
+                  }}>
+                  <Label style={styles.menuTitle}>Send BOL</Label>
+                </PressableOpacity>
+              </Wrapper>
+            )}
+          </CustomDropdown>
+          {/* <DropdownMenu
             title="BOL"
             buttonStyle={{padding: 6, paddingHorizontal: 15}}
             icon={<Icons.DocumentIcon />}
@@ -160,7 +212,7 @@ const CardNationalShuttle = ({
                 action: onInitSendBOL,
               },
             ]}
-          />
+          /> */}
         </View>
         <BolCountVisualize
           bolSended={item.bol_sended}
@@ -199,5 +251,29 @@ const styles = StyleSheet.create({
     fontSize: 8,
     fontWeight: '400',
     color: '#393939',
+  },
+  buttonBOL: {
+    padding: 6,
+    paddingHorizontal: 15,
+    backgroundColor: COLORS.primary,
+    borderRadius: 100,
+    flexDirection: 'row',
+    gap: 5,
+  },
+  menu: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    marginTop: -10,
+  },
+  menuItem: {
+    paddingVertical: 10,
+  },
+  menuTitle: {
+    textAlign: 'center',
+    fontSize: 15,
+  },
+  buttonText: {
+    color: 'white',
   },
 });

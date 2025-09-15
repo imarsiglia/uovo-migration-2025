@@ -1,4 +1,6 @@
+import {SUCCESS_MESSAGES} from '@api/contants/endpoints';
 import {useSendEmailBOL} from '@api/hooks/HooksJobServices';
+import {JobDetailType, JobType, NSJobType} from '@api/types/Jobs';
 import {RBSheetRef} from '@components/commons/bottomsheets/ImageOptionSheet';
 import {IndicatorLoading} from '@components/commons/loading/IndicatorLoading';
 import {CustomModal} from '@components/commons/modals/CustomModal';
@@ -9,7 +11,7 @@ import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {isEmail} from '@utils/functions';
 import {showToastMessage} from '@utils/toast';
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {
   Alert,
   ScrollView,
@@ -35,14 +37,14 @@ type PeopleEmail = {
 };
 
 type Props = {
-  idJob: number;
+  jobDetail: NSJobType | JobDetailType;
   handleVisible: (val: boolean) => void;
   visible: boolean;
   onFinishSendBol?: () => void;
 };
 
 export const SendBOLBottomSheet = ({
-  idJob,
+  jobDetail,
   handleVisible,
   visible = false,
   onFinishSendBol,
@@ -50,39 +52,84 @@ export const SendBOLBottomSheet = ({
   const [emails, setEmails] = useState<PeopleEmail[]>([]);
   const [emailChipText, setEmailChipText] = useState('');
   const [others, setOthers] = useState<PeopleEmail[]>([]);
-  const [showResendBol, setShowResendBol] = useState(false);
-  const [messageErrorBol, setMessageErrorBol] = useState('');
-  const [buttonConfirmModal, setButtonConfirmModal] = useState<{
-    confirmColor?: string;
-    confirmText?: string;
-    confirmFontSize?: number;
-    cancelColor?: string;
-    cancelFontSize?: number;
-    forceSignature?: boolean;
-  }>({});
-  const jobDetail = useTopSheetStore((d) => d.jobDetail);
 
   const refRbsSheet = useRef<RBSheetRef | null>(null);
 
-  const {mutateAsync} = useSendEmailBOL();
+  // const {mutateAsync} = useSendEmailBOL();
   const showDialog = useModalDialogStore((d) => d.showVisible);
+  const closeDialog = useModalDialogStore((d) => d.closeDialog);
 
-  useEffect(() => {
-    if (visible) {
-      resetAll();
-      initSelectedEmails();
-    } else {
-      if (refRbsSheet?.current) {
-        refRbsSheet.current.close();
+  const {mutateAsync: mutateAsync} = useSendEmailBOL({
+    onError: (error) => {
+      if (error?.status == 409) {
+        showDialog({
+          modalVisible: true,
+          cancelable: false,
+          message: error?.response?.data?.message,
+          onConfirm: () => {
+            closeDialog();
+          },
+          type: 'warning',
+        });
+      } else if (error?.status == 499) {
+        showDialog({
+          modalVisible: true,
+          cancelable: true,
+          message: error?.response?.data?.message,
+          confirmBtnLabel: 'Send anyway\n(not recommended)',
+          onConfirm: () => {
+            closeDialog();
+            sendBOL(true, true);
+          },
+          type: 'warning',
+          buttonLabelStyle: {
+            color: 'red',
+            fontSize: 13,
+          },
+        });
+      } else {
+        showToastMessage('Could not send BOL, try again.');
       }
-    }
-  }, [visible]);
+    },
+    onSuccess: (response) => {
+      if (response.message === SUCCESS_MESSAGES.SUCCESS) {
+        showDialog({
+          modalVisible: true,
+          type: 'success',
+          message: 'BOL sent successfully',
+          confirmBtnLabel: 'OK',
+          cancelable: false,
+          onConfirm: () => {
+            if (onFinishSendBol) {
+              onFinishSendBol();
+            }
+          },
+        });
+      } else {
+        showDialog({
+          modalVisible: true,
+          type: 'info',
+          message: response.message,
+          cancelable: false,
+        });
+      }
+    },
+  });
 
   function resetAll() {
     setEmails([]);
     setEmailChipText('');
     setOthers([]);
   }
+
+  useEffect(() => {
+    if (visible) {
+      resetAll();
+      initSelectedEmails();
+    } else {
+      refRbsSheet?.current?.close();
+    }
+  }, [visible]);
 
   function initSelectedEmails() {
     const newList = [];
@@ -114,9 +161,7 @@ export const SendBOLBottomSheet = ({
     }
 
     setEmails(newList);
-    if (refRbsSheet?.current) {
-      refRbsSheet.current.open();
-    }
+    refRbsSheet?.current?.open();
   }
 
   function checkEmail(item: PeopleEmail) {
@@ -182,96 +227,41 @@ export const SendBOLBottomSheet = ({
     }
   }
 
-  async function sendBOL(force: boolean, forceSignature?: boolean) {
-    if (force || forceSignature) {
-      setShowResendBol(false);
-    }
+  const sendBOL = useCallback(
+    (force: boolean, forceSignature?: boolean) => {
+      const selectedEmails = emails.filter((x) => x.checked);
+      const emailsValidos =
+        others.length > 0 && others.some((x) => x.valid == true);
+      if (selectedEmails.length == 0 && !emailsValidos) {
+        showToastMessage(
+          'You have not selected any email, please select at least one or write a valid email',
+        );
+        return;
+      }
 
-    const selectedEmails = emails.filter((x) => x.checked);
-    const emailsValidos =
-      others.length > 0 && others.some((x) => x.valid == true);
-    if (selectedEmails.length == 0 && !emailsValidos) {
-      showToastMessage(
-        'You have not selected any email, please select at least one or write a valid email',
-      );
-      return;
-    }
+      handleVisible(false);
 
-    handleVisible(false);
-
-    setTimeout(async () => {
       const mappedEmails = selectedEmails.map((x) => x.email);
       const othersEmails = others
         .filter((x) => x.valid == true)
         .map((x) => x.email);
       const destinationEmails = mappedEmails.concat(othersEmails);
 
-      loadingWrapperPromise(
-        mutateAsync({
-          idJob: jobDetail?.id!,
-          destination: destinationEmails,
-          force_send: force,
-          force_send_signature_count: forceSignature,
-        })
-          .then((response: any) => {
-            console.log('response');
-            console.log(JSON.stringify(response));
-            // if (response.ok) {
-            //   if (response.data.message == 'SUCCESS') {
-            //     showDialog({
-            //       modalVisible: true,
-            //       type: 'success',
-            //       message: 'BOL sent successfully',
-            //       cancelable: false,
-            //       onConfirm: () => {
-            //         if (onFinishSendBol) {
-            //           onFinishSendBol();
-            //         }
-            //       },
-            //     });
-            //   } else {
-            //     showDialog({
-            //       modalVisible: true,
-            //       type: 'info',
-            //       message: response.data.message,
-            //       cancelable: false,
-            //       onConfirm: () => {
-            //         if (onFinishSendBol) {
-            //           onFinishSendBol();
-            //         }
-            //       },
-            //     });
-            //     setTimeout(() => {
-            //       Alert.alert(response.data.message);
-            //     }, 300);
-            //   }
-            // } else {
-            //   setButtonConfirmModal({});
-            //   if (response.error?.response?.status == 409) {
-            //     setMessageErrorBol(response.error.response.data.message);
-            //     setTimeout(() => {
-            //       setShowResendBol(true);
-            //     }, 500);
-            //   } else if (response.error?.response?.status == 499) {
-            //     setMessageErrorBol(response.error.response.data.message);
-            //     setButtonConfirmModal({
-            //       confirmColor: 'red',
-            //       confirmText: 'Send anyway\n(not recommended)',
-            //       confirmFontSize: 12,
-            //       cancelColor: '#808080',
-            //       cancelFontSize: 14,
-            //       forceSignature: true,
-            //     });
-            //     setTimeout(() => {
-            //       setShowResendBol(true);
-            //     }, 500);
-            //   }
-            // }
-          })
-          .catch(() => {}),
-      );
-    }, 500);
-  }
+      refRbsSheet?.current?.close();
+
+      setTimeout(() => {
+        loadingWrapperPromise(
+          mutateAsync({
+            idJob: jobDetail?.id!,
+            destination: destinationEmails,
+            force_send: force,
+            force_send_signature_count: forceSignature,
+          }).catch(() => {}),
+        );
+      }, 300);
+    },
+    [emails, others, jobDetail?.id, mutateAsync],
+  );
 
   return (
     <>
@@ -283,7 +273,8 @@ export const SendBOLBottomSheet = ({
         closeOnPressMask={false}
         openDuration={250}
         closeDuration={250}
-        animationType="slide"
+        draggable={true}
+        dragOnContent
         customStyles={{
           container: {
             paddingHorizontal: 20,
@@ -420,73 +411,6 @@ export const SendBOLBottomSheet = ({
           </View>
         </View>
       </RBSheet>
-
-      {/* modal para confirmar reenvío de bol */}
-      <CustomModal
-        visible={showResendBol}
-        onClose={() => setShowResendBol(false)}>
-        <View style={GLOBAL_STYLES.modalClockOutHorizontal}>
-          <View style={GLOBAL_STYLES.bodyModalClockOut}>
-            <Text
-              style={[
-                GLOBAL_STYLES.descModalClockOut,
-                {fontWeight: 'bold', fontSize: 16},
-              ]}>
-              {messageErrorBol}
-            </Text>
-          </View>
-
-          <View style={[GLOBAL_STYLES.containerOptionsModalClockOutHorizontal]}>
-            <TouchableHighlight
-              onPress={() => setShowResendBol(false)}
-              underlayColor="#08141F21"
-              style={[GLOBAL_STYLES.btnOptionModalClockOutHorizontal]}>
-              <Text
-                style={[
-                  GLOBAL_STYLES.optionModalClockOutHorizontal,
-                  buttonConfirmModal?.cancelColor
-                    ? {
-                        color: buttonConfirmModal?.cancelColor,
-                        fontSize: buttonConfirmModal?.cancelFontSize,
-                      }
-                    : {},
-                ]}>
-                Cancel
-              </Text>
-            </TouchableHighlight>
-            <TouchableHighlight
-              onPress={() =>
-                sendBOL(
-                  !buttonConfirmModal.forceSignature,
-                  buttonConfirmModal.forceSignature,
-                )
-              }
-              underlayColor="#08141F21"
-              style={[
-                GLOBAL_STYLES.btnOptionModalClockOutHorizontal,
-                {borderStartWidth: 1, borderLeftColor: '#08141F21'},
-              ]}>
-              <Text
-                adjustsFontSizeToFit
-                style={[
-                  GLOBAL_STYLES.optionModalClockOutHorizontal,
-                  GLOBAL_STYLES.bold,
-                  buttonConfirmModal?.confirmColor
-                    ? {
-                        color: buttonConfirmModal?.confirmColor,
-                        fontSize: buttonConfirmModal?.confirmFontSize,
-                      }
-                    : {},
-                ]}>
-                {buttonConfirmModal?.confirmText ?? 'Continue'}
-              </Text>
-            </TouchableHighlight>
-          </View>
-        </View>
-      </CustomModal>
-      {/* <Modal isVisible={showResendBol} style={{alignItems: 'center'}}>
-        
-      </Modal> */}
     </>
   );
 };

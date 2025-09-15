@@ -30,20 +30,24 @@ export const TaskTopsheet = () => {
 
   const toClockOut = useMemo(() => {
     return (
-      jobDetail.current_clock_in?.status == STARTED_STATUS ||
-      jobDetail.current_clock_in?.status == PAUSED_STATUS
+      jobDetail?.current_clock_in?.status == STARTED_STATUS ||
+      jobDetail?.current_clock_in?.status == PAUSED_STATUS
     );
   }, [jobDetail?.current_clock_in]);
 
   const goToLaborReport = useCallback(() => {
-    setToClockout(toClockOut ? 0 : 1);
+    if (setToClockout) {
+      setToClockout(toClockOut ? 0 : 1);
+    }
     navigate(RoutesNavigation.LaborReport);
-  }, [navigate, toClockOut]);
+  }, [setToClockout, navigate, toClockOut]);
 
   const goToClockIn = useCallback(() => {
-    setToClockout(1);
-    navigate(RoutesNavigation.LaborReport);
-  }, [navigate]);
+    if (setToClockout) {
+      setToClockout(1);
+      navigate(RoutesNavigation.LaborReport);
+    }
+  }, [setToClockout, navigate]);
 
   if (!jobDetail) {
     return <></>;
@@ -117,6 +121,7 @@ export const TaskTopsheet = () => {
             quantity={taskCount[1].quantity}
             onPressLeft={() => navigate(RoutesNavigation.Account)}
             onPressRight={() =>
+              // @ts-ignore
               navigate(RoutesNavigation.Account, {fromList: false})
             }
             // offline={[IMAGES_OFFLINE_VALIDATION]}
@@ -128,6 +133,7 @@ export const TaskTopsheet = () => {
             color="#F2DA31"
             quantity={taskCount[2].quantity}
             onPressLeft={() => navigate(RoutesNavigation.Notes)}
+            // @ts-ignore
             onPressRight={() => navigate(RoutesNavigation.SaveNote)}
             // offline={[NOTES_OFFLINE_VALIDATION]}
             idJob={jobDetail.id}
@@ -138,6 +144,7 @@ export const TaskTopsheet = () => {
             color="#E95818"
             quantity={taskCount[3].quantity}
             onPressLeft={() => navigate(RoutesNavigation.ReportMaterials)}
+            // @ts-ignore
             onPressRight={() => navigate(RoutesNavigation.SaveReportMaterials)}
             // offline={[MATERIAL_OFFLINE_VALIDATION]}
             idJob={jobDetail.id}
@@ -247,7 +254,7 @@ export const TaskTopsheet = () => {
       </ScrollView>
 
       <SendBOLBottomSheet
-        idJob={jobDetail.id}
+        jobDetail={jobDetail}
         handleVisible={showBOL}
         visible={visible}
       />

@@ -92,6 +92,14 @@ export const useGetQrUser = () => {
     ...DEFAULT_PERSISTENCE_CONFIG,
     queryKey: [QUERY_KEYS.QR_USER],
     queryFn: generalServices.getQrUser,
-    enabled: false
+    enabled: false,
+  });
+};
+
+export const useGetPackingDetails = () => {
+  return useQuery({
+    ...DEFAULT_PERSISTENCE_CONFIG,
+    queryKey: [QUERY_KEYS.PACKING_DETAILS],
+    queryFn: generalServices.getPackingDetails,
   });
 };

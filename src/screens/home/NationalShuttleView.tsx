@@ -51,7 +51,8 @@ import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {InventoryViewNationalShuttle} from '@components/nationalshuttle/InventoryViewNationalShuttle';
 import {RoutesNavigation} from '@navigation/types';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import { SendBOLBottomSheet } from '@components/bottomSheets/SendBOLBottomSheet';
+import {SendBOLBottomSheet} from '@components/bottomSheets/SendBOLBottomSheet';
+import useTopSheetStore from '@store/topsheet';
 
 type FilterType = {
   type: string;
@@ -77,6 +78,8 @@ const NationalShuttleViewCmp = () => {
   const [isVisibleSendBOL, setIsVisibleSendBOL] = useState(false);
   const [jobDetail, setJobDetail] = useState<NSJobType | null>(null);
   const [canFetchJobQueue, setCanFetchJobQueue] = useState(false);
+
+  const updateJobDetail = useTopSheetStore((d) => d.setJobDetail);
 
   const activeTab = useGeneralStore((d) => d.activeTab);
 
@@ -328,21 +331,23 @@ const NationalShuttleViewCmp = () => {
   };
 
   const onInitSignature = useCallback((idJob: number) => {
-    // props.dispatch(JobActions.copy({id: idJob}));
-    //@ts-ignore
-    navigate('Signature', {
-      refresh: syncro,
+    // @ts-ignore
+    updateJobDetail({
+      id: idJob,
     });
+    navigate(RoutesNavigation.Signatures);
   }, []);
 
   const onInitEditPieceCount = useCallback((idJob: number) => {
-    // props.dispatch(JobActions.copy({id: idJob}));
     //@ts-ignore
-    navigate('EditBOL');
+     updateJobDetail({
+      id: idJob,
+    });
+    navigate(RoutesNavigation.EditPieceCount);
   }, []);
 
   const onInitSendBOL = useCallback((job: NSJobType) => {
-    setJobDetail(job)
+    setJobDetail(job);
     setIsVisibleSendBOL(true);
   }, []);
 

@@ -65,7 +65,7 @@ export const TimelineViewCmp = () => {
 
   const handleItemPress = useCallback((id: string) => {
     navigate(RoutesNavigation.Topsheet, {id, queue: 0});
-  }, []);
+  }, [navigate]);
 
   function onDayPress(date: DateData) {
     setSelectedDate(date.dateString);

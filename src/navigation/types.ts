@@ -106,6 +106,7 @@ export type RootStackParamList = {
   [RoutesNavigation.AddInventory]: undefined;
   [RoutesNavigation.ItemDetail]: {
     id?: number;
+    fromInventory?: boolean;
   };
   [RoutesNavigation.TakeDimensions]: {
     item: JobInventoryType;

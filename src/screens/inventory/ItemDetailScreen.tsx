@@ -10,7 +10,6 @@ import {
   View,
 } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
-import {useFocusEffect} from '@react-navigation/native';
 import {lockToPortrait} from '@utils/functions';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
@@ -23,7 +22,11 @@ import {
   useGetInventoryItemDetail,
 } from '@api/hooks/HooksInventoryServices';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {RootStackParamList, RoutesNavigation} from '@navigation/types';
+import {
+  RootStackParamList,
+  RoutesNavigation,
+  TopSheetRoutesNavigation,
+} from '@navigation/types';
 import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 import {ButtonSyncro} from '@components/commons/syncro/ButtonSyncro';
 import {JobInventoryType} from '@api/types/Inventory';
@@ -41,12 +44,13 @@ export const ItemDetailScreen = (props: Props) => {
   //Client pick
 
   const showDialog = useModalDialogStore((d) => d.showVisible);
+  const isJobQueue = useTopSheetStore((d) => d.isJobQueue);
   const jobDetail = useTopSheetStore((d) => d.jobDetail);
   const {goBack, navigate, goBackToIndex} = useCustomNavigation();
 
   const {mutateAsync: deleteItemAsync} = useDeleteItem();
 
-  const {id} = props.route.params;
+  const {id, fromInventory} = props.route.params;
 
   const {
     data: currentItem,
@@ -76,7 +80,7 @@ export const ItemDetailScreen = (props: Props) => {
     // }
     // return true; // <- ¡esto es crucial!
     // }, [props.navigation, props.route.params]);
-  }, []);
+  }, [goBack]);
 
   // useFocusEffect(
   // useCallback(() => {
@@ -205,18 +209,32 @@ export const ItemDetailScreen = (props: Props) => {
     [],
   );
 
-  const goToTasks = async () => {
-    // props.route.params.goToTasks();
-    // if (props.route.params.parent) {
-    //   props.navigation.goBack();
-    // }
-    // if (props.route.params.fromtopsheet) {
-    //   props.navigation.goBack();
-    // } else {
-    //   props.navigation.pop(2);
-    // }
-    // Orientation.lockToPortrait();
-  };
+  const goToTasks = useCallback(() => {
+    if (jobDetail) {
+      if (fromInventory) {
+        goBackToIndex(1);
+      }
+      goBack();
+      navigate(RoutesNavigation.Topsheet, {
+        id: jobDetail?.id?.toString(),
+        queue: isJobQueue,
+        screen: TopSheetRoutesNavigation.Tasks.name,
+      } as never);
+    }
+  }, [fromInventory, goBackToIndex, goBack, navigate, isJobQueue, jobDetail]);
+
+  // const goToTasks = async () => {
+  // props.route.params.goToTasks();
+  // if (props.route.params.parent) {
+  //   props.navigation.goBack();
+  // }
+  // if (props.route.params.fromtopsheet) {
+  //   props.navigation.goBack();
+  // } else {
+  //   props.navigation.pop(2);
+  // }
+  // Orientation.lockToPortrait();
+  // };
 
   const goToNetsuite = (url?: string) => {
     if (url && url != '') {
@@ -245,6 +263,7 @@ export const ItemDetailScreen = (props: Props) => {
               .then((d) => {
                 if (d) {
                   showToastMessage('Item removed successfully');
+                  goToBack();
                 } else {
                   showErrorToastMessage('An error occurred while adding item');
                 }
@@ -259,11 +278,11 @@ export const ItemDetailScreen = (props: Props) => {
   };
 
   const onInitTakeDimensions = useCallback(() => {
-    if(currentItem)
-    navigate(RoutesNavigation.TakeDimensions, {
-      item: currentItem
-    })
-  }, [currentItem])
+    if (currentItem)
+      navigate(RoutesNavigation.TakeDimensions, {
+        item: currentItem,
+      });
+  }, [currentItem]);
 
   return (
     <View style={[styles.container]}>
@@ -285,7 +304,7 @@ export const ItemDetailScreen = (props: Props) => {
         </TouchableOpacity> */}
         <BackButton title="Back" onPress={goToBack} />
 
-        <View style={[styles.lateralPadding, styles.row]}>
+        <View style={[GLOBAL_STYLES.lateralPadding, styles.row]}>
           <Text
             style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, {fontSize: 20}]}>
             Inventory Detail
@@ -394,7 +413,7 @@ export const ItemDetailScreen = (props: Props) => {
           </View>
         </View>
 
-        <View style={{marginTop: 15, paddingRight: 10, paddingLeft: 10}}>
+        <View style={{marginTop: 15, paddingHorizontal: 10}}>
           <TaskOne
             name="Take dimensions"
             icon="ruler"
@@ -523,8 +542,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ececec',
   },
   leftColumn: {
-    paddingTop: 5,
-    paddingBottom: 5,
+    paddingVertical: 5,
     width: '30%',
     paddingLeft: 0,
     alignSelf: 'center',
@@ -534,18 +552,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   rightColumn: {
-    paddingTop: 5,
-    paddingBottom: 5,
+    paddingVertical: 5,
     width: '65%',
     paddingLeft: 5,
   },
   minVerticalPadding: {
-    paddingTop: 2,
-    paddingBottom: 2,
-  },
-  lateralPadding: {
-    paddingLeft: 20,
-    paddingRight: 20,
+    paddingVertical: 2,
   },
   row: {
     flexDirection: 'row',
@@ -554,35 +566,9 @@ const styles = StyleSheet.create({
   backBtn: {
     flexDirection: 'row',
     opacity: 0.8,
-    paddingLeft: 5,
-    paddingRight: 5,
+    paddingHorizontal: 5,
     height: 40,
     alignItems: 'center',
-  },
-  backBtnText: {
-    color: '#959595',
-    fontSize: 18,
-    paddingBottom: 1,
-  },
-  containerTable: {
-    paddingLeft: 15,
-    paddingRight: 15,
-    marginTop: 10,
-    paddingBottom: 60,
-  },
-  btnPlay: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 25,
-    justifyContent: 'center',
-    backgroundColor: '#1155CC',
-    height: 27,
-  },
-  textPlay: {
-    color: 'white',
-    paddingLeft: 5,
-    fontSize: 15,
-    opacity: 0.9,
   },
   lightText: {
     opacity: 0.8,

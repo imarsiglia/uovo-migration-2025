@@ -26,6 +26,7 @@ import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {useOnline} from '@hooks/useOnline';
 import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
 import {RoutesNavigation} from '@navigation/types';
+import {useFocusEffect} from '@react-navigation/native';
 import {loadingWrapperPromise} from '@store/actions';
 import {useAuth} from '@store/auth';
 import useInventoryStore from '@store/inventory';
@@ -101,8 +102,11 @@ export const InventoryScreen = () => {
   const {mutateAsync: deleteInventory, isPending: isPendingDelete} =
     useDeleteItem();
 
-  useEffect(() => {
+  useFocusEffect(() => {
     lockToLandscape();
+  });
+
+  useEffect(() => {
     return () => {
       lockToPortrait();
     };
@@ -151,6 +155,7 @@ export const InventoryScreen = () => {
   const onViewDetail = useCallback((item: JobInventoryType) => {
     navigate(RoutesNavigation.ItemDetail, {
       id: item.id,
+      fromInventory: true,
     });
   }, []);
 

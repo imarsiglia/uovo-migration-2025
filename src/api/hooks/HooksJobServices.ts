@@ -4,9 +4,11 @@ import {
   jobServices,
   LetsGoApiProps,
   LocationNotesApiProps,
+  SendEmailBOLProps,
   TaskCountApiProps,
   TopSheetApiProps,
 } from '@api/services/jobServices';
+import { ApiResponse } from '@api/types/Response';
 import {
   keepPreviousData,
   useMutation,
@@ -15,6 +17,7 @@ import {
   UseQueryOptions,
 } from '@tanstack/react-query';
 import {getFormattedDateWithTimezone} from '@utils/functions';
+import { AxiosError } from 'axios';
 
 const DEFAULT_PERSISTENCE_CONFIG = {
   staleTime: 5 * 60 * 1000,
@@ -40,7 +43,7 @@ export const useGetCalendar = (date = new Date()) => {
 export const useGetTimeline = (date?: string) => {
   return useQuery({
     queryKey: [QUERY_KEYS.TIMELINE, date],
-    queryFn: () => jobServices.timeline(date),
+    queryFn: () => jobServices.timeline(date!),
     staleTime: 0,
     // staleTime: 5 * 60 * 1000,
     gcTime: 7 * 24 * 60 * 60 * 1000,
@@ -134,9 +137,13 @@ export const useSaveLocationNotes = () => {
   });
 };
 
-export const useSendEmailBOL = () => {
+export const useSendEmailBOL = (
+  props?: UseMutationOptions<ApiResponse<any>, AxiosError<ApiResponse<any>>, SendEmailBOLProps, unknown>,
+  // props?: UseMutationOptions<unknown, Error, SendEmailBOLProps, unknown>,
+) => {
   return useMutation({
-    mutationFn: jobServices.sendEmailBOL,
+    mutationFn: (props: SendEmailBOLProps) => jobServices.sendEmailBOL(props),
+    ...props,
   });
 };
 

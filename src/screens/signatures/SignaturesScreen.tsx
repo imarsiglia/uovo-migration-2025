@@ -71,7 +71,7 @@ export const SignaturesScreen = () => {
     (props: PreSaveSignatureSchemaType) => {
       Keyboard.dismiss();
 
-      if (signatures?.length > 2) {
+      if (signatures?.length! > 2) {
         showErrorToastMessage('All signatures have already been registered');
         return;
       }
@@ -91,9 +91,6 @@ export const SignaturesScreen = () => {
     },
     [navigate, signatures],
   );
-
-  console.log('signatures');
-  console.log(signatures);
 
   const deleteSignature = useCallback(
     (item: SignatureType) => {
@@ -252,7 +249,7 @@ export const SignaturesScreen = () => {
           </Wrapper>
         </BasicFormProvider>
 
-        {signatures?.length > 0 && (
+        {signatures?.length! > 0 && (
           <Wrapper
             style={[
               styles.minLateralPadding,

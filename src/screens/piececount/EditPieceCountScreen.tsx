@@ -1,33 +1,31 @@
-import {QUERY_KEYS} from '@api/contants/constants';
-import {useGetBOLCount, useSaveBOLCount} from '@api/hooks/HooksTaskServices';
-import {Icons} from '@assets/icons/icons';
-import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
-import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
-import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
-import {InputTextContext} from '@components/commons/form/InputTextContext';
-import {SelectRadioButtonContext} from '@components/commons/form/SelectRadioButtonContext';
-import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
-import {Label} from '@components/commons/text/Label';
+import { useGetBOLCount, useSaveBOLCount } from '@api/hooks/HooksTaskServices';
+import { Icons } from '@assets/icons/icons';
+import { PressableOpacity } from '@components/commons/buttons/PressableOpacity';
+import { BasicFormProvider } from '@components/commons/form/BasicFormProvider';
+import { ButtonSubmit } from '@components/commons/form/ButtonSubmit';
+import { InputTextContext } from '@components/commons/form/InputTextContext';
+import { SelectRadioButtonContext } from '@components/commons/form/SelectRadioButtonContext';
+import { GeneralLoading } from '@components/commons/loading/GeneralLoading';
+import { Label } from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import {Wrapper} from '@components/commons/wrappers/Wrapper';
-import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
-import {useRoute} from '@react-navigation/native';
-import {loadingWrapperPromise} from '@store/actions';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
+import { loadingWrapperPromise } from '@store/actions';
 import useTopSheetStore from '@store/topsheet';
-import {COLORS} from '@styles/colors';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {showErrorToastMessage, showToastMessage} from '@utils/toast';
-import {useCallback} from 'react';
-import {Keyboard, StyleSheet} from 'react-native';
+import { COLORS } from '@styles/colors';
+import { GLOBAL_STYLES } from '@styles/globalStyles';
+import { showErrorToastMessage, showToastMessage } from '@utils/toast';
+import { useCallback } from 'react';
+import { Keyboard, StyleSheet } from 'react-native';
 import {
   KeyboardAwareScrollView,
   KeyboardStickyView,
 } from 'react-native-keyboard-controller';
-import {useCustomNavigation} from 'src/hooks/useCustomNavigation';
-import {PieceCountSchema, PieceCountSchemaType} from 'src/types/schemas';
+import { useCustomNavigation } from 'src/hooks/useCustomNavigation';
+import { PieceCountSchema, PieceCountSchemaType } from 'src/types/schemas';
 
 export const EditPieceCountScreen = () => {
   const {goBack} = useCustomNavigation();
+  // @ts-ignore
   const {id: idJob} = useTopSheetStore((d) => d.jobDetail);
 
   const {mutateAsync} = useSaveBOLCount();

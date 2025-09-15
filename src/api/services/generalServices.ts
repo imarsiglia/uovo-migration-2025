@@ -6,6 +6,7 @@ import {
   API_GET_QR_USER,
   API_HELPDESK,
   SUCCESS_MESSAGES,
+  API_GET_PACKING_DETAILS,
 } from '@api/contants/endpoints';
 import {getFetcher} from '@api/general/fetchers';
 import {getRequest, postRequest} from '@api/helpers/apiClientHelper';
@@ -113,6 +114,13 @@ const getQrUser = async (): Promise<string> => {
   return response as unknown as string;
 };
 
+const getPackingDetails = async (): Promise<GeneralListApi[]> => {
+  const response = await getRequest<Paginated<GeneralListApi[]>>(
+    `${API_GET_PACKING_DETAILS}?query=`,
+  );
+  return response.body?.data;
+};
+
 export const generalServices = {
   contactUs,
   helpDesk,
@@ -122,4 +130,5 @@ export const generalServices = {
   getLatLong,
   getEstimatedTimeByLocation,
   getQrUser,
+  getPackingDetails
 };

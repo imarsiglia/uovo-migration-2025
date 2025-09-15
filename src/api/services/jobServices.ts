@@ -132,7 +132,7 @@ const saveLocationNotes = async ({
   return response.message == SUCCESS_MESSAGES.SUCCESS;
 };
 
-type SendEmailBOLProps = {
+export type SendEmailBOLProps = {
   idJob: number;
   destination: string[];
   force_send?: boolean;
@@ -144,14 +144,14 @@ const sendEmailBOL = async ({
   destination,
   force_send = false,
   force_send_signature_count = false,
-}: SendEmailBOLProps): Promise<boolean> => {
+}: SendEmailBOLProps): Promise<any> => {
   const response = await postRequest(API_SEND_EMAIL_BOL, {
     idJob,
     destination,
     force_send,
     force_send_signature_count,
   });
-  return response.message == SUCCESS_MESSAGES.SUCCESS;
+  return response;
 };
 
 export type TaskCountApiProps = {

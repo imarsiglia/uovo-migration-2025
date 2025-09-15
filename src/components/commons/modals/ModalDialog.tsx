@@ -1,12 +1,12 @@
-import { useModalDialogStore } from '@store/modals';
-import { COLORS } from '@styles/colors';
-import { GLOBAL_STYLES } from '@styles/globalStyles';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Animated, StyleSheet } from 'react-native';
+import {useModalDialogStore} from '@store/modals';
+import {COLORS} from '@styles/colors';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
+import {Animated, StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
-import { PressableOpacity } from '../buttons/PressableOpacity';
-import { Label } from '../text/Label';
-import { Wrapper } from '../wrappers/Wrapper';
+import {PressableOpacity} from '../buttons/PressableOpacity';
+import {Label} from '../text/Label';
+import {Wrapper} from '../wrappers/Wrapper';
 
 const ICONS_TYPE_NAMES = {
   info: {
@@ -24,7 +24,7 @@ const ICONS_TYPE_NAMES = {
   warning: {
     icon: 'exclamation-triangle',
     color: COLORS.warning,
-  }
+  },
 };
 
 export const ModalDialog = () => {
@@ -39,6 +39,8 @@ export const ModalDialog = () => {
     title,
     type,
     cancelable,
+    buttonStyle,
+    buttonLabelStyle,
   } = useModalDialogStore();
   const scale = useRef(new Animated.Value(0.5)).current; // Empieza pequeño
   const opacity = useRef(new Animated.Value(0)).current; // Comienza invisible
@@ -122,11 +124,13 @@ export const ModalDialog = () => {
                   borderStartWidth: 1,
                   borderLeftColor: '#08141F21',
                 },
+                buttonStyle,
               ]}>
               <Label
                 style={[
                   styles.optionModalClockOutHorizontal,
                   GLOBAL_STYLES.bold,
+                  buttonLabelStyle,
                 ]}>
                 {confirmBtnLabel}
               </Label>
@@ -200,8 +204,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#08141F21',
     marginTop: 10,
-    width: "100%",
-    position: "relative"
+    width: '100%',
+    position: 'relative',
   },
   btnOptionModalClockOutHorizontal: {
     minHeight: 50,

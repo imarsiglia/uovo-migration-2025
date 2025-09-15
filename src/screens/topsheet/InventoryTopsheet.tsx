@@ -28,14 +28,15 @@ export const InventoryTopsheet = () => {
   const sessionUser = useAuth((d) => d.user);
   const jobDetail = useTopSheetStore((d) => d.jobDetail);
   const {navigate} = useCustomNavigation();
-  const {orderFilter, orderType, topSheetFilter, setTopSheetFilter} = useInventoryStore();
+  const {orderFilter, orderType, topSheetFilter, setTopSheetFilter} =
+    useInventoryStore();
 
   const {
     data: inventory,
     isRefetching,
     refetch,
   } = useGetJobInventory({
-    idJob: jobDetail?.id,
+    idJob: jobDetail?.id!,
     filter: topSheetFilter,
     orderFilter,
     orderType,
@@ -50,7 +51,7 @@ export const InventoryTopsheet = () => {
   const onCheckAll = useCallback(() => {
     let mStatus: string | null = null;
     if (
-      inventory?.length > 0 &&
+      inventory?.length! > 0 &&
       inventory?.every((x) =>
         x.status?.toUpperCase()?.includes(INVENTORY_STATUS_TYPES.LOCKED_BY),
       )
@@ -60,7 +61,7 @@ export const InventoryTopsheet = () => {
       mStatus = INVENTORY_STATUS_TYPES.LOCKED_BY;
     }
     updateAllInventoryStatus({
-      idJob: jobDetail?.id,
+      idJob: jobDetail?.id!,
       status: mStatus,
     }).then(() => {
       refetch();
@@ -73,7 +74,11 @@ export const InventoryTopsheet = () => {
     );
   }, [inventory]);
 
-  const onViewDetail = useCallback((item: JobInventoryType) => {}, []);
+  const onViewDetail = useCallback((item: JobInventoryType) => {
+    navigate(RoutesNavigation.ItemDetail, {
+      id: item?.id,
+    });
+  }, []);
 
   const isInventoryDisabled = useMemo(() => {
     return (
@@ -204,7 +209,7 @@ export const InventoryTopsheet = () => {
                 condition="Condition"
                 status="Status"
                 disabled={isInventoryDisabled}
-                showCheck={inventory?.length > 0}
+                showCheck={inventory?.length! > 0}
                 checked={allChecked}
                 onCheckAll={onCheckAll}
               />
@@ -233,7 +238,7 @@ export const InventoryTopsheet = () => {
                     packedWidth={item.packed_width}
                     status={item.status ?? 'Pending'}
                     checked={
-                      item.status &&
+                      !!item.status &&
                       item.status?.trim() != '' &&
                       (item.status
                         ?.toUpperCase()

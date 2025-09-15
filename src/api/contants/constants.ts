@@ -38,6 +38,7 @@ export const QUERY_KEYS = {
   SEARCH_FULL_INVENTORY: 'search_full_inventory',
   SEARCH_INVENTORY_ITEM: 'search_inventory_item',
   INVENTORY_ITEM_DETAIL: 'inventory_item_detail',
+  PACKING_DETAILS: 'packing_details',
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';

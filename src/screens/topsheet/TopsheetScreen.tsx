@@ -21,7 +21,7 @@ import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {deriveVisualState} from '@utils/functions';
 import {useCallback, useEffect, useMemo, useRef} from 'react';
-import {Animated, StyleSheet, View} from 'react-native';
+import {Alert, Animated, StyleSheet, View} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 import {LocationTopsheet} from './LocationTopsheet';
 import {ResumeTopsheet} from './ResumeTopsheet';
@@ -64,14 +64,16 @@ export const TopsheetScreen = ({route}: Props) => {
     return () => {
       setJobDetail(undefined);
     };
-  }, [jobDetail]);
+  }, [setJobDetail, jobDetail]);
 
   useEffect(() => {
-    setIsJobQueue(queue);
-    return () => {
-      setIsJobQueue(undefined);
-    };
-  }, [queue]);
+    if (setIsJobQueue) {
+      setIsJobQueue(queue);
+      return () => {
+        setIsJobQueue(undefined);
+      };
+    }
+  }, [setIsJobQueue, queue]);
 
   useEffect(() => {
     if (activeTab == 0) {
@@ -184,7 +186,9 @@ export const TopsheetScreen = ({route}: Props) => {
 
             <PressableOpacity
               disabled={isLoading}
-              onPress={() => navigate('DigitalId', {member: false})}
+              onPress={() =>
+                navigate(RoutesNavigation.DigitalId, {member: false})
+              }
               style={GLOBAL_STYLES.btnOptTop}>
               <Icon name="id-badge" color="white" type="solid" size={15} />
             </PressableOpacity>
@@ -213,18 +217,20 @@ export const TopsheetScreen = ({route}: Props) => {
                   </Label>
                 </Wrapper>
               </Wrapper>
-              <Animated.View
-                style={{
-                  transform: [{translateY}],
-                  opacity,
-                  height: animatedHeight,
-                  overflow: 'hidden',
-                }}>
-                <TeamAvatars
-                  crew={jobDetail?.crew ?? []}
-                  onPress={goToTeamMember}
-                />
-              </Animated.View>
+              {jobDetail?.crew?.length! > 0 && (
+                <Animated.View
+                  style={{
+                    transform: [{translateY}],
+                    opacity,
+                    height: animatedHeight,
+                    overflow: 'hidden',
+                  }}>
+                  <TeamAvatars
+                    crew={jobDetail!.crew}
+                    onPress={goToTeamMember}
+                  />
+                </Animated.View>
+              )}
             </Wrapper>
 
             <View style={styles.container}>

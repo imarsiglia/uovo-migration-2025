@@ -169,8 +169,6 @@ const getWoAttachments = async ({
   const response = await getRequest<Paginated<AttachmentType[]>>(
     `${API_GET_WO_ATTACHMENTS}?idJob=${idJob}`,
   );
-  console.log('response get wo attachments...');
-  console.log(JSON.stringify(response));
   return response.body?.data ?? [];
 };
 

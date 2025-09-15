@@ -12,7 +12,7 @@ export type TopSheetStore = {
   toClockout?: BooleanNumberType;
   setToClockout?: (val: BooleanNumberType) => void;
   isJobQueue?: BooleanNumberType;
-  setIsJobQueue?: (val: BooleanNumberType) => void;
+  setIsJobQueue?: (val: BooleanNumberType | undefined) => void;
 };
 
 export const useTopSheetStore = create<TopSheetStore>((set) => ({

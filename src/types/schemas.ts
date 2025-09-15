@@ -12,6 +12,19 @@ const decimalIntegerRegex = /^\d+((\.|\,)\d{1,2})?$/;
 const decimalNoIntegerRegex = /^((\.|\,)\d{1,2})?$/;
 const numberRegex = /^\d+$/;
 
+const decimalString = (maxDecimals = 5) =>
+  yup
+    .string()
+    .transform((v) => {
+      const raw = (v ?? '').toString().trim();
+      if (raw === '') return '0'; // vacío => "0"
+      return raw.replace(',', '.'); // normaliza coma a punto
+    })
+    .matches(
+      new RegExp(`^\\d+(?:\\.\\d{1,${maxDecimals}})?$`),
+      `It must be a valid number`,
+    );
+
 const quantitySchema = yup
   .string()
   .transform(function (value, originalValue) {
@@ -216,12 +229,14 @@ export const AddLaborSchema = yup
     (value) => {
       if (!value) return false;
       const hoursValid =
-        Number.isInteger(value.hours) && value.hours >= 0 && value.hours <= 999;
+        Number.isInteger(value.hours) &&
+        value.hours! >= 0 &&
+        value.hours! <= 999;
 
       const minutesValid =
         Number.isInteger(value.minutes) &&
-        value.minutes >= 0 &&
-        value.minutes <= 59;
+        value.minutes! >= 0 &&
+        value.minutes! <= 59;
 
       return hoursValid || minutesValid;
     },
@@ -234,3 +249,19 @@ export const ClockInSchema = yup.object().shape({
 });
 
 export type ClockInSchemaType = yup.InferType<typeof ClockInSchema>;
+
+export const TakeDimensionsSchema = yup.object().shape({
+  unpacked_height: decimalString(),
+  unpacked_length: decimalString(),
+  unpacked_width: decimalString(),
+  packed_height: decimalString(),
+  packed_length: decimalString(),
+  packed_width: decimalString(),
+  weight: decimalString(),
+  additional_info: yup.string().optional().nullable(),
+  packing_detail: yup.string().optional().nullable(),
+});
+
+export type TakeDimensionsSchemaType = yup.InferType<
+  typeof TakeDimensionsSchema
+>;

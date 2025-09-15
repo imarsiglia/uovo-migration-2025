@@ -82,6 +82,7 @@ export const API_ADD_INVENTORY_ITEM = '/inventory/netsuite/add';
 
 // item detail inventory
 export const API_GET_INVENTORY_ITEM_DETAIL = '/job/inventory/individual';
+export const API_UPDATE_INVENTORY_ITEM_DETAIL = '/inventory/detail/update';
 
 //NATIONAL SHUTTLE ENDPOINTS
 export const API_GET_NS_LOCATION_PLACES = '/jobns/load/locationplacesall';
@@ -89,6 +90,8 @@ export const API_GET_EAST_COAST_PICKUP = '/jobns/eastcoastpickup/query';
 export const API_GET_WEST_COAST_PICKUP = '/jobns/westcoastpickup/query';
 export const API_GET_WEST_COAST_DROPOFF = '/jobns/westcoastdropoff/query';
 export const API_GET_EAST_COAST_DROPOFF = '/jobns/eastcoastdropoff/query';
+
+export const API_GET_PACKING_DETAILS = '/conditionreport/load/packingdetail'
 
 export const API_GET_INVENTORY_EAST_COAST_PICKUP =
   '/jobns/inventory/eastcoastpickup/query';

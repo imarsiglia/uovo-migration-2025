@@ -88,12 +88,19 @@ export const useAddInventoryItem = () => {
   });
 };
 
-
-export const useGetInventoryItemDetail = (props: InventoryItemDetailApiProps) => {
+export const useGetInventoryItemDetail = (
+  props: InventoryItemDetailApiProps,
+) => {
   return useQuery({
     queryKey: [QUERY_KEYS.INVENTORY_ITEM_DETAIL, props],
     queryFn: () => inventoryServices.getInventoryItemDetail(props),
     enabled: !!props.id,
     ...DEFAULT_PERSISTENCE_CONFIG,
+  });
+};
+
+export const useUpdateInventoryItem = () => {
+  return useMutation({
+    mutationFn: inventoryServices.updateInventoryItemDetail,
   });
 };

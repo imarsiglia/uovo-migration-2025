@@ -1,4 +1,5 @@
 import {ReactNode} from 'react';
+import {StyleProp, TextStyle, ViewStyle} from 'react-native';
 import {create} from 'zustand';
 
 type ModalDialogContentType = {
@@ -14,9 +15,14 @@ type ModalDialogContentType = {
   };
   onCancel?: () => void;
   cancelable?: boolean;
+  buttonStyle?: StyleProp<ViewStyle>;
+  setButtonStyle?: (val: StyleProp<ViewStyle>) => void;
+  buttonLabelStyle?: StyleProp<TextStyle>;
+  setButtonLabelStyle?: (val: StyleProp<TextStyle>) => void;
 };
 type ModalDialogType = ModalDialogContentType & {
   showVisible: (info: ModalDialogContentType) => void;
+  closeDialog: () => void;
 };
 
 export const useModalDialogStore = create<ModalDialogType>((set) => ({
@@ -43,6 +49,36 @@ export const useModalDialogStore = create<ModalDialogType>((set) => ({
       modalProps: info.modalProps,
       onCancel: info.onCancel,
       cancelable: info.cancelable,
+      buttonStyle: info.buttonStyle,
+      buttonLabelStyle: info.buttonLabelStyle,
+    })),
+  closeDialog: () =>
+    set((state) => ({
+      ...state,
+      modalVisible: false,
+      type: undefined,
+      message: undefined,
+      title: undefined,
+      onConfirm: undefined,
+      confirmBtnLabel: undefined,
+      cancelBtnLabel: undefined,
+      modalProps: undefined,
+      onCancel: undefined,
+      cancelable: undefined,
+      buttonStyle: undefined,
+      buttonLabelStyle: undefined,
+    })),
+  buttonStyle: undefined,
+  setButtonStyle: (props) =>
+    set((state) => ({
+      ...state,
+      buttonStyle: props,
+    })),
+  buttonLabelStyle: undefined,
+  setButtonLabelStyle: (props) =>
+    set((state) => ({
+      ...state,
+      buttonLabelStyle: props,
     })),
 }));
 

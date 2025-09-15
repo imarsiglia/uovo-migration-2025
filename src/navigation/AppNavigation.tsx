@@ -106,6 +106,7 @@ import {PortalHost} from '@gorhom/portal';
 import {InventoryScreen} from '@screens/inventory/InventoryScreen';
 import {AddInventoryScreen} from '@screens/inventory/AddInventoryScreen';
 import { ItemDetailScreen } from '@screens/inventory/ItemDetailScreen';
+import { TakeDimensionsScreen } from '@screens/inventory/TakeDimensions';
 // import InventoryNS from '../screens/nationalShuttle/InventoryNS';
 
 // LogBox.ignoreLogs([
@@ -265,6 +266,11 @@ export const AppNavigation = () => {
             <Stack.Screen
               name={RoutesNavigation.ItemDetail}
               component={ItemDetailScreen}
+            />
+
+            <Stack.Screen
+              name={RoutesNavigation.TakeDimensions}
+              component={TakeDimensionsScreen}
             />
 
             {/* visualizar imagenes */}
