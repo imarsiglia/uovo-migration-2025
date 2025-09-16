@@ -7,7 +7,7 @@ import Icon from 'react-native-fontawesome-pro';
 type Props = {
   icon?: string;
   color?: string;
-  name: string;
+  name?: string;
   quantity?: number;
   onPressLeft?: () => void;
   onPressRight?: () => void;

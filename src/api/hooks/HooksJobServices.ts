@@ -8,7 +8,7 @@ import {
   TaskCountApiProps,
   TopSheetApiProps,
 } from '@api/services/jobServices';
-import { ApiResponse } from '@api/types/Response';
+import {ApiResponse} from '@api/types/Response';
 import {
   keepPreviousData,
   useMutation,
@@ -17,7 +17,7 @@ import {
   UseQueryOptions,
 } from '@tanstack/react-query';
 import {getFormattedDateWithTimezone} from '@utils/functions';
-import { AxiosError } from 'axios';
+import {AxiosError} from 'axios';
 
 const DEFAULT_PERSISTENCE_CONFIG = {
   staleTime: 5 * 60 * 1000,
@@ -138,7 +138,12 @@ export const useSaveLocationNotes = () => {
 };
 
 export const useSendEmailBOL = (
-  props?: UseMutationOptions<ApiResponse<any>, AxiosError<ApiResponse<any>>, SendEmailBOLProps, unknown>,
+  props?: UseMutationOptions<
+    ApiResponse<any>,
+    AxiosError<ApiResponse<any>>,
+    SendEmailBOLProps,
+    unknown
+  >,
   // props?: UseMutationOptions<unknown, Error, SendEmailBOLProps, unknown>,
 ) => {
   return useMutation({
@@ -153,6 +158,33 @@ export const useGetTaskCount = (props: TaskCountApiProps) => {
     queryFn: () => jobServices.getTaskCount(props),
     enabled: !!props?.idJob,
     ...DEFAULT_PERSISTENCE_CONFIG,
+    placeholderData: [
+      {
+        description: 'BOL',
+        id: 1,
+        quantity: 0,
+      },
+      {
+        description: 'Pictures',
+        id: 2,
+        quantity: 0,
+      },
+      {
+        description: 'Notes',
+        id: 3,
+        quantity: 0,
+      },
+      {
+        description: 'Report materials',
+        id: 4,
+        quantity: 0,
+      },
+      {
+        description: 'Report',
+        id: 5,
+        quantity: 0,
+      },
+    ],
   });
 };
 

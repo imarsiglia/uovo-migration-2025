@@ -34,112 +34,110 @@ export const AccountScreen = () => {
   }
 
   return (
-    <Wrapper style={GLOBAL_STYLES.safeAreaLight}>
-      <Wrapper style={styles.container}>
-        <Wrapper style={[{backgroundColor: COLORS.white}]}>
-          <PressableOpacity onPress={goBack} style={styles.header}>
-            <Icons.AngleLeft fontSize={15} />
-            <Label style={styles.headerTitle}>Home</Label>
-          </PressableOpacity>
+    <Wrapper style={styles.container}>
+      <Wrapper style={[{backgroundColor: COLORS.white}]}>
+        <PressableOpacity onPress={goBack} style={styles.header}>
+          <Icons.AngleLeft fontSize={15} />
+          <Label style={styles.headerTitle}>Home</Label>
+        </PressableOpacity>
 
-          <Wrapper style={[styles.GLOBAL_STYLES, styles.containerTitle]}>
-            <Label
-              style={[
-                GLOBAL_STYLES.title,
-                GLOBAL_STYLES.bold,
-                {color: COLORS.titleColor},
-              ]}>
-              Account
+        <Wrapper style={[GLOBAL_STYLES.lateralPadding, styles.containerTitle]}>
+          <Label
+            style={[
+              GLOBAL_STYLES.title,
+              GLOBAL_STYLES.bold,
+              {color: COLORS.titleColor},
+            ]}>
+            Account
+          </Label>
+        </Wrapper>
+      </Wrapper>
+
+      <MinRoundedView />
+
+      <Wrapper style={styles.containerProfilePhoto}>
+        {!user.user_photo && (
+          <Wrapper style={styles.avatar}>
+            <Label style={styles.avatarText}>
+              {user.user_name[0]}
+              {user.user_last_name[0]}
             </Label>
           </Wrapper>
-        </Wrapper>
-
-        <MinRoundedView />
-
-        <Wrapper style={styles.containerProfilePhoto}>
-          {!user.user_photo && (
-            <Wrapper style={styles.avatar}>
-              <Label style={styles.avatarText}>
-                {user.user_name[0]}
-                {user.user_last_name[0]}
-              </Label>
-            </Wrapper>
-          )}
-          {user.user_photo && (
-            <Image
-              resizeMode="cover"
-              style={styles.userPhoto}
-              source={{
-                uri: 'data:image/jpeg;base64,' + user.user_photo,
-              }}
-            />
-          )}
-        </Wrapper>
-
-        <Label style={[GLOBAL_STYLES.bold, styles.username]}>
-          {user.user_name} {user.user_last_name}
-        </Label>
-        <Label style={[styles.center, styles.email]}>{user.user_mail}</Label>
-
-        <PressableOpacity
-          style={[
-            GLOBAL_STYLES.lateralPadding,
-            styles.containerOption,
-            {marginTop: 30},
-          ]}
-          onPress={() => navigate('EditProfile', {fromprofile: true})}>
-          <Wrapper style={styles.containerOptionLabel}>
-            <Icons.AddressCard fontSize={22} />
-            <Label style={styles.textOption}>My Profile</Label>
-          </Wrapper>
-          <Icons.AngleDown
-            fontSize={20}
-            style={{transform: [{rotate: '-90deg'}]}}
+        )}
+        {user.user_photo && (
+          <Image
+            resizeMode="cover"
+            style={styles.userPhoto}
+            source={{
+              uri: 'data:image/jpeg;base64,' + user.user_photo,
+            }}
           />
-        </PressableOpacity>
-
-        <PressableOpacity
-          style={[
-            GLOBAL_STYLES.lateralPadding,
-            styles.containerOption,
-            {marginTop: 10},
-          ]}
-          onPress={() => navigate('DigitalId', {member: false})}>
-          <Wrapper style={styles.containerOptionLabel}>
-            <Icons.IdBadge fontSize={22} />
-            <Label style={styles.textOption}>Digital ID</Label>
-          </Wrapper>
-          <Icons.AngleDown
-            fontSize={20}
-            style={{transform: [{rotate: '-90deg'}]}}
-          />
-        </PressableOpacity>
-
-        <PressableOpacity
-          style={[
-            GLOBAL_STYLES.lateralPadding,
-            styles.containerOption,
-            {marginTop: 10},
-          ]}
-          onPress={initLogout}>
-          <Wrapper style={styles.containerOptionLabel}>
-            <Icons.Logout fontSize={22} />
-            <Label style={styles.textOption}>Logout</Label>
-          </Wrapper>
-          <Icons.AngleDown
-            fontSize={20}
-            style={{transform: [{rotate: '-90deg'}]}}
-          />
-        </PressableOpacity>
+        )}
       </Wrapper>
+
+      <Label style={[GLOBAL_STYLES.bold, styles.username]}>
+        {user.user_name} {user.user_last_name}
+      </Label>
+      <Label style={[styles.center, styles.email]}>{user.user_mail}</Label>
+
+      <PressableOpacity
+        style={[
+          GLOBAL_STYLES.lateralPadding,
+          styles.containerOption,
+          {marginTop: 30},
+        ]}
+        // @ts-ignore
+        onPress={() => navigate('EditProfile', {fromprofile: true})}>
+        <Wrapper style={styles.containerOptionLabel}>
+          <Icons.AddressCard fontSize={22} />
+          <Label style={styles.textOption}>My Profile</Label>
+        </Wrapper>
+        <Icons.AngleDown
+          fontSize={20}
+          style={{transform: [{rotate: '-90deg'}]}}
+        />
+      </PressableOpacity>
+
+      <PressableOpacity
+        style={[
+          GLOBAL_STYLES.lateralPadding,
+          styles.containerOption,
+          {marginTop: 10},
+        ]}
+        onPress={() => navigate('DigitalId', {member: false})}>
+        <Wrapper style={styles.containerOptionLabel}>
+          <Icons.IdBadge fontSize={22} />
+          <Label style={styles.textOption}>Digital ID</Label>
+        </Wrapper>
+        <Icons.AngleDown
+          fontSize={20}
+          style={{transform: [{rotate: '-90deg'}]}}
+        />
+      </PressableOpacity>
+
+      <PressableOpacity
+        style={[
+          GLOBAL_STYLES.lateralPadding,
+          styles.containerOption,
+          {marginTop: 10},
+        ]}
+        onPress={initLogout}>
+        <Wrapper style={styles.containerOptionLabel}>
+          <Icons.Logout fontSize={22} />
+          <Label style={styles.textOption}>Logout</Label>
+        </Wrapper>
+        <Icons.AngleDown
+          fontSize={20}
+          style={{transform: [{rotate: '-90deg'}]}}
+        />
+      </PressableOpacity>
     </Wrapper>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    height: '100%',
+    flex: 1,
     backgroundColor: COLORS.bgWhite,
   },
   center: {

@@ -1,8 +1,14 @@
 // components/SpeechFormContext.tsx
-import {Icons} from '@assets/icons/icons';
-import Voice from '@react-native-voice/voice';
-import {COLORS} from '@styles/colors';
-import {requestMicrophonePermission} from '@utils/permissions';
+import {
+  addEventListener,
+  destroy,
+  setRecognitionLanguage,
+  startListening,
+  stopListening,
+} from '@ascendtis/react-native-voice-to-text';
+import { Icons } from '@assets/icons/icons';
+import { COLORS } from '@styles/colors';
+import { requestMicrophonePermission } from '@utils/permissions';
 import {
   forwardRef,
   useEffect,
@@ -10,10 +16,11 @@ import {
   useRef,
   useState,
 } from 'react';
-import {useFormContext} from 'react-hook-form';
-import {Alert, StyleSheet} from 'react-native';
-import {PressableOpacity} from '../buttons/PressableOpacity';
-import {Label} from '../text/Label';
+import { useFormContext } from 'react-hook-form';
+import { StyleSheet } from 'react-native';
+import { PressableOpacity } from '../buttons/PressableOpacity';
+import { Label } from '../text/Label';
+import { VOICE_EVENTS } from '@api/contants/constants';
 
 export type SpeechFormInputRef = {
   stop: () => Promise<void>;
@@ -21,20 +28,31 @@ export type SpeechFormInputRef = {
 
 type Props = {
   name: string;
+  locale?: string; // por si quieres parametrizar el idioma (default: 'es-ES')
 };
 
 export const SpeechFormContext = forwardRef<SpeechFormInputRef, Props>(
-  ({name}, ref) => {
+  ({name, locale = 'es-ES'}, ref) => {
     const manuallyStoppedRef = useRef(false);
     const [listening, setListening] = useState(false);
-    const {setValue, trigger, clearErrors} = useFormContext();
-    
+    const {setValue, trigger} = useFormContext();
+
+    // Utilidad para extraer texto desde distintos formatos del evento
+    const extractText = (e: any): string => {
+      return (
+        e?.value ??
+        e?.results?.transcriptions?.[0]?.text ??
+        e?.partial ??
+        e?.text ??
+        ''
+      );
+    };
 
     useImperativeHandle(ref, () => ({
       stop: async () => {
         try {
           manuallyStoppedRef.current = true;
-          await Voice.stop();
+          await stopListening();
           setListening(false);
         } catch (err) {
           console.warn('Error al detener reconocimiento:', err);
@@ -43,58 +61,65 @@ export const SpeechFormContext = forwardRef<SpeechFormInputRef, Props>(
     }));
 
     useEffect(() => {
-      // Texto en vivo mientras se habla
-      Voice.onSpeechPartialResults = (e) => {
-        const partial = e.value?.[0];
-        if (partial) {
-          setValue(name, partial); // solo reemplaza en tiempo real
-        }
-      };
+      // Parciales (texto en vivo mientras se habla)
+      const partialSub = addEventListener(VOICE_EVENTS.PARTIAL_RESULTS, (e: any) => {
+        const partial = extractText(e);
+        if (partial) setValue(name, partial);
+      });
 
-      // Texto final al dejar de hablar
-      Voice.onSpeechResults = (e) => {
+      // Resultados finales
+      const resultsSub = addEventListener('onSpeechResults', (e: any) => {
+        // valida el campo cuando llega el final
         trigger([name]);
+
+        // Si lo detuvimos manualmente, ignoramos este resultado final
         if (manuallyStoppedRef.current) {
-          manuallyStoppedRef.current = false; // 🔄 reseteamos para la próxima vez
-          return; // 🙅 Ignoramos el resultado
+          manuallyStoppedRef.current = false;
+          return;
         }
 
-        const finalText = e.value?.[0];
-        if (finalText) {
-          setValue(name, finalText.trim()); // guarda el texto final
-        }
-      };
+        const finalText = extractText(e);
+        if (finalText) setValue(name, finalText.trim());
+      });
 
-      Voice.onSpeechError = (e) => {
-        console.warn('Speech error:', e.error);
+      // Estado de inicio/fin para el spinner y label
+      const startSub = addEventListener('onSpeechStart', () => setListening(true));
+      const endSub = addEventListener('onSpeechEnd', () => setListening(false));
+
+      // Errores
+      const errorSub = addEventListener('onSpeechError', (e: any) => {
+        console.warn('Speech error:', e);
         setListening(false);
-      };
+      });
 
       return () => {
-        Voice.destroy().then(Voice.removeAllListeners)
+        // Limpieza recomendada: elimina listeners y destruye instancia nativa
+        partialSub.remove();
+        resultsSub.remove();
+        startSub.remove();
+        endSub.remove();
+        errorSub.remove();
+        destroy();
       };
-    }, [name, setValue]);
+    }, [name, setValue, trigger]);
 
     const handlePress = async () => {
       const hasPermission = await requestMicrophonePermission();
       if (!hasPermission) return;
 
-      if (!listening) {
-        try {
-          await Voice.start('es-ES');
-          setListening(true);
-        } catch (e) {
-          console.error('Voice start error:', e);
-          setListening(false);
+      try {
+        if (!listening) {
+          await setRecognitionLanguage(locale);
+          await startListening();
+          // setListening(true) lo hará el evento START
+        } else {
+          manuallyStoppedRef.current = true;
+          await stopListening();
+          // setListening(false) lo hará el evento END
         }
-      } else {
-        try {
-          await Voice.stop();
-          setListening(false);
-        } catch (e) {
-          console.error('Voice stop error:', e);
-          setListening(false);
-        }
+      } catch (e) {
+        console.error('VoiceToText error:', e);
+        setListening(false);
       }
     };
 

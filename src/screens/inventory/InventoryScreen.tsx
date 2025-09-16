@@ -478,25 +478,23 @@ export const InventoryScreen = () => {
         bounces={false}
         horizontal>
         <Wrapper>
-          <Wrapper style={{flexDirection: 'row'}}>
-            <HeaderInventory
-              id="ID"
-              showSecondaryId={jobDetail?.show_secondary_inv_id}
-              clientInvDisplay="Title"
-              clientRef="Client Ref"
-              location="Location"
-              artistName="Artist name"
-              packingDetailsDisplay="Packing Details"
-              dimensions="Dimensions"
-              condition="Condition"
-              status="Status"
-              disabled={isInventoryDisabled}
-              showCheck={inventory?.length! > 0}
-              checked={allChecked}
-              onCheckAll={onCheckAll}
-              deleteBtn="Delete"
-            />
-          </Wrapper>
+          <HeaderInventory
+            id="ID"
+            showSecondaryId={jobDetail?.show_secondary_inv_id}
+            clientInvDisplay="Title"
+            clientRef="Client Ref"
+            location="Location"
+            artistName="Artist name"
+            packingDetailsDisplay="Packing Details"
+            dimensions="Dimensions"
+            condition="Condition"
+            status="Status"
+            disabled={isInventoryDisabled}
+            showCheck={inventory?.length! > 0}
+            checked={allChecked}
+            onCheckAll={onCheckAll}
+            deleteBtn="Delete"
+          />
 
           {inventory && (
             <FlatList

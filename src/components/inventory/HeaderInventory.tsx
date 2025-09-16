@@ -1,3 +1,4 @@
+import {COLUMNS_WIDTH} from '@api/contants/constants';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {InputCheck} from '@components/commons/inputs/InputCheck';
 import {Label} from '@components/commons/text/Label';
@@ -7,22 +8,6 @@ import useInventoryStore from '@store/inventory';
 import {useCallback, useMemo} from 'react';
 import {StyleProp, StyleSheet, ViewStyle} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
-
-export const COLUMNS_WIDTH = {
-  CHECK: 40,
-  ID: 90,
-  ID_DISABLED: 80,
-  ALT_ID: 90,
-  CLIENT_REF: 100,
-  LOCATION: 140,
-  DIMENSIONS: 110,
-  PACKING_DETAILS: 140,
-  TITLE: 130,
-  ARTIST: 120,
-  STATUS: 100,
-  CONDITION: 90,
-  DELETE: 120,
-};
 
 type ColumnSortProps = {
   filterType: string;
@@ -63,7 +48,7 @@ const HeaderInventory = ({
   checked,
   onCheckAll,
   showSecondaryId,
-  deleteBtn
+  deleteBtn,
 }: Props) => {
   const {orderFilter, orderType, setOrderFilter, setOrderType} =
     useInventoryStore();
@@ -274,7 +259,6 @@ const HeaderInventory = ({
           width: COLUMNS_WIDTH.CONDITION,
           maxWidth: COLUMNS_WIDTH.CONDITION,
           minWidth: COLUMNS_WIDTH.CONDITION,
-          ...deleteBtn ? {} : {borderRightWidth: 0}
         }}
       />
 
@@ -315,13 +299,13 @@ const styles = StyleSheet.create({
   containerColumn: {
     height: '100%',
     borderRightColor: '#d0d0d0',
-    borderRightWidth: 1,
+    borderRightWidth: 0.5,
     justifyContent: 'space-around',
     alignItems: 'center',
     flexDirection: 'row',
   },
   columnCheckBox: {
-    borderRightWidth: 1,
+    borderRightWidth: 0.5,
     borderRightColor: '#d0d0d0',
     height: '100%',
     justifyContent: 'center',

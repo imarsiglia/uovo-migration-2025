@@ -21,7 +21,7 @@ export const TaskTopsheet = () => {
   const route = useRoute<any>();
   const jobDetail = useTopSheetStore((d) => d.jobDetail);
   const setToClockout = useTopSheetStore((d) => d.setToClockout);
-  const {data: taskCount} = useGetTaskCount({idJob: jobDetail?.id!});
+  const {data: taskCount, isLoading} = useGetTaskCount({idJob: jobDetail?.id!});
   const [visible, setVisible] = useState(false);
 
   const showBOL = useCallback(() => {
@@ -53,10 +53,6 @@ export const TaskTopsheet = () => {
     return <></>;
   }
 
-  if (!taskCount) {
-    return <></>;
-  }
-
   return (
     <Wrapper style={[styles.containerTabScreen]}>
       <ScrollView style={{paddingTop: 15, paddingBottom: 15}}>
@@ -67,12 +63,11 @@ export const TaskTopsheet = () => {
             paddingBottom: 60,
           }}>
           <TaskOption
-            name={taskCount[0].description}
+            name={taskCount?.[0]?.description}
             icon="file-invoice"
             color="#3ABD6C"
-            quantity={taskCount[0].quantity}
+            quantity={taskCount?.[0]?.quantity}
             openDialog={true}
-            // forwardRef={refBOL}
             onPressLeft={() =>
               jobDetail?.use_bol ? navigate(RoutesNavigation.Signatures) : null
             }
@@ -82,56 +77,60 @@ export const TaskTopsheet = () => {
             idJob={jobDetail.id}
             isMenuRight
             // @ts-ignore
-            menuRight={({close}) => (
-              <Wrapper style={styles.menu}>
-                <PressableOpacity
-                  style={styles.menuItem}
-                  onPress={() => {
-                    close();
-                    navigate(RoutesNavigation.EditPieceCount);
-                  }}>
-                  <Label style={styles.menuTitle}>Edit Piece Count</Label>
-                </PressableOpacity>
-                <PressableOpacity
-                  style={styles.menuItem}
-                  onPress={() => {
-                    close();
-                    navigate(RoutesNavigation.Signatures);
-                  }}>
-                  <Label style={styles.menuTitle}>Signature</Label>
-                </PressableOpacity>
-                <PressableOpacity
-                  style={styles.menuItem}
-                  onPress={() => {
-                    close();
-                    setTimeout(() => {
-                      showBOL();
-                    }, 600);
-                  }}>
-                  <Label style={styles.menuTitle}>Send BOL</Label>
-                </PressableOpacity>
-              </Wrapper>
-            )}
+            menuRight={({close}) =>
+              jobDetail?.use_bol && (
+                <Wrapper style={styles.menu}>
+                  <PressableOpacity
+                    style={styles.menuItem}
+                    onPress={() => {
+                      close();
+                      navigate(RoutesNavigation.EditPieceCount);
+                    }}>
+                    <Label style={styles.menuTitle}>Edit Piece Count</Label>
+                  </PressableOpacity>
+                  <PressableOpacity
+                    style={styles.menuItem}
+                    onPress={() => {
+                      close();
+                      navigate(RoutesNavigation.Signatures);
+                    }}>
+                    <Label style={styles.menuTitle}>Signature</Label>
+                  </PressableOpacity>
+                  <PressableOpacity
+                    style={styles.menuItem}
+                    onPress={() => {
+                      close();
+                      setTimeout(() => {
+                        showBOL();
+                      }, 600);
+                    }}>
+                    <Label style={styles.menuTitle}>Send BOL</Label>
+                  </PressableOpacity>
+                </Wrapper>
+              )
+            }
           />
 
           <TaskOption
-            name={taskCount[1].description}
+            name={taskCount?.[1]?.description}
             icon="image"
             color="#7966E0"
-            quantity={taskCount[1].quantity}
-            onPressLeft={() => navigate(RoutesNavigation.Account)}
-            onPressRight={() =>
+            quantity={taskCount?.[1]?.quantity}
+            onPressLeft={() =>  {}
+              // navigate(RoutesNavigation.Account)
+            }
+            onPressRight={() => {}
               // @ts-ignore
-              navigate(RoutesNavigation.Account, {fromList: false})
+              // navigate(RoutesNavigation.Account, {fromList: false})
             }
             // offline={[IMAGES_OFFLINE_VALIDATION]}
             idJob={jobDetail?.id!}
           />
           <TaskOption
-            name={taskCount[2].description}
+            name={taskCount?.[2]?.description}
             icon="sticky-note"
             color="#F2DA31"
-            quantity={taskCount[2].quantity}
+            quantity={taskCount?.[2]?.quantity}
             onPressLeft={() => navigate(RoutesNavigation.Notes)}
             // @ts-ignore
             onPressRight={() => navigate(RoutesNavigation.SaveNote)}
@@ -139,10 +138,10 @@ export const TaskTopsheet = () => {
             idJob={jobDetail.id}
           />
           <TaskOption
-            name={taskCount[3].description}
+            name={taskCount?.[3]?.description}
             icon="box-full"
             color="#E95818"
-            quantity={taskCount[3].quantity}
+            quantity={taskCount?.[3]?.quantity}
             onPressLeft={() => navigate(RoutesNavigation.ReportMaterials)}
             // @ts-ignore
             onPressRight={() => navigate(RoutesNavigation.SaveReportMaterials)}

@@ -1,8 +1,7 @@
 import * as React from 'react';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, TextProps} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {COLUMNS_WIDTH as ROW_COLUMNS_WIDTH} from './HeaderInventory';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {Label} from '@components/commons/text/Label';
 import {InputCheck} from '@components/commons/inputs/InputCheck';
@@ -10,25 +9,11 @@ import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {BooleanStringType} from '@generalTypes/general';
 import {UserType} from '@api/types/User';
 import ItemSkeleton from '@components/skeletons/ItemSkeleton';
-import {INVENTORY_STATUS_TYPES} from '@api/contants/constants';
-
-const ROW_INVENTORY_MIN_SUBSTRACT = 3;
-export const COLUMNS_WIDTH = {
-  CHECK: ROW_COLUMNS_WIDTH.CHECK,
-  ID: ROW_COLUMNS_WIDTH.ID - ROW_INVENTORY_MIN_SUBSTRACT,
-  ID_DISABLED: ROW_COLUMNS_WIDTH.ID_DISABLED - ROW_INVENTORY_MIN_SUBSTRACT,
-  ALT_ID: ROW_COLUMNS_WIDTH.ALT_ID - ROW_INVENTORY_MIN_SUBSTRACT,
-  CLIENT_REF: ROW_COLUMNS_WIDTH.CLIENT_REF - ROW_INVENTORY_MIN_SUBSTRACT,
-  LOCATION: ROW_COLUMNS_WIDTH.LOCATION - ROW_INVENTORY_MIN_SUBSTRACT,
-  DIMENSIONS: ROW_COLUMNS_WIDTH.DIMENSIONS - ROW_INVENTORY_MIN_SUBSTRACT,
-  PACKING_DETAILS:
-    ROW_COLUMNS_WIDTH.PACKING_DETAILS - ROW_INVENTORY_MIN_SUBSTRACT,
-  TITLE: ROW_COLUMNS_WIDTH.TITLE - ROW_INVENTORY_MIN_SUBSTRACT,
-  ARTIST: ROW_COLUMNS_WIDTH.ARTIST - ROW_INVENTORY_MIN_SUBSTRACT,
-  STATUS: ROW_COLUMNS_WIDTH.STATUS - ROW_INVENTORY_MIN_SUBSTRACT,
-  CONDITION: ROW_COLUMNS_WIDTH.CONDITION - ROW_INVENTORY_MIN_SUBSTRACT,
-  DELETE: ROW_COLUMNS_WIDTH.DELETE - ROW_INVENTORY_MIN_SUBSTRACT,
-};
+import {
+  COLUMNS_WIDTH,
+  INVENTORY_STATUS_TYPES,
+  ROW_COLUMNS_WIDTH,
+} from '@api/contants/constants';
 
 type Props = {
   id: string;
@@ -53,6 +38,24 @@ type Props = {
   id2?: string | null;
   deleteBtn?: () => void;
 };
+
+type props = {
+  width: number;
+  label?: string | null;
+  labelProps?: TextProps;
+  onPress: () => void;
+};
+
+const Column = ({width, label, labelProps, onPress}: props) => (
+  <PressableOpacity onPress={onPress} style={[styles.containerColumn, {width}]}>
+    <Label
+      allowFontScaling={false}
+      {...labelProps}
+      style={[styles.textColumn, labelProps?.style]}>
+      {label}
+    </Label>
+  </PressableOpacity>
+);
 
 const RowInventory = ({
   id,
@@ -99,7 +102,7 @@ const RowInventory = ({
     <Wrapper style={styles.container}>
       {loading && <ItemSkeleton />}
       {!loading && (
-        <Wrapper style={[GLOBAL_STYLES.row]}>
+        <Wrapper style={{flexDirection: 'row'}}>
           {actions && (
             <Wrapper
               style={[
@@ -130,174 +133,77 @@ const RowInventory = ({
             </Wrapper>
           )}
 
-          <PressableOpacity
-            style={styles.containerColumn}
-            onPress={checkViewDetail}>
-            <Label
-              style={[
-                styles.column,
-                {
-                  width: actions ? COLUMNS_WIDTH.ID : COLUMNS_WIDTH.ID_DISABLED,
-                  minWidth: actions
-                    ? COLUMNS_WIDTH.ID
-                    : COLUMNS_WIDTH.ID_DISABLED,
-                  maxWidth: actions
-                    ? COLUMNS_WIDTH.ID
-                    : COLUMNS_WIDTH.ID_DISABLED,
-                },
-              ]}
-              allowFontScaling={false}>
-              {id}
-            </Label>
-          </PressableOpacity>
+          <Column
+            onPress={checkViewDetail}
+            label={id}
+            width={
+              disabled ? ROW_COLUMNS_WIDTH.ID_DISABLED : ROW_COLUMNS_WIDTH.ID
+            }
+          />
 
           {showSecondaryId && (
-            <PressableOpacity
-              style={styles.containerColumn}
-              onPress={() => checkViewDetail()}>
-              <Label
-                style={[
-                  styles.column,
-                  {
-                    width: COLUMNS_WIDTH.ALT_ID,
-                    minWidth: COLUMNS_WIDTH.ALT_ID,
-                    maxWidth: COLUMNS_WIDTH.ALT_ID,
-                  },
-                ]}
-                allowFontScaling={false}>
-                {id2}
-              </Label>
-            </PressableOpacity>
+            <Column
+              onPress={checkViewDetail}
+              label={id2}
+              width={ROW_COLUMNS_WIDTH.ALT_ID}
+            />
           )}
 
-          <PressableOpacity
-            style={styles.containerColumn}
-            onPress={() => checkViewDetail()}>
-            <Label
-              style={[
-                styles.column,
-                {
-                  width: COLUMNS_WIDTH.CLIENT_REF,
-                  minWidth: COLUMNS_WIDTH.CLIENT_REF,
-                  maxWidth: COLUMNS_WIDTH.CLIENT_REF,
-                },
-              ]}
-              allowFontScaling={false}>
-              {clientRef}
-            </Label>
-          </PressableOpacity>
+          <Column
+            onPress={checkViewDetail}
+            label={clientRef}
+            width={ROW_COLUMNS_WIDTH.CLIENT_REF}
+          />
 
-          <PressableOpacity
-            style={styles.containerColumn}
-            onPress={() => checkViewDetail()}>
-            <Label
-              style={[
-                styles.columnLocation,
-                {
-                  width: COLUMNS_WIDTH.LOCATION,
-                  minWidth: COLUMNS_WIDTH.LOCATION,
-                  maxWidth: COLUMNS_WIDTH.LOCATION,
-                },
-              ]}
-              allowFontScaling={false}>
-              {location}
-            </Label>
-          </PressableOpacity>
+          <Column
+            onPress={checkViewDetail}
+            label={location}
+            width={ROW_COLUMNS_WIDTH.LOCATION}
+            labelProps={{
+              style: {
+                fontSize: 10,
+              },
+            }}
+          />
 
-          <PressableOpacity
-            style={styles.containerColumn}
-            onPress={() => checkViewDetail()}>
-            <Label
-              style={[
-                styles.columnLocation,
-                {
-                  width: COLUMNS_WIDTH.DIMENSIONS,
-                  minWidth: COLUMNS_WIDTH.DIMENSIONS,
-                  maxWidth: COLUMNS_WIDTH.DIMENSIONS,
-                  fontSize: 12,
-                },
-              ]}
-              allowFontScaling={false}>
-              {packedHeight != null ? packedHeight : '-'} x{' '}
-              {packedLength != null ? packedLength : '-'} x{' '}
-              {packedWidth != null ? packedWidth : '-'}
-            </Label>
-          </PressableOpacity>
+          <Column
+            onPress={checkViewDetail}
+            label={`${packedHeight ?? '-'} x ${packedLength ?? '-'} x ${
+              packedWidth ?? '-'
+            }`}
+            width={ROW_COLUMNS_WIDTH.DIMENSIONS}
+          />
 
-          <PressableOpacity
-            style={styles.containerColumn}
-            onPress={() => checkViewDetail()}>
-            <Label
-              style={[
-                styles.column,
-                {
-                  width: COLUMNS_WIDTH.PACKING_DETAILS,
-                  minWidth: COLUMNS_WIDTH.PACKING_DETAILS,
-                  maxWidth: COLUMNS_WIDTH.PACKING_DETAILS,
-                },
-              ]}
-              allowFontScaling={false}>
-              {packingDetailsDisplay}
-            </Label>
-          </PressableOpacity>
+          <Column
+            onPress={checkViewDetail}
+            label={packingDetailsDisplay}
+            width={ROW_COLUMNS_WIDTH.PACKING_DETAILS}
+          />
 
-          <PressableOpacity
-            style={styles.containerColumn}
-            onPress={() => checkViewDetail()}>
-            <Label
-              style={[
-                styles.column,
-                {
-                  width: COLUMNS_WIDTH.TITLE,
-                  minWidth: COLUMNS_WIDTH.TITLE,
-                  maxWidth: COLUMNS_WIDTH.TITLE,
-                },
-              ]}
-              allowFontScaling={false}>
-              {clientInvDisplay}
-            </Label>
-          </PressableOpacity>
+          <Column
+            onPress={checkViewDetail}
+            label={clientInvDisplay}
+            width={ROW_COLUMNS_WIDTH.TITLE}
+          />
 
-          <PressableOpacity
-            style={styles.containerColumn}
-            onPress={() => checkViewDetail()}>
-            <Label
-              style={[
-                styles.column,
-                {
-                  width: COLUMNS_WIDTH.ARTIST,
-                  minWidth: COLUMNS_WIDTH.ARTIST,
-                  maxWidth: COLUMNS_WIDTH.ARTIST,
-                },
-              ]}
-              allowFontScaling={false}>
-              {artistName}
-            </Label>
-          </PressableOpacity>
+          <Column
+            onPress={checkViewDetail}
+            label={artistName}
+            width={ROW_COLUMNS_WIDTH.ARTIST}
+          />
 
-          <PressableOpacity
-            style={styles.containerColumn}
-            onPress={() => checkViewDetail()}>
-            <Label
-              style={[
-                styles.columnStatus,
-                {
-                  width: COLUMNS_WIDTH.STATUS,
-                  minWidth: COLUMNS_WIDTH.STATUS,
-                  maxWidth: COLUMNS_WIDTH.STATUS,
-                },
-              ]}
-              allowFontScaling={false}>
-              {status == null ? 'Pending' : status}
-            </Label>
-          </PressableOpacity>
+          <Column
+            onPress={checkViewDetail}
+            label={status}
+            width={ROW_COLUMNS_WIDTH.STATUS}
+          />
 
           <PressableOpacity
             style={[
               {
-                width: COLUMNS_WIDTH.CONDITION,
-                minWidth: COLUMNS_WIDTH.CONDITION,
-                maxWidth: COLUMNS_WIDTH.CONDITION,
+                width: ROW_COLUMNS_WIDTH.CONDITION,
+                minWidth: ROW_COLUMNS_WIDTH.CONDITION,
+                maxWidth: ROW_COLUMNS_WIDTH.CONDITION,
               },
             ]}
             onPress={() => checkViewDetail()}>
@@ -339,9 +245,9 @@ const RowInventory = ({
               style={[
                 styles.containerColumn,
                 {
-                  width: COLUMNS_WIDTH.DELETE,
-                  minWidth: COLUMNS_WIDTH.DELETE,
-                  maxWidth: COLUMNS_WIDTH.DELETE,
+                  width: ROW_COLUMNS_WIDTH.DELETE,
+                  minWidth: ROW_COLUMNS_WIDTH.DELETE,
+                  maxWidth: ROW_COLUMNS_WIDTH.DELETE,
                 },
               ]}>
               <Wrapper
@@ -351,7 +257,7 @@ const RowInventory = ({
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   width: '100%',
-                  paddingHorizontal: 10,
+                  paddingHorizontal: 5,
                 }}>
                 <PressableOpacity onPress={() => setIsConfirmDelete(false)}>
                   <Label style={{color: '#333'}} allowFontScaling={false}>
@@ -372,9 +278,9 @@ const RowInventory = ({
                   styles.containerColumn,
                   styles.btnDeleteItem,
                   {
-                    width: COLUMNS_WIDTH.DELETE,
-                    minWidth: COLUMNS_WIDTH.DELETE,
-                    maxWidth: COLUMNS_WIDTH.DELETE,
+                    width: ROW_COLUMNS_WIDTH.DELETE,
+                    minWidth: ROW_COLUMNS_WIDTH.DELETE,
+                    maxWidth: ROW_COLUMNS_WIDTH.DELETE,
                   },
                 ]}
                 onPress={() => setIsConfirmDelete(true)}>
@@ -408,11 +314,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   containerColumn: {
-    borderRightWidth: 1,
+    borderRightWidth: 0.5,
     borderRightColor: '#d0d0d0',
-    height: '100%',
-    alignItems: 'center',
-    flexDirection: 'row',
+    justifyContent: 'center',
   },
   columnCondition: {
     textAlign: 'center',
@@ -424,15 +328,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   columnCheckBox: {
-    borderRightWidth: 1,
+    borderRightWidth: 0.5,
     borderRightColor: '#d0d0d0',
     alignItems: 'center',
     flexDirection: 'row',
     height: '100%',
     justifyContent: 'center',
-    width: COLUMNS_WIDTH.CHECK,
-    minWidth: COLUMNS_WIDTH.CHECK,
-    maxWidth: COLUMNS_WIDTH.CHECK,
+    width: ROW_COLUMNS_WIDTH.CHECK,
+    minWidth: ROW_COLUMNS_WIDTH.CHECK,
+    maxWidth: ROW_COLUMNS_WIDTH.CHECK,
   },
   columnLocation: {
     textAlign: 'center',
@@ -461,6 +365,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 5,
     justifyContent: 'center',
+  },
+  textColumn: {
+    fontSize: 12,
+    color: '#464646',
+    textAlign: 'center',
+    textAlignVertical: 'center',
   },
 });
 

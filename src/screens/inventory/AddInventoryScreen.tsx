@@ -1,42 +1,38 @@
-import {QUERY_KEYS} from '@api/contants/constants';
+import { QUERY_KEYS } from '@api/contants/constants';
 import {
   useAddInventoryItem,
   useSearchFullInventory,
   useSearchInventoryItem,
 } from '@api/hooks/HooksInventoryServices';
-import {MinimalInventoryType} from '@api/types/Inventory';
-import {CustomAutocomplete} from '@components/commons/autocomplete/CustomAutocomplete';
-import {BackButton} from '@components/commons/buttons/BackButton';
-import {RoundedButton} from '@components/commons/buttons/RoundedButton';
-import {BottomSheetSelectInput} from '@components/commons/inputs/BottomSheetSelectInput';
-import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
+import { MinimalInventoryType } from '@api/types/Inventory';
+import { CustomAutocomplete } from '@components/commons/autocomplete/CustomAutocomplete';
+import { BackButton } from '@components/commons/buttons/BackButton';
+import { RoundedButton } from '@components/commons/buttons/RoundedButton';
+import { BottomSheetSelectInput } from '@components/commons/inputs/BottomSheetSelectInput';
+import { GeneralLoading } from '@components/commons/loading/GeneralLoading';
+import { Label } from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
 import HeaderInventoryAdd from '@components/inventory/HeaderInventoryAdd';
 import RowInventoryAdd from '@components/inventory/RowInventoryAdd';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
-import {loadingWrapperPromise} from '@store/actions';
+import { useCustomNavigation } from '@hooks/useCustomNavigation';
+import { useRefreshIndicator } from '@hooks/useRefreshIndicator';
+import { loadingWrapperPromise } from '@store/actions';
 import useInventoryStore from '@store/inventory';
-import {useModalDialogStore} from '@store/modals';
+import { useModalDialogStore } from '@store/modals';
 import useTopSheetStore from '@store/topsheet';
-import {COLORS} from '@styles/colors';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {showErrorToastMessage, showToastMessage} from '@utils/toast';
-import {useCallback, useEffect, useRef, useState} from 'react';
+import { COLORS } from '@styles/colors';
+import { GLOBAL_STYLES } from '@styles/globalStyles';
+import { showErrorToastMessage, showToastMessage } from '@utils/toast';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  Alert,
   FlatList,
   Keyboard,
   ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+  StyleSheet
 } from 'react-native';
-import {IAutocompleteDropdownRef} from 'react-native-autocomplete-dropdown';
+import { IAutocompleteDropdownRef } from 'react-native-autocomplete-dropdown';
 import Icon from 'react-native-fontawesome-pro';
-import Modal from 'react-native-modal';
 
 const CRITERIA_LIST = [
   {name: 'ID', id: 'id'},
@@ -46,7 +42,7 @@ const CRITERIA_LIST = [
 ];
 
 export const AddInventoryScreen = () => {
-  const {id} = useTopSheetStore((d) => d.jobDetail);
+  const {id} = useTopSheetStore((d) => d.jobDetail!);
   const [type, setType] = useState('');
   const [filter, setFilter] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('');
@@ -107,14 +103,14 @@ export const AddInventoryScreen = () => {
     }
   }, [type]);
 
-  const addItemSearch = async () => {
+  const addItemSearch = () => {
     Keyboard.dismiss();
     refetch().then(() => {
       setShowTable(true);
     });
   };
 
-  const onCheckItem = async (query) => {
+  const onCheckItem = (query: string) => {
     setFilter(query?.trim());
   };
 
@@ -124,11 +120,11 @@ export const AddInventoryScreen = () => {
       type: 'info',
       cancelable: true,
       message: (
-        <View style={[styles.bodyModalClockOut, {paddingHorizontal: 0}]}>
-          <Text style={styles.titleModalClockOut}>
+        <Wrapper style={[styles.bodyModalClockOut, {paddingHorizontal: 0}]}>
+          <Label style={styles.titleModalClockOut}>
             Do you want to add this item to inventory?
-          </Text>
-        </View>
+          </Label>
+        </Wrapper>
       ),
       onConfirm: () => {
         showDialog({
@@ -137,7 +133,7 @@ export const AddInventoryScreen = () => {
         loadingWrapperPromise(
           addInventoryAsync({
             idJob: id,
-            idInventory: item.inventory_id,
+            idInventory: item.inventory_id!,
           })
             .then((d) => {
               if (d) {
@@ -163,32 +159,32 @@ export const AddInventoryScreen = () => {
   }, [itemRef?.current]);
 
   return (
-    <View style={[styles.container]}>
-      <View style={[styles.container]}>
-        <View
+    <Wrapper style={[styles.container]}>
+      <Wrapper style={[styles.container]}>
+        <Wrapper
           style={[
             GLOBAL_STYLES.containerBtnOptTop,
             {backgroundColor: 'white'},
           ]}>
           <BackButton onPress={goBack} />
 
-          <View style={[styles.lateralPadding]}>
-            <Text
+          <Wrapper style={[styles.lateralPadding]}>
+            <Label
               style={[
                 GLOBAL_STYLES.title,
                 GLOBAL_STYLES.bold,
                 styles.topsheet,
               ]}>
               New Item
-            </Text>
-          </View>
+            </Label>
+          </Wrapper>
 
-          <View style={[styles.lateralPadding, {width: 50}]}></View>
-        </View>
+          <Wrapper style={[styles.lateralPadding, {width: 50}]}></Wrapper>
+        </Wrapper>
 
         <MinRoundedView />
 
-        <View
+        <Wrapper
           style={{
             display: 'flex',
             flexDirection: 'row',
@@ -216,10 +212,12 @@ export const AddInventoryScreen = () => {
 
           <Wrapper style={{flex: 0.7}}>
             <CustomAutocomplete
-              dataSet={autocompleteItems?.map((x) => ({
-                id: x,
-                title: x,
-              }))}
+              dataSet={
+                autocompleteItems?.map((x) => ({
+                  id: x,
+                  title: x,
+                }))!
+              }
               textInputProps={{
                 placeholder: 'Search an item',
               }}
@@ -229,12 +227,12 @@ export const AddInventoryScreen = () => {
               onChangeText={onCheckItem}
               onFocus={() => {
                 closeAutocomplete();
-                itemRef.current.open();
+                itemRef.current!.open();
               }}
               onClear={() => {
                 setFilter('');
               }}
-              onSelectItem={(item) => setSelectedFilter(item?.id)}
+              onSelectItem={(item) => setSelectedFilter(item?.id!)}
             />
           </Wrapper>
 
@@ -250,10 +248,10 @@ export const AddInventoryScreen = () => {
             onPress={addItemSearch}
             icon={<Icon name="search" size={16} color="#959595" />}
           />
-        </View>
+        </Wrapper>
 
         {showTable && (
-          <View style={[styles.containerTable]}>
+          <Wrapper style={[styles.containerTable]}>
             <ScrollView
               horizontal={true}
               showsHorizontalScrollIndicator={false}
@@ -263,7 +261,7 @@ export const AddInventoryScreen = () => {
                 styles.table,
                 {elevation: 0.5, borderRadius: 12, borderColor: '#d0d0d0'},
               ]}>
-              <View style={[GLOBAL_STYLES.alignItems, styles.containerList]}>
+              <Wrapper style={[GLOBAL_STYLES.alignItems, styles.containerList]}>
                 <HeaderInventoryAdd />
 
                 <FlatList
@@ -284,17 +282,17 @@ export const AddInventoryScreen = () => {
                       onCheck={() => {}}
                     />
                   )}
-                  keyExtractor={(item) => item.inventory_id?.toString()}
+                  keyExtractor={(item) => item.inventory_id?.toString()!}
                   refreshing={isRefetching}
                   onRefresh={refetch}
                 />
-              </View>
+              </Wrapper>
             </ScrollView>
-          </View>
+          </Wrapper>
         )}
-      </View>
+      </Wrapper>
       {isRefetching && <GeneralLoading />}
-    </View>
+    </Wrapper>
   );
 };
 

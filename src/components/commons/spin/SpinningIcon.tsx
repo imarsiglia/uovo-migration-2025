@@ -1,7 +1,6 @@
 import { Icons } from '@assets/icons/icons';
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome5'; // o el paquete que uses
 
 type Props = {
   color?: string;

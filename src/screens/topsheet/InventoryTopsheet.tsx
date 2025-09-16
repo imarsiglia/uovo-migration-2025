@@ -33,6 +33,7 @@ export const InventoryTopsheet = () => {
 
   const {
     data: inventory,
+    isLoading,
     isRefetching,
     refetch,
   } = useGetJobInventory({
@@ -176,7 +177,7 @@ export const InventoryTopsheet = () => {
 
       <Wrapper style={[GLOBAL_STYLES.row, {gap: 10, minHeight: 20}]}>
         <Label style={styles.showingText}>Showing {inventory?.length}</Label>
-        {(isRefetching || isPendingAllInventory) && (
+        {(isRefetching || isPendingAllInventory || isLoading) && (
           <IndicatorLoading
             containerStyle={{alignItems: 'flex-start', alignSelf: 'flex-start'}}
             activityIndicatorProps={{

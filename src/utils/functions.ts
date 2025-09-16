@@ -6,6 +6,7 @@ import moment from 'moment';
 import momentTZ from 'moment-timezone';
 import {AgendaSchedule} from 'react-native-calendars';
 import {
+  COLUMNS_WIDTH,
   FINALIZED_COLOR_CREW,
   FINALIZED_STATUS,
   INITIAL_COLOR_CREW,
