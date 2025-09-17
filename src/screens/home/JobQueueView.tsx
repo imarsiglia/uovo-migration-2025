@@ -35,11 +35,7 @@ import {useAuth} from '@store/auth';
 import useGeneralStore from '@store/general';
 import {useJobQueueStore} from '@store/jobqueue';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {
-  getDeviceTimeZone,
-  getFormattedDate,
-  getFormattedDateWithTimezone,
-} from '@utils/functions';
+import {getDeviceTimeZone, getFormattedDate} from '@utils/functions';
 import {memo, useCallback, useMemo, useRef, useState} from 'react';
 import {
   ActivityIndicator,
@@ -111,36 +107,26 @@ export const JobQueueViewCmp = () => {
     return getFormattedDate(filter, 'MMM DD [•] YYYY');
   }, [START_DATE]);
 
-  const handleConfirm = useCallback((date: Date | null) => {
-    hideDatePicker();
-    onChangeValueByType(
-      date?.toString() ?? new Date().toString(),
-      JOBQUEUE_START_DATE,
-    );
-  }, []);
+  const handleConfirm = useCallback(
+    (date: Date | null) => {
+      hideDatePicker();
+      onChangeValueByType(
+        date?.toString() ?? new Date().toString(),
+        JOBQUEUE_START_DATE,
+      );
+    },
+    [hideDatePicker, onChangeValueByType],
+  );
 
-  async function goToTopSheet(item: any) {
-    // navigate('TopSheet', {
-    //   job: item.id,
-    //   wo_name: item.formatted_wo_name,
-    //   selectedDate: undefined,
-    //   formattedDate: item.formattedDateDetail,
-    //   refreshStatus: function () {
-    //     onRefreshJobQueue();
-    //   }.bind(this),
-    //   queue: 1,
-    //   offline: !isConnected,
-    //   syncroRequests: (() => {}).bind(this),
-    // });
-    // props.dispatch(TopSheetActions.copyWoName(item.formatted_client_name));
-  }
-
-  const handleItemPress = useCallback((id: string) => {
-    navigate(RoutesNavigation.Topsheet, {
-      id,
-      queue: 1,
-    });
-  }, []);
+  const handleItemPress = useCallback(
+    (id: number) => {
+      navigate(RoutesNavigation.Topsheet, {
+        id: id?.toString(),
+        queue: 1,
+      });
+    },
+    [navigate],
+  );
 
   const formattedItems = useMemo(() => {
     if (!jobqueueLista?.length) return [];
@@ -183,32 +169,30 @@ export const JobQueueViewCmp = () => {
           prepped={item.prepped}
         />
       ) : (
-        <>
-          <TimelineCard
-            id={item.id}
-            name={item.formattedName!}
-            paused={item.paused}
-            prepped={item.prepped}
-            statusOwn={item.statusOwn}
-            date={item.__dateFmt!}
-            bolSended={item.bol_sended}
-            crUpdate={item.cr_update}
-            icon={item.icon}
-            iconColor={item.icon_color}
-            iconType={item.icon_type as FAIconType}
-            instructions={item.instructions}
-            item={item.total_items}
-            manager={item.account_manager_name}
-            onPress={handleItemPress}
-            signatureBolCount={item.signature_bol_count}
-            status={item.wo_status ?? WO_DEFAULT_NAME}
-            title_instructions={item.wo_title}
-            wo_type={item.job_type_desc}
-            jobQueue={true}
-            isFilterActive={isFilterActive}
-            isOnline={online}
-          />
-        </>
+        <TimelineCard
+          id={item.id}
+          name={item.formattedName!}
+          paused={item.paused}
+          prepped={item.prepped}
+          statusOwn={item.statusOwn}
+          date={item.__dateFmt!}
+          bolSended={item.bol_sended}
+          crUpdate={item.cr_update}
+          icon={item.icon}
+          iconColor={item.icon_color}
+          iconType={item.icon_type as FAIconType}
+          instructions={item.instructions}
+          item={item.total_items}
+          manager={item.account_manager_name}
+          onPress={handleItemPress}
+          signatureBolCount={item.signature_bol_count}
+          status={item.wo_status ?? WO_DEFAULT_NAME}
+          title_instructions={item.wo_title}
+          wo_type={item.job_type_desc}
+          jobQueue={true}
+          isFilterActive={isFilterActive}
+          isOnline={online}
+        />
       ),
     [handleItemPress, isFilterActive, online],
   );
@@ -393,6 +377,7 @@ export const JobQueueViewCmp = () => {
         windowSize={5}
         removeClippedSubviews={true} // (solo en Android)
         updateCellsBatchingPeriod={50}
+        extraData={online}
       />
     </Wrapper>
   );

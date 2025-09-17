@@ -49,8 +49,8 @@ export const ClockinButton = () => {
 
   const {refetch: refetchJobDetail, isRefetching: isRefetchingTopsheet} =
     useGetTopsheet({
-      id: jobDetail?.id?.toString(),
-      queue: isJobQueue,
+      id: jobDetail?.id?.toString()!,
+      queue: isJobQueue!,
     });
 
   const {refetchAll, isRefetchingAny} = useRefreshIndicator([
@@ -59,8 +59,10 @@ export const ClockinButton = () => {
   ]);
 
   const goToLaborReport = useCallback(() => {
-    setToClockout(1);
-    navigate(RoutesNavigation.LaborReport);
+    if (setToClockout) {
+      setToClockout(1);
+      navigate(RoutesNavigation.LaborReport);
+    }
   }, [navigate, setToClockout]);
 
   const refetchTopsheet = useCallback(() => {
@@ -83,9 +85,9 @@ export const ClockinButton = () => {
     (props: ClockInSchemaType) => {
       loadingWrapperPromise(
         clockInAsync({
-          idJob: jobDetail.id,
+          idJob: jobDetail!.id,
           laborCode: props.code,
-          queue: isJobQueue,
+          queue: isJobQueue!,
         })
           .then((d) => {
             if (d) {
@@ -105,8 +107,8 @@ export const ClockinButton = () => {
   const pauseJob = useCallback(() => {
     loadingWrapperPromise(
       pauseJobAsync({
-        idJob: jobDetail.id,
-        queue: isJobQueue,
+        idJob: jobDetail!.id,
+        queue: isJobQueue!,
       })
         .then((d) => {
           if (d) {
@@ -131,7 +133,7 @@ export const ClockinButton = () => {
           style={[GLOBAL_STYLES.bodyModalClockOut, {paddingHorizontal: 0}]}>
           <Label style={GLOBAL_STYLES.titleModalClockOut}>FINISH JOB?</Label>
           <Label style={GLOBAL_STYLES.subtitleModalClockOut}>
-            Order #: {jobDetail.netsuite_order}
+            Order #: {jobDetail!.netsuite_order}
           </Label>
           <Label style={GLOBAL_STYLES.descModalClockOut}>
             Are you sure you want to finish the current job?
@@ -147,8 +149,8 @@ export const ClockinButton = () => {
         });
         loadingWrapperPromise(
           clockoutAsync({
-            idJob: jobDetail.id,
-            queue: isJobQueue,
+            idJob: jobDetail!.id,
+            queue: isJobQueue!,
           })
             .then((d) => {
               if (d) {
@@ -168,8 +170,8 @@ export const ClockinButton = () => {
   const resumeJob = useCallback(() => {
     loadingWrapperPromise(
       resumeJobAsync({
-        idJob: jobDetail.id,
-        queue: isJobQueue,
+        idJob: jobDetail!.id,
+        queue: isJobQueue!,
       })
         .then((d) => {
           if (d) {
@@ -222,11 +224,7 @@ export const ClockinButton = () => {
             </Wrapper>
           }>
           {({close}) => (
-            <BasicFormProvider
-              schema={ClockInSchema}
-              defaultValue={{
-                code: laborCodes?.map((x) => x.id)[0]?.toString(),
-              }}>
+            <BasicFormProvider schema={ClockInSchema}>
               <Wrapper style={[styles.modalClockin]}>
                 <Wrapper
                   style={[
@@ -279,7 +277,7 @@ export const ClockinButton = () => {
                   <Wrapper style={{flex: 0.7}}>
                     <BottomSheetSelectInputContext
                       currentId="code"
-                      options={laborCodes}
+                      options={laborCodes!}
                       placeholder="Select a labor code"
                       label="Search"
                       labelKey="description"

@@ -77,7 +77,8 @@ export const API_PREPARE_INVENTORY = 'job/prepped';
 export const API_DELETE_INVENTORY_ITEM = '/inventory/netsuite/remove';
 // add inventory
 export const API_SEARCH_FULL_INVENTORY = '/inventory/netsuite/search';
-export const API_SEARCH_INVENTORY_ITEM = '/inventory/netsuite/search/autocomplete';
+export const API_SEARCH_INVENTORY_ITEM =
+  '/inventory/netsuite/search/autocomplete';
 export const API_ADD_INVENTORY_ITEM = '/inventory/netsuite/add';
 
 // item detail inventory
@@ -91,7 +92,19 @@ export const API_GET_WEST_COAST_PICKUP = '/jobns/westcoastpickup/query';
 export const API_GET_WEST_COAST_DROPOFF = '/jobns/westcoastdropoff/query';
 export const API_GET_EAST_COAST_DROPOFF = '/jobns/eastcoastdropoff/query';
 
-export const API_GET_PACKING_DETAILS = '/conditionreport/load/packingdetail'
+// CONDITION REPORT / CHECK
+export const API_GET_RESUME_CONDITION_REPORT = '/conditionreport/resume';
+export const API_GET_RESUME_CONDITION_CHECK = '/conditioncheck/resume';
+
+export const API_SAVE_CONDITION_REPORT = '/conditionreport/register';
+
+export const API_GET_CONDITION_REPORT_BY_INVENTORY = '/conditionreport/list';
+
+// GENERAL
+export const API_GET_PACKING_DETAILS = '/conditionreport/load/packingdetail';
+export const API_GET_PLACES_CONDITION_REPORT = '/conditionreport/load/places';
+export const API_GET_ARTISTS = '/conditionreport/load/artist';
+export const API_GET_ART_TYPES = '/conditionreport/load/arttype';
 
 export const API_GET_INVENTORY_EAST_COAST_PICKUP =
   '/jobns/inventory/eastcoastpickup/query';

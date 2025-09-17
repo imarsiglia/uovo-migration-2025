@@ -24,7 +24,7 @@ export type JobType = {
   icon: string;
   icon_color: string;
   icon_type: string;
-  id: string;
+  id: number;
   instructions: string;
   job_type_desc: string;
   job_type_uuid: string;

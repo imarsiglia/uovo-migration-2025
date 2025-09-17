@@ -51,3 +51,49 @@ export type MinimalInventoryType = {
   inventory_id?: string;
   title?: string;
 };
+
+export type ReportResumeType = {
+  client_ref: string;
+  id_inventory: number;
+  id_job_inventory: number;
+  name: string;
+  partial?: boolean;
+  report_count: number;
+  unmanaged?: boolean;
+  unmanaged_name?: string | null;
+};
+
+export type ConditionReportType = {
+  art_type_name?: string | null;
+  artist_name?: string | null;
+  condition_artwork?: string | null;
+  condition_report_frame_fixture_list: string;
+  condition_report_hanging_system_list: string;
+  condition_report_packing_detail_list: string;
+  date_report: string;
+  edition: string;
+  frame_height: string;
+  frame_length: string;
+  frame_width: string;
+  id: number;
+  id_job: number;
+  id_job_inventory: number;
+  id_user: number;
+  labeled: string;
+  medium_name: string;
+  other_text: string;
+  packed_height: string;
+  packed_length: string;
+  packed_width: string;
+  partial: string;
+  place_of_exam: string;
+  signature: string;
+  title: string;
+  un_packed_height: string;
+  un_packed_length: string;
+  un_packed_width: string;
+  unmanaged_name: string;
+  unpacked_weight: string;
+  weight: string;
+  year: string;
+};

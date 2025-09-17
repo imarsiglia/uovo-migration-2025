@@ -11,7 +11,6 @@ import {
   Text,
   useColorScheme,
 } from 'react-native';
-import {AutocompleteDropdownContextProvider} from 'react-native-autocomplete-dropdown';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {ModalProvider, createModalStack} from 'react-native-modalfy';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
@@ -111,29 +110,27 @@ const App = () => {
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       {/* <Provider store={store}> */}
-      <AutocompleteDropdownContextProvider>
-        <AppProviders>
-          <KeyboardProvider>
-            <EDSProvider colorScheme={scheme as ColorScheme} density="phone">
-              {/* {Platform.OS == 'android' && <CustomStatusBar />} */}
-              {/* <ModalProvider stack={modalStack}> */}
-              {/* <UserProvider
+      <AppProviders>
+        <KeyboardProvider>
+          <EDSProvider colorScheme={scheme as ColorScheme} density="phone">
+            {/* {Platform.OS == 'android' && <CustomStatusBar />} */}
+            {/* <ModalProvider stack={modalStack}> */}
+            {/* <UserProvider
                   value={{isInventoryMode: false, activeFilter: false}}> */}
-              {/* <TabHomeProvider>
+            {/* <TabHomeProvider>
                     <NationalShuttleProvider>
                       <InventoryProvider> */}
-              <SafeAreaProvider>
-                <AppNavigation />
-              </SafeAreaProvider>
-              {/* </InventoryProvider>
+            <SafeAreaProvider>
+              <AppNavigation />
+            </SafeAreaProvider>
+            {/* </InventoryProvider>
                     </NationalShuttleProvider>
                   </TabHomeProvider> */}
-              {/* </UserProvider> */}
-              {/* </ModalProvider> */}
-            </EDSProvider>
-          </KeyboardProvider>
-        </AppProviders>
-      </AutocompleteDropdownContextProvider>
+            {/* </UserProvider> */}
+            {/* </ModalProvider> */}
+          </EDSProvider>
+        </KeyboardProvider>
+      </AppProviders>
       {/* </Provider> */}
     </GestureHandlerRootView>
   );

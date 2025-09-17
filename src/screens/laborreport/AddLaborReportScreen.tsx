@@ -258,7 +258,7 @@ export const AddLaborReportScreen = (props: Props) => {
                 dataSet={employees?.map((x) => ({
                   id: x.id.toString(),
                   title: x.name,
-                }))}
+                }))!}
                 textInputProps={{
                   placeholder: 'Search a handler',
                 }}

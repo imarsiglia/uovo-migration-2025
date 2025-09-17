@@ -284,3 +284,9 @@ export function formatWorkedHours(hours?: number, minutes?: number) {
     minutes ?? 0,
   ).padStart(2, '0')}:00`;
 }
+
+export function moveOtherToEnd(arr: {id: string; name: string}[]) {
+  const others = arr.filter((x) => x.name && x.name.toUpperCase() === 'OTHER');
+  const rest = arr.filter((x) => !(x.name && x.name.toUpperCase() === 'OTHER'));
+  return [...rest, ...others];
+}

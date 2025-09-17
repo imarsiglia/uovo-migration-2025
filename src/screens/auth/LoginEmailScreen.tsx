@@ -1,30 +1,32 @@
-import { useRegularLogin } from '@api/hooks/HooksAuthentication';
-import { Icons } from '@assets/icons/icons';
-import { PressableOpacity } from '@components/commons/buttons/PressableOpacity';
-import { BasicFormProvider } from '@components/commons/form/BasicFormProvider';
-import { ButtonSubmit } from '@components/commons/form/ButtonSubmit';
-import { InputPasswordContext } from '@components/commons/form/InputPasswordContext';
-import { InputTextContext } from '@components/commons/form/InputTextContext';
-import { Label } from '@components/commons/text/Label';
-import { Wrapper } from '@components/commons/wrappers/Wrapper';
-import { useCustomNavigation } from '@hooks/useCustomNavigation';
-import { RoutesNavigation } from '@navigation/types';
-import { useAuth } from '@store/auth';
-import { COLORS } from '@styles/colors';
-import { GLOBAL_STYLES } from '@styles/globalStyles';
-import { getDeviceInfo } from '@utils/functions';
-import { showToastMessage } from '@utils/toast';
-import { useRef } from 'react';
+import {useRegularLogin} from '@api/hooks/HooksAuthentication';
+import {Icons} from '@assets/icons/icons';
+import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
+import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
+import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
+import {InputPasswordContext} from '@components/commons/form/InputPasswordContext';
+import {InputTextContext} from '@components/commons/form/InputTextContext';
+import {Label} from '@components/commons/text/Label';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {RoutesNavigation} from '@navigation/types';
+import {loadingWrapperPromise} from '@store/actions';
+import {useAuth} from '@store/auth';
+import {useModalDialogStore} from '@store/modals';
+import {COLORS} from '@styles/colors';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {getDeviceInfo} from '@utils/functions';
+import {showToastMessage} from '@utils/toast';
+import {useRef} from 'react';
 import {
-    Alert,
-    Image,
-    Keyboard,
-    StyleSheet,
-    TextInput,
-    TouchableWithoutFeedback,
-    View
+  Alert,
+  Image,
+  Keyboard,
+  StyleSheet,
+  TextInput,
+  TouchableWithoutFeedback,
+  View,
 } from 'react-native';
-import { LoginSchema, LoginSchemaType } from 'src/types/schemas';
+import {LoginSchema, LoginSchemaType} from 'src/types/schemas';
 
 const logotipo = require('../../assets/logotipo/logotipo.png');
 
@@ -34,6 +36,7 @@ const logotipo = require('../../assets/logotipo/logotipo.png');
 
 export const LoginEmailScreen = () => {
   const {mutateAsync, isPending} = useRegularLogin();
+  const showDialog = useModalDialogStore((d) => d.showVisible);
 
   const passwordInputRef = useRef<TextInput>(null);
   const buttonSubmitRef = useRef<View>(null);
@@ -43,21 +46,28 @@ export const LoginEmailScreen = () => {
   const {goBack, resetTo} = useCustomNavigation();
 
   async function onLogin(props: LoginSchemaType) {
-    mutateAsync({
-      ...props,
-      ...getDeviceInfo(),
-    })
-      .then((data) => {
-        setSession(data.token, data);
-        if (data.user_updated === 0) {
-          resetTo(RoutesNavigation.EditProfile);
-        } else {
-          resetTo(RoutesNavigation.Home);
-        }
+    loadingWrapperPromise(
+      mutateAsync({
+        ...props,
+        ...getDeviceInfo(),
       })
-      .catch(() => {
-        Alert.alert('Invalid credentials');
-      });
+        .then((data) => {
+          setSession(data.token, data);
+          if (data.user_updated === 0) {
+            resetTo(RoutesNavigation.EditProfile);
+          } else {
+            resetTo(RoutesNavigation.Home);
+          }
+        })
+        .catch(() => {
+          showDialog({
+            modalVisible: true,
+            cancelable: false,
+            message: 'Invalid credencials',
+            type: "error"
+          });
+        }),
+    );
   }
 
   function onFocusPassword() {

@@ -39,6 +39,12 @@ export const QUERY_KEYS = {
   SEARCH_INVENTORY_ITEM: 'search_inventory_item',
   INVENTORY_ITEM_DETAIL: 'inventory_item_detail',
   PACKING_DETAILS: 'packing_details',
+  RESUME_CONDITION_REPORT: 'resume_condition_report',
+  RESUME_CONDITION_CHECK: 'resume_condition_check',
+  PLACES_CONDITION_REPORT: 'places_condition_report',
+  ARTISTS: 'artists',
+  ART_TYPES: 'art_types',
+  CONDITION_REPORT_BY_INVENTORY: 'condition_report_by_inventory',
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';
@@ -308,3 +314,44 @@ export const VOICE_EVENTS = {
   END: "onSpeechEnd",
   ERROR: "onSpeechError"
 }
+
+
+const tempPlaceExamList = [
+  {label: 'UOVO: LIC', value: 'UOVO: LIC'},
+  {label: 'UOVO: 33 KH', value: 'UOVO: 33 KH'},
+  {label: 'UOVO: 100 BP', value: 'UOVO: 100 BP'},
+  {label: 'UOVO: 105 EVG', value: 'UOVO: 105 EVG'},
+  {label: 'UOVO: WPB', value: 'UOVO: WPB'},
+  {label: 'UOVO: WMI', value: 'UOVO: WMI'},
+  {label: 'UOVO: LDD', value: 'UOVO: LDD'},
+  {label: 'UOVO: SSF', value: 'UOVO: SSF'},
+  {label: 'UOVO: LVM', value: 'UOVO: LVM'},
+  {label: 'UOVO: DEN', value: 'UOVO: DEN'},
+  {label: 'UOVO: DAL', value: 'UOVO: DAL'},
+  {label: 'OFFSITE', value: 'OFFSITE'},
+];
+
+//Frame and Fixture list
+export const FRAME_FIXTURE_LIST = [
+  'Framed',
+  'Unframed',
+  'Hinged',
+  'Glass',
+  'Backed',
+  'Museum Glass',
+  'Matted',
+  'Plexiglass',
+  'Other',
+];
+
+//Hanging System list
+export const HANGING_SYSTEM_LIST = [
+  'Cleats',
+  'D-rings',
+  'Wire',
+  'Z-clip',
+  'Keyhole',
+  'Security hooks',
+  'Screw eyes',
+  'Other',
+];

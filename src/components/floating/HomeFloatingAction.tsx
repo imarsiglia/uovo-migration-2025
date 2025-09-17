@@ -1,31 +1,38 @@
-import {useCallback, useMemo, useState} from 'react';
-import {SpeedDial} from '@rneui/themed';
-import {Icons} from '@assets/icons/icons';
-import {COLORS} from '@styles/colors';
-import {Alert, StyleSheet} from 'react-native';
+import { Icons } from '@assets/icons/icons';
+import { useCustomNavigation } from '@hooks/useCustomNavigation';
+import { RoutesNavigation } from '@navigation/types';
+import { IconNode } from '@rneui/base';
+import { SpeedDial } from '@rneui/themed';
+import { useAuth } from '@store/auth';
+import useGeneralStore from '@store/general';
+import { useModalDialogStore } from '@store/modals';
+import { COLORS } from '@styles/colors';
 import {
   closeSessionOnGoogle,
   getDeviceInfo,
   showAlertDialogWithOptions,
 } from '@utils/functions';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {useAuth} from '@store/auth';
-import {RoutesNavigation} from '@navigation/types';
-import useGeneralStore from '@store/general';
-import {IconNode} from '@rneui/base';
+import { useCallback, useState } from 'react';
+import { StyleSheet } from 'react-native';
 
 export const HomeFloatingAction = () => {
   const [open, setOpen] = useState(false);
   const {resetTo, navigate} = useCustomNavigation();
   const clearSession = useAuth((d) => d.clearSession);
   const {isFilterActive, setFilterActive} = useGeneralStore();
+  const showDialog = useModalDialogStore((d) => d.showVisible);
 
   const onCloseFab = useCallback(() => {
     setOpen(false);
   }, []);
 
   const showAbout = useCallback(() => {
-    Alert.alert('ABOUT', '\nUOVO APP \nVersion ' + getDeviceInfo().buildNumber);
+    showDialog({
+      modalVisible: true,
+      type: 'info',
+      message: `ABOUT\n\nUOVO APP\nVerion ${getDeviceInfo().buildNumber}`,
+      confirmBtnLabel: "OK"
+    });
     onCloseFab();
   }, []);
 

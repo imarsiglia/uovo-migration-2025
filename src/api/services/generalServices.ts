@@ -7,6 +7,9 @@ import {
   API_HELPDESK,
   SUCCESS_MESSAGES,
   API_GET_PACKING_DETAILS,
+  API_GET_PLACES_CONDITION_REPORT,
+  API_GET_ARTISTS,
+  API_GET_ART_TYPES,
 } from '@api/contants/endpoints';
 import {getFetcher} from '@api/general/fetchers';
 import {getRequest, postRequest} from '@api/helpers/apiClientHelper';
@@ -121,6 +124,35 @@ const getPackingDetails = async (): Promise<GeneralListApi[]> => {
   return response.body?.data;
 };
 
+const getPlacesConditionReport = async (): Promise<string[]> => {
+  const response = await getRequest<Paginated<string[]>>(
+    API_GET_PLACES_CONDITION_REPORT,
+  );
+  return response.body?.data ?? [];
+};
+
+const getArtists = async ({
+  filter,
+}: {
+  filter: string;
+}): Promise<GeneralListApi[]> => {
+  const response = await getRequest<Paginated<GeneralListApi[]>>(
+    `${API_GET_ARTISTS}?query=${filter}`,
+  );
+  return response.body?.data ?? [];
+};
+
+const getArtTypes = async ({
+  filter,
+}: {
+  filter: string;
+}): Promise<GeneralListApi[]> => {
+  const response = await getRequest<Paginated<GeneralListApi[]>>(
+    `${API_GET_ART_TYPES}?query=${filter}`,
+  );
+  return response.body?.data ?? [];
+};
+
 export const generalServices = {
   contactUs,
   helpDesk,
@@ -130,5 +162,8 @@ export const generalServices = {
   getLatLong,
   getEstimatedTimeByLocation,
   getQrUser,
-  getPackingDetails
+  getPackingDetails,
+  getPlacesConditionReport,
+  getArtists,
+  getArtTypes
 };

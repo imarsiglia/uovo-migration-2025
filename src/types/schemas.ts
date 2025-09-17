@@ -265,3 +265,41 @@ export const TakeDimensionsSchema = yup.object().shape({
 export type TakeDimensionsSchemaType = yup.InferType<
   typeof TakeDimensionsSchema
 >;
+
+export const ConditionReportSchema = yup.object().shape({
+  // autocomplete
+  artistName: yup.mixed<{id: string; title: string}>().optional().nullable(),
+  artTypeName: yup.mixed<{id: string; title: string}>().optional().nullable(),
+
+  conditionArtWork: yup.string().optional().nullable(),
+  edition: yup.string().optional().nullable(),
+  labeled: yup.string().optional().nullable(),
+  mediumName: yup.string().optional().nullable(),
+  packing_details_other: yup.string().optional().nullable(),
+  placeOfExam: yup.string().optional().nullable(),
+  signature: yup.string().optional().nullable(),
+  title: yup.string().optional().nullable(),
+  year: yup.string().optional().nullable(),
+
+  // numeros
+  frame_height: decimalString(),
+  frame_length: decimalString(),
+  frame_width: decimalString(),
+  packed_height: decimalString(),
+  packed_length: decimalString(),
+  packed_width: decimalString(),
+  un_packed_height: decimalString(),
+  un_packed_length: decimalString(),
+  un_packed_width: decimalString(),
+  unpacked_weight: decimalString(),
+  weight: decimalString(),
+
+  // listas
+  frameFixture: yup.array().of(yup.string().required()),
+  hangingSystem: yup.array().of(yup.string().required()),
+  packingDetail: yup.array().of(yup.string().required()),
+});
+
+export type ConditionReportSchemaType = yup.InferType<
+  typeof ConditionReportSchema
+>;

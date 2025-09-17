@@ -36,6 +36,9 @@ export const RoutesNavigation = {
   AddInventory: 'AddInventory',
   ItemDetail: 'ItemDetail',
   TakeDimensions: 'TakeDimensions',
+  Reports: 'Reports',
+  ConditionReport: 'ConditionReport',
+  ConditionCheck: 'ConditionCheck'
 } as const;
 
 // Union de nombres de ruta: "Home" | "ContactUs" | ...
@@ -110,6 +113,13 @@ export type RootStackParamList = {
   };
   [RoutesNavigation.TakeDimensions]: {
     item: JobInventoryType;
+  };
+  [RoutesNavigation.Reports]: undefined;
+  [RoutesNavigation.ConditionReport]: {
+    fromReports?: boolean
+  };
+  [RoutesNavigation.ConditionCheck]: {
+    fromReports?: boolean
   };
 };
 

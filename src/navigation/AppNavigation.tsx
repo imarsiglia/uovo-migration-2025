@@ -105,8 +105,11 @@ import {ModalLoading} from '@components/commons/modals/ModalLoading';
 import {PortalHost} from '@gorhom/portal';
 import {InventoryScreen} from '@screens/inventory/InventoryScreen';
 import {AddInventoryScreen} from '@screens/inventory/AddInventoryScreen';
-import { ItemDetailScreen } from '@screens/inventory/ItemDetailScreen';
-import { TakeDimensionsScreen } from '@screens/inventory/TakeDimensions';
+import {ItemDetailScreen} from '@screens/inventory/ItemDetailScreen';
+import {TakeDimensionsScreen} from '@screens/inventory/TakeDimensions';
+import {ReportsScreen} from '@screens/reports/ReportsScreen';
+import {ConditionReportScreen} from '@screens/reports/ConditionReportScreen';
+import {ConditionCheckScreen} from '@screens/reports/ConditionCheckScreen';
 // import InventoryNS from '../screens/nationalShuttle/InventoryNS';
 
 // LogBox.ignoreLogs([
@@ -271,6 +274,21 @@ export const AppNavigation = () => {
             <Stack.Screen
               name={RoutesNavigation.TakeDimensions}
               component={TakeDimensionsScreen}
+            />
+
+            <Stack.Screen
+              name={RoutesNavigation.Reports}
+              component={ReportsScreen}
+            />
+
+            <Stack.Screen
+              name={RoutesNavigation.ConditionReport}
+              component={ConditionReportScreen}
+            />
+
+            <Stack.Screen
+              name={RoutesNavigation.ConditionCheck}
+              component={ConditionCheckScreen}
             />
 
             {/* visualizar imagenes */}

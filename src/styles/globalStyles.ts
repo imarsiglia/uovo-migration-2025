@@ -146,4 +146,27 @@ export const GLOBAL_STYLES = StyleSheet.create({
     fontSize: 12,
     color: 'black',
   },
+  fifty: {
+    width: '50%',
+  },
+  fiftyFive: {
+    width: '55%',
+  },
+  inputTitle: {
+    color: COLORS.gray,
+    fontSize: 13,
+  },
+  input: {
+    borderWidth: 0.5,
+    borderRadius: 10,
+    borderColor: COLORS.borderInputColor,
+  },
+  backgroundOpacity: {
+    zIndex: 5001,
+    position: 'absolute',
+    height: '100%',
+    width: '100%',
+    backgroundColor: '#d0d0d0',
+    opacity: 0.7,
+  },
 });

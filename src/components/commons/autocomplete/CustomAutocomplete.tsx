@@ -27,7 +27,7 @@ export const CustomAutocomplete = forwardRef<any, CustomAutocompleteProps>(
         closeOnBlur={false}
         closeOnSubmit={false}
         suggestionsListMaxHeight={300}
-        debounce={600}
+        debounce={400}
         showChevron={false}
         {...rest}
         textInputProps={mergedTextInputProps}

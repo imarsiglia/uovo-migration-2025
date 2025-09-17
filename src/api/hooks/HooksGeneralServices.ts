@@ -103,3 +103,29 @@ export const useGetPackingDetails = () => {
     queryFn: generalServices.getPackingDetails,
   });
 };
+
+export const useGetPlacesConditionReport = () => {
+  return useQuery({
+    ...DEFAULT_PERSISTENCE_CONFIG,
+    queryKey: [QUERY_KEYS.PLACES_CONDITION_REPORT],
+    queryFn: generalServices.getPlacesConditionReport,
+  });
+};
+
+export const useGetArtists = ({filter}: {filter: string}) => {
+  return useQuery({
+    ...DEFAULT_PERSISTENCE_CONFIG,
+    queryKey: [QUERY_KEYS.ARTISTS, {filter}],
+    queryFn: () => generalServices.getArtists({filter}),
+    enabled: filter.trim().length > 2,
+  });
+};
+
+export const useGetArtTypes = ({filter}: {filter: string}) => {
+  return useQuery({
+    ...DEFAULT_PERSISTENCE_CONFIG,
+    queryKey: [QUERY_KEYS.ART_TYPES, {filter}],
+    queryFn: () => generalServices.getArtTypes({filter}),
+    enabled: filter.trim().length > 1,
+  });
+};

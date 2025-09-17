@@ -1,7 +1,7 @@
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {COLORS} from '@styles/colors';
 import {getFormattedDate} from '@utils/functions';
-import {memo, useMemo} from 'react';
+import {memo} from 'react';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
@@ -28,10 +28,7 @@ const PlaceholderCardCmp = ({
   paused,
   scheduled_on,
 }: Props) => {
-  const monthYear = useMemo(
-    () => getFormattedDate(scheduled_on, 'MMMM YYYY'),
-    [scheduled_on],
-  );
+  const monthYear = getFormattedDate(scheduled_on, 'MMMM YYYY');
 
   return (
     <Wrapper style={style.container}>

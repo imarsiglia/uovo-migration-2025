@@ -6,6 +6,7 @@ import CustomDropdown from '@components/commons/menu/CustomDropdown';
 import CustomMenu from '@components/commons/menu/CustomMenu';
 import {Label} from '@components/commons/text/Label';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import TaskNoAdd from '@components/topheet/TaskNoAdd';
 import TaskOption from '@components/topheet/TaskOption';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {RoutesNavigation} from '@navigation/types';
@@ -116,10 +117,12 @@ export const TaskTopsheet = () => {
             icon="image"
             color="#7966E0"
             quantity={taskCount?.[1]?.quantity}
-            onPressLeft={() =>  {}
+            onPressLeft={
+              () => {}
               // navigate(RoutesNavigation.Account)
             }
-            onPressRight={() => {}
+            onPressRight={
+              () => {}
               // @ts-ignore
               // navigate(RoutesNavigation.Account, {fromList: false})
             }
@@ -214,16 +217,16 @@ export const TaskTopsheet = () => {
             )}
           </CustomDropdown>
 
-          {/* <TaskNoAdd
-            description={taskCount[4].description}
-            quantity={taskCount[4].quantity}
-            onPress={() => navigate('Reports')}
+          <TaskNoAdd
+            description={taskCount?.[4]?.description}
+            quantity={taskCount?.[4]?.quantity}
+            onPress={() => navigate(RoutesNavigation.Reports)}
             idJob={jobDetail.id}
-            offline={[
-              CONDITION_REPORT_OFFLINE_VALIDATION,
-              CONDITION_CHECK_OFFLINE_VALIDATION,
-            ]}
-          /> */}
+            // offline={[
+            //   CONDITION_REPORT_OFFLINE_VALIDATION,
+            //   CONDITION_CHECK_OFFLINE_VALIDATION,
+            // ]}
+          />
 
           {/* {!loadingService && ( */}
           {true && (

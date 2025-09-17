@@ -9,14 +9,13 @@ import {SelectableText} from '@components/commons/text/SelectableText';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {BolCountVisualize} from '@components/jobs/bol/BolCountVisualize';
 import {FAIconType} from '@generalTypes/general';
-import {useOnline} from '@hooks/useOnline';
 import {COLORS, ICON_COLORS, IconColorKeys} from '@styles/colors';
 import {memo, useCallback} from 'react';
 import {Platform, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
 type Props = {
-  id: string;
+  id: number;
   name: string;
   title_instructions: string;
   instructions: string;
@@ -37,7 +36,7 @@ type Props = {
   bolSended: boolean;
   isFilterActive?: boolean;
   isOnline?: boolean;
-  onPress: (id: string) => void;
+  onPress: (id: number) => void;
 };
 
 const TimelineCardCmp = ({
@@ -62,9 +61,8 @@ const TimelineCardCmp = ({
   signatureBolCount,
   bolSended,
   isFilterActive,
-  isOnline
+  isOnline,
 }: Props) => {
-
   const handleTopSheetPress = useCallback(() => onPress(id), [onPress, id]);
 
   return (
@@ -434,5 +432,6 @@ export const TimelineCard = memo(
     a.iconType === b.iconType &&
     a.statusOwn === b.statusOwn &&
     a.jobQueue === b.jobQueue &&
-    a.isFilterActive === b.isFilterActive,
+    a.isFilterActive === b.isFilterActive &&
+    a.isOnline === b.isOnline,
 );

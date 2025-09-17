@@ -52,7 +52,7 @@ export const ClockinButtonLaborReport = ({list}: Props) => {
 
   const {refetchAll, isRefetchingAny} = useRefreshIndicator([
     [QUERY_KEYS.TOPSHEET, {id: jobDetail?.id?.toString(), queue: isJobQueue}],
-    [QUERY_KEYS.LABOR_REPORTS, {idJob: jobDetail.id, toClockout}],
+    [QUERY_KEYS.LABOR_REPORTS, {idJob: jobDetail!.id, toClockout}],
     [QUERY_KEYS.TIMELINE, selectedDate],
   ]);
 
@@ -60,9 +60,9 @@ export const ClockinButtonLaborReport = ({list}: Props) => {
     (props: ClockInSchemaType) => {
       loadingWrapperPromise(
         clockInAsync({
-          idJob: jobDetail.id,
+          idJob: jobDetail!.id,
           laborCode: props.code,
-          queue: isJobQueue,
+          queue: isJobQueue!,
         })
           .then((d) => {
             if (d) {
@@ -91,7 +91,7 @@ export const ClockinButtonLaborReport = ({list}: Props) => {
           style={[GLOBAL_STYLES.bodyModalClockOut, {paddingHorizontal: 0}]}>
           <Label style={GLOBAL_STYLES.titleModalClockOut}>FINISH JOB?</Label>
           <Label style={GLOBAL_STYLES.subtitleModalClockOut}>
-            Order #: {jobDetail.netsuite_order}
+            Order #: {jobDetail!.netsuite_order}
           </Label>
           <Label style={GLOBAL_STYLES.descModalClockOut}>
             Are you sure you want to finish the current job?
@@ -107,8 +107,8 @@ export const ClockinButtonLaborReport = ({list}: Props) => {
         });
         loadingWrapperPromise(
           clockoutAsync({
-            idJob: jobDetail.id,
-            queue: isJobQueue,
+            idJob: jobDetail!.id,
+            queue: isJobQueue!,
           })
             .then((d) => {
               if (d) {
@@ -144,8 +144,8 @@ export const ClockinButtonLaborReport = ({list}: Props) => {
   const confirmJob = useCallback(() => {
     loadingWrapperPromise(
       registerLaborReportAsync({
-        idJob: jobDetail.id,
-        queue: isJobQueue,
+        idJob: jobDetail?.id!,
+        queue: isJobQueue!,
         preventEditCurrentClock: false,
         confirm: 1,
         list: list?.map((x) => ({
@@ -196,10 +196,7 @@ export const ClockinButtonLaborReport = ({list}: Props) => {
           }>
           {({close}) => (
             <BasicFormProvider
-              schema={ClockInSchema}
-              defaultValue={{
-                code: laborCodes?.map((x) => x.id)[0]?.toString(),
-              }}>
+              schema={ClockInSchema}>
               <Wrapper style={[styles.modalClockin]}>
                 <Wrapper
                   style={[
@@ -243,7 +240,7 @@ export const ClockinButtonLaborReport = ({list}: Props) => {
                   <Wrapper style={{flex: 0.7}}>
                     <BottomSheetSelectInputContext
                       currentId="code"
-                      options={laborCodes}
+                      options={laborCodes!}
                       placeholder="Select a labor code"
                       label="Search"
                       labelKey="description"

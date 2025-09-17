@@ -63,8 +63,8 @@ export const TimelineViewCmp = () => {
     a.calendar?.scrollToDay?.(day, a.calendarOffset?.(), true);
   }, []);
 
-  const handleItemPress = useCallback((id: string) => {
-    navigate(RoutesNavigation.Topsheet, {id, queue: 0});
+  const handleItemPress = useCallback((id: number) => {
+    navigate(RoutesNavigation.Topsheet, {id: id as never as string, queue: 0});
   }, [navigate]);
 
   function onDayPress(date: DateData) {

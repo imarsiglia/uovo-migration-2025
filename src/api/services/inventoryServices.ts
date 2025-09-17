@@ -21,6 +21,8 @@ export type GetJobInventoryApiProps = {
   orderType?: InventoryFilterOrderType;
   orderFilter?: string;
   filter?: string;
+  start?: number;
+  limit?: number;
 } & TaskBaseApiProps;
 
 const getJobInventory = async ({
@@ -28,9 +30,11 @@ const getJobInventory = async ({
   orderType,
   orderFilter,
   filter = '',
+  start = 0,
+  limit = 200,
 }: GetJobInventoryApiProps): Promise<JobInventoryType[]> => {
   const response = await getRequest<Paginated<JobInventoryType[]>>(
-    `${API_GET_JOB_INVENTORY}?idjob=${idJob}&start=0&limit=200&totalize=1&filter=${filter.trim()}` +
+    `${API_GET_JOB_INVENTORY}?idjob=${idJob}&start=${start}&limit=${limit}&totalize=1&filter=${filter.trim()}` +
       (orderType != undefined && orderFilter != undefined
         ? `&orderbytype=${orderType}&orderby=${orderFilter}`
         : ''),

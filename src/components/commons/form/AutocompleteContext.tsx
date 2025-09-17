@@ -110,6 +110,7 @@ export function AutocompleteContext<T extends FieldValues>({
                 inputContainerStyle,
                 fieldState.error && {borderColor: COLORS.error, borderWidth: 1},
               ]}
+              useFilter={false}
             />
           </>
         );
