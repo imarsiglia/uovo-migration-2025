@@ -1,4 +1,4 @@
-import {JobInventoryType} from '@api/types/Inventory';
+import {JobInventoryType, ReportResumeType} from '@api/types/Inventory';
 import {CrewMemberType} from '@api/types/Jobs';
 import {LaborReportType, NoteType, ReportMaterialType} from '@api/types/Task';
 import {BooleanNumberType} from '@generalTypes/general';
@@ -38,7 +38,7 @@ export const RoutesNavigation = {
   TakeDimensions: 'TakeDimensions',
   Reports: 'Reports',
   ConditionReport: 'ConditionReport',
-  ConditionCheck: 'ConditionCheck'
+  ConditionCheck: 'ConditionCheck',
 } as const;
 
 // Union de nombres de ruta: "Home" | "ContactUs" | ...
@@ -116,10 +116,14 @@ export type RootStackParamList = {
   };
   [RoutesNavigation.Reports]: undefined;
   [RoutesNavigation.ConditionReport]: {
-    fromReports?: boolean
+    fromReports?: boolean;
+    report?: ReportResumeType;
+    item?: JobInventoryType;
   };
   [RoutesNavigation.ConditionCheck]: {
-    fromReports?: boolean
+    fromReports?: boolean;
+    report?: ReportResumeType;
+    item?: JobInventoryType;
   };
 };
 

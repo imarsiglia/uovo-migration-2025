@@ -63,13 +63,30 @@ export type ReportResumeType = {
   unmanaged_name?: string | null;
 };
 
+type ConditionReportObjectItem = {
+  id_condition_report: number;
+  text_value: string;
+};
+
+type ConditionReportFrameFixturePk = {
+  condition_report_frame_fixture_pk: ConditionReportObjectItem;
+};
+
+type ConditionReportHangingSystemPk = {
+  condition_report_hanging_system_pk: ConditionReportObjectItem;
+};
+
+type ConditionReportPackingDetailPk = {
+  condition_report_packing_detail_pk: ConditionReportObjectItem;
+};
+
 export type ConditionReportType = {
   art_type_name?: string | null;
   artist_name?: string | null;
   condition_artwork?: string | null;
-  condition_report_frame_fixture_list: string;
-  condition_report_hanging_system_list: string;
-  condition_report_packing_detail_list: string;
+  condition_report_frame_fixture_list: ConditionReportFrameFixturePk[];
+  condition_report_hanging_system_list: ConditionReportHangingSystemPk[];
+  condition_report_packing_detail_list: ConditionReportPackingDetailPk[];
   date_report: string;
   edition: string;
   frame_height: string;
@@ -96,4 +113,9 @@ export type ConditionReportType = {
   unpacked_weight: string;
   weight: string;
   year: string;
+};
+
+export type TotalPhotoReportType = {
+  type: string;
+  total: number;
 };

@@ -1,3 +1,4 @@
+import { COLORS } from '@styles/colors';
 import { forwardRef, useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import {
@@ -24,8 +25,8 @@ export const CustomAutocomplete = forwardRef<any, CustomAutocompleteProps>(
       <AutocompleteDropdown
         ref={ref}
         clearOnFocus={false}
-        closeOnBlur={false}
-        closeOnSubmit={false}
+        closeOnBlur={true}
+        closeOnSubmit={true}
         suggestionsListMaxHeight={300}
         debounce={400}
         showChevron={false}
@@ -43,7 +44,7 @@ const styles = StyleSheet.create({
     paddingLeft: 0,
     paddingRight: 0,
     fontSize: 12,
-    color: '#3C424A',
+    color: COLORS.inputTextColor,
   },
   inputSearch: {
     borderColor: '#d0d0d0',

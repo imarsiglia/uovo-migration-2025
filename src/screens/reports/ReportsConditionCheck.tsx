@@ -1,9 +1,13 @@
+import {ReportResumeType} from '@api/types/Inventory';
 import ReportItemList from '@components/reports/ReportItemList';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {RoutesNavigation} from '@navigation/types';
 import useReportStore from '@store/reports';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 
 export const ReportsConditionCheck = () => {
+  const {navigate} = useCustomNavigation();
   const list = useReportStore((d) => d.conditionCheckList);
 
   useEffect(() => {
@@ -30,13 +34,15 @@ export const ReportsConditionCheck = () => {
   //     };
   //   }, []);
 
-  const initEdit = (item: any) => {
-    // navigate('ConditionReport', {
-    //   fromReports: true,
-    //   refresh: props.refresh,
-    //   condition: item,
-    // });
-  };
+  const initEdit = useCallback(
+    (item: ReportResumeType) => {
+      navigate(RoutesNavigation.ConditionCheck, {
+        fromReports: true,
+        report: item,
+      });
+    },
+    [navigate],
+  );
 
   return (
     <View style={[styles.container]}>

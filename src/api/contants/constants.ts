@@ -45,6 +45,9 @@ export const QUERY_KEYS = {
   ARTISTS: 'artists',
   ART_TYPES: 'art_types',
   CONDITION_REPORT_BY_INVENTORY: 'condition_report_by_inventory',
+  CONDITION_CHECK_BY_INVENTORY: 'condition_check_by_inventory',
+  TOTAL_PHOTOS_CONDITION_REPORT: 'total_photos_condition_report',
+  TOTAL_PHOTOS_CONDITION_CHECK: 'total_photos_condition_check',
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';
@@ -271,9 +274,8 @@ export const INVENTORY_STATUS_TYPES = {
   LOCKED_BY: 'LOCKED BY',
   COMPLETED_BY: 'COMPLETED BY',
   PROCESSING_BY: 'PROCESSING BY',
-  READY_TO_TRANSPORT: 'READY TO TRANSPORT'
+  READY_TO_TRANSPORT: 'READY TO TRANSPORT',
 } as const;
-
 
 export const COLUMNS_WIDTH = {
   CHECK: 40,
@@ -308,13 +310,12 @@ export const ROW_COLUMNS_WIDTH = {
 };
 
 export const VOICE_EVENTS = {
-  PARTIAL_RESULTS: "onSpeechPartialResults",
-  RESULTS: "onSpeechResults",
-  START: "onSpeechStart",
-  END: "onSpeechEnd",
-  ERROR: "onSpeechError"
-}
-
+  PARTIAL_RESULTS: 'onSpeechPartialResults',
+  RESULTS: 'onSpeechResults',
+  START: 'onSpeechStart',
+  END: 'onSpeechEnd',
+  ERROR: 'onSpeechError',
+};
 
 const tempPlaceExamList = [
   {label: 'UOVO: LIC', value: 'UOVO: LIC'},
@@ -355,3 +356,15 @@ export const HANGING_SYSTEM_LIST = [
   'Screw eyes',
   'Other',
 ];
+
+export const CONDITION_STATES_LIST = [
+  {name: 'Partial', id: 'true'},
+  {name: 'Final', id: 'false'},
+];
+
+export const PHOTOS_REPORT_TYPES = {
+  FRONT: 'front',
+  BACK: 'back',
+  SIDES: 'sides',
+  DETAIL: 'detail',
+};

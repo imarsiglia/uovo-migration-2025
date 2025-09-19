@@ -1,28 +1,20 @@
-import {useCallback, useEffect, useMemo, useRef} from 'react';
+import { COLORS } from '@styles/colors';
+import { useCallback, useMemo, useRef } from 'react';
 import {
-  Controller,
   Control,
-  FieldValues,
+  Controller,
   FieldPath,
+  FieldValues,
   useFormContext,
 } from 'react-hook-form';
 import {
-  IAutocompleteDropdownProps,
   AutocompleteDropdownItem,
+  IAutocompleteDropdownProps,
+  IAutocompleteDropdownRef,
 } from 'react-native-autocomplete-dropdown';
-import {CustomAutocomplete} from '../autocomplete/CustomAutocomplete';
-import {COLORS} from '@styles/colors';
+import { CustomAutocomplete } from '../autocomplete/CustomAutocomplete';
 
 type AnyItem = AutocompleteDropdownItem & Record<string, any>;
-
-type DropdownController = {
-  close: () => void;
-  open: () => void;
-  toggle: () => void;
-  clear: () => void;
-  setInputText: (t: string) => void;
-  setItem: (item: {id: string; title?: string} & Record<string, any>) => void;
-};
 
 type Props<T extends FieldValues> = Omit<
   IAutocompleteDropdownProps,
@@ -37,7 +29,7 @@ type Props<T extends FieldValues> = Omit<
   /** Transforma el item seleccionado a lo que guardas en el form (default: item completo) */
   mapToFormValue?: (item: AnyItem | null) => any;
   /** Acceso al controller interno del dropdown */
-  controllerRef?: (c: DropdownController) => void;
+  controllerRef?: (c: IAutocompleteDropdownRef) => void;
 };
 
 export function AutocompleteContext<T extends FieldValues>({
@@ -53,7 +45,7 @@ export function AutocompleteContext<T extends FieldValues>({
   const {control: ctxControl, formState} = useFormContext<T>();
   const control = controlProp ?? ctxControl;
 
-  const ddCtrlRef = useRef<DropdownController | null>(null);
+  const ddCtrlRef = useRef<IAutocompleteDropdownRef | null>(null);
   const typingRef = useRef(false); // evita reimponer selección mientras escribe
   const appliedKeyRef = useRef<string | null>(null); // evita re-aplicar lo mismo
   const dataVersion = useMemo(() => {
@@ -71,6 +63,7 @@ export function AutocompleteContext<T extends FieldValues>({
           (item: AnyItem | null) => {
             typingRef.current = false;
             appliedKeyRef.current = null;
+            // ddCtrlRef?.current?.setInputText(item?.title!);
             field.onChange(mapToFormValue(item));
           },
           [field, mapToFormValue],
@@ -95,9 +88,9 @@ export function AutocompleteContext<T extends FieldValues>({
           <>
             <CustomAutocomplete
               {...rest}
-              controller={(c: DropdownController) => {
+              controller={(c) => {
                 ddCtrlRef.current = c;
-                controllerRef?.(c);
+                controllerRef?.(c!);
               }}
               onSelectItem={handleSelect}
               onChangeText={handleChangeText}

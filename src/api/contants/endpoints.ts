@@ -97,8 +97,13 @@ export const API_GET_RESUME_CONDITION_REPORT = '/conditionreport/resume';
 export const API_GET_RESUME_CONDITION_CHECK = '/conditioncheck/resume';
 
 export const API_SAVE_CONDITION_REPORT = '/conditionreport/register';
+export const API_SAVE_CONDITION_CHECK = '/conditioncheck/register';
 
 export const API_GET_CONDITION_REPORT_BY_INVENTORY = '/conditionreport/list';
+export const API_GET_CONDITION_CHECK_BY_INVENTORY = '/conditioncheck/list';
+
+export const API_GET_TOTAL_PHOTOS_CONDITION_REPORT = '/conditionreport/totalPhotos';
+export const API_GET_TOTAL_PHOTOS_CONDITION_CHECK = '/conditioncheck/totalPhotos';
 
 // GENERAL
 export const API_GET_PACKING_DETAILS = '/conditionreport/load/packingdetail';

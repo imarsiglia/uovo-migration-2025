@@ -284,6 +284,18 @@ export const ItemDetailScreen = (props: Props) => {
       });
   }, [currentItem]);
 
+  const onInitConditionReport = useCallback(() => {
+    navigate(RoutesNavigation.ConditionReport, {
+      item: currentItem,
+    });
+  }, [navigate, currentItem]);
+
+  const onInitConditionCheck = useCallback(() => {
+    navigate(RoutesNavigation.ConditionCheck, {
+      item: currentItem,
+    });
+  }, [navigate, currentItem]);
+
   return (
     <View style={[styles.container]}>
       {isLoading && <GeneralLoading />}
@@ -444,16 +456,10 @@ export const ItemDetailScreen = (props: Props) => {
                     styles.containerOptionPickReport,
                     styles.borderBottom,
                   ]}
-                  onPress={
-                    () => {
-                      close();
-                    }
-                    // navigate('ConditionReport', {
-                    //   fromReports: false,
-                    //   updateItem: updateItemDetail.bind(this),
-                    //   item: currentItem,
-                    // })
-                  }>
+                  onPress={() => {
+                    close();
+                    onInitConditionReport();
+                  }}>
                   <Text style={[styles.optionReport]}>Condition Report</Text>
                 </TouchableHighlight>
 
@@ -461,16 +467,10 @@ export const ItemDetailScreen = (props: Props) => {
                   activeOpacity={0.6}
                   underlayColor="#DDDDDD"
                   style={[styles.containerOptionPickReport]}
-                  onPress={
-                    () => {
-                      close();
-                    }
-                    // navigate('ConditionCheck', {
-                    //   fromReports: false,
-                    //   updateItem: updateItemDetail.bind(this),
-                    //   item: currentItem,
-                    // })
-                  }>
+                  onPress={() => {
+                    close();
+                    onInitConditionCheck();
+                  }}>
                   <Text style={[styles.optionReport]}>Condition Check</Text>
                 </TouchableHighlight>
               </View>
@@ -613,7 +613,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 50,
     alignContent: 'center',
-    paddingLeft: 20,
+    paddingHorizontal: 20,
     borderRadius: 15,
   },
   borderBottom: {

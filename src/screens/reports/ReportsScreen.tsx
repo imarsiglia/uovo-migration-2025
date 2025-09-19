@@ -67,10 +67,6 @@ export const ReportsScreen = () => {
       navigate(RoutesNavigation.ConditionReport, {
         fromReports: true,
       });
-      //   props.navigation.navigate('ConditionReport', {
-      //     fromReports: true,
-      //     refresh: refresh.bind(this),
-      //   });
     } else {
       navigate(RoutesNavigation.ConditionCheck, {
         fromReports: true,

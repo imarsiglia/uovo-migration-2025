@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   StyleSheet,
   View,
@@ -19,20 +19,18 @@ import MinRoundedView from '@components/commons/view/MinRoundedView';
 import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 import ReportItemList from '@components/reports/ReportItemList';
 import useReportStore from '@store/reports';
+import {ReportResumeType} from '@api/types/Inventory';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {RoutesNavigation} from '@navigation/types';
 
 export const ReportsConditionReport = () => {
-//   const [loading, setLoading] = useState(true);
-  //   const [list, setList] = useState([]);
-  const [fullList, setfullList] = useState([]);
-  const [filter, setfilter] = useState('');
-
+  const {navigate} = useCustomNavigation();
   const list = useReportStore((d) => d.conditionReportList);
 
   useEffect(() => {
     // setList(props.list);
     // setfullList(props.list);
     // setLoading(false);
-
     // const mmsubscribe = props.navigation.addListener('state', (e) => {
     //   if (e != undefined) {
     //     if (
@@ -53,20 +51,18 @@ export const ReportsConditionReport = () => {
   //     };
   //   }, []);
 
-  const initEdit = (item: any) => {
-    // navigate('ConditionReport', {
-    //   fromReports: true,
-    //   refresh: props.refresh,
-    //   condition: item,
-    // });
-  };
+  const initEdit = useCallback(
+    (item: ReportResumeType) => {
+      navigate(RoutesNavigation.ConditionReport, {
+        fromReports: true,
+        report: item,
+      });
+    },
+    [navigate],
+  );
 
   return (
     <View style={[styles.container]}>
-      {/* {loading && <GeneralLoading />} */}
-
-      {/* <MinRoundedView /> */}
-
       <ScrollView style={styles.scrollNotifications}>
         {list?.map((item, index) => {
           return (

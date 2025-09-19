@@ -137,7 +137,7 @@ const getArtists = async ({
   filter: string;
 }): Promise<GeneralListApi[]> => {
   const response = await getRequest<Paginated<GeneralListApi[]>>(
-    `${API_GET_ARTISTS}?query=${filter}`,
+    `${API_GET_ARTISTS}?query=${filter}&start=0&limit=20`,
   );
   return response.body?.data ?? [];
 };
@@ -148,7 +148,7 @@ const getArtTypes = async ({
   filter: string;
 }): Promise<GeneralListApi[]> => {
   const response = await getRequest<Paginated<GeneralListApi[]>>(
-    `${API_GET_ART_TYPES}?query=${filter}`,
+    `${API_GET_ART_TYPES}?query=${filter}&start=0&limit=20`,
   );
   return response.body?.data ?? [];
 };
