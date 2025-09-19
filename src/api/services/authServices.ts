@@ -1,5 +1,11 @@
 import {UserType} from '@api/types/User';
-import {API_LOGIN, API_REFRESH_TOKEN, API_REGULAR_LOGIN} from '@api/contants/endpoints';
+import {
+  API_LOGIN,
+  API_REFRESH_TOKEN,
+  API_REGULAR_LOGIN,
+  API_UPDATE_USER,
+  SUCCESS_MESSAGES,
+} from '@api/contants/endpoints';
 import {postRequest} from '@api/helpers/apiClientHelper';
 
 type PropsLogin = {
@@ -46,8 +52,21 @@ const regularLogin = async (props: PropsRegularLogin): Promise<UserType> => {
   return response.body;
 };
 
+type UpdateUserApiProps = {
+  firstname: string;
+  lastname: string;
+  phone: string;
+  photo?: string | null;
+};
+
+const updateUser = async (props: UpdateUserApiProps): Promise<boolean> => {
+  const response = await postRequest<boolean>(API_UPDATE_USER, props);
+  return response.message === SUCCESS_MESSAGES.SUCCESS;
+};
+
 export const authServices = {
   login,
   refreshToken,
   regularLogin,
+  updateUser,
 };

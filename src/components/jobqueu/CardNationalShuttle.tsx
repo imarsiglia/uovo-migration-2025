@@ -194,25 +194,6 @@ const CardNationalShuttle = ({
               </Wrapper>
             )}
           </CustomDropdown>
-          {/* <DropdownMenu
-            title="BOL"
-            buttonStyle={{padding: 6, paddingHorizontal: 15}}
-            icon={<Icons.DocumentIcon />}
-            actionList={[
-              {
-                title: 'Edit Piece Count',
-                action: onInitEditPieceCount,
-              },
-              {
-                title: 'Signature',
-                action: onInitSignature,
-              },
-              {
-                title: 'Send BOL',
-                action: onInitSendBOL,
-              },
-            ]}
-          /> */}
         </View>
         <BolCountVisualize
           bolSended={item.bol_sended}
@@ -263,7 +244,7 @@ const styles = StyleSheet.create({
   menu: {
     backgroundColor: 'white',
     borderRadius: 10,
-    padding: 20,
+    padding: 0,
     marginTop: -10,
   },
   menuItem: {

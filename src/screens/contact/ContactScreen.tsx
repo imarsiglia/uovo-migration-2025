@@ -93,13 +93,13 @@ export const ContactScreen = () => {
     if (refCallSheet.current) {
       refCallSheet.current.open();
     }
-  }, [refVoice?.current, refCallSheet?.current]);
+  }, []);
 
   const closeSheet = useCallback(() => {
     if (refCallSheet.current) {
       refCallSheet.current.close();
     }
-  }, [refCallSheet?.current]);
+  }, []);
 
   const initCamera = useCallback(() => {
     onLaunchCamera(closeSheet, generateImagePathIOS);

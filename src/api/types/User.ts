@@ -40,7 +40,7 @@ export interface UserType {
   user_netsuite_id: string | number | null;
   user_phone: string;
   user_phone_prefix: number;
-  user_photo: Base64String; // JPEG base64
+  user_photo?: Base64String | null; // JPEG base64
   user_platform: string | null;
   user_recovery_code: string | null;
   user_ses_type: string; // ej: "Manual"

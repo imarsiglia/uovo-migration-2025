@@ -8,40 +8,23 @@ import {enableScreens} from 'react-native-screens';
 //Screens
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 // import ConfirmPhoto from '../components/general/ConfirmPhoto';
-// import Account from '../screens/account';
 // import AddLabor from '../screens/addLabor';
 // import AddLocationNote from '../screens/addLocationNote';
 // import AddMaterials from '../screens/addMaterials';
 // import Attachments from '../screens/attachments';
 // import ClientLocations from '../screens/clientLocations';
-// import ConditionCheck from '../screens/conditionCheck';
-// import ConditionReport from '../screens/conditionReport';
-// import ContactUs from '../screens/contactUs';
-// import DigitalId from '../screens/digitalId';
-// import EditBOL from '../screens/editBOL';
 // import EditImage from '../screens/editImage';
-// import EditProfile from '../screens/editProfile';
-// import HelpDesk from '../screens/helpDesk';
 // import Images from '../screens/images';
-// import Inventory from '../screens/inventory';
-// import InventoryNewItem from '../screens/inventoryNewItem';
 // import ItemDetail from '../screens/itemDetail';
 // import ReportMaterialsItemDetail from '../screens/itemDetails/reportMaterials';
 // import LaborReport from '../screens/laborReport';
 // import LocationNotes from '../screens/locationNotes';
 
-// import LoginEmail from '../screens/LoginEmail';
-// import NavigatorHome from '../screens/navigatorHome';
-// import NavigatorTopSheet from '../screens/navigatorTopSheet';
-// import Notes from '../screens/notes';
-// import ReportIssue from '../screens/reportIssue';
 // import ReportMaterials from '../screens/reportMaterials';
 // import Reports from '../screens/reports';
 // import Signature from '../screens/signature';
-// import TakeDimensions from '../screens/takeDimensions';
 // import TakeImages from '../screens/takeImages';
-// import TakeNotes from '../screens/takeNotes';
-// import TakeSignature from '../screens/takeSignature';
+
 // import VisualizePdf from '../screens/visualizePdf';
 // import VisualizePhoto from '../screens/visualizePhoto';
 
@@ -110,6 +93,8 @@ import {TakeDimensionsScreen} from '@screens/inventory/TakeDimensions';
 import {ReportsScreen} from '@screens/reports/ReportsScreen';
 import {ConditionReportScreen} from '@screens/reports/ConditionReportScreen';
 import {ConditionCheckScreen} from '@screens/reports/ConditionCheckScreen';
+import {EditProfileScreen} from '@screens/profile/EditProfileScreen';
+import CallPhoneSheet from '@components/bottomSheets/CallPhoneSheet';
 // import InventoryNS from '../screens/nationalShuttle/InventoryNS';
 
 // LogBox.ignoreLogs([
@@ -166,6 +151,10 @@ export const AppNavigation = () => {
               component={LoginScreen}
             />
             <Stack.Screen
+              name={RoutesNavigation.EditProfile}
+              component={EditProfileScreen}
+            />
+            <Stack.Screen
               name={RoutesNavigation.ContactUs}
               component={ContactScreen}
             />
@@ -174,7 +163,6 @@ export const AppNavigation = () => {
               name={RoutesNavigation.Topsheet}
               component={TopsheetScreen}
             />
-
             <Stack.Screen
               name={RoutesNavigation.EditImage}
               component={EditImageScreen}
@@ -235,62 +223,50 @@ export const AppNavigation = () => {
               name={RoutesNavigation.SaveReportMaterials}
               component={SaveReportMaterialScreen}
             />
-
             <Stack.Screen
               name={RoutesNavigation.WoAttachment}
               component={WoAttachmentScreen}
             />
-
             <Stack.Screen
               name={RoutesNavigation.EditPieceCount}
               component={EditPieceCountScreen}
             />
-
             <Stack.Screen
               name={RoutesNavigation.LaborReport}
               component={LaborReportScreen}
             />
-
             <Stack.Screen
               name={RoutesNavigation.AddLaborReport}
               component={AddLaborReportScreen}
             />
-
             <Stack.Screen
               name={RoutesNavigation.Inventory}
               component={InventoryScreen}
             />
-
             <Stack.Screen
               name={RoutesNavigation.AddInventory}
               component={AddInventoryScreen}
             />
-
             <Stack.Screen
               name={RoutesNavigation.ItemDetail}
               component={ItemDetailScreen}
             />
-
             <Stack.Screen
               name={RoutesNavigation.TakeDimensions}
               component={TakeDimensionsScreen}
             />
-
             <Stack.Screen
               name={RoutesNavigation.Reports}
               component={ReportsScreen}
             />
-
             <Stack.Screen
               name={RoutesNavigation.ConditionReport}
               component={ConditionReportScreen}
             />
-
             <Stack.Screen
               name={RoutesNavigation.ConditionCheck}
               component={ConditionCheckScreen}
             />
-
             {/* visualizar imagenes */}
             <Stack.Screen
               name={RoutesNavigation.BaseImageScreen}
@@ -300,6 +276,7 @@ export const AppNavigation = () => {
           <ModalDialog />
           <ModalLoading />
           <PortalHost name="root" />
+          <CallPhoneSheet/>
         </NavigationContainer>
         // <OfflineComponentSync />
         // <OfflineCompSecondSync />

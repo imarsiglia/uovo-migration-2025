@@ -3,6 +3,9 @@ export const API_LOGIN = '/login';
 export const API_REFRESH_TOKEN = '/user/refreshtoken';
 export const API_REGULAR_LOGIN = '/loginalter';
 
+// user update profile
+export const API_UPDATE_USER = '/user/update'
+
 //help desk general
 export const API_CONTACT_US = '/login/helpdesk';
 export const API_HELPDESK = '/user/helpdesk';

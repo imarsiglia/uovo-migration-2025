@@ -40,7 +40,7 @@ export const ImageOptionSheet = forwardRef<
       draggable={true} // v3: reemplaza closeOnDragDown
       useNativeDriver={true}
       customModalProps={{
-        animationType: 'slide', // v3: va dentro de customModalProps
+        animationType: 'slide',
         statusBarTranslucent: true,
       }}
       customAvoidingViewProps={{enabled: false}}
@@ -51,7 +51,9 @@ export const ImageOptionSheet = forwardRef<
           height,
           backgroundColor: 'white',
         },
-        wrapper: {backgroundColor: '#eeeeee5e'},
+        wrapper: {
+          backgroundColor: '#00000070',
+        },
         draggableIcon: {backgroundColor: '#d1d1d1', width: 100},
       }}>
       <View style={{flex: 1}}>

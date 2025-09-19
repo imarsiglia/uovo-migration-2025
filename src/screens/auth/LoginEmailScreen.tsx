@@ -64,7 +64,7 @@ export const LoginEmailScreen = () => {
             modalVisible: true,
             cancelable: false,
             message: 'Invalid credencials',
-            type: "error"
+            type: 'error',
           });
         }),
     );

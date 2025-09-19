@@ -1,3 +1,5 @@
+import {Image as ImageType} from 'react-native-image-crop-picker';
+
 export const SPEECH_EVENTS = {
   RESULTS: 'onSpeechResults',
   START: 'onSpeechStart',
@@ -27,3 +29,5 @@ export const INVENTORY_ORDER_TYPE = {
 } as const;
 
 export type InventoryFilterOrderType = 'ASC' | 'DESC';
+
+export type {ImageType};

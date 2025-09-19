@@ -8,7 +8,7 @@ export type SubmitModulesFormProps<T> = {
   schema?: yup.ObjectSchema<DeepPartial<T>>;
   defaultValue?: any;
   resetDefaultValue?: boolean;
-  key: any
+  key?: string
 };
 
 export function BasicFormProvider<T>({

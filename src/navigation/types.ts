@@ -53,7 +53,9 @@ export type RootStackParamList = {
     photos?: any;
   };
   [RoutesNavigation.Login]: undefined;
-  [RoutesNavigation.EditProfile]: undefined;
+  [RoutesNavigation.EditProfile]: {
+    fromProfile?: boolean
+  };
   [RoutesNavigation.EditImage]: {
     photo: any;
     photos?: any;

@@ -87,7 +87,9 @@ export const AccountScreen = () => {
           {marginTop: 30},
         ]}
         // @ts-ignore
-        onPress={() => navigate('EditProfile', {fromprofile: true})}>
+        onPress={() =>
+          navigate(RoutesNavigation.EditProfile, {fromProfile: true})
+        }>
         <Wrapper style={styles.containerOptionLabel}>
           <Icons.AddressCard fontSize={22} />
           <Label style={styles.textOption}>My Profile</Label>
@@ -104,7 +106,7 @@ export const AccountScreen = () => {
           styles.containerOption,
           {marginTop: 10},
         ]}
-        onPress={() => navigate('DigitalId', {member: false})}>
+        onPress={() => navigate(RoutesNavigation.DigitalId, {member: false})}>
         <Wrapper style={styles.containerOptionLabel}>
           <Icons.IdBadge fontSize={22} />
           <Label style={styles.textOption}>Digital ID</Label>

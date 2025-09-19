@@ -169,4 +169,9 @@ export const GLOBAL_STYLES = StyleSheet.create({
     backgroundColor: '#d0d0d0',
     opacity: 0.7,
   },
+  container: {
+    paddingTop: 10,
+    paddingLeft: 30,
+    paddingRight: 30,
+  },
 });

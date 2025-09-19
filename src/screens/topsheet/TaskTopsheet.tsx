@@ -310,11 +310,11 @@ const styles = StyleSheet.create({
   menu: {
     backgroundColor: 'white',
     borderRadius: 10,
-    padding: 15,
+    paddingVertical: 10,
     minWidth: 160,
+    gap: 15
   },
   menuItem: {
-    height: 40,
     justifyContent: 'center',
   },
   menuTitle: {

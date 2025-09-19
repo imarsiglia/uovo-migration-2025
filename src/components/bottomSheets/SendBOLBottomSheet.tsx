@@ -1,29 +1,23 @@
 import {SUCCESS_MESSAGES} from '@api/contants/endpoints';
 import {useSendEmailBOL} from '@api/hooks/HooksJobServices';
-import {JobDetailType, JobType, NSJobType} from '@api/types/Jobs';
+import {JobDetailType, NSJobType} from '@api/types/Jobs';
 import {RBSheetRef} from '@components/commons/bottomsheets/ImageOptionSheet';
-import {IndicatorLoading} from '@components/commons/loading/IndicatorLoading';
-import {CustomModal} from '@components/commons/modals/CustomModal';
 import {loadingWrapperPromise} from '@store/actions';
 import {useModalDialogStore} from '@store/modals';
-import useTopSheetStore from '@store/topsheet';
-import {COLORS} from '@styles/colors';
+import { COLORS } from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {isEmail} from '@utils/functions';
 import {showToastMessage} from '@utils/toast';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {
-  Alert,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  TouchableHighlight,
   TouchableOpacity,
   View,
 } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
-import Modal from 'react-native-modal';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 type PeopleEmail = {
@@ -264,154 +258,154 @@ export const SendBOLBottomSheet = ({
   );
 
   return (
-    <>
-      {/* @ts-ignore */}
-      <RBSheet
-        ref={refRbsSheet}
-        // @ts-ignore
-        closeOnDragDown={true}
-        closeOnPressMask={false}
-        openDuration={250}
-        closeDuration={250}
-        draggable={true}
-        dragOnContent
-        customStyles={{
-          container: {
-            paddingHorizontal: 20,
-            borderTopStartRadius: 10,
-            borderTopEndRadius: 10,
-            height: 400,
-          },
-          wrapper: {
-            backgroundColor: '#eeeeee5e',
-          },
-          draggableIcon: {
-            backgroundColor: 'gray',
-            width: 100,
-          },
-        }}>
-        <ScrollView style={styles.gridContainer}>
-          <View
-            style={{
-              width: '100%',
-              alignItems: 'center',
-              marginTop: 5,
-            }}>
-            <Text style={[styles.grayText, styles.textInfo, {fontSize: 13}]}>
-              Select emails to send
-            </Text>
-          </View>
-          {emails.map((item, index) => {
-            return (
-              <TouchableOpacity
-                key={index}
-                style={[GLOBAL_STYLES.row, styles.containerOptionCheck]}
-                onPress={() => checkEmail(item)}>
-                <View>
-                  <Text style={GLOBAL_STYLES.bold}>{item.type}</Text>
-                  <Text style={GLOBAL_STYLES.bold}>{item.name}</Text>
-                  <View style={GLOBAL_STYLES.row}>
-                    {item.phone != null && item.phone != '' && (
-                      <Text style={styles.grayText}>{item.phone + ' - '}</Text>
-                    )}
-
-                    <Text style={styles.grayText}>{item.email}</Text>
-                  </View>
-                </View>
-                <View>
-                  {item.checked && (
-                    <Icon name="check" type="solid" color="#00D3ED" size={18} />
+    <RBSheet
+      ref={refRbsSheet}
+      openDuration={250}
+      closeDuration={250}
+      closeOnPressBack={false}
+      closeOnPressMask={false}
+      draggable={false}
+      customModalProps={{
+        animationType: 'slide',
+        statusBarTranslucent: true,
+      }}
+      // dragOnContent
+      customStyles={{
+        container: {
+          paddingHorizontal: 20,
+          borderTopStartRadius: 10,
+          borderTopEndRadius: 10,
+          height: 400,
+        },
+        wrapper: {
+          backgroundColor: '#00000070',
+        },
+        draggableIcon: {
+          backgroundColor: 'gray',
+          width: 100,
+        },
+      }}>
+      <ScrollView style={styles.gridContainer}>
+        <View
+          style={{
+            width: '100%',
+            alignItems: 'center',
+            paddingTop: 20,
+          }}>
+          <Text style={[styles.grayText, styles.textInfo, {fontSize: 13}]}>
+            Select emails to send
+          </Text>
+        </View>
+        {emails.map((item, index) => {
+          return (
+            <TouchableOpacity
+              key={index}
+              style={[GLOBAL_STYLES.row, styles.containerOptionCheck]}
+              onPress={() => checkEmail(item)}>
+              <View>
+                <Text style={GLOBAL_STYLES.bold}>{item.type}</Text>
+                <Text style={GLOBAL_STYLES.bold}>{item.name}</Text>
+                <View style={GLOBAL_STYLES.row}>
+                  {item.phone != null && item.phone != '' && (
+                    <Text style={styles.grayText}>{item.phone + ' - '}</Text>
                   )}
-                </View>
-              </TouchableOpacity>
-            );
-          })}
 
-          <View
-            style={{
-              marginLeft: 4,
-              display: 'flex',
-              flex: 1,
-              flexDirection: 'row',
-              width: '100%',
-              marginBottom: 20,
-            }}>
-            <View>
-              <Text style={[GLOBAL_STYLES.bold, {flex: 0.2}]}>Other</Text>
-            </View>
-            <View style={[styles.emailFieldStyle, {flex: 0.7}]}>
-              {others.map((item, index) => {
-                return (
-                  <View
-                    key={index}
-                    style={{
-                      backgroundColor: item.valid ? '#00d3ed' : 'red',
-                      alignSelf: 'flex-start',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      flex: 0.5,
-                      borderRadius: 20,
-                      flexDirection: 'row',
-                      margin: 3,
-                      padding: 5,
-                    }}>
-                    <Text
-                      style={{
-                        marginRight: 5,
-                        color: 'white',
-                        fontSize: 11,
-                      }}>
-                      {item.email}
-                    </Text>
-                    <TouchableOpacity
-                      onPress={() => removeEmail(index)}
-                      style={{alignSelf: 'center'}}>
-                      <Icon name="times" size={16} color="white" />
-                    </TouchableOpacity>
-                  </View>
-                );
-              })}
-              <TextInput
-                autoCorrect={false}
-                autoCapitalize="none"
-                style={{
-                  backgroundColor: 'transparent',
-                  borderWidth: 0,
-                  padding: 5,
-                  fontSize: 11,
-                  color: 'black',
-                }}
-                value={emailChipText}
-                onChangeText={(text) => checkEmailText(text)}
-                onSubmitEditing={() => onSubmitEmail()}
-              />
-            </View>
-          </View>
-        </ScrollView>
+                  <Text style={styles.grayText}>{item.email}</Text>
+                </View>
+              </View>
+              <View>
+                {item.checked && (
+                  <Icon name="check" type="solid" color="#00D3ED" size={18} />
+                )}
+              </View>
+            </TouchableOpacity>
+          );
+        })}
 
         <View
           style={{
-            position: 'absolute',
-            bottom: 0,
-            paddingBottom: 30,
-            right: 0,
-            paddingRight: 20,
+            marginLeft: 4,
+            display: 'flex',
+            flex: 1,
+            flexDirection: 'row',
+            width: '100%',
+            marginBottom: 20,
           }}>
-          <View style={GLOBAL_STYLES.row}>
-            <TouchableOpacity
-              style={{padding: 10}}
-              onPress={() => handleVisible(false)}>
-              <Text>Close</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{marginLeft: 30, padding: 10}}
-              onPress={() => sendBOL(false)}>
-              <Text>Send</Text>
-            </TouchableOpacity>
+          <View>
+            <Text style={[GLOBAL_STYLES.bold, {flex: 0.2}]}>Other</Text>
+          </View>
+          <View style={[styles.emailFieldStyle, {flex: 0.7}]}>
+            {others.map((item, index) => {
+              return (
+                <View
+                  key={index}
+                  style={{
+                    backgroundColor: item.valid ? '#00d3ed' : 'red',
+                    alignSelf: 'flex-start',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    flex: 0.5,
+                    borderRadius: 20,
+                    flexDirection: 'row',
+                    margin: 3,
+                    padding: 5,
+                  }}>
+                  <Text
+                    style={{
+                      marginRight: 5,
+                      color: 'white',
+                      fontSize: 11,
+                    }}>
+                    {item.email}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => removeEmail(index)}
+                    style={{alignSelf: 'center'}}>
+                    <Icon name="times" size={16} color="white" />
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+            <TextInput
+              autoCorrect={false}
+              autoCapitalize="none"
+              style={{
+                backgroundColor: 'transparent',
+                borderWidth: 0,
+                padding: 5,
+                fontSize: 11,
+                color: 'black',
+              }}
+              value={emailChipText}
+              onChangeText={(text) => checkEmailText(text)}
+              onSubmitEditing={() => onSubmitEmail()}
+            />
           </View>
         </View>
-      </RBSheet>
-    </>
+      </ScrollView>
+
+      <View
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          paddingBottom: 30,
+          right: 0,
+          paddingRight: 20,
+        }}>
+        <View style={GLOBAL_STYLES.row}>
+          <TouchableOpacity
+            style={{padding: 10}}
+            onPress={() => handleVisible(false)}>
+            <Text>Close</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{marginLeft: 30, padding: 10}}
+            onPress={() => sendBOL(false)}>
+            <Text>Send</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </RBSheet>
   );
 };
 
@@ -428,8 +422,8 @@ const styles = StyleSheet.create({
     paddingLeft: 3,
     height: 15,
     fontSize: 12,
-    color: '#464646',
-    opacity: 0.66,
+    color: COLORS.dark,
+    // opacity: 0.66,
     marginBottom: 5,
   },
   containerOptionCheck: {

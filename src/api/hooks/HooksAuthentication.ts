@@ -26,3 +26,9 @@ export const useRegularLogin = () => {
     mutationFn: authServices.regularLogin,
   });
 };
+
+export const useUpdateUser = () => {
+  return useMutation({
+    mutationFn: authServices.updateUser,
+  });
+};

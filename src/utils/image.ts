@@ -1,11 +1,12 @@
-import ImageCropPicker, { Image } from 'react-native-image-crop-picker';
+import ImageCropPicker from 'react-native-image-crop-picker';
 import { PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 import { isAndroid } from './functions';
 import { showToastMessage } from './toast';
+import { ImageType } from '@generalTypes/general';
 
 export const onLaunchCamera = async (
   closeModal: () => void,
-  callback: (photo?: any, path?: string) => void,
+  callback: (photo?: ImageType, path?: string) => void,
 ) => {
   let granted = true;
   if (isAndroid()) {
@@ -36,7 +37,7 @@ export const onLaunchCamera = async (
 
 export const onSelectImage = async (
   closeModal: () => void,
-  callback: () => void,
+  callback: (photo?: ImageType, path?: string) => void,
 ) => {
   let granted = true;
   if (isAndroid()) {
@@ -69,11 +70,11 @@ type ResponseImagePickerProps = {
   error: Error;
   customButton: any;
   data: string;
-} & Image;
+} & ImageType;
 
 const manageImage = async (
-  response: Image,
-  callback?: (photo?: any, imagePath?: string) => void,
+  response: ImageType,
+  callback?: (photo?: ImageType, imagePath?: string) => void,
 ) => {
   if (response.data && callback) {
     // var responseName = isAndroid()

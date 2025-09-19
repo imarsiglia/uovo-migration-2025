@@ -11,9 +11,11 @@ import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
 import {RoutesNavigation} from '@navigation/types';
 import {loadingWrapperPromise} from '@store/actions';
 import {useAuth} from '@store/auth';
+import {openCallSheet} from '@store/callSheetStore';
 import {useModalDialogStore} from '@store/modals';
 import useTopSheetStore from '@store/topsheet';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
+import openCallOptions from '@utils/openCallOptions';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import {useCallback, useMemo, useState} from 'react';
 import {Keyboard, ScrollView, StyleSheet} from 'react-native';
@@ -59,9 +61,9 @@ export const TeamTopsheet = () => {
           });
           loadingWrapperPromise(
             removeMemberTeam({
-              idJob: jobDetail?.id,
+              idJob: jobDetail?.id!,
               idUser: item.id_user,
-              jobQueue: isJobQueue,
+              jobQueue: isJobQueue!,
             })
               .then((d) => {
                 if (d) {
@@ -83,7 +85,7 @@ export const TeamTopsheet = () => {
 
   const doCall = useCallback((phone?: string) => {
     if (phone) {
-      // pendiente
+      openCallSheet(phone);
     } else {
       showToastMessage('Undefined phone');
     }

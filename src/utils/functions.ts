@@ -290,3 +290,16 @@ export function moveOtherToEnd(arr: {id: string; name: string}[]) {
   const rest = arr.filter((x) => !(x.name && x.name.toUpperCase() === 'OTHER'));
   return [...rest, ...others];
 }
+
+export const getFormattedNumber = (num: string) => {
+  let tempNumber = num;
+  tempNumber = tempNumber
+    .replaceAll(' ', '')
+    .replaceAll('-', '')
+    .replaceAll('(', '')
+    .replaceAll(')', '');
+  if (!tempNumber.includes('+')) {
+    tempNumber = '+1' + tempNumber;
+  }
+  return tempNumber;
+};

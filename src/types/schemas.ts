@@ -6,6 +6,8 @@ const DEFAULT_REQUIRED_MESSAGE = 'This field is required';
 const DEFAULT_NUMBER_TYPE_MESSAGE = 'Must input a number';
 const DEFAULT_DATE_TYPE_MESSAGE = 'Invalid date';
 const DEFAULT_EMAIL_TYPE_MESSAGE = 'Invalid email';
+const DEFAULT_COMPLETE_INFO_MESSAGE =
+  'Before continuing, you must complete your information';
 
 const decimalRegex = /^\d*((\.|\,)\d{1,2})?$/;
 const decimalIntegerRegex = /^\d+((\.|\,)\d{1,2})?$/;
@@ -310,7 +312,6 @@ export type ConditionReportSchemaType = yup.InferType<
   typeof ConditionReportSchema
 >;
 
-
 export const ConditionCheckSchema = yup.object().shape({
   // autocomplete
   artistName: yup.mixed<{id: string; title: string}>().optional().nullable(),
@@ -333,9 +334,23 @@ export const ConditionCheckSchema = yup.object().shape({
   un_packed_height: decimalString(),
   un_packed_length: decimalString(),
   un_packed_width: decimalString(),
-  
 });
 
 export type ConditionCheckSchemaType = yup.InferType<
   typeof ConditionCheckSchema
 >;
+
+export const ProfileSchema = yup.object({
+  firstname: yup.string().required(DEFAULT_COMPLETE_INFO_MESSAGE),
+  lastname: yup.string().required(DEFAULT_COMPLETE_INFO_MESSAGE),
+  phone: yup
+    .string()
+    .trim()
+    .required(DEFAULT_COMPLETE_INFO_MESSAGE)
+    .notOneOf(
+      ['555-55555'],
+      'Before continuing, you must update your phone number',
+    ),
+});
+
+export type ProfileSchemaType = yup.InferType<typeof ProfileSchema>;
