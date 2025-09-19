@@ -178,7 +178,7 @@ export const TopsheetScreen = ({route}: Props) => {
             {jobDetail?.use_bol && (
               <PressableOpacity
                 disabled={isLoading}
-                onPress={() => navigate(RoutesNavigation.VisualizePdf)}
+                onPress={() => navigate(RoutesNavigation.VisualizeBOL)}
                 style={GLOBAL_STYLES.btnOptTop}>
                 <Icon name="file-pdf" color="white" type="solid" size={15} />
               </PressableOpacity>

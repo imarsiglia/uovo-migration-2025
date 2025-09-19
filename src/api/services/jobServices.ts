@@ -5,6 +5,7 @@ import {
   API_CLOCK_IN_STOP,
   API_CLOCK_RESUME,
   API_GET_LOCATION_NOTES,
+  API_GET_VISUALIZE_BOL,
   API_JOBQUEUE,
   API_LOCATION_LETSGO,
   API_LOCATION_REPORT_ISSUE,
@@ -216,6 +217,13 @@ const removeMemberTeam = async (
   return response.message == SUCCESS_MESSAGES.SUCCESS;
 };
 
+const getBolPdf = async ({idJob}: TaskBaseApiProps): Promise<string> => {
+  const response = await getRequest<string>(
+    `${API_GET_VISUALIZE_BOL}/${idJob}?create=0`,
+  );
+  return response as never as string;
+};
+
 export const jobServices = {
   calendar,
   timeline,
@@ -232,4 +240,5 @@ export const jobServices = {
   clockout,
   resumeJob,
   removeMemberTeam,
+  getBolPdf,
 };

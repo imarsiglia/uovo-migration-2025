@@ -48,6 +48,7 @@ export const QUERY_KEYS = {
   CONDITION_CHECK_BY_INVENTORY: 'condition_check_by_inventory',
   TOTAL_PHOTOS_CONDITION_REPORT: 'total_photos_condition_report',
   TOTAL_PHOTOS_CONDITION_CHECK: 'total_photos_condition_check',
+  GET_BOL_PDF: 'get_bol_pdf',
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';

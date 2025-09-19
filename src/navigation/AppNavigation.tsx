@@ -71,7 +71,7 @@ import {ReportIssueScreen} from '@screens/location/ReportIssueScreen';
 import {LocationNotesScreen} from '@screens/location/LocationNotesScreen';
 import {SaveLocationNoteScreen} from '@screens/location/SaveLocationNoteScreen';
 import {DigitalIdScreen} from '@screens/digitalid/DigitalIdScreen';
-import {VisualizePdfScreen} from '@screens/visualizepdf/VisualizePdfScreen';
+import {VisualizeBolScreen} from '@screens/bol/VisualizeBolScreen';
 import {SignaturesScreen} from '@screens/signatures/SignaturesScreen';
 import {TakeSignatureScreen} from '@screens/signatures/TakeSignatureScreen';
 import {NotesScreen} from '@screens/notes/NotesScreen';
@@ -196,8 +196,8 @@ export const AppNavigation = () => {
               component={DigitalIdScreen}
             />
             <Stack.Screen
-              name={RoutesNavigation.VisualizePdf}
-              component={VisualizePdfScreen}
+              name={RoutesNavigation.VisualizeBOL}
+              component={VisualizeBolScreen}
             />
             <Stack.Screen
               name={RoutesNavigation.Signatures}

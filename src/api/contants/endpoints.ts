@@ -114,6 +114,10 @@ export const API_GET_PLACES_CONDITION_REPORT = '/conditionreport/load/places';
 export const API_GET_ARTISTS = '/conditionreport/load/artist';
 export const API_GET_ART_TYPES = '/conditionreport/load/arttype';
 
+// VISUALIZE BOL
+export const API_GET_VISUALIZE_BOL = '/bol/generate';
+
+
 export const API_GET_INVENTORY_EAST_COAST_PICKUP =
   '/jobns/inventory/eastcoastpickup/query';
 export const API_GET_INVENTORY_WEST_COAST_PICKUP =

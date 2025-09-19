@@ -117,10 +117,7 @@ export const TeamTopsheet = () => {
         ]}>
         <Wrapper
           style={{
-            paddingLeft: 10,
-            paddingRight: 10,
-            paddingBottom: 0,
-            height: 45,
+            paddingHorizontal: 20,
           }}>
           <SearchInput
             value={filter}

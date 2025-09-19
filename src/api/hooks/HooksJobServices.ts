@@ -8,6 +8,7 @@ import {
   TaskCountApiProps,
   TopSheetApiProps,
 } from '@api/services/jobServices';
+import {TaskBaseApiProps} from '@api/services/taskServices';
 import {ApiResponse} from '@api/types/Response';
 import {
   keepPreviousData,
@@ -215,5 +216,14 @@ export const useResumeJob = () => {
 export const useRemoveMemberTeam = () => {
   return useMutation({
     mutationFn: jobServices.removeMemberTeam,
+  });
+};
+
+export const useGetBolPdf = (props: TaskBaseApiProps) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_BOL_PDF, props],
+    queryFn: () => jobServices.getBolPdf(props),
+    enabled: !!props?.idJob,
+    ...DEFAULT_PERSISTENCE_CONFIG,
   });
 };

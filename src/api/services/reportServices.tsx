@@ -16,10 +16,7 @@ import {
   TotalPhotoReportType,
 } from '@api/types/Inventory';
 import {Paginated} from '@api/types/Response';
-
-export type TaskBaseApiProps = {
-  idJob: number;
-};
+import { TaskBaseApiProps } from './taskServices';
 
 export type SignaturesApiProps = {
   forceSend?: boolean;

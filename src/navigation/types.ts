@@ -20,7 +20,7 @@ export const RoutesNavigation = {
   LocationNotes: 'LocationNotes',
   SaveLocationNotes: 'SaveLocationNotes',
   DigitalId: 'DigitalId',
-  VisualizePdf: 'VisualizePdf',
+  VisualizeBOL: 'VisualizeBOL',
   Signatures: 'Signatures',
   TakeSignature: 'TakeSignature',
   Notes: 'Notes',
@@ -84,7 +84,7 @@ export type RootStackParamList = {
     member?: boolean;
     person?: CrewMemberType;
   };
-  [RoutesNavigation.VisualizePdf]: undefined;
+  [RoutesNavigation.VisualizeBOL]: undefined;
   [RoutesNavigation.Signatures]: undefined;
   [RoutesNavigation.TakeSignature]: {
     name: string;
