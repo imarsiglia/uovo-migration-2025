@@ -95,6 +95,9 @@ import {ConditionReportScreen} from '@screens/reports/ConditionReportScreen';
 import {ConditionCheckScreen} from '@screens/reports/ConditionCheckScreen';
 import {EditProfileScreen} from '@screens/profile/EditProfileScreen';
 import CallPhoneSheet from '@components/bottomSheets/CallPhoneSheet';
+import {navigationRef} from '@utils/navigationService';
+import {InventoryNSScreen} from '@screens/nationalshuttle/InventoryNSScreen';
+import { OfflineBanner } from '@components/offline/OfflineBanner';
 // import InventoryNS from '../screens/nationalShuttle/InventoryNS';
 
 // LogBox.ignoreLogs([
@@ -135,7 +138,7 @@ export const AppNavigation = () => {
       {/* {loading == true && <Splash />} */}
       {!isSuccess && !isError && !isLoaded && <Splash />}
       {(isSuccess || isLoaded) && (
-        <NavigationContainer>
+        <NavigationContainer ref={navigationRef}>
           <CustomStatusBar />
           <Stack.Navigator
             initialRouteName={
@@ -267,6 +270,11 @@ export const AppNavigation = () => {
               name={RoutesNavigation.ConditionCheck}
               component={ConditionCheckScreen}
             />
+            <Stack.Screen
+              name={RoutesNavigation.InventoryNationalShuttle}
+              component={InventoryNSScreen}
+            />
+
             {/* visualizar imagenes */}
             <Stack.Screen
               name={RoutesNavigation.BaseImageScreen}
@@ -276,7 +284,8 @@ export const AppNavigation = () => {
           <ModalDialog />
           <ModalLoading />
           <PortalHost name="root" />
-          <CallPhoneSheet/>
+          <CallPhoneSheet />
+          <OfflineBanner/>
         </NavigationContainer>
         // <OfflineComponentSync />
         // <OfflineCompSecondSync />

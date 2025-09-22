@@ -1,42 +1,47 @@
-import { QUERY_KEYS } from '@api/contants/constants';
-import { useDeleteNote, useGetNotes } from '@api/hooks/HooksTaskServices';
-import { NoteType } from '@api/types/Task';
-import { BackButton } from '@components/commons/buttons/BackButton';
-import { GeneralLoading } from '@components/commons/loading/GeneralLoading';
+import {QUERY_KEYS} from '@api/contants/constants';
+import {useDeleteNote, useGetNotes} from '@api/hooks/HooksTaskServices';
+import {NoteType} from '@api/types/Task';
+import {BackButton} from '@components/commons/buttons/BackButton';
+import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 import {
-    SwipeableListProvider,
-    SwipeableRow,
+  SwipeableListProvider,
+  SwipeableRow,
 } from '@components/commons/swipeable/SwipeableRow';
-import { Label } from '@components/commons/text/Label';
+import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import { Wrapper } from '@components/commons/wrappers/Wrapper';
-import { useCustomNavigation } from '@hooks/useCustomNavigation';
-import { useRefreshIndicator } from '@hooks/useRefreshIndicator';
-import { RoutesNavigation } from '@navigation/types';
-import { loadingWrapperPromise } from '@store/actions';
-import { useModalDialogStore } from '@store/modals';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {deleteNoteOffline} from '@features/notes/offline';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {useOnline} from '@hooks/useOnline';
+import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {RoutesNavigation} from '@navigation/types';
+import {loadingWrapperPromise} from '@store/actions';
+import {useModalDialogStore} from '@store/modals';
 import useTopSheetStore from '@store/topsheet';
-import { COLORS } from '@styles/colors';
-import { GLOBAL_STYLES } from '@styles/globalStyles';
-import { getFormattedDateWithTimezone } from '@utils/functions';
-import { showErrorToastMessage, showToastMessage } from '@utils/toast';
-import { useCallback } from 'react';
+import {COLORS} from '@styles/colors';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {useQueryClient} from '@tanstack/react-query';
+import {getFormattedDateWithTimezone} from '@utils/functions';
+import {showErrorToastMessage, showToastMessage} from '@utils/toast';
+import {useCallback} from 'react';
 import {
-    FlatList,
-    ListRenderItemInfo,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  FlatList,
+  ListRenderItemInfo,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 // import OfflineValidation from '../components/offline/OfflineValidation';
 
 export const NotesScreen = () => {
-  const {id: idJob} = useTopSheetStore((d) => d.jobDetail);
+  const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
   const {goBack, navigate} = useCustomNavigation();
   const showDialog = useModalDialogStore((d) => d.showVisible);
   const {refetchAll} = useRefreshIndicator([[QUERY_KEYS.TASK_COUNT, {idJob}]]);
+  const {online} = useOnline();
+  const qc = useQueryClient();
 
   const {
     data: list,
@@ -49,49 +54,58 @@ export const NotesScreen = () => {
 
   const {mutateAsync} = useDeleteNote();
 
-  const initRemove = useCallback(({id, title}: NoteType) => {
-    showDialog({
-      modalVisible: true,
-      title: 'Delete',
-      cancelable: true,
-      message: (
-        <Wrapper
-          style={{flexDirection: 'column', gap: 10, alignItems: 'center'}}>
-          {/* <Label style={GLOBAL_STYLES.titleModalClockOut}>Delete?</Label> */}
-          <Label style={GLOBAL_STYLES.subtitleModalClockOut}>
-            Title: {title}
-          </Label>
-          <Label style={GLOBAL_STYLES.descModalClockOut}>
-            Are you sure you want to delete the current note?
-          </Label>
-          <Label style={GLOBAL_STYLES.descModalClockOut}>
-            Once finished you will not be able to make changes.
-          </Label>
-        </Wrapper>
-      ),
-      type: 'warning',
-      onConfirm: () => {
-        showDialog({
-          modalVisible: false,
-        });
-        loadingWrapperPromise(
-          mutateAsync({
-            id,
-          })
-            .then((d) => {
-              if (d) {
-                refetch();
-                refetchAll();
-                showToastMessage('Note deleted successfully');
-              } else {
-                showErrorToastMessage('Error while deleting note');
-              }
-            })
-            .catch(() => showErrorToastMessage('Error while deleting note')),
-        );
-      },
-    });
-  }, []);
+  const initRemove = useCallback(
+    (note: NoteType) => {
+      showDialog({
+        modalVisible: true,
+        title: 'Delete',
+        cancelable: true,
+        message: (
+          <Wrapper
+            style={{flexDirection: 'column', gap: 10, alignItems: 'center'}}>
+            {/* <Label style={GLOBAL_STYLES.titleModalClockOut}>Delete?</Label> */}
+            <Label style={GLOBAL_STYLES.subtitleModalClockOut}>
+              Title: {note.title}
+            </Label>
+            <Label style={GLOBAL_STYLES.descModalClockOut}>
+              Are you sure you want to delete the current note?
+            </Label>
+            <Label style={GLOBAL_STYLES.descModalClockOut}>
+              Once finished you will not be able to make changes.
+            </Label>
+          </Wrapper>
+        ),
+        type: 'warning',
+        onConfirm: () => {
+          if (online && note.id) {
+            loadingWrapperPromise(
+              mutateAsync({
+                id: note.id,
+              })
+                .then((d) => {
+                  if (d) {
+                    refetch();
+                    refetchAll();
+                    showToastMessage('Note deleted successfully');
+                  } else {
+                    showErrorToastMessage('Error while deleting note');
+                  }
+                })
+                .catch(() =>
+                  showErrorToastMessage('Error while deleting note'),
+                ),
+            );
+          } else {
+            deleteNoteOffline(qc, {
+              ...note,
+            });
+            showToastMessage('Note deleted successfully');
+          }
+        },
+      });
+    },
+    [online, mutateAsync, refetch, refetchAll],
+  );
 
   const initEdit = (item: NoteType) => {
     navigate(RoutesNavigation.SaveNote, {
@@ -157,7 +171,7 @@ export const NotesScreen = () => {
                   ]}>
                   {getFormattedDateWithTimezone(
                     item.update_time,
-                    'YYYY-MM-DD hh:mm',
+                    'YYYY-MM-DD hh:mm A',
                   )}
                 </Text>
               </View>
@@ -206,7 +220,7 @@ export const NotesScreen = () => {
         <FlatList
           data={list}
           renderItem={renderItem}
-          keyExtractor={(it) => it.id.toString()}
+          keyExtractor={(it) => it.id?.toString() ?? it.clientId}
           refreshing={isRefetching}
           onRefresh={refetch}
           removeClippedSubviews

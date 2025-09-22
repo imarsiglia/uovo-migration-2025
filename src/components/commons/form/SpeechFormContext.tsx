@@ -99,7 +99,7 @@ export const SpeechFormContext = forwardRef<SpeechFormInputRef, Props>(
         startSub.remove();
         endSub.remove();
         errorSub.remove();
-        destroy();
+        // destroy();
       };
     }, [name, setValue, trigger]);
 

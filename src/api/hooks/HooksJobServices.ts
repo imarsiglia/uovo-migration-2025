@@ -90,13 +90,18 @@ export const useGetJobQueue = ({
   });
 };
 
-export const useGetTopsheet = (props: TopSheetApiProps) => {
+export const useGetTopsheet = ({
+  enabled,
+  ...props
+}: TopSheetApiProps & {enabled?: boolean}) => {
   return useQuery({
     queryKey: [QUERY_KEYS.TOPSHEET, props],
     queryFn: () => jobServices.topsheet(props),
-    staleTime: 0,
-    // staleTime: 5 * 60 * 1000,
-    gcTime: 7 * 24 * 60 * 60 * 1000,
+    // staleTime: 0,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 0,
+    // gcTime: 7 * 24 * 60 * 60 * 1000,
+    enabled: props.id != null && props.queue != null && enabled,
     retry: 1,
     placeholderData: undefined,
   });

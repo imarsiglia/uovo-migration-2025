@@ -23,7 +23,8 @@ import {FILTER_WO_ACTIVE} from '@api/contants/constants';
 import {useMinBusy} from '@hooks/useMinBusy';
 import {JobQueueView} from './JobQueueView';
 import {useJobQueueStore} from '@store/jobqueue';
-import { NationalShuttleView } from './NationalShuttleView';
+import {NationalShuttleView} from './NationalShuttleView';
+import useNationalShuttleStore from '@store/nationalShuttle';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -34,6 +35,7 @@ export const HomeScreen = () => {
     setTimelinePressed,
     setActiveTab,
     activeTab,
+    setSyncroNS,
   } = useGeneralStore();
   const selectedDate = useGeneralStore((d) => d.selectedDate);
   const {
@@ -146,7 +148,8 @@ export const HomeScreen = () => {
         refetchPromise = refetchJobQueue();
         break;
       default:
-        refetchPromise = Promise.resolve(); // evita que sea undefined
+        setSyncroNS(Date.now());
+        refetchPromise = Promise.resolve();
     }
     return refetchPromise.finally(() => setIsRefetching(false));
   }, [activeTab, refetchCalendar, refetchTimeline, refetchJobQueue]);

@@ -83,7 +83,7 @@ const getNotes = async ({idJob}: TaskBaseApiProps): Promise<NoteType[]> => {
 };
 
 export type SaveNoteApiProps = {
-  id: number;
+  id?: number | null;
   title: string;
   description: string;
 } & TaskBaseApiProps;

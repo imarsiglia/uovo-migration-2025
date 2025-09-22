@@ -13,7 +13,8 @@ import {keepPreviousData, useMutation, useQuery} from '@tanstack/react-query';
 
 const DEFAULT_PERSISTENCE_CONFIG = {
   staleTime: 5 * 60 * 1000,
-  gcTime: 7 * 24 * 60 * 60 * 1000,
+  // gcTime: 7 * 24 * 60 * 60 * 1000,
+  gcTime: 0,
   retry: 1,
   placeholderData: keepPreviousData,
 };
@@ -143,7 +144,7 @@ export const useGetLaborReports = ({
   return useQuery({
     queryKey: [QUERY_KEYS.LABOR_REPORTS, props],
     queryFn: () => taskServices.getLaborReports(props),
-    enabled: !!props?.idJob && !!props.toClockout && enabled,
+    enabled: !!props?.idJob && props.toClockout != null && enabled,
     ...DEFAULT_PERSISTENCE_CONFIG,
   });
 };

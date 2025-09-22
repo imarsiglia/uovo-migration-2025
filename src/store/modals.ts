@@ -2,7 +2,7 @@ import {ReactNode} from 'react';
 import {StyleProp, TextStyle, ViewStyle} from 'react-native';
 import {create} from 'zustand';
 
-type ModalDialogContentType = {
+export type ModalDialogContentType = {
   modalVisible: boolean;
   type?: 'info' | 'error' | 'success' | 'warning';
   message?: string | ReactNode;
@@ -30,8 +30,8 @@ export const useModalDialogStore = create<ModalDialogType>((set) => ({
   type: 'info',
   message: undefined,
   title: '',
-  confirmBtnLabel: undefined,
-  cancelBtnLabel: undefined,
+  confirmBtnLabel: 'Ok',
+  cancelBtnLabel: 'Cancel',
   modalProps: undefined,
   cancelable: true,
   onConfirm: () => {},
@@ -56,12 +56,12 @@ export const useModalDialogStore = create<ModalDialogType>((set) => ({
     set((state) => ({
       ...state,
       modalVisible: false,
-      type: undefined,
+      type: 'info',
       message: undefined,
       title: undefined,
       onConfirm: undefined,
-      confirmBtnLabel: undefined,
-      cancelBtnLabel: undefined,
+      confirmBtnLabel: 'Ok',
+      cancelBtnLabel: 'Cancel',
       modalProps: undefined,
       onCancel: undefined,
       cancelable: undefined,

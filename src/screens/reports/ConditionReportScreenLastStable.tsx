@@ -480,9 +480,6 @@ export const ConditionReportScreen = (props: Props) => {
     }
   }, [isLoadingArtist]);
 
-  console.log('artists');
-  console.log(artists);
-
   return (
     <Wrapper style={[styles.container]}>
       {isLoadingConditionReport && <GeneralLoading />}

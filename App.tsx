@@ -1,22 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // import {createAsyncStoragePersister} from '@tanstack/query-async-storage-persister';
 import {QueryClient} from '@tanstack/react-query';
-import {PersistQueryClientProvider} from '@tanstack/react-query-persist-client';
 import * as React from 'react';
-import {
-  Dimensions,
-  Easing,
-  LogBox,
-  Platform,
-  Text,
-  useColorScheme,
-} from 'react-native';
+import {Dimensions, Easing, LogBox, Platform} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {ModalProvider, createModalStack} from 'react-native-modalfy';
-import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {AppNavigation} from './src/navigation/AppNavigation';
-import {ColorScheme, EDSProvider, useEDS} from '@equinor/mad-components';
-import {KeyboardProvider} from 'react-native-keyboard-controller';
 import AppProviders from '@providers/AppProviders';
 import {ModalDialog} from '@components/commons/modals/ModalDialog';
 import {ModalLoading} from '@components/commons/modals/ModalLoading';
@@ -40,13 +29,13 @@ import {PortalHost} from '@gorhom/portal';
 // });
 
 // const store = createStore(userReducer);
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      gcTime: 1000 * 60 * 60 * 72, // 72 hours
-    },
-  },
-});
+// const queryClient = new QueryClient({
+//   defaultOptions: {
+//     queries: {
+//       gcTime: 1000 * 60 * 60 * 72, // 72 hours
+//     },
+//   },
+// });
 
 // const asyncStoragePersister = createAsyncStoragePersister({
 //   storage: AsyncStorage,
@@ -105,31 +94,14 @@ const App = () => {
   //     TextInput.defaultProps.allowFontScaling = false;
   // }, [])
 
-  const scheme = useColorScheme();
-
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       {/* <Provider store={store}> */}
       <AppProviders>
-        <KeyboardProvider>
-          <EDSProvider colorScheme={scheme as ColorScheme} density="phone">
-            {/* {Platform.OS == 'android' && <CustomStatusBar />} */}
-            {/* <ModalProvider stack={modalStack}> */}
-            {/* <UserProvider
-                  value={{isInventoryMode: false, activeFilter: false}}> */}
-            {/* <TabHomeProvider>
-                    <NationalShuttleProvider>
-                      <InventoryProvider> */}
-            <SafeAreaProvider>
-              <AppNavigation />
-            </SafeAreaProvider>
-            {/* </InventoryProvider>
-                    </NationalShuttleProvider>
-                  </TabHomeProvider> */}
-            {/* </UserProvider> */}
-            {/* </ModalProvider> */}
-          </EDSProvider>
-        </KeyboardProvider>
+        {/* {Platform.OS == 'android' && <CustomStatusBar />} */}
+        {/* <ModalProvider stack={modalStack}> */}
+        <AppNavigation />
+        {/* </ModalProvider> */}
       </AppProviders>
       {/* </Provider> */}
     </GestureHandlerRootView>

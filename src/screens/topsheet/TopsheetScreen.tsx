@@ -41,7 +41,7 @@ export const TopsheetScreen = ({route}: Props) => {
     useTopSheetStore();
 
   const {
-    params: {id, queue},
+    params: {id, queue, nsItemId},
   } = route;
 
   const {
@@ -52,6 +52,7 @@ export const TopsheetScreen = ({route}: Props) => {
   } = useGetTopsheet({
     id,
     queue,
+    enabled: true,
   });
 
   const heightAnim = useRef(new Animated.Value(36)).current;
@@ -59,8 +60,15 @@ export const TopsheetScreen = ({route}: Props) => {
   const opacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    setJobDetail(jobDetail);
-
+    if (jobDetail) {
+      setJobDetail(jobDetail);
+      if (jobDetail?.id && nsItemId) {
+        navigate(RoutesNavigation.ItemDetail, {
+          id: nsItemId,
+          isNS: true,
+        });
+      }
+    }
     return () => {
       setJobDetail(undefined);
     };

@@ -1,5 +1,5 @@
 import {JobInventoryType, ReportResumeType} from '@api/types/Inventory';
-import {CrewMemberType} from '@api/types/Jobs';
+import {CrewMemberType, NSItemListType} from '@api/types/Jobs';
 import {LaborReportType, NoteType, ReportMaterialType} from '@api/types/Task';
 import {BooleanNumberType} from '@generalTypes/general';
 import {ImageType} from '@generalTypes/images';
@@ -39,6 +39,7 @@ export const RoutesNavigation = {
   Reports: 'Reports',
   ConditionReport: 'ConditionReport',
   ConditionCheck: 'ConditionCheck',
+  InventoryNationalShuttle: 'InventoryNationalShuttle',
 } as const;
 
 // Union de nombres de ruta: "Home" | "ContactUs" | ...
@@ -54,7 +55,7 @@ export type RootStackParamList = {
   };
   [RoutesNavigation.Login]: undefined;
   [RoutesNavigation.EditProfile]: {
-    fromProfile?: boolean
+    fromProfile?: boolean;
   };
   [RoutesNavigation.EditImage]: {
     photo: any;
@@ -66,6 +67,7 @@ export type RootStackParamList = {
   [RoutesNavigation.Topsheet]: {
     id: string;
     queue: BooleanNumberType;
+    nsItemId?: number;
   };
   [RoutesNavigation.ReportIssue]: {
     type: string;
@@ -93,9 +95,11 @@ export type RootStackParamList = {
     changed?: number;
   };
   [RoutesNavigation.Notes]: undefined;
-  [RoutesNavigation.SaveNote]: {
-    item?: NoteType;
-  };
+  [RoutesNavigation.SaveNote]:
+    | {
+        item?: NoteType;
+      }
+    | undefined;
   [RoutesNavigation.ReportMaterials]: undefined;
   [RoutesNavigation.SaveReportMaterials]: {
     item?: ReportMaterialType;
@@ -104,14 +108,17 @@ export type RootStackParamList = {
   [RoutesNavigation.WoAttachment]: undefined;
   [RoutesNavigation.EditPieceCount]: undefined;
   [RoutesNavigation.LaborReport]: undefined;
-  [RoutesNavigation.AddLaborReport]: {
-    item?: LaborReportType;
-  };
+  [RoutesNavigation.AddLaborReport]:
+    | {
+        item?: LaborReportType;
+      }
+    | undefined;
   [RoutesNavigation.Inventory]: undefined;
   [RoutesNavigation.AddInventory]: undefined;
   [RoutesNavigation.ItemDetail]: {
     id?: number;
     fromInventory?: boolean;
+    isNS?: boolean;
   };
   [RoutesNavigation.TakeDimensions]: {
     item: JobInventoryType;
@@ -127,6 +134,11 @@ export type RootStackParamList = {
     report?: ReportResumeType;
     item?: JobInventoryType;
   };
+  [RoutesNavigation.InventoryNationalShuttle]:
+    | {
+        initialList?: NSItemListType[];
+      }
+    | undefined;
 };
 
 export const TopSheetRoutesNavigation = {

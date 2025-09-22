@@ -1,5 +1,4 @@
-import {useNavigation} from '@react-navigation/native';
-import {memo, ReactNode, useCallback, useState} from 'react';
+import {memo, ReactNode, useCallback, useEffect, useState} from 'react';
 import {
   Dimensions,
   ScrollView,
@@ -12,15 +11,17 @@ import {
 } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
-import {getFormattedDate, getItemColorStatus} from '../../utils/functions';
-import {isInternet} from '../../utils/internet';
+import {getItemColorStatus} from '../../utils/functions';
 import useNationalShuttleStore from '@store/nationalShuttle';
 import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 import {STATUS_NATIONAL_SHUTTLE} from '@api/contants/constants';
 import {EmptyCard} from '@components/commons/cards/EmptyCard';
 import {CustomPressable} from '@components/commons/pressable/CustomPressable';
 import {COLORS} from '@styles/colors';
-import { NSItemListType } from '@api/types/Jobs';
+import {NSItemListType} from '@api/types/Jobs';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {RoutesNavigation} from '@navigation/types';
+import useTopSheetStore from '@store/topsheet';
 
 export const COLUMN_HEADER_HEIGHT = 35;
 
@@ -44,82 +45,22 @@ type Props = {
   onShowFullList: () => void;
 };
 
-const _InventoryViewNationalShuttle = ({
-  list,
-  onShowFullList,
-  ...rest
-}: Props) => {
-  const {navigate} = useNavigation();
-  const {fetchInventory, setInventoryList} = useNationalShuttleStore();
+export const InventoryViewNationalShuttle = ({list, onShowFullList}: Props) => {
+  const {navigate} = useCustomNavigation();
 
-  const [isLoading, setIsLoading] = useState(false);
-
-  const goToTopSheet = useCallback(async (item: NSItemListType) => {
-    setIsLoading(true);
-    const isConnected = await isInternet();
-    // const response = await fetchData.Get(
-    //   `resources/job/topsheet?idjob=${item.plain_id_job}&queue=1`,
-    // );
-    // if (response.data?.body) {
-    //   const jobDetail = response.data?.body as JobDetailType;
-
-    //   let selectedDate = getFormattedDate(
-    //     jobDetail.start_date,
-    //     'YYYY-MM-DD',
-    //   );
-    //   let scheduleDate = getFormattedDate(
-    //     jobDetail.start_date,
-    //     'dddd MMM DD [•] HH:mm A MMMM YYYY',
-    //   );
-    //   // Tuesday Jul 23 • 07:00 AM July 2024
-    //   const indexOf = jobDetail.client_name.indexOf(' ');
-
-    //   //@ts-ignore
-    //   // rest.dispatch(
-    //   //   TopSheetActions.copyWoName(
-    //   //     jobDetail.client_name.substring(
-    //   //       indexOf,
-    //   //       jobDetail.client_name?.length,
-    //   //     ),
-    //   //   ),
-    //   // );
-    //   //@ts-ignore
-    //   navigate('TopSheet', {
-    //     job: jobDetail.id,
-    //     wo_name:
-    //       jobDetail.wo_title +
-    //       ' •' +
-    //       jobDetail.client_name.substring(
-    //         indexOf,
-    //         jobDetail.client_name?.length,
-    //       ),
-    //     selectedDate: selectedDate,
-    //     formattedDate: scheduleDate,
-    //     refreshStatus: refreshStatus.bind(this),
-    //     queue: 1,
-    //     offline: !isConnected,
-    //     syncroRequests: (() => {}).bind(this),
-    //     nsItem: item,
-    //   });
-
-    //   setIsLoading(false);
-    // }
-  }, []);
-
-  async function refreshStatus() {
-    if (fetchInventory) {
-      //@ts-ignore
-      const {data: dataList} = await fetchInventory();
-      if (setInventoryList) {
-        setInventoryList(dataList);
-      }
-    }
-  }
+  const goToTopSheet = useCallback(
+    (item: NSItemListType) => {
+      navigate(RoutesNavigation.Topsheet, {
+        id: item.plain_id_job.toString(),
+        queue: 1,
+        nsItemId: item.id,
+      });
+    },
+    [navigate],
+  );
 
   return (
     <>
-      {isLoading && <GeneralLoading />}
-
       <View
         style={{
           flexDirection: 'row',
@@ -467,7 +408,7 @@ const SortComponent = ({
         name="caret-up"
         color={
           sortField && sortField.field == field && !sortField.asc
-            ? COLORS.secondary
+            ? COLORS.terteary
             : 'black'
         }
         type="solid"
@@ -478,7 +419,7 @@ const SortComponent = ({
         name="caret-down"
         color={
           sortField && sortField.field == field && sortField.asc
-            ? COLORS.secondary
+            ? COLORS.terteary
             : 'black'
         }
         type="solid"
@@ -565,5 +506,3 @@ const ColorLabel = ({color, label}: {color: string; label: string}) => (
     </Text>
   </View>
 );
-
-export const InventoryViewNationalShuttle = memo(_InventoryViewNationalShuttle);

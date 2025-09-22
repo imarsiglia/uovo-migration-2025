@@ -40,9 +40,6 @@ var itemLoaded = false;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ItemDetail'>;
 export const ItemDetailScreen = (props: Props) => {
-  //Modal options report
-  //Client pick
-
   const showDialog = useModalDialogStore((d) => d.showVisible);
   const isJobQueue = useTopSheetStore((d) => d.isJobQueue);
   const jobDetail = useTopSheetStore((d) => d.jobDetail);
@@ -50,7 +47,7 @@ export const ItemDetailScreen = (props: Props) => {
 
   const {mutateAsync: deleteItemAsync} = useDeleteItem();
 
-  const {id, fromInventory} = props.route.params;
+  const {id, fromInventory, isNS} = props.route.params;
 
   const {
     data: currentItem,
@@ -72,7 +69,12 @@ export const ItemDetailScreen = (props: Props) => {
   }, []);
 
   const goToBack = useCallback(() => {
-    goBack();
+    if (!isNS) {
+      goBack();
+    } else {
+      goBackToIndex(2);
+    }
+    return true;
     // if (props.route.params.nsItem) {
     //   props.navigation.pop(2);
     // } else {
@@ -83,16 +85,12 @@ export const ItemDetailScreen = (props: Props) => {
   }, [goBack]);
 
   // useFocusEffect(
-  // useCallback(() => {
-  //   const onBackPress = () => {
-  //     return goToBack();
-  //   };
-
-  //   BackHandler.addEventListener('hardwareBackPress', onBackPress);
-  //   return () =>
-  //     BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-  // }, [goToBack]),
-  // );
+  useCallback(() => {
+    BackHandler.addEventListener('hardwareBackPress', goToBack);
+    return () =>
+      // @ts-ignore
+      BackHandler.removeEventListener('hardwareBackPress', goToBack);
+  }, [goToBack]);
 
   const navigateToParent = () => {
     // hideReportPick();
@@ -314,7 +312,10 @@ export const ItemDetailScreen = (props: Props) => {
             </Text>
           </View>
         </TouchableOpacity> */}
-        <BackButton title="Back" onPress={goToBack} />
+        <BackButton
+          title={fromInventory ? 'Inventory' : isNS ? 'Back' : 'Tasks'}
+          onPress={goToBack}
+        />
 
         <View style={[GLOBAL_STYLES.lateralPadding, styles.row]}>
           <Text

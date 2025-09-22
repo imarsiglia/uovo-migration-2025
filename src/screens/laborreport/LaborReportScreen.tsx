@@ -50,8 +50,8 @@ export const LaborReportScreen = () => {
   const showDialog = useModalDialogStore((d) => d.showVisible);
 
   const {refetchAll} = useRefreshIndicator([
-    [QUERY_KEYS.TASK_COUNT, {idJob: jobDetail.id}],
-    [QUERY_KEYS.TOPSHEET, {id: jobDetail.id, queue: isJobQueue}],
+    [QUERY_KEYS.TASK_COUNT, {idJob: jobDetail!.id}],
+    [QUERY_KEYS.TOPSHEET, {id: jobDetail!.id, queue: isJobQueue}],
   ]);
 
   const {
@@ -60,8 +60,8 @@ export const LaborReportScreen = () => {
     isRefetching,
     refetch,
   } = useGetLaborReports({
-    idJob: jobDetail.id,
-    toClockout: toClockout,
+    idJob: jobDetail!.id,
+    toClockout: toClockout!,
   });
 
   const {mutateAsync} = useRegisterLaborReport();
@@ -102,19 +102,20 @@ export const LaborReportScreen = () => {
           });
           loadingWrapperPromise(
             mutateAsync({
-              idJob: jobDetail.id,
-              queue: isJobQueue,
+              idJob: jobDetail!.id,
+              queue: isJobQueue!,
               confirm: 0,
               preventEditCurrentClock,
-              list: list
-                ?.filter((x) => x.id !== id)
-                ?.map((item) => ({
-                  ...item,
-                  laborCode: item.labor_code?.id,
-                  addedManually: item.added_manually,
-                  workedHours: item.worked_hour,
-                  userName: item.user_name,
-                })),
+              list:
+                list
+                  ?.filter((x) => x.id !== id)
+                  ?.map((item) => ({
+                    ...item,
+                    laborCode: item.labor_code?.id,
+                    addedManually: item.added_manually,
+                    workedHours: item.worked_hour,
+                    userName: item.user_name,
+                  })) ?? [],
             })
               .then((d) => {
                 if (d) {
@@ -254,7 +255,7 @@ export const LaborReportScreen = () => {
         <FlatList
           data={list}
           renderItem={renderItem}
-          keyExtractor={(it) => it.id.toString()}
+          keyExtractor={(it) => it.id!.toString()}
           refreshing={isRefetching}
           onRefresh={refetch}
           removeClippedSubviews
@@ -276,7 +277,7 @@ export const LaborReportScreen = () => {
           backgroundColor: 'white',
           paddingHorizontal: 10,
         }}>
-        <ClockinButtonLaborReport list={list} />
+        <ClockinButtonLaborReport list={list!} />
       </Wrapper>
     </View>
   );

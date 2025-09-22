@@ -1,4 +1,4 @@
-import { getFormattedDate } from '@utils/functions';
+import {getFormattedDate} from '@utils/functions';
 import {create} from 'zustand';
 
 export type GeneralStore = {
@@ -10,6 +10,8 @@ export type GeneralStore = {
   setTimelinePressed: (pressed: boolean) => void;
   selectedDate?: string;
   setSelectedDate: (date: string) => void;
+  syncroNS?: number;
+  setSyncroNS: (syncro?: number) => void;
 };
 
 export const useGeneralStore = create<GeneralStore>((set) => ({
@@ -23,6 +25,8 @@ export const useGeneralStore = create<GeneralStore>((set) => ({
     set((state) => ({...state, timelinePressed: pressed})),
   selectedDate: getFormattedDate(new Date(), 'YYYY-MM-DD'),
   setSelectedDate: (date) => set((state) => ({...state, selectedDate: date})),
+  syncroNS: undefined,
+  setSyncroNS: (syncro) => set((state) => ({...state, syncroNS: syncro})),
 }));
 
 export default useGeneralStore;

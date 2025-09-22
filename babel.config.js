@@ -29,6 +29,8 @@ module.exports = {
           '@fortawesome': './@fortawesome',
           '@providers': './src/providers',
           '@generalTypes': './src/types',
+          '@features': './src/features',
+          '@offline': './src/offline',
         },
       },
     ],

@@ -42,6 +42,7 @@ import useNationalShuttleStore from '@store/nationalShuttle';
 import {
   FILTER_TYPES_ACTIVITY,
   NATIONAL_SHUTTLE_TYPE,
+  NationalShuttleType,
 } from '@api/contants/constants';
 import {COLORS} from '@styles/colors';
 import {JobDetailType, NSJobType} from '@api/types/Jobs';
@@ -82,6 +83,7 @@ const NationalShuttleViewCmp = () => {
   const updateJobDetail = useTopSheetStore((d) => d.setJobDetail);
 
   const activeTab = useGeneralStore((d) => d.activeTab);
+  const syncroNS = useGeneralStore((d) => d.syncroNS);
 
   const [filter, setFilter] = useState<FilterType>({
     type: NATIONAL_SHUTTLE_TYPE.EAST_COAST_PICKUP,
@@ -220,114 +222,106 @@ const NationalShuttleViewCmp = () => {
     }
   }, [activeTab]);
 
-  // useEffect(() => {
-  //   if (props.syncro) {
-  //     syncro();
-  //   }
-  // }, [props.syncro]);
-
-  async function syncro() {
-    filterJobs();
-  }
-
-  async function filterJobs() {
-    if (filter?.serviceLocation == '-1') {
-      return;
+  useEffect(() => {
+    if (syncroNS) {
+      syncro();
     }
+  }, [syncroNS]);
+
+  const filterJobs = useCallback(async () => {
+    if (filter?.serviceLocation === '-1') return;
+
     if (!isInventoryMode) {
-      switch (filter.type) {
-        case NATIONAL_SHUTTLE_TYPE.EAST_COAST_PICKUP:
-          const {data: eastCoastPickup} = await getEastCoastPickup();
-          setList(eastCoastPickup);
-          break;
-        case NATIONAL_SHUTTLE_TYPE.WEST_COAST_PICKUP:
-          const {data: westCoastPickup} = await getWestCoastPickup();
-          setList(westCoastPickup);
-          break;
-        case NATIONAL_SHUTTLE_TYPE.EAST_COAST_DROPOFF:
-          const {data: eastCoastDropoff} = await getEastCoastDropoff();
-          setList(eastCoastDropoff);
-          break;
-        case NATIONAL_SHUTTLE_TYPE.WEST_COAST_DROPOFF:
-          const {data: weastCoastDropoff} = await getWestCoastDropoff();
-          setList(weastCoastDropoff);
-          break;
-        case NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_PICKUP:
-          const {data: uniqueRoutePickup} = await getUniqueRoutePickup();
-          setList(uniqueRoutePickup);
-          break;
-        case NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_DROPOFF:
-          const {data: uniqueRouteDropoff} = await getUniqueRouteDropoff();
-          setList(uniqueRouteDropoff);
-          break;
-      }
+      const actions: Record<string, () => Promise<void>> = {
+        [NATIONAL_SHUTTLE_TYPE.EAST_COAST_PICKUP]: async () => {
+          const {data} = await getEastCoastPickup();
+          setList(data);
+        },
+        [NATIONAL_SHUTTLE_TYPE.WEST_COAST_PICKUP]: async () => {
+          const {data} = await getWestCoastPickup();
+          setList(data);
+        },
+        [NATIONAL_SHUTTLE_TYPE.EAST_COAST_DROPOFF]: async () => {
+          const {data} = await getEastCoastDropoff();
+          setList(data);
+        },
+        [NATIONAL_SHUTTLE_TYPE.WEST_COAST_DROPOFF]: async () => {
+          const {data} = await getWestCoastDropoff();
+          setList(data);
+        },
+        [NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_PICKUP]: async () => {
+          const {data} = await getUniqueRoutePickup();
+          setList(data);
+        },
+        [NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_DROPOFF]: async () => {
+          const {data} = await getUniqueRouteDropoff();
+          setList(data);
+        },
+      };
+
+      await actions[filter.type]?.();
     } else {
-      switch (filter.type) {
-        case NATIONAL_SHUTTLE_TYPE.EAST_COAST_PICKUP:
-          const {data: eastCoastPickup} = await getInventoryEastCoastPickup();
-          setInventoryList(eastCoastPickup!);
-          setFetchInventory(() => getInventoryEastCoastPickup);
-          break;
-        case NATIONAL_SHUTTLE_TYPE.WEST_COAST_PICKUP:
-          const {data: westCoastPickup} = await getInventoryWestCoastPickup();
-          setInventoryList(westCoastPickup!);
-          setFetchInventory(() => getInventoryWestCoastPickup);
-          break;
-        case NATIONAL_SHUTTLE_TYPE.EAST_COAST_DROPOFF:
-          const {data: eastCoastDropoff} = await getInventoryEastCoastDropoff();
-          setInventoryList(eastCoastDropoff!);
-          setFetchInventory(() => getInventoryEastCoastDropoff);
-          break;
-        case NATIONAL_SHUTTLE_TYPE.WEST_COAST_DROPOFF:
-          const {data: weastCoastDropoff} =
-            await getInventoryWestCoastDropoff();
-          setInventoryList(weastCoastDropoff!);
-          setFetchInventory(() => getInventoryWestCoastDropoff);
-          break;
-        case NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_PICKUP:
-          const {data: uniqueRoutePickup} =
-            await getInventoryUniqueRoutePickup();
-          setInventoryList(uniqueRoutePickup!);
-          break;
-        case NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_DROPOFF:
-          const {data: uniqueRouteDropoff} =
-            await getInventoryUniqueRouteDropoff();
-          setInventoryList(uniqueRouteDropoff!);
-          break;
-      }
+      const actions: Record<string, () => Promise<void>> = {
+        [NATIONAL_SHUTTLE_TYPE.EAST_COAST_PICKUP]: async () => {
+          const {data} = await getInventoryEastCoastPickup();
+          setInventoryList(data!);
+          setFetchInventory(getInventoryEastCoastPickup);
+        },
+        [NATIONAL_SHUTTLE_TYPE.WEST_COAST_PICKUP]: async () => {
+          const {data} = await getInventoryWestCoastPickup();
+          setInventoryList(data!);
+          setFetchInventory(getInventoryWestCoastPickup);
+        },
+        [NATIONAL_SHUTTLE_TYPE.EAST_COAST_DROPOFF]: async () => {
+          const {data} = await getInventoryEastCoastDropoff();
+          setInventoryList(data!);
+          setFetchInventory(getInventoryEastCoastDropoff);
+        },
+        [NATIONAL_SHUTTLE_TYPE.WEST_COAST_DROPOFF]: async () => {
+          const {data} = await getInventoryWestCoastDropoff();
+          setInventoryList(data!);
+          setFetchInventory(getInventoryWestCoastDropoff);
+        },
+        [NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_PICKUP]: async () => {
+          const {data} = await getInventoryUniqueRoutePickup();
+          setInventoryList(data!);
+          setFetchInventory(getInventoryUniqueRoutePickup);
+        },
+        [NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_DROPOFF]: async () => {
+          const {data} = await getInventoryUniqueRouteDropoff();
+          setInventoryList(data!);
+          setFetchInventory(getInventoryUniqueRouteDropoff);
+        },
+      };
+
+      await actions[filter.type]?.();
     }
-  }
+  }, [
+    filter,
+    isInventoryMode,
+    setList,
+    setInventoryList,
+    setFetchInventory,
+    getEastCoastPickup,
+    getWestCoastPickup,
+    getEastCoastDropoff,
+    getWestCoastDropoff,
+    getUniqueRoutePickup,
+    getUniqueRouteDropoff,
+    getInventoryEastCoastPickup,
+    getInventoryWestCoastPickup,
+    getInventoryEastCoastDropoff,
+    getInventoryWestCoastDropoff,
+    getInventoryUniqueRoutePickup,
+    getInventoryUniqueRouteDropoff,
+  ]);
+
+  const syncro = useCallback(() => {
+    filterJobs();
+  }, [filterJobs]);
 
   const goToTopSheet = async (item: NSJobType) => {
-    // const isConnected = await isInternet();
-    // let selectedDate = getFormattedDate(filter.date, 'YYYY-MM-DD');
-    // let scheduleDate = getFormattedDate(
-    //   item.start_date,
-    //   'dddd MMM DD [•] HH:mm A MMMM YYYY',
-    // );
-    navigate(RoutesNavigation.Topsheet, {id: item.id.toString(), queue: 0});
-    // Tuesday Jul 23 • 07:00 AM July 2024
-    // const indexOf = item.client_name.indexOf(' ');
-    // pendiente logica
-    // props.dispatch(
-    //   TopSheetActions.copyWoName(
-    //     item.client_name.substring(indexOf, item.client_name?.length),
-    //   ),
-    // );
-    //@ts-ignore
-    // navigate('TopSheet', {
-    //   job: item.id,
-    //   wo_name:
-    //     item.wo +
-    //     ' •' +
-    //     item.client_name.substring(indexOf, item.client_name?.length),
-    //   selectedDate: selectedDate,
-    //   formattedDate: scheduleDate,
-    //   refreshStatus: syncro,
-    //   queue: 1,
-    //   offline: !isConnected,
-    //   syncroRequests: (() => {}).bind(this),
-    // });
+    navigate(RoutesNavigation.Topsheet, {id: item.id.toString(), queue: 1});
   };
 
   const onInitSignature = useCallback((idJob: number) => {
@@ -340,7 +334,7 @@ const NationalShuttleViewCmp = () => {
 
   const onInitEditPieceCount = useCallback((idJob: number) => {
     //@ts-ignore
-     updateJobDetail({
+    updateJobDetail({
       id: idJob,
     });
     navigate(RoutesNavigation.EditPieceCount);
@@ -352,11 +346,11 @@ const NationalShuttleViewCmp = () => {
   }, []);
 
   const showFullList = useCallback(() => {
-    //@ts-ignore
-    navigate('InventoryNS', {
+    navigate(RoutesNavigation.InventoryNationalShuttle, {
       initialList: inventoryList,
     });
-  }, []);
+  }, [navigate]);
+
   const customLocationPlaces = useMemo(() => {
     return [
       {id: null, name: 'All locations'},

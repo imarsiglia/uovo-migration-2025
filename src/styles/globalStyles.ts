@@ -12,7 +12,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingRight: 20,
+    paddingHorizontal: 10,
     paddingLeft: 5,
   },
   bgwhite: {

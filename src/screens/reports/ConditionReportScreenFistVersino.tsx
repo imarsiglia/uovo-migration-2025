@@ -438,8 +438,6 @@ export const ConditionReportScreen = (props: Props) => {
     }
   }, [selectedItem, receivedReport]);
 
-  console.log("initialConditionReport")
-  console.log(initialConditionReport)
   return (
     <Wrapper style={[styles.container]}>
       {isLoadingConditionReport && <GeneralLoading />}

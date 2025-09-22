@@ -42,7 +42,7 @@ const DEFAULT_VALUE_TYPE = SIGNER_TYPES[0].id;
 
 export const SignaturesScreen = () => {
   const {goBack, navigate} = useCustomNavigation();
-  const {id: idJob} = useTopSheetStore((d) => d.jobDetail);
+  const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
   const route = useRoute<any>();
   const showDialog = useModalDialogStore((d) => d.showVisible);
   const {mutateAsync: deleteAsync} = useDeleteSignature();

@@ -51,6 +51,7 @@ export const ClockinButton = () => {
     useGetTopsheet({
       id: jobDetail?.id?.toString()!,
       queue: isJobQueue!,
+      enabled: false
     });
 
   const {refetchAll, isRefetchingAny} = useRefreshIndicator([
@@ -68,7 +69,7 @@ export const ClockinButton = () => {
   const refetchTopsheet = useCallback(() => {
     loadingWrapperPromise(
       refetchAll()
-        .then(async () => {
+        .then(() => {
           refetchJobDetail()
             .then((d) => {
               if (d?.data?.current_clock_in?.status === FINALIZED_STATUS) {

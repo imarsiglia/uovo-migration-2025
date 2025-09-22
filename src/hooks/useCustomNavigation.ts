@@ -34,10 +34,15 @@ export const useCustomNavigation = () => {
     navigation.dispatch(StackActions.pop(pop));
   }
 
+  function replaceScreen(routeName: keyof RootStackParamList, params?: any) {
+    navigation.dispatch(StackActions.replace(routeName, params));
+  }
+
   return {
     ...navigation,
     resetTo,
     goBackAndUpdate,
     goBackToIndex,
+    replaceScreen,
   };
 };

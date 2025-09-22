@@ -1,7 +1,7 @@
+import {useOnline} from '@hooks/useOnline';
 import {Text, View} from 'react-native';
-import {useOnline} from 'src/hooks/useOnline';
 
-const OfflineBanner = () => {
+export const OfflineBanner = () => {
   const {online} = useOnline();
   if (online) return null;
   return (

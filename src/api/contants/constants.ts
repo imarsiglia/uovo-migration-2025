@@ -134,7 +134,9 @@ export const NATIONAL_SHUTTLE_TYPE = {
   WEST_COAST_DROPOFF: 'west_coast_dropoff',
   UNIQUE_ROUTE_PICKUP: 'unique_route_pickup',
   UNIQUE_ROUTE_DROPOFF: 'unique_route_dropoff',
-};
+} as const;
+
+export type NationalShuttleType = typeof NATIONAL_SHUTTLE_TYPE
 
 export const STATUS_NATIONAL_SHUTTLE = {
   UNLOADED: {

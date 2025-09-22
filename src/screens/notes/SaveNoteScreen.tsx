@@ -1,43 +1,46 @@
-import { QUERY_KEYS } from '@api/contants/constants';
-import { useSaveNote } from '@api/hooks/HooksTaskServices';
-import { Icons } from '@assets/icons/icons';
-import { BackButton } from '@components/commons/buttons/BackButton';
-import { BasicFormProvider } from '@components/commons/form/BasicFormProvider';
-import { ButtonSubmit } from '@components/commons/form/ButtonSubmit';
-import { InputTextContext } from '@components/commons/form/InputTextContext';
+import {QUERY_KEYS} from '@api/contants/constants';
+import {useSaveNote} from '@api/hooks/HooksTaskServices';
+import {Icons} from '@assets/icons/icons';
+import {BackButton} from '@components/commons/buttons/BackButton';
+import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
+import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
+import {InputTextContext} from '@components/commons/form/InputTextContext';
 import {
-    SpeechFormContext,
-    SpeechFormInputRef,
+  SpeechFormContext,
+  SpeechFormInputRef,
 } from '@components/commons/form/SpeechFormContext';
-import { Label } from '@components/commons/text/Label';
+import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import { Wrapper } from '@components/commons/wrappers/Wrapper';
-import { useRefreshIndicator } from '@hooks/useRefreshIndicator';
-import { RootStackParamList } from '@navigation/types';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { loadingWrapperPromise } from '@store/actions';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {createNoteOffline, updateNoteOffline} from '@features/notes/offline';
+import {useOnline} from '@hooks/useOnline';
+import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {RootStackParamList} from '@navigation/types';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {loadingWrapperPromise} from '@store/actions';
 import useTopSheetStore from '@store/topsheet';
-import { COLORS } from '@styles/colors';
-import { GLOBAL_STYLES } from '@styles/globalStyles';
-import { showErrorToastMessage } from '@utils/toast';
-import { useCallback, useRef } from 'react';
-import { StyleSheet } from 'react-native';
+import {COLORS} from '@styles/colors';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {useQueryClient} from '@tanstack/react-query';
+import {showErrorToastMessage} from '@utils/toast';
+import {useCallback, useRef} from 'react';
+import {StyleSheet} from 'react-native';
 import {
-    KeyboardAwareScrollView,
-    KeyboardStickyView,
+  KeyboardAwareScrollView,
+  KeyboardStickyView,
 } from 'react-native-keyboard-controller';
-import { useCustomNavigation } from 'src/hooks/useCustomNavigation';
-import {
-    HelpDeskSchema,
-    SaveNoteSchemaType
-} from 'src/types/schemas';
+import {useCustomNavigation} from 'src/hooks/useCustomNavigation';
+import {HelpDeskSchema, SaveNoteSchemaType} from 'src/types/schemas';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SaveNote'>;
 
 export const SaveNoteScreen = (props: Props) => {
   const item = props.route.params?.item;
   const {goBack} = useCustomNavigation();
-  const {id: idJob} = useTopSheetStore((d) => d.jobDetail);
+  const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
+
+  const {online} = useOnline();
+  const qc = useQueryClient();
 
   const {refetchAll} = useRefreshIndicator([
     [QUERY_KEYS.TASK_COUNT, {idJob}],
@@ -50,27 +53,52 @@ export const SaveNoteScreen = (props: Props) => {
 
   const saveNote = useCallback(
     (props: SaveNoteSchemaType) => {
-      loadingWrapperPromise(
-        mutateAsync({
-          idJob,
-          id: item?.id ?? null,
-          title: props.title,
-          description: props.description,
-        })
-          .then((d) => {
-            if (d) {
-              refetchAll();
-              goBack();
-            } else {
-              showErrorToastMessage('Error while saving note');
-            }
+      if (online) {
+        loadingWrapperPromise(
+          mutateAsync({
+            idJob,
+            id: item?.id ?? null,
+            title: props.title,
+            description: props.description,
           })
-          .catch(() => {
-            showErrorToastMessage('Error while saving note');
-          }),
-      );
+            .then((d) => {
+              if (d) {
+                refetchAll();
+                goBack();
+              } else {
+                showErrorToastMessage('Error while saving note');
+              }
+            })
+            .catch(() => {
+              showErrorToastMessage('Error while saving note');
+            }),
+        );
+      } else {
+        try {
+          if (item?.clientId) {
+            updateNoteOffline(qc, {
+              idJob,
+              title: props.title,
+              description: props.description,
+              clientId: item.clientId,
+              id: item.id,
+              pending: item.pending,
+            });
+          } else {
+            createNoteOffline(qc, {
+              idJob,
+              title: props.title,
+              description: props.description,
+              update_time: new Date().toISOString()
+            });
+          }
+          goBack();
+        } catch (e) {
+          console.log(e)
+        }
+      }
     },
-    [mutateAsync],
+    [mutateAsync, online, goBack, refetchAll],
   );
 
   return (

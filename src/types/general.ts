@@ -31,3 +31,9 @@ export const INVENTORY_ORDER_TYPE = {
 export type InventoryFilterOrderType = 'ASC' | 'DESC';
 
 export type {ImageType};
+
+export type OfflineItemType = {
+  clientId?: string;
+  pending?: boolean;
+  idJob?: number;
+}

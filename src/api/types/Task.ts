@@ -1,3 +1,4 @@
+import { OfflineItemType } from "@generalTypes/general";
 import { LaborCodeType } from "./Jobs";
 
 export type SignatureType = {
@@ -11,11 +12,11 @@ export type SignatureType = {
 };
 
 export type NoteType = {
-  id: number;
+  id?: number;
   title: string;
   description?: string;
-  update_time: string;
-};
+  update_time?: string;
+} & OfflineItemType;
 
 export type IdReportMaterialType = {
   id: number;

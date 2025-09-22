@@ -5,6 +5,7 @@ export interface ApiResponse<T> {
   service: string;
   status? : number;
   statusText? : string;
+  screen_route?: string;
 }
 
 export type Paginated<T> = {data: T; total: number};

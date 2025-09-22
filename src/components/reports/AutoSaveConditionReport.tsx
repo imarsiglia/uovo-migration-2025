@@ -119,7 +119,6 @@ export const AutoSaveConditionReport = ({
         })
           .then((d) => {
             if (d) {
-              console.log('update SUCCESSFULLY');
               refetchAll();
               hardRefreshMany();
             }
