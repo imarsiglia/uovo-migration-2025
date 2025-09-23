@@ -14,7 +14,17 @@ export type OutboxItemBase = {
   updatedAt?: number;
 };
 
-export type OutboxItem =
-  | (OutboxItemBase & { kind: 'note/create'; payload: Required<NoteType> })
-  | (OutboxItemBase & { kind: 'note/update'; payload: Required<NoteType> })
-  | (OutboxItemBase & { kind: 'note/delete'; payload: Required<NoteType> });
+export type OutboxItem = {
+  uid: string;
+  kind: OutboxKind;
+  createdAt: number;
+  attempts: number;
+  status: OutboxStatus;
+  lastError?: string | null;
+  payload: NoteType;
+};
+
+// export type OutboxItem =
+//   | (OutboxItemBase & { kind: 'note/create'; payload: Required<NoteType> })
+//   | (OutboxItemBase & { kind: 'note/update'; payload: Required<NoteType> })
+//   | (OutboxItemBase & { kind: 'note/delete'; payload: Required<NoteType> });

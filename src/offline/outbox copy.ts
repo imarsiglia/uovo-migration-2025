@@ -35,8 +35,6 @@ export const getQueue = () => readQueue();
 
 export const clearQueue = () => writeQueue([]);
 
-export const replaceQueue = (newQueue: OutboxItem[]) => writeQueue(newQueue);
-
 /**
  * ENQUEUE con COALESCE inteligente
  * - Si haces create -> update: combina en single create con datos actualizados.

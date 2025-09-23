@@ -141,7 +141,7 @@ export const TopsheetScreen = ({route}: Props) => {
     // }
     // return refetchPromise.finally(() => setIsRefetching(false));
     // }, [activeTab, refetchCalendar, refetchTimeline, refetchJobQueue]);
-  }, []);
+  }, [refetch]);
 
   const {visual, label} = useMemo(
     () =>

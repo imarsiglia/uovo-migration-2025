@@ -97,6 +97,7 @@ export const NotesScreen = () => {
             );
           } else {
             deleteNoteOffline(qc, {
+              idJob,
               ...note,
             });
             showToastMessage('Note deleted successfully');
@@ -171,7 +172,7 @@ export const NotesScreen = () => {
                   ]}>
                   {getFormattedDateWithTimezone(
                     item.update_time,
-                    'YYYY-MM-DD hh:mm A',
+                    'YYYY-MM-DD HH:mm A',
                   )}
                 </Text>
               </View>
@@ -220,7 +221,7 @@ export const NotesScreen = () => {
         <FlatList
           data={list}
           renderItem={renderItem}
-          keyExtractor={(it) => it.id?.toString() ?? it.clientId}
+          keyExtractor={(it) => it.id?.toString() ?? it.clientId!}
           refreshing={isRefetching}
           onRefresh={refetch}
           removeClippedSubviews

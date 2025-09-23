@@ -206,7 +206,7 @@ export const LaborReportScreen = () => {
                     Timestamp
                   </Text>
                   <Text style={styles.subtitleNotification}>
-                    {getFormattedDate(item.clock_in, 'YYYY/MM/DD [•] hh:mm A')}
+                    {getFormattedDate(item.clock_in, 'YYYY/MM/DD [•] HH:mm A')}
                   </Text>
                 </Wrapper>
               </View>

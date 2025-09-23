@@ -309,28 +309,33 @@ export function sortList<T>(
   field: keyof T,
   ascending: boolean = true,
 ): T[] {
-  return list?.sort((a, b) => {
-    const fieldA = a[field];
-    const fieldB = b[field];
+  return (
+    list?.sort((a, b) => {
+      const fieldA = a[field];
+      const fieldB = b[field];
 
-    if (fieldA === null && fieldB === null) {
-      return 0;
-    }
-    if (fieldA === null) {
-      return 1;
-    }
-    if (fieldB === null) {
-      return -1;
-    }
+      if (fieldA === null && fieldB === null) {
+        return 0;
+      }
+      if (fieldA === null) {
+        return 1;
+      }
+      if (fieldB === null) {
+        return -1;
+      }
 
-    if (typeof fieldA === 'string' && typeof fieldB === 'string') {
-      return ascending
-        ? fieldA.localeCompare(fieldB)
-        : fieldB.localeCompare(fieldA);
-    } else if (typeof fieldA === 'number' && typeof fieldB === 'number') {
-      return ascending ? fieldA - fieldB : fieldB - fieldA;
-    } else {
-      return 0;
-    }
-  }) ?? [];
+      if (typeof fieldA === 'string' && typeof fieldB === 'string') {
+        return ascending
+          ? fieldA.localeCompare(fieldB)
+          : fieldB.localeCompare(fieldA);
+      } else if (typeof fieldA === 'number' && typeof fieldB === 'number') {
+        return ascending ? fieldA - fieldB : fieldB - fieldA;
+      } else {
+        return 0;
+      }
+    }) ?? []
+  );
 }
+
+export const sleep = (ms: number) =>
+  new Promise<void>((res) => setTimeout(res, ms));

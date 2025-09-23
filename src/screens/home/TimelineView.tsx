@@ -184,6 +184,7 @@ export const TimelineViewCmp = () => {
 
     // Agrupar por fecha y preformatear la etiqueta de fecha
     return base.reduce<Record<string, JobType[]>>((acc, job) => {
+      console.log(job.scheduled_on)
       const key = job.scheduled_on.split('T')[0];
       const withFmt = {
         ...job,

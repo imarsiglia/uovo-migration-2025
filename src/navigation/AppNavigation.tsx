@@ -97,7 +97,8 @@ import {EditProfileScreen} from '@screens/profile/EditProfileScreen';
 import CallPhoneSheet from '@components/bottomSheets/CallPhoneSheet';
 import {navigationRef} from '@utils/navigationService';
 import {InventoryNSScreen} from '@screens/nationalshuttle/InventoryNSScreen';
-import { OfflineBanner } from '@components/offline/OfflineBanner';
+import {OfflineBanner} from '@components/offline/OfflineBanner';
+import {ModalOffline} from '@components/offline/ModalOffline';
 // import InventoryNS from '../screens/nationalShuttle/InventoryNS';
 
 // LogBox.ignoreLogs([
@@ -285,7 +286,8 @@ export const AppNavigation = () => {
           <ModalLoading />
           <PortalHost name="root" />
           <CallPhoneSheet />
-          <OfflineBanner/>
+          <OfflineBanner />
+          <ModalOffline />
         </NavigationContainer>
         // <OfflineComponentSync />
         // <OfflineCompSecondSync />

@@ -84,10 +84,10 @@ export const AddLaborReportScreen = (props: Props) => {
       if (mLaborCode) {
         if (itemToEdit) {
           return registerLaborReport({
-            idJob: jobDetail.id,
+            idJob: jobDetail!.id,
             confirm: 0,
             preventEditCurrentClock,
-            queue: isJobQueue,
+            queue: isJobQueue!,
             list: [
               ...laborReports
                 ?.filter((x) => x.id != itemToEdit.id)
@@ -114,7 +114,7 @@ export const AddLaborReportScreen = (props: Props) => {
           });
         } else {
           return registerLaborReport({
-            idJob: jobDetail.id,
+            idJob: jobDetail!.id,
             confirm: 0,
             preventEditCurrentClock,
             queue: isJobQueue,
