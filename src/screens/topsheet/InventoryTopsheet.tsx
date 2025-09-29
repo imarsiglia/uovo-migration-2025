@@ -151,6 +151,18 @@ export const InventoryTopsheet = () => {
     [isInventoryDisabled, sessionUser, updateInventoryStatus, refetch],
   );
 
+  const isAltIdVisible = useMemo(() => {
+    return inventory?.some(
+      (x) => !!x.clientinv2 && x.clientinv2.trim().length > 0,
+    );
+  }, [inventory]);
+
+  const isClientRefVisible = useMemo(() => {
+    return inventory?.some(
+      (x) => !!x.clientref && x.clientref.trim().length > 0,
+    );
+  }, [inventory]);
+
   if (!jobDetail) {
     return <></>;
   }
@@ -213,6 +225,9 @@ export const InventoryTopsheet = () => {
                 showCheck={inventory?.length! > 0}
                 checked={allChecked}
                 onCheckAll={onCheckAll}
+                hasImage="Has image"
+                isAltIdVisible={isAltIdVisible}
+                isClientRefVisible={isClientRefVisible}
               />
             </Wrapper>
 
@@ -258,6 +273,9 @@ export const InventoryTopsheet = () => {
                     hasConditionReport={item.has_condition_check}
                     hasConditionCheck={item.has_condition_check}
                     user={sessionUser}
+                    hasImage={!!item.netsuite_image}
+                    isAltIdVisible={isAltIdVisible}
+                    isClientRefVisible={isClientRefVisible}
                   />
                 )}
                 keyExtractor={(item) => item.id.toString()}

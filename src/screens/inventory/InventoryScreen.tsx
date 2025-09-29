@@ -360,6 +360,18 @@ export const InventoryScreen = () => {
     };
   }, [online, status]);
 
+  const isAltIdVisible = useMemo(() => {
+    return inventory?.some(
+      (x) => !!x.clientinv2 && x.clientinv2.trim().length > 0,
+    );
+  }, [inventory]);
+
+  const isClientRefVisible = useMemo(() => {
+    return inventory?.some(
+      (x) => !!x.clientref && x.clientref.trim().length > 0,
+    );
+  }, [inventory]);
+
   return (
     <Wrapper style={styles.container}>
       <Wrapper
@@ -494,6 +506,9 @@ export const InventoryScreen = () => {
             checked={allChecked}
             onCheckAll={onCheckAll}
             deleteBtn="Delete"
+            hasImage="Has image"
+            isAltIdVisible={isAltIdVisible}
+            isClientRefVisible={isClientRefVisible}
           />
 
           {inventory && (
@@ -539,6 +554,9 @@ export const InventoryScreen = () => {
                   hasConditionCheck={item.has_condition_check}
                   user={sessionUser}
                   deleteBtn={() => onDeleteItem(item)}
+                  hasImage={!!item.netsuite_image}
+                  isAltIdVisible={isAltIdVisible}
+                  isClientRefVisible={isClientRefVisible}
                 />
               )}
               keyExtractor={(item) => item.id.toString()}

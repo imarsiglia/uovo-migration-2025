@@ -70,6 +70,7 @@ const SearchInput = ({
       <TextInput
         ref={inputRef}
         style={styles.input}
+        placeholderTextColor={COLORS.placeholderInput}
         {...rest}
         value={value}
         onChangeText={handleInputChange}

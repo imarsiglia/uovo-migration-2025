@@ -115,6 +115,7 @@ export const TimelineViewCmp = () => {
           jobQueue={false}
           isFilterActive={isFilterActive}
           isOnline={online}
+          userStatus={item.user_status}
         />
       ),
     [handleItemPress, isFilterActive, online],
@@ -190,7 +191,7 @@ export const TimelineViewCmp = () => {
         ...job,
         __dateFmt: getFormattedDate(
           job.scheduled_on,
-          'dddd MMM DD [•] HH:mm A',
+          'dddd MMM DD [•] hh:mm A',
         ),
         statusOwn: job.crew?.some(
           (x) => x.id_user == sessionUser?.user_id && x.status == PAUSED_STATUS,

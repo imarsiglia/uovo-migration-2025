@@ -13,11 +13,13 @@ import {
   PAUSED_COLOR_CREW,
   PAUSED_STATUS,
   PAUSED_STATUS_CREW,
+  REPREPPED_STATUS,
   STARTED_COLOR_CREW,
   STARTED_STATUS,
   STARTED_STATUS_CREW,
   STATUS_NATIONAL_SHUTTLE,
   StatusNationalShuttleTye,
+  WO_CONFIRMED_STATUS,
 } from '@api/contants/constants';
 import Orientation from 'react-native-orientation-locker';
 
@@ -183,22 +185,31 @@ export function getItemColorStatus(loadStatus: StatusNationalShuttleTye) {
   );
 }
 
-export function deriveVisualState({
+export function deriveVisualGroupState({
   offline,
-  currentClockInStatus,
   woStatus,
 }: {
   offline: boolean;
-  currentClockInStatus?: string | null;
   woStatus?: string | null;
 }) {
   if (offline) return {visual: 'offline' as const, label: 'Offline'};
-
-  // Prioriza current_clock_in.status si existe
-  const status = currentClockInStatus ?? woStatus ?? null;
-
+  const status = woStatus ?? null;
   if (!status) return {visual: 'inProgress' as const, label: 'WO Confirmed'};
+  return getDerivedState(status);
+}
 
+export function deriveVisualUserState({
+  currentClockInStatus,
+}: {
+  currentClockInStatus?: string | null;
+}) {
+  if (!currentClockInStatus) {
+    return {visual: null, label: null};
+  }
+  return getDerivedState(currentClockInStatus);
+}
+
+function getDerivedState(status: string) {
   switch (status) {
     case STARTED_STATUS:
       return {visual: 'inProgress' as const, label: status};
@@ -210,6 +221,44 @@ export function deriveVisualState({
       return {visual: 'inProgress' as const, label: status};
   }
 }
+
+export const getGroupStatusType = (
+  isOnline?: boolean,
+  status?: string | null,
+) => {
+  if (!isOnline) return 'offline';
+  if (
+    status === WO_CONFIRMED_STATUS ||
+    status === 'Scheduled' ||
+    status?.includes(STARTED_STATUS)
+  ) {
+    return 'scheduled';
+  }
+  if (status?.includes(PAUSED_STATUS)) {
+    return 'paused';
+  }
+  if (status?.includes(REPREPPED_STATUS)) {
+    return 'reprepped';
+  }
+  return 'canceled';
+};
+
+export const getUserStatusType = (status?: string | null) => {
+  if (
+    status === WO_CONFIRMED_STATUS ||
+    status === 'Scheduled' ||
+    status?.includes(STARTED_STATUS)
+  ) {
+    return 'scheduled';
+  }
+  if (status?.includes(PAUSED_STATUS)) {
+    return 'paused';
+  }
+  if (status?.includes(REPREPPED_STATUS)) {
+    return 'reprepped';
+  }
+  return 'canceled';
+};
 
 export function cleanAddress(address: string) {
   if (!address) {

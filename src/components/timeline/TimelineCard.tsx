@@ -1,4 +1,5 @@
 import {
+  GLOBAL_FONT_SIZE_MULTIPLIER_MD,
   PAUSED_STATUS,
   REPREPPED_STATUS,
   STARTED_STATUS,
@@ -10,6 +11,8 @@ import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {BolCountVisualize} from '@components/jobs/bol/BolCountVisualize';
 import {FAIconType} from '@generalTypes/general';
 import {COLORS, ICON_COLORS, IconColorKeys} from '@styles/colors';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {getGroupStatusType, getUserStatusType} from '@utils/functions';
 import {memo, useCallback} from 'react';
 import {Platform, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
@@ -37,6 +40,7 @@ type Props = {
   isFilterActive?: boolean;
   isOnline?: boolean;
   onPress: (id: number) => void;
+  userStatus?: string;
 };
 
 const TimelineCardCmp = ({
@@ -62,6 +66,7 @@ const TimelineCardCmp = ({
   bolSended,
   isFilterActive,
   isOnline,
+  userStatus,
 }: Props) => {
   const handleTopSheetPress = useCallback(() => onPress(id), [onPress, id]);
 
@@ -120,37 +125,69 @@ const TimelineCardCmp = ({
             <Wrapper style={{flexDirection: 'column', width: '90%'}}>
               {name != null && <Label style={style.text}>{name}</Label>}
               <Label style={style.subtitle}>{date}</Label>
-              <Wrapper
-                style={[
-                  isOnline
-                    ? status == WO_CONFIRMED_STATUS ||
-                      status === 'Scheduled' ||
-                      status.includes(STARTED_STATUS)
-                      ? style.scheduled
-                      : status.includes(PAUSED_STATUS)
-                      ? style.paused
-                      : status.includes(REPREPPED_STATUS)
-                      ? style.reprepped
-                      : style.canceled
-                    : style.offline,
-                  style.containerStatus,
-                ]}>
-                <Label
-                  style={
-                    isOnline
-                      ? status == WO_CONFIRMED_STATUS ||
-                        status === 'Scheduled' ||
-                        status.includes(STARTED_STATUS)
-                        ? style.scheduled_text
-                        : status.includes(PAUSED_STATUS)
-                        ? style.paused_text
-                        : status.includes(REPREPPED_STATUS)
-                        ? style.reprepped_text
-                        : style.canceled_text
-                      : style.offline_text
-                  }>
-                  {!isOnline ? 'Offline' : status}
-                </Label>
+
+              <Wrapper style={[GLOBAL_STYLES.row, {gap: 15, marginTop: 5}]}>
+                <Wrapper style={style.containerTypeStatus}>
+                  <Label
+                    style={style.textStatus}
+                    maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_MD}>
+                    Group status
+                  </Label>
+                  <Wrapper
+                    style={[
+                      style.containerStatus,
+                      containerByVisual[getGroupStatusType(isOnline, status)],
+                      // isOnline
+                      //   ? status == WO_CONFIRMED_STATUS ||
+                      //     status === 'Scheduled' ||
+                      //     status.includes(STARTED_STATUS)
+                      //     ? style.scheduled
+                      //     : status.includes(PAUSED_STATUS)
+                      //     ? style.paused
+                      //     : status.includes(REPREPPED_STATUS)
+                      //     ? style.reprepped
+                      //     : style.canceled
+                      //   : style.offline,
+                    ]}>
+                    <Label
+                      style={
+                        labelByVisual[getGroupStatusType(isOnline, status)]
+                        // isOnline
+                        //   ? status == WO_CONFIRMED_STATUS ||
+                        //     status === 'Scheduled' ||
+                        //     status.includes(STARTED_STATUS)
+                        //     ? style.scheduled_text
+                        //     : status.includes(PAUSED_STATUS)
+                        //     ? style.paused_text
+                        //     : status.includes(REPREPPED_STATUS)
+                        //     ? style.reprepped_text
+                        //     : style.canceled_text
+                        //   : style.offline_text
+                      }>
+                      {!isOnline ? 'Offline' : status}
+                    </Label>
+                  </Wrapper>
+                </Wrapper>
+
+                {!!userStatus && (
+                  <Wrapper style={style.containerTypeStatus}>
+                    <Label
+                      style={style.textStatus}
+                      maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_MD}>
+                      Group status
+                    </Label>
+                    <Wrapper
+                      style={[
+                        style.containerStatus,
+                        containerByVisual[getUserStatusType(userStatus)],
+                      ]}>
+                      <Label
+                        style={labelByVisual[getUserStatusType(userStatus)]}>
+                        {userStatus}
+                      </Label>
+                    </Wrapper>
+                  </Wrapper>
+                )}
               </Wrapper>
             </Wrapper>
 
@@ -193,23 +230,25 @@ const TimelineCardCmp = ({
             </Wrapper>
           }
 
-          <ScrollView
-            style={[
-              style.note,
-              {
-                flexGrow: 1,
-                paddingLeft: 10,
-                maxHeight: 85,
-              },
-            ]}
-            nestedScrollEnabled={true}>
-            <Label style={{fontSize: 14, marginBottom: 5, fontWeight: '500'}}>
-              Dispatcher notes:
-            </Label>
-            <SelectableText style={{fontSize: 13, color: '#707070'}}>
-              {instructions ? instructions : 'N/A'}
-            </SelectableText>
-          </ScrollView>
+          {(!jobQueue || (jobQueue && instructions)) && (
+            <ScrollView
+              style={[
+                style.note,
+                {
+                  flexGrow: 1,
+                  paddingLeft: 10,
+                  maxHeight: 85,
+                },
+              ]}
+              nestedScrollEnabled={true}>
+              <Label style={{fontSize: 14, marginBottom: 5, fontWeight: '500'}}>
+                Dispatcher notes:
+              </Label>
+              <SelectableText style={{fontSize: 13, color: '#707070'}}>
+                {instructions ?? 'N/A'}
+              </SelectableText>
+            </ScrollView>
+          )}
 
           {!jobQueue && (
             <Wrapper style={[style.child, style.flex, {paddingLeft: 10}]}>
@@ -408,6 +447,14 @@ const style = StyleSheet.create({
   container: {
     paddingHorizontal: 10,
   },
+  textStatus: {
+    fontSize: 12,
+    color: '#2c2c2c',
+  },
+  containerTypeStatus: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 
 export const TimelineCard = memo(
@@ -433,5 +480,28 @@ export const TimelineCard = memo(
     a.statusOwn === b.statusOwn &&
     a.jobQueue === b.jobQueue &&
     a.isFilterActive === b.isFilterActive &&
-    a.isOnline === b.isOnline,
+    a.isOnline === b.isOnline &&
+    a.userStatus === b.userStatus,
 );
+
+const containerByVisual: Record<
+  'offline' | 'scheduled' | 'paused' | 'reprepped' | 'canceled',
+  any
+> = {
+  offline: style.offline,
+  scheduled: style.scheduled,
+  paused: style.paused,
+  reprepped: style.reprepped,
+  canceled: style.canceled,
+};
+
+const labelByVisual: Record<
+  'offline' | 'scheduled' | 'paused' | 'reprepped' | 'canceled',
+  any
+> = {
+  offline: style.offline_text,
+  scheduled: style.scheduled_text,
+  paused: style.paused_text,
+  reprepped: style.reprepped_text,
+  canceled: style.canceled_text,
+};

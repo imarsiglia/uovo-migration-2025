@@ -171,8 +171,8 @@ export const NotesScreen = () => {
                     {marginTop: 2},
                   ]}>
                   {getFormattedDateWithTimezone(
-                    item.update_time,
-                    'YYYY-MM-DD HH:mm A',
+                    item.update_time!,
+                    'YYYY-MM-DD hh:mm A',
                   )}
                 </Text>
               </View>

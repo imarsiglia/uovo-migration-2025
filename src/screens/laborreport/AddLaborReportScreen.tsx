@@ -9,34 +9,34 @@ import {
   useGetLaborReports,
   useRegisterLaborReport,
 } from '@api/hooks/HooksTaskServices';
-import { BackButton } from '@components/commons/buttons/BackButton';
-import { AutocompleteContext } from '@components/commons/form/AutocompleteContext';
-import { BasicFormProvider } from '@components/commons/form/BasicFormProvider';
-import { BottomSheetSelectInputContext } from '@components/commons/form/BottomSheetSelectInputContext';
-import { ButtonSubmit } from '@components/commons/form/ButtonSubmit';
-import { InputTextContext } from '@components/commons/form/InputTextContext';
-import { GeneralLoading } from '@components/commons/loading/GeneralLoading';
-import { Label } from '@components/commons/text/Label';
+import {BackButton} from '@components/commons/buttons/BackButton';
+import {AutocompleteContext} from '@components/commons/form/AutocompleteContext';
+import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
+import {BottomSheetSelectInputContext} from '@components/commons/form/BottomSheetSelectInputContext';
+import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
+import {DatePickerCalendarContext} from '@components/commons/form/DatePickerCalendarContext';
+import {InputTextContext} from '@components/commons/form/InputTextContext';
+import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
+import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import { Wrapper } from '@components/commons/wrappers/Wrapper';
-import {
-  AddLaborSchema,
-  AddLaborSchemaType
-} from '@generalTypes/schemas';
-import { useCustomNavigation } from '@hooks/useCustomNavigation';
-import { useRefreshIndicator } from '@hooks/useRefreshIndicator';
-import { RootStackParamList } from '@navigation/types';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { loadingWrapperPromise } from '@store/actions';
-import { useModalDialogStore } from '@store/modals';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {AddLaborSchema, AddLaborSchemaType} from '@generalTypes/schemas';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {RootStackParamList} from '@navigation/types';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {loadingWrapperPromise} from '@store/actions';
+import {useModalDialogStore} from '@store/modals';
 import useTopSheetStore from '@store/topsheet';
-import { COLORS } from '@styles/colors';
-import { GLOBAL_STYLES } from '@styles/globalStyles';
-import { formatWorkedHours } from '@utils/functions';
-import { showErrorToastMessage, showToastMessage } from '@utils/toast';
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import {COLORS} from '@styles/colors';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {formatWorkedHours} from '@utils/functions';
+import {showErrorToastMessage, showToastMessage} from '@utils/toast';
+import {useCallback, useMemo, useRef, useState} from 'react';
+import {StyleSheet, Text, View} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
+
+const maxDate = new Date();
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddLaborReport'>;
 export const AddLaborReportScreen = (props: Props) => {
@@ -57,16 +57,16 @@ export const AddLaborReportScreen = (props: Props) => {
   });
 
   const {data: laborReports, isLoading} = useGetLaborReports({
-    idJob: jobDetail.id,
-    toClockout,
+    idJob: jobDetail!.id,
+    toClockout: toClockout!,
     enabled: false,
   });
 
   const {data: laborCodes} = useGetLaborCodes();
 
   const {refetchAll} = useRefreshIndicator([
-    [QUERY_KEYS.TASK_COUNT, {idJob: jobDetail.id}],
-    [QUERY_KEYS.LABOR_REPORTS, {idJob: jobDetail.id, toClockout}],
+    [QUERY_KEYS.TASK_COUNT, {idJob: jobDetail!.id}],
+    [QUERY_KEYS.LABOR_REPORTS, {idJob: jobDetail!.id, toClockout}],
   ]);
 
   const preventEditCurrentClock = useMemo(() => {
@@ -89,7 +89,7 @@ export const AddLaborReportScreen = (props: Props) => {
             preventEditCurrentClock,
             queue: isJobQueue!,
             list: [
-              ...laborReports
+              ...laborReports!
                 ?.filter((x) => x.id != itemToEdit.id)
                 ?.map((x) => ({
                   laborCode: x.labor_code?.id,
@@ -103,10 +103,10 @@ export const AddLaborReportScreen = (props: Props) => {
                 //@ts-ignore
                 laborCode: mLaborCode.id?.toString(),
                 addedManually: itemToEdit.added_manually?.toString(),
-                workedHours: formatWorkedHours(props.hours, props.minutes),
+                workedHours: formatWorkedHours(props.hours!, props.minutes!),
                 userName: props.handler?.title,
                 labor_code: mLaborCode,
-                worked_hour: formatWorkedHours(props.hours, props.minutes),
+                worked_hour: formatWorkedHours(props.hours!, props.minutes!),
                 user_name: props.handler?.title,
                 id_user: Number(props.handler.id),
               },
@@ -117,9 +117,9 @@ export const AddLaborReportScreen = (props: Props) => {
             idJob: jobDetail!.id,
             confirm: 0,
             preventEditCurrentClock,
-            queue: isJobQueue,
+            queue: isJobQueue!,
             list: [
-              ...laborReports?.map((x) => ({
+              ...laborReports!?.map((x) => ({
                 laborCode: x.labor_code?.id,
                 addedManually: x.added_manually,
                 workedHours: x.worked_hour,
@@ -131,12 +131,12 @@ export const AddLaborReportScreen = (props: Props) => {
                 //@ts-ignore
                 laborCode: mLaborCode.id?.toString(),
                 addedManually: 1,
-                workedHours: formatWorkedHours(props.hours, props.minutes),
+                workedHours: formatWorkedHours(props.hours!, props.minutes!),
                 userName: props.handler?.title,
-                id_job: jobDetail.id,
+                id_job: jobDetail!.id,
                 id_user: Number(props.handler.id),
                 user_name: props.handler?.title,
-                worked_hour: formatWorkedHours(props.hours, props.minutes),
+                worked_hour: formatWorkedHours(props.hours!, props.minutes!),
                 added_manually: 1,
                 labor_code: mLaborCode,
               },
@@ -255,10 +255,12 @@ export const AddLaborReportScreen = (props: Props) => {
             <View style={styles.autocompleteContainer}>
               <AutocompleteContext
                 name="handler"
-                dataSet={employees?.map((x) => ({
-                  id: x.id.toString(),
-                  title: x.name,
-                }))!}
+                dataSet={
+                  employees?.map((x) => ({
+                    id: x.id.toString(),
+                    title: x.name,
+                  }))!
+                }
                 textInputProps={{
                   placeholder: 'Search a handler',
                 }}
@@ -283,6 +285,17 @@ export const AddLaborReportScreen = (props: Props) => {
           </View>
 
           <View style={{marginTop: 10}}>
+            <View style={[GLOBAL_STYLES.row, styles.containerFields]}>
+              <Label>Report date:</Label>
+              <DatePickerCalendarContext
+                currentId="reportDate"
+                maxDate={maxDate}
+                containerStyles={{
+                  minWidth: '60%',
+                }}
+              />
+            </View>
+
             <View style={[GLOBAL_STYLES.row, styles.containerFields]}>
               <Label>Labor:</Label>
               <Wrapper style={[GLOBAL_STYLES.row, {minWidth: '60%'}]}>

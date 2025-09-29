@@ -32,7 +32,7 @@ const calendar = async (month: number, year: number): Promise<string[]> => {
 
 const timeline = async (date: string): Promise<JobType[]> => {
   const response = await getRequest<Paginated<JobType[]>>(
-    `${API_TIMELINE}?date=${date}&start=0&limit=20&totalize=1`,
+    `${API_TIMELINE}?date=${date}&start=0&limit=100&totalize=1`,
   );
   return response.body?.data ?? [];
 };

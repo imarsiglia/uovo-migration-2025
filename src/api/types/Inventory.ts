@@ -22,7 +22,7 @@ export type JobInventoryType = {
   medium: string;
   medium_id: string;
   must_update: number;
-  netsuite_image: null;
+  netsuite_image: string | null;
   packed_cubit_foot: string;
   packed_height: string;
   packed_length: string;

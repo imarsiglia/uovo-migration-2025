@@ -37,6 +37,9 @@ type Props = {
   showSecondaryId?: boolean;
   id2?: string | null;
   deleteBtn?: () => void;
+  hasImage?: boolean;
+  isAltIdVisible?: boolean;
+  isClientRefVisible?: boolean;
 };
 
 type props = {
@@ -79,6 +82,9 @@ const RowInventory = ({
   showSecondaryId,
   id2,
   deleteBtn,
+  hasImage,
+  isAltIdVisible,
+  isClientRefVisible,
 }: Props) => {
   const [loading, setLoading] = React.useState(false);
   const [isConfirmDelete, setIsConfirmDelete] = React.useState(false);
@@ -141,7 +147,7 @@ const RowInventory = ({
             }
           />
 
-          {showSecondaryId && (
+          {showSecondaryId && isAltIdVisible && (
             <Column
               onPress={checkViewDetail}
               label={id2}
@@ -149,11 +155,13 @@ const RowInventory = ({
             />
           )}
 
-          <Column
-            onPress={checkViewDetail}
-            label={clientRef}
-            width={ROW_COLUMNS_WIDTH.CLIENT_REF}
-          />
+          {isClientRefVisible && (
+            <Column
+              onPress={checkViewDetail}
+              label={clientRef}
+              width={ROW_COLUMNS_WIDTH.CLIENT_REF}
+            />
+          )}
 
           <Column
             onPress={checkViewDetail}
@@ -200,13 +208,14 @@ const RowInventory = ({
 
           <PressableOpacity
             style={[
+              styles.containerColumn,
               {
                 width: ROW_COLUMNS_WIDTH.CONDITION,
                 minWidth: ROW_COLUMNS_WIDTH.CONDITION,
                 maxWidth: ROW_COLUMNS_WIDTH.CONDITION,
               },
             ]}
-            onPress={() => checkViewDetail()}>
+            onPress={checkViewDetail}>
             <Wrapper style={[GLOBAL_STYLES.row, styles.containerCondition]}>
               <Wrapper style={{width: 20}}>
                 {hasConditionCheck != '0' && (
@@ -238,6 +247,24 @@ const RowInventory = ({
                 report
               </Label>
             </Wrapper>
+          </PressableOpacity>
+
+          <PressableOpacity
+            style={[
+              styles.containerColumn,
+              {
+                width: ROW_COLUMNS_WIDTH.HAS_IMAGE,
+                minWidth: ROW_COLUMNS_WIDTH.HAS_IMAGE,
+                maxWidth: ROW_COLUMNS_WIDTH.HAS_IMAGE,
+                alignItems: 'center',
+              },
+            ]}
+            onPress={checkViewDetail}>
+            {hasImage ? (
+              <Icon name="check" type="solid" size={12} color="#46bd73" />
+            ) : (
+              <Icon name="times" type="light" size={13} color="gray" />
+            )}
           </PressableOpacity>
 
           {isConfirmDelete ? (

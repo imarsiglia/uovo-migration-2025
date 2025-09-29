@@ -192,6 +192,7 @@ export const JobQueueViewCmp = () => {
           jobQueue={true}
           isFilterActive={isFilterActive}
           isOnline={online}
+          userStatus={item.user_status}
         />
       ),
     [handleItemPress, isFilterActive, online],

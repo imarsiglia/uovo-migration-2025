@@ -19,7 +19,7 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {deriveVisualState} from '@utils/functions';
+import {deriveVisualGroupState, deriveVisualUserState} from '@utils/functions';
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 import {Alert, Animated, StyleSheet, View} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
@@ -29,6 +29,7 @@ import {TaskTopsheet} from './TaskTopsheet';
 import {TeamTopsheet} from './TeamTopsheet';
 import {ClockinButton} from '@components/clockin/ClockinButton';
 import {InventoryTopsheet} from './InventoryTopsheet';
+import {GLOBAL_FONT_SIZE_MULTIPLIER_MD} from '@api/contants/constants';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -143,14 +144,21 @@ export const TopsheetScreen = ({route}: Props) => {
     // }, [activeTab, refetchCalendar, refetchTimeline, refetchJobQueue]);
   }, [refetch]);
 
-  const {visual, label} = useMemo(
+  const {visual: visualGroupStatus, label: labelGroupStatus} = useMemo(
     () =>
-      deriveVisualState({
+      deriveVisualGroupState({
         offline: !online,
-        currentClockInStatus: jobDetail?.current_clock_in?.status,
         woStatus: jobDetail?.wo_status,
       }),
-    [online, jobDetail?.current_clock_in?.status, jobDetail?.wo_status],
+    [online, jobDetail?.wo_status],
+  );
+
+  const {visual: visualUserStatus, label: labelUserStatus} = useMemo(
+    () =>
+      deriveVisualUserState({
+        currentClockInStatus: jobDetail?.current_clock_in?.status,
+      }),
+    [jobDetail?.current_clock_in?.status],
   );
 
   const goToTeamMember = useCallback(() => {
@@ -218,12 +226,46 @@ export const TopsheetScreen = ({route}: Props) => {
                   ]}>
                   {jobDetail?.netsuite_order}
                 </Label>
-                <Wrapper
-                  style={[styles.containerState, containerByVisual[visual]]}>
-                  <Label style={[{fontSize: 12}, textByVisual[visual]]}>
-                    {label}
+                <Wrapper style={styles.containerWoStatus}>
+                  <Label
+                    style={styles.textStatus}
+                    maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_MD}>
+                    Group status
                   </Label>
+                  <Wrapper
+                    style={[
+                      styles.containerState,
+                      containerByVisual[visualGroupStatus],
+                    ]}>
+                    <Label
+                      style={[{fontSize: 12}, textByVisual[visualGroupStatus]]}>
+                      {labelGroupStatus}
+                    </Label>
+                  </Wrapper>
                 </Wrapper>
+
+                {visualUserStatus && (
+                  <Wrapper style={styles.containerWoStatus}>
+                    <Label
+                      style={styles.textStatus}
+                      maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_MD}>
+                      User status
+                    </Label>
+                    <Wrapper
+                      style={[
+                        styles.containerState,
+                        containerByVisual[visualUserStatus],
+                      ]}>
+                      <Label
+                        style={[
+                          {fontSize: 12},
+                          textByVisual[visualUserStatus],
+                        ]}>
+                        {labelUserStatus}
+                      </Label>
+                    </Wrapper>
+                  </Wrapper>
+                )}
               </Wrapper>
               {jobDetail?.crew?.length! > 0 && (
                 <Animated.View
@@ -395,6 +437,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 3,
+  },
+  textStatus: {
+    fontSize: 10,
+    marginTop: 2,
+    color: '#2f2f2f',
+  },
+  containerWoStatus: {
+    alignItems: 'center',
+    gap: 5,
   },
 });
 
