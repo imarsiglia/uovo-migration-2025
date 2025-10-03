@@ -144,7 +144,7 @@ export const LoginEmailScreen = () => {
                 label="Sign in"
                 onSubmit={onLogin}
                 onInvalid={() =>
-                  showToastMessage('Please, enter your credentials')
+                  showToastMessage('Please, enter valid credentials')
                 }
                 disabled={isPending}
                 style={styles.button}

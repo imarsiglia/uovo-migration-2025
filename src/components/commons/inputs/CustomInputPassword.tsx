@@ -102,6 +102,7 @@ const styles = StyleSheet.create({
     height: '100%',
     fontSize: 16,
     flex: 1,
+    color: COLORS.inputTextColor
   },
   disabled: {
     backgroundColor: COLORS.disabled,
