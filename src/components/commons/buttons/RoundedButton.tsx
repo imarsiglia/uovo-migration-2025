@@ -5,6 +5,7 @@ import {
   PressableProps,
   StyleProp,
   StyleSheet,
+  TextProps,
   TextStyle,
   View,
   ViewStyle,
@@ -20,6 +21,7 @@ export type RoundedButtonProps = {
   labelStyles?: StyleProp<TextStyle>;
   buttonStyles?: StyleProp<ViewStyle>;
   loading?: boolean;
+  labelProps?: TextProps;
 } & PressableProps;
 
 export const RoundedButton = forwardRef(
@@ -30,6 +32,7 @@ export const RoundedButton = forwardRef(
       buttonStyles,
       labelStyles,
       loading,
+      labelProps,
       ...rest
     }: RoundedButtonProps,
     ref: React.Ref<View>,
@@ -60,7 +63,9 @@ export const RoundedButton = forwardRef(
           <>
             {icon && <Wrapper style={styles.containerIcon}>{icon}</Wrapper>}
             {label && (
-              <Label style={[{color: COLORS.white}, styles.label, labelStyles]}>
+              <Label
+                {...labelProps}
+                style={[{color: COLORS.white}, styles.label, labelStyles]}>
                 {label}
               </Label>
             )}

@@ -4,10 +4,7 @@ import {
   Linking,
   ScrollView,
   StyleSheet,
-  Text,
   TouchableHighlight,
-  TouchableOpacity,
-  View,
 } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 import {lockToPortrait} from '@utils/functions';
@@ -35,6 +32,13 @@ import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {BackButton} from '@components/commons/buttons/BackButton';
 import {useModalDialogStore} from '@store/modals';
 import {loadingWrapperPromise} from '@store/actions';
+import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
+import {Label} from '@components/commons/text/Label';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {
+  GLOBAL_FONT_SIZE_MULTIPLIER_SM,
+  GLOBAL_FONT_SIZE_MULTIPLIER_XS,
+} from '@api/contants/constants';
 
 var itemLoaded = false;
 
@@ -185,23 +189,27 @@ export const ItemDetailScreen = (props: Props) => {
   const rowItemDetail = useCallback(
     ({title, description, hideBorder}: RowItemDetailProps) => {
       return (
-        <View
+        <Wrapper
           style={[
             styles.row,
             styles.rowItemDetail,
             {borderBottomWidth: hideBorder ? 0 : 0.3},
           ]}>
-          <View style={styles.leftColumn}>
-            <Text style={[styles.lightText, styles.minVerticalPadding]}>
+          <Wrapper style={styles.leftColumn}>
+            <Label
+              style={[styles.lightText, styles.minVerticalPadding]}
+              maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_XS}>
               {title ? title : 'N/A'}
-            </Text>
-          </View>
-          <View style={styles.rightColumn}>
-            <Text style={styles.normalText}>
+            </Label>
+          </Wrapper>
+          <Wrapper style={styles.rightColumn}>
+            <Label
+              style={styles.normalText}
+              maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_SM}>
               {description ? description : 'N/A'}
-            </Text>
-          </View>
-        </View>
+            </Label>
+          </Wrapper>
+        </Wrapper>
       );
     },
     [],
@@ -294,11 +302,23 @@ export const ItemDetailScreen = (props: Props) => {
     });
   }, [navigate, currentItem]);
 
+  const goToItemImage = useCallback(() => {
+    if (!!currentItem?.netsuite_image) {
+      try {
+        Linking.openURL(currentItem.netsuite_image);
+      } catch (error) {
+        showErrorToastMessage('Could not open url');
+      }
+    } else {
+      showErrorToastMessage('Invalid URL');
+    }
+  }, [currentItem?.netsuite_image]);
+
   return (
-    <View style={[styles.container]}>
+    <Wrapper style={[styles.container]}>
       {isLoading && <GeneralLoading />}
 
-      <View
+      <Wrapper
         style={[{backgroundColor: 'white'}, GLOBAL_STYLES.containerBtnOptTop]}>
         {/* <TouchableOpacity onPress={goToBack}>
           <View style={styles.backBtn}>
@@ -315,25 +335,29 @@ export const ItemDetailScreen = (props: Props) => {
         <BackButton
           title={fromInventory ? 'Inventory' : isNS ? 'Back' : 'Tasks'}
           onPress={goToBack}
+          labelProps={{
+            maxFontSizeMultiplier: GLOBAL_FONT_SIZE_MULTIPLIER_XS,
+          }}
         />
 
-        <View style={[GLOBAL_STYLES.lateralPadding, styles.row]}>
-          <Text
-            style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, {fontSize: 20}]}>
+        <Wrapper style={[GLOBAL_STYLES.lateralPadding, styles.row]}>
+          <Label
+            style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, {fontSize: 20}]}
+            maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_SM}>
             Inventory Detail
-          </Text>
-        </View>
+          </Label>
+        </Wrapper>
 
-        <View style={{flexDirection: 'row', width: 40}}>
+        <Wrapper style={{flexDirection: 'row', width: 40}}>
           <ButtonSyncro isRefetching={isRefetching} onPress={refetch} />
-        </View>
-      </View>
+        </Wrapper>
+      </Wrapper>
 
       <MinRoundedView />
 
       <ScrollView style={{marginTop: 10}}>
-        <View style={{paddingHorizontal: 10}}>
-          <View style={[styles.containerItemDetail]}>
+        <Wrapper style={{paddingHorizontal: 10}}>
+          <Wrapper style={[styles.containerItemDetail]}>
             {rowItemDetail({
               title: 'ID',
               description: currentItem?.clientinv,
@@ -348,9 +372,55 @@ export const ItemDetailScreen = (props: Props) => {
             })}
 
             {rowItemDetail({
-              title: 'Dimensions',
+              title: 'Packed dimensions',
               description: `${currentItem?.packed_height} x ${currentItem?.packed_length} x ${currentItem?.packed_width}`,
             })}
+
+            {rowItemDetail({
+              title: 'Unpacked dimensions',
+              description: `${currentItem?.unpacked_height ?? 0} x ${
+                currentItem?.unpacked_length ?? 0
+              } x ${currentItem?.unpacked_width ?? 0}`,
+            })}
+
+            <Wrapper
+              style={[
+                styles.row,
+                styles.rowItemDetail,
+                {borderBottomWidth: 0.3},
+              ]}>
+              <Wrapper style={styles.leftColumn}>
+                <Label
+                  style={[styles.lightText, styles.minVerticalPadding]}
+                  maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_XS}>
+                  Associated image
+                </Label>
+              </Wrapper>
+              <Wrapper
+                style={[styles.rightColumn, GLOBAL_STYLES.row, {gap: 5}]}>
+                <Label
+                  style={styles.normalText}
+                  maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_SM}>
+                  {!!currentItem?.netsuite_image ? 'Yes - ' : 'N/A'}
+                </Label>
+                {!!currentItem?.netsuite_image && (
+                  <PressableOpacity
+                    onPress={goToItemImage}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 5,
+                    }}>
+                    <Label
+                      style={[styles.normalText, styles.linkText]}
+                      maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_SM}>
+                      View image
+                    </Label>
+                    <Icon name="image" size={16} color={COLORS.primary} />
+                  </PressableOpacity>
+                )}
+              </Wrapper>
+            </Wrapper>
 
             {rowItemDetail({
               title: 'Title',
@@ -385,23 +455,23 @@ export const ItemDetailScreen = (props: Props) => {
               description: currentItem?.weight,
             })}
 
-            <View
+            <Wrapper
               style={[
                 styles.row,
                 styles.rowItemDetail,
                 {borderBottomWidth: 0},
               ]}>
-              <View style={styles.leftColumn}>
-                <Text style={[styles.lightText, styles.minVerticalPadding]}>
+              <Wrapper style={styles.leftColumn}>
+                <Label style={[styles.lightText, styles.minVerticalPadding]}>
                   Parent
-                </Text>
-              </View>
-              <View style={styles.rightColumn}>
+                </Label>
+              </Wrapper>
+              <Wrapper style={styles.rightColumn}>
                 {currentItem?.parent ? (
                   currentItem?.parent_id ? (
                     // Parent on WO
-                    <TouchableOpacity onPress={() => navigateToParent()}>
-                      <Text
+                    <PressableOpacity onPress={() => navigateToParent()}>
+                      <Label
                         style={[
                           styles.normalText,
                           {
@@ -410,23 +480,23 @@ export const ItemDetailScreen = (props: Props) => {
                           },
                         ]}>
                         {currentItem?.parent}
-                      </Text>
-                    </TouchableOpacity>
+                      </Label>
+                    </PressableOpacity>
                   ) : (
                     // Parent not on WO
-                    <Text style={[styles.normalText]}>
+                    <Label style={[styles.normalText]}>
                       {currentItem?.parent} (Parent not on WO)
-                    </Text>
+                    </Label>
                   )
                 ) : (
-                  <Text style={styles.normalText}>N/A</Text>
+                  <Label style={styles.normalText}>N/A</Label>
                 )}
-              </View>
-            </View>
-          </View>
-        </View>
+              </Wrapper>
+            </Wrapper>
+          </Wrapper>
+        </Wrapper>
 
-        <View style={{marginTop: 15, paddingHorizontal: 10}}>
+        <Wrapper style={{marginTop: 15, paddingHorizontal: 10}}>
           <TaskOne
             name="Take dimensions"
             icon="ruler"
@@ -449,7 +519,7 @@ export const ItemDetailScreen = (props: Props) => {
               />
             }>
             {({close}) => (
-              <View style={[styles.modalRp]}>
+              <Wrapper style={[styles.modalRp]}>
                 <TouchableHighlight
                   activeOpacity={0.6}
                   underlayColor="#DDDDDD"
@@ -461,7 +531,7 @@ export const ItemDetailScreen = (props: Props) => {
                     close();
                     onInitConditionReport();
                   }}>
-                  <Text style={[styles.optionReport]}>Condition Report</Text>
+                  <Label style={[styles.optionReport]}>Condition Report</Label>
                 </TouchableHighlight>
 
                 <TouchableHighlight
@@ -472,9 +542,9 @@ export const ItemDetailScreen = (props: Props) => {
                     close();
                     onInitConditionCheck();
                   }}>
-                  <Text style={[styles.optionReport]}>Condition Check</Text>
+                  <Label style={[styles.optionReport]}>Condition Check</Label>
                 </TouchableHighlight>
-              </View>
+              </Wrapper>
             )}
           </CustomDropdown>
 
@@ -485,43 +555,43 @@ export const ItemDetailScreen = (props: Props) => {
             light={true}
             onPress={() => goToTasks()}
           />
-          <View
+          <Wrapper
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
               gap: 5,
               marginBottom: 20,
             }}>
-            <TouchableOpacity
+            <PressableOpacity
               style={[
                 GLOBAL_STYLES.row,
                 styles.btnGoToNetsuite,
                 {alignSelf: 'flex-start', marginTop: 10, width: '50%'},
               ]}
               onPress={() => goToNetsuite(currentItem?.url)}>
-              <Text style={{color: 'white', fontSize: 13, marginRight: 10}}>
+              <Label style={{color: 'white', fontSize: 13, marginRight: 10}}>
                 Go to Netsuite
-              </Text>
+              </Label>
               <Icon name="globe-americas" size={17} color="white" />
-            </TouchableOpacity>
+            </PressableOpacity>
             {true && (
-              <TouchableOpacity
+              <PressableOpacity
                 style={[
                   GLOBAL_STYLES.row,
                   styles.btnDeleteItem,
                   {alignSelf: 'flex-start', marginTop: 10, width: '50%'},
                 ]}
                 onPress={deleteItem}>
-                <Text style={{color: 'white', fontSize: 13, marginRight: 10}}>
+                <Label style={{color: 'white', fontSize: 13, marginRight: 10}}>
                   Remove
-                </Text>
+                </Label>
                 <Icon name="trash-alt" size={17} color="white" />
-              </TouchableOpacity>
+              </PressableOpacity>
             )}
-          </View>
-        </View>
+          </Wrapper>
+        </Wrapper>
       </ScrollView>
-    </View>
+    </Wrapper>
   );
 };
 
@@ -546,8 +616,6 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     width: '30%',
     paddingLeft: 0,
-    alignSelf: 'center',
-    alignItems: 'flex-start',
     borderEndWidth: 0.3,
     borderEndColor: '#ececec',
     justifyContent: 'center',
@@ -576,7 +644,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#3C424A',
     fontSize: 13,
-    textAlign: 'right',
+    textAlign: 'left',
   },
   normalText: {
     color: '#3C424A',
@@ -689,5 +757,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.7,
     shadowRadius: 6.14,
     elevation: 10,
+  },
+  linkText: {
+    color: COLORS.primary,
+    textDecorationLine: 'underline',
   },
 });

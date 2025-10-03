@@ -2,18 +2,17 @@ import {useGetBolPdf} from '@api/hooks/HooksJobServices';
 import {BackButton} from '@components/commons/buttons/BackButton';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
-import {Label} from '@components/commons/text/Label';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import sharePdf from '@utils/sharePdf';
-import {showErrorToastMessage} from '@utils/toast';
-import {useCallback, useMemo, useState} from 'react';
-import {Dimensions, Platform, StyleSheet} from 'react-native';
+import {useCallback, useEffect, useMemo, useState} from 'react';
+import {StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 import Pdf from 'react-native-pdf';
+import RNFS from 'react-native-fs';
 
 export const VisualizeBolScreen = () => {
   const {goBack} = useCustomNavigation();
@@ -24,6 +23,7 @@ export const VisualizeBolScreen = () => {
     wo_title,
     client_name,
   } = useTopSheetStore((d) => d.jobDetail!);
+
   const {data: bolBase64, isLoading} = useGetBolPdf({
     idJob,
   });
@@ -35,6 +35,20 @@ export const VisualizeBolScreen = () => {
       return null;
     }
   }, [bolBase64]);
+
+  useEffect(() => {
+    return () => {
+      if (filePath) {
+        RNFS.exists(filePath).then((exists) => {
+          if (exists) {
+            RNFS.unlink(filePath)
+              .then(() => console.log('archivo eliminado:', filePath))
+              .catch((err) => console.log('Error deleting file:', err));
+          }
+        });
+      }
+    };
+  }, [filePath]);
 
   const filename = useMemo(() => {
     return `BOL_${wo_title}_${client_name}_${idJob}.pdf`.replaceAll(' ', '');

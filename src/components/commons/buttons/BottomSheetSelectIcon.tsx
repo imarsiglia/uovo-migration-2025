@@ -17,10 +17,10 @@ import React, {
   useState,
 } from 'react';
 import {StyleProp, StyleSheet, ViewStyle} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {CustomPressable} from '../pressable/CustomPressable';
 import {Label} from '../text/Label';
 import {Wrapper} from '../wrappers/Wrapper';
+import {useCustomInsetBottom} from '@hooks/useCustomInsetBottom';
 
 // ---- Types ----
 export type Primitive = string | number | boolean | null | undefined;
@@ -129,10 +129,9 @@ function _BottomSheetSelectIcon<T extends Record<string, any>>(
   }: BottomSheetSelectIconProps<T>,
   ref: React.Ref<BottomSheetSelectIconRef>,
 ) {
-  const insets = useSafeAreaInsets();
+  const insetBottom = useCustomInsetBottom();
   const modalRef = useRef<BottomSheetModal>(null);
   const [query, setQuery] = useState('');
-  const [footerH, setFooterH] = useState(0);
 
   // Normaliza value controlado
   const selected = ensureArray(value);
@@ -196,9 +195,17 @@ function _BottomSheetSelectIcon<T extends Record<string, any>>(
           <Label numberOfLines={1} style={styles.rowLabel}>
             {name}
           </Label>
-          <Wrapper style={[styles.checkbox, checked && styles.checkboxChecked]}>
-            {checked ? <Label style={styles.checkboxIcon}>✓</Label> : null}
-          </Wrapper>
+
+          {multiple ? (
+            <Wrapper
+              style={[styles.checkbox, checked && styles.checkboxChecked]}>
+              {checked ? <Label style={styles.checkboxIcon}>✓</Label> : null}
+            </Wrapper>
+          ) : (
+            <Wrapper style={[styles.radio, checked && styles.radioChecked]}>
+              {checked ? <Label style={styles.radioIcon}>✓</Label> : null}
+            </Wrapper>
+          )}
         </CustomPressable>
       );
     },
@@ -236,9 +243,7 @@ function _BottomSheetSelectIcon<T extends Record<string, any>>(
         // Footer FIJO SIEMPRE VISIBLE
         footerComponent={(props) => (
           <BottomSheetFooter {...props}>
-            <Wrapper
-              onLayout={(e) => setFooterH(e.nativeEvent.layout.height)}
-              style={[styles.footer, {paddingBottom: insets.bottom + 10}]}>
+            <Wrapper style={[styles.footer, {paddingBottom: !!insetBottom ? insetBottom : 10}]}>
               <CustomPressable
                 onPress={cancel}
                 style={({pressed}) => [
@@ -291,11 +296,6 @@ function _BottomSheetSelectIcon<T extends Record<string, any>>(
             keyboardShouldPersistTaps="handled"
             nestedScrollEnabled // importante en Android para scroll anidado
             style={{flex: 1}}
-            contentContainerStyle={
-              filtered.length === 0
-                ? styles.emptyContainer
-                : {paddingBottom: footerH + insets.bottom + 8}
-            }
             ListEmptyComponent={
               <Label style={styles.emptyText}>No results</Label>
             }
@@ -363,6 +363,26 @@ const styles = StyleSheet.create({
     borderColor: COLORS.tertearyDark,
   },
   checkboxIcon: {
+    color: 'white',
+    fontWeight: '900',
+    fontSize: 14,
+    lineHeight: 16,
+  },
+  radio: {
+    width: 22,
+    height: 22,
+    borderRadius: 100,
+    borderWidth: 1.5,
+    borderColor: '#CBD5E1',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
+  },
+  radioChecked: {
+    backgroundColor: COLORS.tertearyDark,
+    borderColor: COLORS.tertearyDark,
+  },
+  radioIcon: {
     color: 'white',
     fontWeight: '900',
     fontSize: 14,

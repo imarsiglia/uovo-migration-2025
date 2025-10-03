@@ -76,7 +76,8 @@ export const TakeDimensionsScreen = (props: Props) => {
         <BackButton title="Inventory detail" onPress={goBack} />
 
         <Label
-          style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, {fontSize: 20}]}>
+          style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, {fontSize: 20}]}
+          allowFontScaling={false}>
           Take dimensions
         </Label>
 

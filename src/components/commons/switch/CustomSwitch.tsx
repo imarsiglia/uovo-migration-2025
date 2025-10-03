@@ -120,7 +120,7 @@ export const CustomSwitch: React.FC<Props> = ({
 const styles = StyleSheet.create({
   switchContainer: {
     width: '100%',
-    height: 28,
+    minHeight: 28,
     justifyContent: 'center',
     backgroundColor: COLORS.primary,
     borderRadius: 30,

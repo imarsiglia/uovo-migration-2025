@@ -1,9 +1,11 @@
 import {CrewMemberType} from '@api/types/Jobs';
+import { PressableOpacity } from '@components/commons/buttons/PressableOpacity';
 import {SwipeableRow} from '@components/commons/swipeable/SwipeableRow';
+import { Label } from '@components/commons/text/Label';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
 import {getColorStatusCrewMember} from '@utils/functions';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Image, StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
-import {Swipeable} from 'react-native-gesture-handler';
 
 type Props = {
   onPressProfile: () => void;
@@ -23,7 +25,7 @@ const CrewMember = ({
   const rightActions = (close: () => void) => {
     return (
       <>
-        <TouchableOpacity
+        <PressableOpacity
           style={[
             currentUser != item.id_user ? null : styles.borderRadiusLeft,
             styles.swipeableView,
@@ -34,9 +36,9 @@ const CrewMember = ({
             close();
           }}>
           <Icon name="address-card" size={25} color="white" type="solid" />
-        </TouchableOpacity>
+        </PressableOpacity>
         {currentUser != item.id_user && (
-          <TouchableOpacity
+          <PressableOpacity
             style={[
               item.leader ? styles.borderRadiusLeft : null,
               styles.swipeableView,
@@ -47,11 +49,11 @@ const CrewMember = ({
               close();
             }}>
             <Icon name="phone-alt" size={25} color="white" type="solid" />
-          </TouchableOpacity>
+          </PressableOpacity>
         )}
 
         {currentUser != item.id_user && !item.leader && (
-          <TouchableOpacity
+          <PressableOpacity
             style={[
               styles.borderRadiusLeft,
               styles.swipeableView,
@@ -62,17 +64,17 @@ const CrewMember = ({
               close();
             }}>
             <Icon name="trash-alt" size={25} color="white" type="solid" />
-          </TouchableOpacity>
+          </PressableOpacity>
         )}
       </>
     );
   };
 
   return (
-    <View style={styles.container}>
+    <Wrapper style={styles.container}>
       <SwipeableRow rightActions={(close) => rightActions(close)}>
-        <View style={styles.subContainer}>
-          <View style={styles.paddingHorizontal}>
+        <Wrapper style={styles.subContainer}>
+          <Wrapper style={styles.paddingHorizontal}>
             {item.photo && (
               <Image
                 style={[
@@ -84,7 +86,7 @@ const CrewMember = ({
             )}
 
             {!item.photo && (
-              <View
+              <Wrapper
                 style={[
                   styles.image,
                   {
@@ -92,33 +94,33 @@ const CrewMember = ({
                     borderColor: getColorStatusCrewMember(item.status),
                   },
                 ]}>
-                <Text allowFontScaling={false} style={{color: 'white'}}>
+                <Label allowFontScaling={false} style={{color: 'white'}}>
                   {item.name ? item.name[0] : 'T'}
                   {item.lastname ? item.lastname[0] : 'R'}
-                </Text>
-              </View>
+                </Label>
+              </Wrapper>
             )}
-          </View>
-          <View style={styles.containerName}>
+          </Wrapper>
+          <Wrapper style={styles.containerName}>
             {item.leader && (
-              <View style={styles.teamLeader}>
+              <Wrapper style={styles.teamLeader}>
                 <Icon name="check" size={9} color="white" type="solid" />
-                <Text style={styles.txtteamLeader} allowFontScaling={false}>
+                <Label style={styles.txtteamLeader} allowFontScaling={false}>
                   Team leader
-                </Text>
-              </View>
+                </Label>
+              </Wrapper>
             )}
 
-            <Text style={styles.name} allowFontScaling={false}>
+            <Label style={styles.name} allowFontScaling={false}>
               {item.name ?? 'No name'}
-            </Text>
-            <Text style={styles.phone} allowFontScaling={false}>
+            </Label>
+            <Label style={styles.phone} allowFontScaling={false}>
               {item.phone ?? 'No phone'}
-            </Text>
-          </View>
-        </View>
+            </Label>
+          </Wrapper>
+        </Wrapper>
       </SwipeableRow>
-    </View>
+    </Wrapper>
   );
 };
 

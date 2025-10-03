@@ -28,10 +28,10 @@ import {
   ViewStyle,
 } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {CustomPressable} from '../pressable/CustomPressable';
 import {Label} from '../text/Label';
 import {Wrapper} from '../wrappers/Wrapper';
+import {useCustomInsetBottom} from '@hooks/useCustomInsetBottom';
 
 // ---- Types ----
 export type Primitive = string | number | boolean | null | undefined;
@@ -145,11 +145,10 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
   }: BottomSheetSelectInputProps<T>,
   ref: React.Ref<BottomSheetSelectInputRef>,
 ) {
-  const insets = useSafeAreaInsets();
+  const insetBottom = useCustomInsetBottom();
   const modalRef = useRef<BottomSheetModal>(null);
   const listRef = useRef<BottomSheetFlatListMethods>(null); // ref de la FlatList para scroll
   const [query, setQuery] = useState('');
-  const [footerH, setFooterH] = useState(0);
 
   // Visibilidad con animación
   const listOpacity = useRef(new Animated.Value(0)).current;
@@ -361,7 +360,7 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
         snapPoints={snapPoints}
         enablePanDownToClose
         enableDynamicSizing={false}
-        keyboardBehavior="extend"
+        keyboardBehavior="interactive"
         keyboardBlurBehavior="restore"
         handleStyle={styles.handle}
         backgroundStyle={styles.sheetBg}
@@ -376,8 +375,10 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
         footerComponent={(props) => (
           <BottomSheetFooter {...props}>
             <Wrapper
-              onLayout={(e) => setFooterH(e.nativeEvent.layout.height)}
-              style={[styles.footer, {paddingBottom: insets.bottom + 10}]}>
+              style={[
+                styles.footer,
+                {paddingBottom: !!insetBottom ? insetBottom : 10},
+              ]}>
               <CustomPressable
                 onPress={cancel}
                 style={({pressed}) => [
@@ -434,11 +435,6 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
               keyboardShouldPersistTaps="handled"
               nestedScrollEnabled
               style={{flex: 1}}
-              contentContainerStyle={
-                filtered.length === 0
-                  ? styles.emptyContainer
-                  : {paddingBottom: footerH + insets.bottom + 8}
-              }
               ListEmptyComponent={
                 <Label style={styles.emptyText}>No results</Label>
               }
@@ -520,7 +516,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   search: {
-    height: 40,
+    minHeight: 40,
     borderWidth: 1,
     borderColor: '#E5E7EB',
     borderRadius: 10,
@@ -605,14 +601,11 @@ const styles = StyleSheet.create({
   btnGhostText: {color: '#111827'},
   btnPrimary: {backgroundColor: COLORS.primary},
   btnPrimaryText: {color: 'white', fontWeight: '600'},
-
-  emptyContainer: {
-    flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
+  emptyText: {
+    color: '#6B7280',
+    textAlign: 'center',
+    top: 50,
   },
-  emptyText: {color: '#6B7280', bottom: '35%'},
   container: {
     flex: 1,
     paddingTop: 200,

@@ -30,7 +30,11 @@ import {useModalDialogStore} from '@store/modals';
 import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {formatWorkedHours} from '@utils/functions';
+import {
+  formatWorkedHours,
+  getFormattedDate,
+  getFormattedDateWithTimezone,
+} from '@utils/functions';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import {useCallback, useMemo, useRef, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
@@ -96,6 +100,7 @@ export const AddLaborReportScreen = (props: Props) => {
                   addedManually: x.added_manually,
                   workedHours: x.worked_hour,
                   userName: x.user_name,
+                  customDateReport: x.custom_date_report,
                   ...x,
                 })),
               {
@@ -109,6 +114,10 @@ export const AddLaborReportScreen = (props: Props) => {
                 worked_hour: formatWorkedHours(props.hours!, props.minutes!),
                 user_name: props.handler?.title,
                 id_user: Number(props.handler.id),
+                customDateReport: getFormattedDate(
+                  props.reportDate,
+                  'YYYY-MM-DD',
+                ),
               },
             ],
           });
@@ -124,6 +133,7 @@ export const AddLaborReportScreen = (props: Props) => {
                 addedManually: x.added_manually,
                 workedHours: x.worked_hour,
                 userName: x.user_name,
+                customDateReport: x.custom_date_report,
                 ...x,
               })),
               {
@@ -139,6 +149,10 @@ export const AddLaborReportScreen = (props: Props) => {
                 worked_hour: formatWorkedHours(props.hours!, props.minutes!),
                 added_manually: 1,
                 labor_code: mLaborCode,
+                customDateReport: getFormattedDate(
+                  props.reportDate,
+                  'YYYY-MM-DD',
+                ),
               },
             ],
           });
@@ -215,6 +229,21 @@ export const AddLaborReportScreen = (props: Props) => {
     [setFilter],
   );
 
+  const initialReportDate = useMemo(() => {
+    return itemToEdit?.custom_date_report
+      ? new Date(
+          getFormattedDate(
+            itemToEdit?.custom_date_report,
+            'YYYY-MM-DD[T]HH:mm:ss',
+          ),
+        )
+      : itemToEdit?.clock_in
+      ? new Date(
+          getFormattedDate(itemToEdit?.clock_in, 'YYYY-MM-DD[T]HH:mm:ss'),
+        )
+      : null;
+  }, [itemToEdit?.custom_date_report, itemToEdit?.clock_in]);
+
   if (isLoading || !laborCodes) {
     return <GeneralLoading />;
   }
@@ -250,6 +279,7 @@ export const AddLaborReportScreen = (props: Props) => {
               id: itemToEdit?.id_user?.toString(),
               title: itemToEdit?.user_name,
             },
+            reportDate: initialReportDate,
           }}>
           <View style={{paddingBottom: 0, height: 45}}>
             <View style={styles.autocompleteContainer}>

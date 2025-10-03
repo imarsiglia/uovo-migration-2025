@@ -374,4 +374,6 @@ export const PHOTOS_REPORT_TYPES = {
   DETAIL: 'detail',
 };
 
+export const GLOBAL_FONT_SIZE_MULTIPLIER_XS = 1.2
+export const GLOBAL_FONT_SIZE_MULTIPLIER_SM = 1.4
 export const GLOBAL_FONT_SIZE_MULTIPLIER_MD = 1.7

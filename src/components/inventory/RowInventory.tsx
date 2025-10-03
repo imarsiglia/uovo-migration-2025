@@ -11,6 +11,7 @@ import {UserType} from '@api/types/User';
 import ItemSkeleton from '@components/skeletons/ItemSkeleton';
 import {
   COLUMNS_WIDTH,
+  GLOBAL_FONT_SIZE_MULTIPLIER_MD,
   INVENTORY_STATUS_TYPES,
   ROW_COLUMNS_WIDTH,
 } from '@api/contants/constants';
@@ -287,12 +288,16 @@ const RowInventory = ({
                   paddingHorizontal: 5,
                 }}>
                 <PressableOpacity onPress={() => setIsConfirmDelete(false)}>
-                  <Label style={{color: '#333'}} allowFontScaling={false}>
+                  <Label
+                    style={{color: '#333'}}
+                    maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_MD}>
                     Cancel
                   </Label>
                 </PressableOpacity>
                 <PressableOpacity onPress={deleteBtn}>
-                  <Label style={{color: '#FF6C6C'}} allowFontScaling={false}>
+                  <Label
+                    style={{color: '#FF6C6C'}}
+                    maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_MD}>
                     Yes
                   </Label>
                 </PressableOpacity>

@@ -10,7 +10,9 @@ import {AutocompleteContext} from '@components/commons/form/AutocompleteContext'
 import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
 import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
 import {InputTextContext} from '@components/commons/form/InputTextContext';
+import { Label } from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
 import {
   SaveReportMaterialSchema,
   SaveReportMaterialSchemaType,
@@ -26,9 +28,9 @@ import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {showErrorToastMessage} from '@utils/toast';
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useRef, useState} from 'react';
 import {useWatch} from 'react-hook-form';
-import {Alert, StyleSheet, Text, View} from 'react-native';
+import {StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SaveReportMaterials'>;
@@ -38,9 +40,9 @@ export const SaveReportMaterialScreen = (props: Props) => {
   const itemRef = useRef<any>(null);
 
   const {goBack} = useCustomNavigation();
-  const {id: idJob} = useTopSheetStore((d) => d.jobDetail);
+  const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
   const [filter, setFilter] = useState('');
-  const {user_id: idUser} = useAuth((d) => d.user);
+  const {user_id: idUser} = useAuth((d) => d.user!);
   const showDialog = useModalDialogStore((d) => d.showVisible);
 
   const {mutateAsync: registerReportMaterials} = useRegisterReportMaterials();
@@ -65,10 +67,10 @@ export const SaveReportMaterialScreen = (props: Props) => {
         return registerReportMaterials({
           idJob,
           list: [
-            ...reportMaterials
+            ...reportMaterials!
               ?.filter((x) => x.id != itemToEdit.id)
               ?.map((x) => ({
-                idMaterial: x.id_material.id,
+                idMaterial: x.id_material?.id,
                 idUser: x.id_user,
                 ...x,
               })),
@@ -150,22 +152,23 @@ export const SaveReportMaterialScreen = (props: Props) => {
   }
 
   return (
-    <View style={[styles.container]}>
-      <View style={GLOBAL_STYLES.bgwhite}>
-        <View style={GLOBAL_STYLES.containerBtnOptTop}>
+    <Wrapper style={[styles.container]}>
+      <Wrapper style={GLOBAL_STYLES.bgwhite}>
+        <Wrapper style={GLOBAL_STYLES.containerBtnOptTop}>
           <BackButton onPress={goBack} />
-        </View>
+        </Wrapper>
 
-        <View style={[styles.lateralPadding, styles.row]}>
-          <Text
-            style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, styles.topsheet]}>
+        <Wrapper style={[styles.lateralPadding, styles.row]}>
+          <Label
+            style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, styles.topsheet]}
+            allowFontScaling={false}>
             Add materials
-          </Text>
-        </View>
-      </View>
+          </Label>
+        </Wrapper>
+      </Wrapper>
 
       <MinRoundedView />
-      <View
+      <Wrapper
         style={{
           paddingTop: 20,
           paddingHorizontal: 20,
@@ -182,12 +185,12 @@ export const SaveReportMaterialScreen = (props: Props) => {
               : undefined,
             quantity: itemToEdit?.quantity?.toString(),
           }}>
-          <View style={{paddingBottom: 0, height: 45}}>
-            <View style={styles.autocompleteContainer}>
+          <Wrapper style={{paddingBottom: 0, height: 45}}>
+            <Wrapper style={styles.autocompleteContainer}>
               <AutocompleteContext
                 name="material"
                 // ref={itemRef}
-                dataSet={materials?.map((x) => ({
+                dataSet={materials!?.map((x) => ({
                   ...x,
                   id: x.id.toString(),
                   title: x.name,
@@ -213,16 +216,16 @@ export const SaveReportMaterialScreen = (props: Props) => {
                   itemRef.current.open();
                 }}
               />
-            </View>
-          </View>
+            </Wrapper>
+          </Wrapper>
 
-          <View style={[styles.lateralPadding, {marginTop: 10}]}>
-            <View style={[GLOBAL_STYLES.row, styles.containerFields]}>
-              <Text>Units Type:</Text>
+          <Wrapper style={[styles.lateralPadding, {marginTop: 10}]}>
+            <Wrapper style={[GLOBAL_STYLES.row, styles.containerFields]}>
+              <Label>Units Type:</Label>
               <TextValueFormContext name="material" />
-            </View>
-            <View style={[GLOBAL_STYLES.row, styles.containerFields]}>
-              <Text>Quantity:</Text>
+            </Wrapper>
+            <Wrapper style={[GLOBAL_STYLES.row, styles.containerFields]}>
+              <Label>Quantity:</Label>
               <InputTextContext
                 currentId="quantity"
                 maxLength={10}
@@ -231,9 +234,9 @@ export const SaveReportMaterialScreen = (props: Props) => {
                 keyboardType="numeric"
                 style={styles.inputDimensions}
               />
-            </View>
+            </Wrapper>
 
-            <View style={{marginTop: 40, marginBottom: 20}}>
+            <Wrapper style={{marginTop: 40, marginBottom: 20}}>
               <ButtonSubmit
                 label="Save material"
                 icon={<Icon name="save" type="solid" size={16} color="white" />}
@@ -241,11 +244,11 @@ export const SaveReportMaterialScreen = (props: Props) => {
                 showValidationError
                 // onInvalid={() => Alert.alert("hola")}
               />
-            </View>
-          </View>
+            </Wrapper>
+          </Wrapper>
         </BasicFormProvider>
-      </View>
-    </View>
+      </Wrapper>
+    </Wrapper>
   );
 };
 
@@ -361,5 +364,5 @@ const styles = StyleSheet.create({
 const TextValueFormContext = ({name}: {name: string}) => {
   const value = useWatch({name});
 
-  return <Text>{value?.unit}</Text>;
+  return <Label>{value?.unit}</Label>;
 };

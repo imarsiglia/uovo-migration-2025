@@ -61,6 +61,27 @@ export const getRequest = async <T>(
   }
 };
 
+export const getRequestString = async <T>(
+  endpoint: string,
+): Promise<ApiResponse<T>> => {
+  try {
+    const response = await apiClient.get<T>(endpoint);
+    return {
+      body: response.data,
+      status: response.status,
+      statusText: response.statusText,
+      message: '',
+      service: '',
+    };
+  } catch (error: any) {
+    handleError(error);
+    if (axios.isAxiosError(error)) {
+      throw error;
+    }
+    throw new Error(error?.message || 'Error en la solicitud');
+  }
+};
+
 function handleResponse<T>(response: AxiosResponse<ApiResponse<T>, any>) {
   if (response.status == 299 && response.data.screen_route) {
     openGeneralDialog({
@@ -101,9 +122,6 @@ const errorMessages: ErrorMap = {
 };
 
 function handleError(error: any) {
-
-  console.log("error")
-  console.log(JSON.stringify(error))
   // Caso especial: timeout
   if (error.message.includes('timeout')) {
     showErrorToastMessage(

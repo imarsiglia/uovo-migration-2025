@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     backgroundColor: COLORS.white,
     fontSize: 10,
-    height: 40,
+    minHeight: 40,
     padding: 0,
     paddingLeft: 10,
     borderBottomWidth: 0.5,

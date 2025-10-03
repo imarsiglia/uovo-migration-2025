@@ -1,4 +1,4 @@
-import {COLUMNS_WIDTH} from '@api/contants/constants';
+import {COLUMNS_WIDTH, GLOBAL_FONT_SIZE_MULTIPLIER_MD} from '@api/contants/constants';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {InputCheck} from '@components/commons/inputs/InputCheck';
 import {Label} from '@components/commons/text/Label';
@@ -77,7 +77,7 @@ const HeaderInventory = ({
         onPress={() => sort({filterType})}>
         <Label
           style={[styles.column, marked ? {color: '#00D3ED'} : {}]}
-          allowFontScaling={false}>
+          maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_MD}>
           {columnName}
         </Label>
 

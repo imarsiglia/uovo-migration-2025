@@ -68,7 +68,10 @@ export const HomeFloatingAction = () => {
       onOpen={() => setOpen(!open)}
       onClose={() => setOpen(!open)}
       color={isFilterActive ? 'green' : COLORS.tertearyDark}
-      overlayColor="#00000040">
+      overlayColor="#00000040"
+      style={{
+        paddingBottom: 15
+      }}>
       <CustomSpeedDialoAction
         title="Show active jobs"
         icon={<Icons.Filter fontSize={20} color={COLORS.white} />}

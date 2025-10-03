@@ -204,6 +204,7 @@ export const AddLaborSchema = yup
       .min(0, "Minutes can't be inferior than 0")
       .max(59, "Minutes can't be superior to 59")
       .nullable(),
+    reportDate: yup.date().required(DEFAULT_REQUIRED_MESSAGE),
   })
   // Autorrelleno: si uno es válido y el otro no, rellenar con 0
   .transform((current) => {

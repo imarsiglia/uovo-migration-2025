@@ -499,7 +499,8 @@ export const ConditionCheckScreen = (props: Props) => {
 
         <Wrapper style={[styles.lateralPadding, styles.row]}>
           <Label
-            style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, styles.topsheet]}>
+            style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, styles.topsheet]}
+            allowFontScaling={false}>
             Condition Check
           </Label>
         </Wrapper>

@@ -10,7 +10,7 @@
     "test": "jest",
     "ccache": "npx react-native start --reset-cache --port=8081",
     "device": "npx react-native run-android --deviceId=",
-    "idevice": "npx react-native run-ios --simulator=\"iPhone SE (3rd generation)\" --port=8081",
+    "idevice": "npx react-native run-ios --simulator=\"iPhone 15 Pro Max\" --port=8081",
     "pod": "cd ios && pod install",
     "podupdate": "cd ios && pod install --repo-update",
     "iphone": "npx react-native run-ios --port=8081 --device ",

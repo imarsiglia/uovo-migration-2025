@@ -154,6 +154,7 @@ export const ClockinButtonLaborReport = ({list}: Props) => {
           addedManually: x.added_manually,
           workedHours: x.worked_hour,
           userName: x.user_name,
+          customDateReport: x.custom_date_report,
         })),
       })
         .then((d) => {

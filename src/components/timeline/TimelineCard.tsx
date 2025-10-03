@@ -360,7 +360,7 @@ const style = StyleSheet.create({
   card: {
     width: '100%',
     backgroundColor: 'white',
-    maxWidth: 380,
+    maxWidth: 500,
     alignSelf: 'center',
     borderRadius: 10,
     shadowColor: '#000',

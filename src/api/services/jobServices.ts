@@ -17,7 +17,11 @@ import {
   API_TOPSHEET,
   SUCCESS_MESSAGES,
 } from '@api/contants/endpoints';
-import {getRequest, postRequest} from '@api/helpers/apiClientHelper';
+import {
+  getRequest,
+  getRequestString,
+  postRequest,
+} from '@api/helpers/apiClientHelper';
 import {JobDetailType, JobType, TaskJobType} from '@api/types/Jobs';
 import {Paginated} from '@api/types/Response';
 import {BooleanNumberType} from '@generalTypes/general';
@@ -217,11 +221,11 @@ const removeMemberTeam = async (
   return response.message == SUCCESS_MESSAGES.SUCCESS;
 };
 
-const getBolPdf = async ({idJob}: TaskBaseApiProps): Promise<string> => {
-  const response = await getRequest<string>(
+const getBolPdf = async ({idJob}: TaskBaseApiProps): Promise<string | null> => {
+  const response = await getRequestString<string>(
     `${API_GET_VISUALIZE_BOL}/${idJob}?create=0`,
   );
-  return response as never as string;
+  return response.body;
 };
 
 export const jobServices = {
