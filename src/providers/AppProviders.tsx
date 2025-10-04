@@ -78,27 +78,13 @@ export default function AppProviders({children}: {children: React.ReactNode}) {
                         k === QUERY_KEYS.TASK_COUNT ||
                         k === QUERY_KEYS.NOTES;
                       return allow && q.state.status === 'success';
-
-                      // // Ejemplo: guarda solo queries exitosas del calendario
-                      // const areSomeKeys =
-                      //   Array.isArray(q.queryKey) &&
-                      //   (q.queryKey[0] === QUERY_KEYS.CALENDAR ||
-                      //     q.queryKey[0] === QUERY_KEYS.TIMELINE ||
-                      //     q.queryKey[0] === QUERY_KEYS.LOCATION_PLACES ||
-                      //     q.queryKey[0] === QUERY_KEYS.WO_STATUS_LIST ||
-                      //     q.queryKey[0] === QUERY_KEYS.WO_TYPE_LIST ||
-                      //     q.queryKey[0] === QUERY_KEYS.JOB_QUEUE_LIST ||
-                      //     q.queryKey[0] === QUERY_KEYS.NOTES);
-                      // const isSuccess = q.state.status === 'success';
-                      // return areSomeKeys && isSuccess;
                     },
                   },
                   // Limpia el cache persistido si cambias la “versión” de datos:
                   buster: 'app-v7', // cambia a 'app-v2' tras cambios de schema o logout
                 }}>
                 {children}
-
-                <OutboxProcessor />
+                {/* <OutboxProcessor /> */}
               </PersistQueryClientProvider>
             </EDSProvider>
           </KeyboardProvider>

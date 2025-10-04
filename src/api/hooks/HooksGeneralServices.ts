@@ -14,6 +14,7 @@ const DEFAULT_PERSISTENCE_CONFIG = {
   gcTime: 7 * 24 * 60 * 60 * 1000,
   retry: 1,
   placeholderData: (prev: any) => prev,
+  refetchOnMount: 'always' as const,
 };
 
 export const useContactUsService = () => {

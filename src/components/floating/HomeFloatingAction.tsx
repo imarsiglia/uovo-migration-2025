@@ -1,19 +1,15 @@
-import { Icons } from '@assets/icons/icons';
-import { useCustomNavigation } from '@hooks/useCustomNavigation';
-import { RoutesNavigation } from '@navigation/types';
-import { IconNode } from '@rneui/base';
-import { SpeedDial } from '@rneui/themed';
-import { useAuth } from '@store/auth';
+import {Icons} from '@assets/icons/icons';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {RoutesNavigation} from '@navigation/types';
+import {IconNode} from '@rneui/base';
+import {SpeedDial} from '@rneui/themed';
+import {useAuth} from '@store/auth';
 import useGeneralStore from '@store/general';
-import { useModalDialogStore } from '@store/modals';
-import { COLORS } from '@styles/colors';
-import {
-  closeSessionOnGoogle,
-  getDeviceInfo,
-  showAlertDialogWithOptions,
-} from '@utils/functions';
-import { useCallback, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import {useModalDialogStore} from '@store/modals';
+import {COLORS} from '@styles/colors';
+import {closeSessionOnGoogle, getDeviceInfo} from '@utils/functions';
+import {useCallback, useState} from 'react';
+import {StyleSheet} from 'react-native';
 
 export const HomeFloatingAction = () => {
   const [open, setOpen] = useState(false);
@@ -31,18 +27,27 @@ export const HomeFloatingAction = () => {
       modalVisible: true,
       type: 'info',
       message: `ABOUT\n\nUOVO APP\nVerion ${getDeviceInfo().buildNumber}`,
-      confirmBtnLabel: "OK"
+      confirmBtnLabel: 'OK',
+      cancelable: false,
     });
     onCloseFab();
   }, []);
 
   const logout = useCallback(() => {
-    showAlertDialogWithOptions(() => {
-      clearSession();
-      closeSessionOnGoogle();
-      resetTo(RoutesNavigation.Login);
-    });
     onCloseFab();
+    showDialog({
+      modalVisible: true,
+      type: 'info',
+      message: 'Are you sure you want to logout?',
+      confirmBtnLabel: 'Yes, logout',
+      cancelBtnLabel: 'Cancel',
+      cancelable: true,
+      onConfirm: () => {
+        clearSession();
+        closeSessionOnGoogle();
+        resetTo(RoutesNavigation.Login);
+      },
+    });
   }, []);
 
   const goToHelpDesk = useCallback(() => {
@@ -70,7 +75,7 @@ export const HomeFloatingAction = () => {
       color={isFilterActive ? 'green' : COLORS.tertearyDark}
       overlayColor="#00000040"
       style={{
-        paddingBottom: 15
+        paddingBottom: 15,
       }}>
       <CustomSpeedDialoAction
         title="Show active jobs"

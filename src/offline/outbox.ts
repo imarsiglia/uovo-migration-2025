@@ -1,68 +1,71 @@
-import {MMKV} from 'react-native-mmkv';
-import {OutboxItem, OutboxStatus, OutboxKind} from './types';
-import {v4 as uuid} from 'uuid';
-import {NoteType} from '@api/types/Task';
+// src/offline/outbox.ts
+import 'react-native-get-random-values';
+import { MMKV } from 'react-native-mmkv';
+import { v4 as uuid } from 'uuid';
+import type { OutboxItem, GenericPayload, OutboxOpKind } from './types';
 
-const STORE_ID = 'offline-outbox-v2';
-const KEY = 'OUTBOX_QUEUE';
-const PROCESS_FLAG = 'OUTBOX_PROCESSING_FLAG'; // marca persistente para non-reentrant
+const STORE_ID = 'uovo-offbox-v1';
+const KEY = 'OUTBOX_QUEUE_V1';
+const PROC_FLAG = 'OUTBOX_PROCESSING_FLAG_V1';
 
-const store = new MMKV({id: STORE_ID});
+const store = new MMKV({ id: STORE_ID });
 
-const readQueue = (): OutboxItem[] => {
+export const readQueue = (): OutboxItem[] => {
   const raw = store.getString(KEY);
   if (!raw) return [];
   try {
     return JSON.parse(raw) as OutboxItem[];
-  } catch {
+  } catch (e) {
+    console.warn('[OUTBOX] parse error', e);
     return [];
   }
 };
 
-export const writeQueue = (q: OutboxItem[]) =>
-  store.set(KEY, JSON.stringify(q));
-
-export const isProcessingPersisted = (): boolean => {
-  return !!store.getString(PROCESS_FLAG);
-};
-
-export const setProcessingPersisted = (val: boolean) => {
-  if (val) store.set(PROCESS_FLAG, String(Date.now()));
-  else store.delete(PROCESS_FLAG);
+export const writeQueue = (q: OutboxItem[]) => {
+  try {
+    store.set(KEY, JSON.stringify(q));
+  } catch (e) {
+    console.warn('[OUTBOX] writeQueue error', e);
+  }
 };
 
 export const getQueue = () => readQueue();
-
+export const replaceQueue = (newQ: OutboxItem[]) => writeQueue(newQ);
 export const clearQueue = () => writeQueue([]);
-
-export const replaceQueue = (newQueue: OutboxItem[]) => writeQueue(newQueue);
+export const isProcessingPersisted = () => !!store.getString(PROC_FLAG);
+export const setProcessingPersisted = (val: boolean) => {
+  if (val) store.set(PROC_FLAG, String(Date.now()));
+  else store.delete(PROC_FLAG);
+};
 
 /**
- * ENQUEUE con COALESCE inteligente
- * - Si haces create -> update: combina en single create con datos actualizados.
- * - Si haces create -> delete (antes de sync): quita ambas (no es necesario llamar al server).
- * - Si haces update -> delete: deja solo delete (con id si existe).
+ * enqueueCoalesced: agrega operación a la cola y aplica reglas de coalescing por (entity + clientId|id)
+ * Retorna uid del item creado o el uid existente si se coalesció; retorna null si la operación se anuló (create+delete)
  */
-export const enqueueCoalesced = (kind: OutboxKind, payload: NoteType) => {
+export const enqueueCoalesced = (op: OutboxOpKind, payload: GenericPayload): string | null => {
   const q = readQueue();
   const now = Date.now();
+
   const match = (it: OutboxItem) => {
     const p = it.payload;
-    if (payload.clientId && p.clientId) return p.clientId === payload.clientId;
-    if (payload.id && p.id) return p.id === payload.id;
+    if (payload.clientId && p.clientId) return p.clientId === payload.clientId && p.entity === payload.entity;
+    if (payload.id && p.id) return p.id === payload.id && p.entity === payload.entity;
+    // fallback: if entity and idJob match and body has an identifier you could match, but avoid heuristics here
     return false;
   };
+
   const idx = q.findIndex(match);
 
   if (idx === -1) {
     const item: OutboxItem = {
       uid: uuid(),
-      kind,
+      op,
       createdAt: now,
       attempts: 0,
       status: 'pending',
       lastError: null,
-      payload: {...payload},
+      payload: { ...payload },
+      updatedAt: now,
     };
     q.push(item);
     writeQueue(q);
@@ -71,101 +74,95 @@ export const enqueueCoalesced = (kind: OutboxKind, payload: NoteType) => {
 
   const existing = q[idx];
 
-  // Helper para reemplazar
-  const replaceAt = (i: number, it: OutboxItem | null) => {
-    if (it === null) q.splice(i, 1);
-    else q[i] = it;
+  // Reglas de coalescing:
+  // existing.create + new.update => merge into create (update payload)
+  // existing.create + new.delete => remove existing (no op)
+  // existing.update + new.update => merge (last wins)
+  // existing.update + new.delete => replace with delete
+  // existing.delete + new.create => replace with create (re-create)
+  // others => append
+
+  if (existing.op === 'create') {
+    if (op === 'update') {
+      existing.payload = { ...existing.payload, ...payload, clientUpdatedAt: now };
+      existing.updatedAt = now;
+      existing.status = 'pending';
+      writeQueue(q);
+      return existing.uid;
+    }
+    if (op === 'delete') {
+      // create then delete => remove both (no server op needed)
+      q.splice(idx, 1);
+      writeQueue(q);
+      return null;
+    }
+    // create + create => merge
+    existing.payload = { ...existing.payload, ...payload, clientUpdatedAt: now };
+    existing.updatedAt = now;
     writeQueue(q);
-  };
-
-  // Reglas
-  if (existing.kind === 'note/create') {
-    if (kind === 'note/update') {
-      // merge update into create => keep create with updated payload
-      const merged = {
-        ...existing,
-        payload: {...existing.payload, ...payload},
-        updatedAt: now,
-      };
-      replaceAt(idx, merged);
-      return;
-    }
-    if (kind === 'note/delete') {
-      // create then delete before sync -> remove both (no op)
-      replaceAt(idx, null);
-      return;
-    }
+    return existing.uid;
   }
 
-  if (existing.kind === 'note/update') {
-    if (kind === 'note/update') {
-      // update+update -> merge to last
-      const merged = {
-        ...existing,
-        payload: {...existing.payload, ...payload},
-        updatedAt: now,
-      };
-      replaceAt(idx, merged);
-      return;
+  if (existing.op === 'update') {
+    if (op === 'update') {
+      existing.payload = { ...existing.payload, ...payload, clientUpdatedAt: now };
+      existing.updatedAt = now;
+      existing.status = 'pending';
+      writeQueue(q);
+      return existing.uid;
     }
-    if (kind === 'note/delete') {
-      // update then delete -> convert to delete
-      const del: OutboxItem = {
-        ...existing,
-        kind: 'note/delete',
-        payload: {
-          idJob: payload.idJob,
-          id: payload.id ?? existing.payload.id,
-          clientId: payload.clientId ?? existing.payload.clientId,
-          // idempotencyKey: payload.idempotencyKey ?? existing.payload.idempotencyKey,
-        } as NoteType,
-        updatedAt: now,
-      } as OutboxItem;
-      replaceAt(idx, del);
-      return;
+    if (op === 'delete') {
+      existing.op = 'delete';
+      existing.payload = {
+        entity: existing.payload.entity,
+        id: payload.id ?? existing.payload.id,
+        clientId: payload.clientId ?? existing.payload.clientId,
+      } as GenericPayload;
+      existing.updatedAt = now;
+      existing.status = 'pending';
+      writeQueue(q);
+      return existing.uid;
     }
-    if (kind === 'note/create') {
-      // improbable: create after update -> treat as update (or push)
-      const merged = {
-        ...existing,
-        payload: {...existing.payload, ...payload},
-        updatedAt: now,
-      };
-      replaceAt(idx, merged);
-      return;
-    }
+    // update + create improbable -> treat as update
+    existing.payload = { ...existing.payload, ...payload, clientUpdatedAt: now };
+    existing.updatedAt = now;
+    writeQueue(q);
+    return existing.uid;
   }
 
-  if (existing.kind === 'note/delete') {
-    if (kind === 'note/create') {
-      // delete then create -> keep create (it could be a re-create)
-      const created: OutboxItem = {
+  if (existing.op === 'delete') {
+    if (op === 'create') {
+      // delete then create => convert to create
+      const newItem: OutboxItem = {
         uid: uuid(),
-        kind: 'note/create',
+        op: 'create',
         createdAt: now,
         attempts: 0,
         status: 'pending',
         lastError: null,
-        payload: {...payload} as NoteType,
-      } as OutboxItem;
-      // replace delete with create
-      replaceAt(idx, created);
-      return;
+        payload: { ...payload },
+        updatedAt: now,
+      };
+      q.splice(idx, 1, newItem);
+      writeQueue(q);
+      return newItem.uid;
     }
-    // if delete exists and another delete -> ignore
-    return;
+    // delete + delete -> ignore
+    return existing.uid;
   }
 
-  // fallback: no specific rule -> append
+  // fallback append
   const item: OutboxItem = {
     uid: uuid(),
-    kind,
+    op,
     createdAt: now,
     attempts: 0,
     status: 'pending',
     lastError: null,
-    payload: {...payload} as NoteType,
-  } as OutboxItem;
+    payload: { ...payload },
+    updatedAt: now,
+  };
   q.push(item);
   writeQueue(q);
+  return item.uid;
 };

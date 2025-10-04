@@ -75,26 +75,34 @@ export const SaveNoteScreen = (props: Props) => {
         );
       } else {
         try {
-          if (item?.clientId) {
+          if (item?.clientId || item?.id) {
             updateNoteOffline(qc, {
-              idJob,
-              title: props.title,
-              description: props.description,
-              clientId: item.clientId,
               id: item.id,
-              pending: item.pending,
+              clientId: item.clientId,
+              idJob,
+              body: {
+                title: props.title,
+                description: props.description,
+                clientId: item.clientId,
+                id: item.id,
+                pending: item.pending,
+                update_time: new Date().toISOString(),
+              },
             });
           } else {
             createNoteOffline(qc, {
               idJob,
-              title: props.title,
-              description: props.description,
-              update_time: new Date().toISOString()
+              body: {
+                idJob,
+                title: props.title,
+                description: props.description,
+                update_time: new Date().toISOString(),
+              },
             });
           }
           goBack();
         } catch (e) {
-          console.log(e)
+          console.log(e);
         }
       }
     },

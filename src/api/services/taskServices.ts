@@ -76,6 +76,7 @@ const deleteSignature = async ({id}: {id: number}): Promise<boolean> => {
 };
 
 const getNotes = async ({idJob}: TaskBaseApiProps): Promise<NoteType[]> => {
+  console.log("getNotes....");
   const response = await getRequest<Paginated<NoteType[]>>(
     `${API_GET_NOTES}?idJob=${idJob}`,
   );

@@ -111,21 +111,21 @@ export async function closeSessionOnGoogle() {
   } catch (e) {}
 }
 
-export function showAlertDialogWithOptions(onConfirm: () => void) {
-  Alert.alert(
-    'Logout',
-    'Sure want to logout?',
-    [
-      {
-        text: 'Cancel',
-        onPress: () => console.log('Cancel Pressed'),
-        style: 'cancel',
-      },
-      {text: 'Yes', onPress: onConfirm},
-    ],
-    {cancelable: false},
-  );
-}
+// export function showAlertDialogWithOptions(onConfirm: () => void) {
+//   Alert.alert(
+//     'Logout',
+//     'Sure want to logout?',
+//     [
+//       {
+//         text: 'Cancel',
+//         onPress: () => console.log('Cancel Pressed'),
+//         style: 'cancel',
+//       },
+//       {text: 'Yes', onPress: onConfirm},
+//     ],
+//     {cancelable: false},
+//   );
+// }
 
 export function adaptAgendaItemsToArray(itemsObj: AgendaSchedule) {
   return Object.keys(itemsObj)

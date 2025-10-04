@@ -8,15 +8,14 @@ import {
   TaskBaseApiProps,
   taskServices,
 } from '@api/services/taskServices';
-import {IdReportMaterialType} from '@api/types/Task';
 import {keepPreviousData, useMutation, useQuery} from '@tanstack/react-query';
 
 const DEFAULT_PERSISTENCE_CONFIG = {
   staleTime: 5 * 60 * 1000,
-  // gcTime: 7 * 24 * 60 * 60 * 1000,
-  gcTime: 0,
+  gcTime: 7 * 24 * 60 * 60 * 1000,
   retry: 1,
   placeholderData: keepPreviousData,
+  refetchOnMount: 'always' as const,
 };
 
 export const useGetSignatures = ({

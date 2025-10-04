@@ -1,30 +1,29 @@
-import { NoteType } from "@api/types/Task";
+// src/offline/types.ts
+export type EntityKind = 'note' | 'report' | 'image' | 'inventory' | string;
 
-export type OutboxKind = 'note/create' | 'note/update' | 'note/delete';
+export type OutboxOpKind = 'create' | 'update' | 'delete';
 
 export type OutboxStatus = 'pending' | 'in_progress' | 'succeeded' | 'failed';
 
-export type OutboxItemBase = {
-  uid: string; // uuid de la cola
-  kind: OutboxKind;
-  createdAt: number;
-  attempts: number;
-  status: OutboxStatus;
-  lastError?: string | null;
-  updatedAt?: number;
+export type GenericPayload = {
+  entity: EntityKind;
+  idJob?: number; // ejemplo: job id si aplica
+  id?: number; // server id if exists
+  clientId?: string; // local-only identifier for newly created items
+  // entity-specific body (note: keep small, store full object if necessary)
+  body?: Record<string, any>;
+  // timestamp local
+  clientCreatedAt?: number;
+  clientUpdatedAt?: number;
 };
 
 export type OutboxItem = {
   uid: string;
-  kind: OutboxKind;
+  op: OutboxOpKind;
   createdAt: number;
   attempts: number;
   status: OutboxStatus;
   lastError?: string | null;
-  payload: NoteType;
+  payload: GenericPayload;
+  updatedAt?: number;
 };
-
-// export type OutboxItem =
-//   | (OutboxItemBase & { kind: 'note/create'; payload: Required<NoteType> })
-//   | (OutboxItemBase & { kind: 'note/update'; payload: Required<NoteType> })
-//   | (OutboxItemBase & { kind: 'note/delete'; payload: Required<NoteType> });
