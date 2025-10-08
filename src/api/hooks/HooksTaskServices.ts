@@ -10,6 +10,8 @@ import {
 } from '@api/services/taskServices';
 import {keepPreviousData, useMutation, useQuery} from '@tanstack/react-query';
 
+const DAY = 24 * 60 * 60 * 1000;
+
 const DEFAULT_PERSISTENCE_CONFIG = {
   staleTime: 5 * 60 * 1000,
   gcTime: 7 * 24 * 60 * 60 * 1000,
@@ -81,16 +83,16 @@ export const useRegisterReportMaterials = () => {
   });
 };
 
-export const useGetHistoryReportMaterials = (
-  props: HistoryReportMaterialsApiProps,
-) => {
-  return useQuery({
+export const useGetHistoryReportMaterials = ({
+  enabled,
+  ...props
+}: HistoryReportMaterialsApiProps & {enabled?: boolean}) =>
+  useQuery({
     queryKey: [QUERY_KEYS.HISTORY_REPORT_MATERIALS, props],
     queryFn: () => taskServices.getHistoryReportMaterials(props),
     ...DEFAULT_PERSISTENCE_CONFIG,
-    enabled: false,
+    enabled: enabled && !!props?.idJob && !!props?.id,
   });
-};
 
 export const useGetReportMaterialsInventory = (
   props: ReportMaterialsInventoryApiProps,
@@ -103,6 +105,20 @@ export const useGetReportMaterialsInventory = (
     // gcTime: 0,
     // staleTime: 0
     // ...DEFAULT_PERSISTENCE_CONFIG,
+  });
+};
+
+export const useGetReportMaterialsInventoryAll = ({idJob}: {idJob?: number}) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.ALL_REPORT_MATERIALS_INVENTORY, {idJob}],
+    queryFn: () => taskServices.getReportMaterialsInventoryAll({idJob: idJob!}),
+    enabled: !!idJob, // sin filtro, solo exige idJob
+    staleTime: 7 * DAY, // refresca cada 7 días
+    gcTime: 8 * DAY, // un poco más largo que staleTime
+    refetchOnMount: 'always', // si está stale, refetch al abrir
+    refetchOnReconnect: true, // si vuelve internet y está stale
+    refetchInterval: false, // no necesitamos polling
+    // select: (rows) => rows.map(...), // opcional si quieres transformar
   });
 };
 

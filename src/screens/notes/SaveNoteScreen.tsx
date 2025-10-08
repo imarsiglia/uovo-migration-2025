@@ -1,3 +1,4 @@
+import 'react-native-get-random-values';
 import {QUERY_KEYS} from '@api/contants/constants';
 import {useSaveNote} from '@api/hooks/HooksTaskServices';
 import {Icons} from '@assets/icons/icons';
@@ -12,7 +13,7 @@ import {
 import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
-import {createNoteOffline, updateNoteOffline} from '@features/notes/offline';
+import {offlineCreateNote, offlineUpdateNote} from '@features/notes/offline';
 import {useOnline} from '@hooks/useOnline';
 import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
 import {RootStackParamList} from '@navigation/types';
@@ -23,7 +24,7 @@ import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {useQueryClient} from '@tanstack/react-query';
 import {showErrorToastMessage} from '@utils/toast';
-import {useCallback, useRef} from 'react';
+import React, {useCallback, useMemo, useRef} from 'react';
 import {StyleSheet} from 'react-native';
 import {
   KeyboardAwareScrollView,
@@ -31,8 +32,20 @@ import {
 } from 'react-native-keyboard-controller';
 import {useCustomNavigation} from 'src/hooks/useCustomNavigation';
 import {HelpDeskSchema, SaveNoteSchemaType} from 'src/types/schemas';
+import {v4 as uuid} from 'uuid';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SaveNote'>;
+
+type NoteListItem = {
+  id?: number;
+  clientId?: string;
+  idJob: number;
+  title: string;
+  description: string;
+  update_time?: string;
+  _pending?: boolean;
+  _deleted?: boolean;
+};
 
 export const SaveNoteScreen = (props: Props) => {
   const item = props.route.params?.item;
@@ -51,15 +64,48 @@ export const SaveNoteScreen = (props: Props) => {
 
   const {mutateAsync} = useSaveNote();
 
+  const notesQueryKey = useMemo(() => [QUERY_KEYS.NOTES, {idJob}], [idJob]);
+
+  /** Upsert note optimistically into the list cache */
+  const upsertInCache = useCallback(
+    (patch: NoteListItem) => {
+      qc.setQueryData<NoteListItem[] | undefined>(notesQueryKey, (old) => {
+        const arr = old ? [...old] : [];
+        const idx = arr.findIndex((n) =>
+          patch.id
+            ? n.id === patch.id
+            : patch.clientId
+            ? n.clientId === patch.clientId
+            : false,
+        );
+        const nowIso = new Date().toISOString();
+        const next: NoteListItem = {
+          id: patch.id,
+          clientId: patch.clientId,
+          idJob: patch.idJob,
+          title: patch.title ?? '',
+          description: patch.description ?? '',
+          update_time: nowIso,
+          _pending: patch._pending ?? true,
+          _deleted: patch._deleted ?? false,
+        };
+        if (idx >= 0) arr[idx] = {...arr[idx], ...next, update_time: nowIso};
+        else arr.unshift(next);
+        return arr;
+      });
+    },
+    [qc, notesQueryKey],
+  );
+
   const saveNote = useCallback(
-    (props: SaveNoteSchemaType) => {
+    (form: SaveNoteSchemaType) => {
       if (online) {
         loadingWrapperPromise(
           mutateAsync({
             idJob,
             id: item?.id ?? null,
-            title: props.title,
-            description: props.description,
+            title: form.title,
+            description: form.description,
           })
             .then((d) => {
               if (d) {
@@ -74,30 +120,37 @@ export const SaveNoteScreen = (props: Props) => {
             }),
         );
       } else {
+        // OFFLINE: enqueue + optimistic cache
         try {
+          const title = form.title;
+          const description = form.description;
           if (item?.clientId || item?.id) {
-            updateNoteOffline(qc, {
-              id: item.id,
-              clientId: item.clientId,
+            // update an existing offline/server note
+            offlineUpdateNote({
               idJob,
-              body: {
-                title: props.title,
-                description: props.description,
-                clientId: item.clientId,
-                id: item.id,
-                pending: item.pending,
-                update_time: new Date().toISOString(),
-              },
+              clientId: item?.clientId,
+              id: item?.id,
+              title,
+              description,
+            });
+            upsertInCache({
+              id: item?.id,
+              clientId: item?.clientId,
+              idJob,
+              title,
+              description,
+              _pending: true,
             });
           } else {
-            createNoteOffline(qc, {
+            // create a new offline draft with auto clientId
+            const clientId = uuid();
+            offlineCreateNote({idJob, clientId, title, description});
+            upsertInCache({
+              clientId,
               idJob,
-              body: {
-                idJob,
-                title: props.title,
-                description: props.description,
-                update_time: new Date().toISOString(),
-              },
+              title,
+              description,
+              _pending: true,
             });
           }
           goBack();
@@ -106,7 +159,7 @@ export const SaveNoteScreen = (props: Props) => {
         }
       }
     },
-    [mutateAsync, online, goBack, refetchAll],
+    [online, mutateAsync, idJob, item, upsertInCache, refetchAll, goBack],
   );
 
   return (
@@ -150,7 +203,7 @@ export const SaveNoteScreen = (props: Props) => {
                 multiline={true}
                 style={styles.inputTextArea}
                 isErrorHidden={true}
-                placeholder="Body example note, this can be multi-line, with many characteres"
+                placeholder="Body example note, this can be multi-line, with many characters"
               />
               <SpeechFormContext ref={refVoice} name="description" />
             </Wrapper>
@@ -171,11 +224,7 @@ export const SaveNoteScreen = (props: Props) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    height: '100%',
-    backgroundColor: COLORS.bgWhite,
-  },
+  container: {flex: 1, height: '100%', backgroundColor: COLORS.bgWhite},
   btnOptTop: {
     backgroundColor: COLORS.primary,
     justifyContent: 'center',
@@ -187,9 +236,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 10,
   },
-  topsheet: {
-    color: COLORS.titleColor,
-  },
+  topsheet: {color: COLORS.titleColor},
   inputTextArea: {
     textAlignVertical: 'top',
     backgroundColor: 'white',

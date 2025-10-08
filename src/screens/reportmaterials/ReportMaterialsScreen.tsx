@@ -4,7 +4,7 @@ import {
   useGetReportMaterials,
   useRegisterReportMaterials,
 } from '@api/hooks/HooksTaskServices';
-import {ReportMaterialType} from '@api/types/Task';
+import {HistoryReportMaterialType, ReportMaterialType} from '@api/types/Task';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {CollapsibleItem} from '@components/commons/collapsible/CollapsibleItem';
 import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
@@ -26,25 +26,37 @@ import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import {Fragment, useCallback, useEffect, useState} from 'react';
 import {ScrollView, StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
+import {useOnline} from '@hooks/useOnline';
+import {useQueryClient} from '@tanstack/react-query';
+import {
+  offlineDeleteOneOfflineReportMaterial,
+  offlineUpsertMaterialsList,
+} from '@features/materials/offline';
 // import OfflineValidation from '../components/offline/OfflineValidation';
 
 export const ReportMaterialsScreen = () => {
-  const [itemExpanded, setItemExpanded] = useState(undefined);
-  const [detailList, setDetailList] = useState([]);
+  const [itemExpanded, setItemExpanded] = useState<number | undefined>(
+    undefined,
+  );
+  const [detailList, setDetailList] = useState<any[]>([]);
   const {navigate, goBack} = useCustomNavigation();
-  const {id: idJob} = useTopSheetStore((d) => d.jobDetail);
+  const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
   const showDialog = useModalDialogStore((d) => d.showVisible);
 
   const {refetchAll} = useRefreshIndicator([
     [QUERY_KEYS.REPORT_MATERIALS, {idJob}],
     [QUERY_KEYS.TASK_COUNT, {idJob}],
   ]);
+
+  const qc = useQueryClient();
+  const {online} = useOnline();
+  const materialsQueryKey = [QUERY_KEYS.REPORT_MATERIALS, {idJob}];
+
   const {
     data: materials,
     isLoading,
     isRefetching,
     refetch,
-    isFetched,
   } = useGetReportMaterials({idJob});
 
   const {mutateAsync: removeMaterialAsync} = useRegisterReportMaterials();
@@ -58,10 +70,10 @@ export const ReportMaterialsScreen = () => {
           <Wrapper style={styles.bodyModalClockOut}>
             <Label style={styles.titleModalClockOut}>Delete?</Label>
             <Label style={styles.subtitleModalClockOut}>
-              Name: {item.id_material.name}
+              Name: {item?.id_material?.name}
             </Label>
             <Label style={styles.subtitleModalClockOut}>
-              Unit type: {item.id_material.unit}
+              Unit type: {item?.id_material?.unit}
             </Label>
             <Label style={styles.subtitleModalClockOut}>
               Quantity: {item.quantity}
@@ -73,35 +85,57 @@ export const ReportMaterialsScreen = () => {
         ),
         cancelable: true,
         onConfirm: () => {
-          const list = materials?.filter((x) => x.id !== item.id) ?? [];
-          loadingWrapperPromise(
-            removeMaterialAsync({
-              idJob,
-              list,
-            })
-              .then((d) => {
-                if (d) {
-                  refetchAll();
-                  showToastMessage('Material deleted successfully');
-                } else {
-                  showErrorToastMessage(
-                    'Error while removing material, try again',
-                  );
-                }
-              })
-              .catch(() =>
-                showErrorToastMessage(
-                  'Error while removing material, try again',
+          const filtered = (materials ?? []).filter((x) => {
+            if (x.id != null && item.id != null) return x.id !== item.id;
+            if (x.clientId != null && item.clientId != null)
+              return x.clientId !== item.clientId;
+            return true;
+          });
+
+          if (online) {
+            loadingWrapperPromise(
+              removeMaterialAsync({idJob, list: filtered})
+                .then((ok) => {
+                  if (ok) {
+                    refetchAll();
+                    showToastMessage('Material deleted successfully');
+                  } else {
+                    showErrorToastMessage(
+                      'Error while removing material, try again',
+                    );
+                  }
+                })
+                .catch(() =>
+                  showErrorToastMessage('Error while removing material'),
                 ),
-              ),
-          );
+            );
+          } else {
+            // OFFLINE: cache optimista + encolar update por LISTA
+            qc.setQueryData<any[] | undefined>(materialsQueryKey, filtered);
+
+            // const listoToQueue = filtered.filter((x) => !!x.id);
+
+            if (item.id) {
+              offlineUpsertMaterialsList({
+                idJob,
+                list: filtered.filter((x) => !!x.id),
+              });
+            } else {
+              offlineDeleteOneOfflineReportMaterial({
+                idJob,
+                clientId: item.clientId!,
+              });
+            }
+
+            showToastMessage('Queued deletion for sync (offline)');
+          }
         },
       });
     },
     [showDialog, materials, removeMaterialAsync, refetchAll],
   );
 
-  function onSelectCollapse(itemId) {
+  function onSelectCollapse(itemId: number) {
     if (itemExpanded == itemId) {
       setItemExpanded(undefined);
       return;
@@ -218,32 +252,28 @@ export const ReportMaterialsScreen = () => {
 
                 {materials
                   ?.map((item) => ({
-                    id: item.id,
-                    name: item.id_material.name,
-                    unitType: item.id_material.unit,
+                    id: item.id ?? item.clientId,
+                    name: item?.id_material?.name,
+                    unitType: item?.id_material?.unit,
                     quantity: item.quantity,
-                    user:
-                      item.user_info == null
-                        ? ''
-                        : item.user_info.user_name +
-                          ' ' +
-                          item.user_info.user_last_name,
-                    timestamp:
-                      item.updated_date == null
-                        ? ''
-                        : getFormattedDate(item.updated_date, 'MM/DD/YYYY'),
+                    user: `${item.user_info?.user_name} ${item.user_info?.user_last_name}`,
+                    timestamp: getFormattedDate(
+                      item.updated_date,
+                      'MM/DD/YYYY',
+                    ),
                   }))
                   ?.map((objeto) => Object.values(objeto))
-                  ?.map((item: any, index) => (
-                    <AccordionItem
-                      key={`${item?.id}_${index}`}
-                      item={item}
-                      expanded={itemExpanded == item[0]}
-                      itemIndex={index}
-                      onSelectCollapse={() => onSelectCollapse(item[0])}
-                      detailList={detailList}
-                    />
-                  ))}
+                  ?.map((item: any[]) => {
+                    return (
+                      <AccordionItem
+                        key={`${item[0]}`}
+                        item={item}
+                        expanded={itemExpanded == item[0]}
+                        onSelectCollapse={() => onSelectCollapse(item[0])}
+                        detailList={detailList}
+                      />
+                    );
+                  })}
               </Wrapper>
             </ScrollView>
             <Wrapper style={{}}>
@@ -289,7 +319,8 @@ export const ReportMaterialsScreen = () => {
                     style={{
                       backgroundColor: 'white',
                     }}>
-                    <CollapsibleItem collapsed={item.id != itemExpanded}>
+                    <CollapsibleItem
+                      collapsed={(item.id ?? item.clientId) != itemExpanded}>
                       <Wrapper
                         style={{
                           height:
@@ -307,9 +338,9 @@ export const ReportMaterialsScreen = () => {
 
           {materials
             ?.map((item) => ({
-              id: item.id_material.id,
+              id: item?.id_material?.id,
               job: item.id_job,
-              idItem: item.id,
+              idItem: item.id ?? item.clientId,
             }))
             ?.map((item, index) => (
               <AccordionAux
@@ -318,7 +349,7 @@ export const ReportMaterialsScreen = () => {
                 index={index}
                 expanded={item.idItem == itemExpanded}
                 onLoadData={setDetailList}
-                refresh={isRefetching}
+                refreshing={isRefetching}
               />
             ))}
         </ScrollView>
@@ -327,13 +358,19 @@ export const ReportMaterialsScreen = () => {
   );
 };
 
+type AccordionItemProps = {
+  item: any[];
+  expanded: boolean;
+  onSelectCollapse: () => void;
+  detailList: any[];
+};
+
 const AccordionItem = ({
   item,
-  itemIndex,
   expanded,
   onSelectCollapse,
   detailList,
-}) => {
+}: AccordionItemProps) => {
   return (
     <>
       <PressableOpacity
@@ -381,20 +418,40 @@ const AccordionItem = ({
   );
 };
 
-const AccordionAux = ({item, index, expanded, onLoadData, refresh}) => {
-  const [detailList, setDetailList] = useState([]);
+type AuxItemType = {
+  id?: number;
+  job?: number;
+  idItem?: number | string;
+};
+
+type AccordionAuxProps = {
+  item: AuxItemType;
+  index: number;
+  expanded: boolean;
+  onLoadData: (data: any[]) => void;
+  refreshing: boolean;
+};
+const AccordionAux = ({
+  item,
+  index,
+  expanded,
+  onLoadData,
+  refreshing,
+}: AccordionAuxProps) => {
+  const [detailList, setDetailList] = useState<HistoryReportMaterialType[]>([]);
   const isFocused = useIsFocused();
 
   const {refetch} = useGetHistoryReportMaterials({
-    idJob: item.job,
-    id: item.id,
+    idJob: item.job!,
+    id: item.id!,
+    enabled: expanded,
   });
 
   useEffect(() => {
     if (expanded) {
       getData();
     }
-  }, [expanded, isFocused, refresh]);
+  }, [expanded, isFocused, refreshing]);
 
   async function getData() {
     refetch()

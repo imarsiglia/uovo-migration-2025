@@ -1,125 +1,101 @@
 // src/api/services/entityServices.ts
-// Adapter genérico que mapea "entity" -> llamadas concretas a tus servicios.
-// Implementa 'note' (usa taskServices) y deja el patrón para añadir otras entidades.
-//
-// Ajusta los imports / nombres si tus servicios están en rutas distintas.
+// Generic adapter: maps entity -> concrete API calls.
+// Implements "note" using your taskServices, and is ready to extend.
 
-import { QUERY_KEYS } from "@api/contants/constants";
-import { taskServices } from "./taskServices";
+import { QueryClient } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@api/contants/constants';
+import { taskServices } from './taskServices';
+import type { OutboxItem } from '@offline/types';
+import { readQueue, replaceQueue } from '@offline/outbox';
 
-export type CreateResult = boolean | Record<string, any>;
+type CreateFn = (payload: any) => Promise<any>;
+type UpdateFn = (payload: any) => Promise<any>;
+type DeleteFn = (payload: any) => Promise<any>;
+type ListFn   = (opts: any) => Promise<any[]>;
 
-/**
- * Firma de funciones que el processor espera:
- * - createEntity({ entity, body, meta }) => Promise<boolean | createdObject>
- * - updateEntity({ entity, id, body, meta }) => Promise<boolean | updatedObject>
- * - deleteEntity({ entity, id, meta }) => Promise<boolean>
- * - getEntityList({ entity, idJob, meta }) => Promise<any[]>
- *
- * meta es un objeto libre que puede contener clientId, clientCreatedAt, etc.
- */
+type Service = { create?: CreateFn; update?: UpdateFn; delete?: DeleteFn; list?: ListFn };
 
-// Nota: si tus servicios devuelven tipos distintos, adapta aquí para convertir/normalizar.
-export const entityServices = {
-  async createEntity({
-    entity,
-    body,
-    meta,
-  }: {
-    entity: string;
-    body: any;
-    meta?: any;
-  }): Promise<CreateResult> {
-    if (entity === 'note') {
-      // tu api actual parece exponer saveNote({ idJob, id, title, description })
-      // asumimos body contiene title/description y meta.idJob
-      const idJob = meta?.idJob ?? body?.idJob;
-      // Llamamos al endpoint existente
-      return await taskServices.saveNote({
-        idJob,
-        id: undefined,
-        title: body.title,
-        description: body.description,
-      });
-    }
-
-    // TODO: agrega adaptadores para 'report', 'image', 'inventory' aquí
-    throw new Error(`createEntity not implemented for entity=${entity}`);
+const REGISTRY: Record<string, Service> = {
+  /** NOTES */
+  note: {
+    list: async ({ idJob }: { idJob: number }) => taskServices.getNotes({ idJob }),
+    // In your backend saveNote creates/updates depending on props.id
+    create: async ({ idJob, body }: any) => taskServices.saveNote({ idJob, ...body, id: null }),
+    update: async ({ id, idJob, body }: any)  => taskServices.saveNote({ idJob, ...body, id }),
+    delete: async ({ id }: any)               => taskServices.deleteNote({ id }),
   },
 
-  async updateEntity({
-    entity,
-    id,
-    body,
-    meta,
-  }: {
-    entity: string;
-    id?: number;
-    body: any;
-    meta?: any;
-  }): Promise<CreateResult> {
-    if (entity === 'note') {
-      const idJob = meta?.idJob ?? body?.idJob;
-      // reusar saveNote para update si tu backend usa el mismo endpoint
-      return await taskServices.saveNote({
-        idJob,
-        id, // server id
-        title: body.title,
-        description: body.description,
-      });
-    }
-
-    // TODO: agrega adaptadores para 'report', 'image', 'inventory' aquí
-    throw new Error(`updateEntity not implemented for entity=${entity}`);
+  /** MATERIALS: crear 1 individual */
+  report_material: {
+    // create individual (usa tu hook/servicio registerOne)
+    create: async ({ idJob, body }: { idJob: number; body: { idMaterial: number; quantity: number; idUser: number } }) => {
+      return taskServices.registerOneReportMaterial({ idJob, ...body });
+    },
+    // opcionalmente podrías exponer list si lo necesitas:
+    list: async ({ idJob }: { idJob: number }) => taskServices.getReportMaterials({ idJob }),
   },
 
-  async deleteEntity({
-    entity,
-    id,
-    meta,
-  }: {
-    entity: string;
-    id?: number;
-    meta?: any;
-  }): Promise<boolean> {
-    if (entity === 'note') {
-      if (!id) {
-        // Sin id server, nada que eliminar en server — devolvemos true para indicar "no-op"
-        return true;
-      }
-      return await taskServices.deleteNote({id});
-    }
-
-    // TODO: agrega adaptadores para 'report', 'image', 'inventory' aquí
-    throw new Error(`deleteEntity not implemented for entity=${entity}`);
-  },
-
-  async getEntityList({
-    entity,
-    idJob,
-    meta,
-  }: {
-    entity: string;
-    idJob?: number;
-    meta?: any;
-  }): Promise<any[]> {
-    if (entity === 'note') {
-      const res = await taskServices.getNotes({idJob: idJob!});
-      return res ?? [];
-    }
-
-    // TODO: otros entities
-    throw new Error(`getEntityList not implemented for entity=${entity}`);
-  },
-
-  // helper para resolver el queryKey que tu app usa para cada entidad
-  // por defecto uso [entity, { idJob }], pero si tu proyecto usa QUERY_KEYS constants,
-  // aquí puedes mapear entity->QUERY_KEYS.* .
-  getQueryKeyForEntity(entity: string, opts?: {idJob?: number}) {
-    if (entity === 'note') {
-      // ejemplo si usas un object QUERY_KEYS: return [QUERY_KEYS.NOTES, { idJob: opts?.idJob }];
-      return [QUERY_KEYS.NOTES, {idJob: opts?.idJob}];
-    }
-    return [entity, {idJob: opts?.idJob}];
+  /** MATERIALS: actualizar/eliminar por LISTA completa */
+  report_materials: {
+    // en tu backend, delete == enviar la lista filtrada
+    update: async ({ idJob, body }: { idJob: number; body: { list: any[] } }) => {
+      // body.list ya debe venir transformada a { idMaterial, quantity, idUser }
+      return taskServices.registerReportMaterials({ idJob, list: body.list });
+    },
+    list: async ({ idJob }: { idJob: number }) => taskServices.getReportMaterials({ idJob }),
   },
 };
+
+export function getEntityQueryKey(entity: string, params?: { idJob?: number }) {
+  if (entity === 'note') return [QUERY_KEYS.NOTES, { idJob: params?.idJob }];
+  // ambas entidades de materials invalidan la misma lista
+  if (entity === 'report_material' || entity === 'report_materials') {
+    return [QUERY_KEYS.REPORT_MATERIALS, { idJob: params?.idJob }];
+  }
+
+  return [entity, params ?? {}];
+}
+
+export async function runItemThroughEntityServices(qc: QueryClient, item: OutboxItem): Promise<any> {
+  const { op, payload } = item;
+  const { entity } = payload;
+  const svc = REGISTRY[entity];
+  if (!svc) throw new Error(`No service registered for entity "${entity}"`);
+
+  if (op === 'create') {
+    if (!svc.create) throw new Error(`Create not implemented for "${entity}"`);
+    const result = await svc.create(payload);
+    try { await qc.invalidateQueries({ queryKey: getEntityQueryKey(entity, { idJob: payload.idJob }) }); } catch {}
+    return result;
+  }
+  if (op === 'update') {
+    if (!svc.update) throw new Error(`Update not implemented for "${entity}"`);
+    const result = await svc.update(payload);
+    try { await qc.invalidateQueries({ queryKey: getEntityQueryKey(entity, { idJob: payload.idJob }) }); } catch {}
+    return result;
+  }
+  if (op === 'delete') {
+    if (!svc.delete) throw new Error(`Delete not implemented for "${entity}"`);
+    const result = await svc.delete(payload);
+    try { await qc.invalidateQueries({ queryKey: getEntityQueryKey(entity, { idJob: payload.idJob }) }); } catch {}
+    return result;
+  }
+  throw new Error(`Unsupported op "${op}"`);
+}
+
+/** When a create resolves, remap clientId -> id in queued items for the same entity. */
+export async function reconcileClientIdInQueue(entity: string, clientId: string, newId: number) {
+  let q = await readQueue();
+  q = q.map((x) => {
+    if (x.payload.entity !== entity) return x;
+    const p = x.payload;
+    if (p.clientId && p.clientId === clientId) {
+      const np: any = { ...p };
+      delete np.clientId;
+      np.id = newId;
+      return { ...x, payload: np };
+    }
+    return x;
+  });
+  await replaceQueue(q);
+}

@@ -1,6 +1,7 @@
 import {QUERY_KEYS} from '@api/contants/constants';
 import {useDeleteNote, useGetNotes} from '@api/hooks/HooksTaskServices';
 import {NoteType} from '@api/types/Task';
+import {Icons} from '@assets/icons/icons';
 import {BackButton} from '@components/commons/buttons/BackButton';
 import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 import {
@@ -10,7 +11,7 @@ import {
 import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
-import {deleteNoteOffline} from '@features/notes/offline';
+import {offlineDeleteNote} from '@features/notes/offline';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {useOnline} from '@hooks/useOnline';
 import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
@@ -23,7 +24,7 @@ import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {useQueryClient} from '@tanstack/react-query';
 import {getFormattedDateWithTimezone} from '@utils/functions';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
-import {useCallback} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {
   FlatList,
   ListRenderItemInfo,
@@ -33,7 +34,12 @@ import {
   View,
 } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
-// import OfflineValidation from '../components/offline/OfflineValidation';
+
+type NoteListItem = NoteType & {
+  clientId?: string;
+  _pending?: boolean; // locally queued
+  _deleted?: boolean; // locally marked deleted
+};
 
 export const NotesScreen = () => {
   const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
@@ -43,17 +49,50 @@ export const NotesScreen = () => {
   const {online} = useOnline();
   const qc = useQueryClient();
 
-  const {
-    data: list,
-    isLoading,
-    isRefetching,
-    refetch,
-  } = useGetNotes({
-    idJob,
-  });
+  const notesQueryKey = useMemo(() => [QUERY_KEYS.NOTES, {idJob}], [idJob]);
 
-  const {mutateAsync} = useDeleteNote();
+  const {data: list, isLoading, isRefetching, refetch} = useGetNotes({idJob});
 
+  const {mutateAsync: deleteNoteAsync} = useDeleteNote();
+
+  /** ---------- cache helpers (optimistic UI) ---------- */
+  const removeFromCache = useCallback(
+    (ref: {id?: number; clientId?: string}) => {
+      qc.setQueryData<NoteListItem[] | undefined>(notesQueryKey, (old) => {
+        if (!old) return old;
+        return old.filter((n) =>
+          ref.id
+            ? n.id !== ref.id
+            : ref.clientId
+            ? n.clientId !== ref.clientId
+            : true,
+        );
+      });
+    },
+    [qc, notesQueryKey],
+  );
+
+  const markDeletedInCache = useCallback(
+    (ref: {id?: number; clientId?: string}) => {
+      qc.setQueryData<NoteListItem[] | undefined>(notesQueryKey, (old) => {
+        if (!old) return old;
+        const now = new Date().toISOString();
+        return old.map((n) => {
+          const match = ref.id
+            ? n.id === ref.id
+            : ref.clientId
+            ? n.clientId === ref.clientId
+            : false;
+          return match
+            ? {...n, _deleted: true, _pending: true, update_time: now}
+            : n;
+        });
+      });
+    },
+    [qc, notesQueryKey],
+  );
+
+  /** ---------- actions ---------- */
   const initRemove = useCallback(
     (note: NoteType) => {
       showDialog({
@@ -63,7 +102,6 @@ export const NotesScreen = () => {
         message: (
           <Wrapper
             style={{flexDirection: 'column', gap: 10, alignItems: 'center'}}>
-            {/* <Label style={GLOBAL_STYLES.titleModalClockOut}>Delete?</Label> */}
             <Label style={GLOBAL_STYLES.subtitleModalClockOut}>
               Title: {note.title}
             </Label>
@@ -79,7 +117,7 @@ export const NotesScreen = () => {
         onConfirm: () => {
           if (online && note.id) {
             loadingWrapperPromise(
-              mutateAsync({
+              deleteNoteAsync({
                 id: note.id,
               })
                 .then((d) => {
@@ -96,22 +134,20 @@ export const NotesScreen = () => {
                 ),
             );
           } else {
-            deleteNoteOffline(qc, {
-              idJob,
-              ...note,
-            });
-            showToastMessage('Note deleted successfully');
+            // OFFLINE: enqueue + optimistic removal from cache
+            offlineDeleteNote({idJob, ...note});
+            // Puedes elegir "remover" o "marcar eliminado". Aquí removemos para que desaparezca de la lista.
+            removeFromCache({id: note.id, clientId: note.clientId});
+            showToastMessage('Note deleted (queued)');
           }
         },
       });
     },
-    [online, mutateAsync, refetch, refetchAll],
+    [online, refetch, refetchAll, idJob, removeFromCache, deleteNoteAsync],
   );
 
   const initEdit = (item: NoteType) => {
-    navigate(RoutesNavigation.SaveNote, {
-      item,
-    });
+    navigate(RoutesNavigation.SaveNote, {item});
   };
 
   const initCreate = useCallback(() => {
@@ -119,7 +155,8 @@ export const NotesScreen = () => {
   }, [navigate]);
 
   const renderItem = useCallback(
-    ({item, index}: ListRenderItemInfo<NoteType>) => {
+    ({item, index}: ListRenderItemInfo<NoteListItem>) => {
+      if ((item as any)._deleted) return null; // skip locally deleted
       const circleColor = index % 2 === 0 ? '#3ABD6C' : '#EEA32D';
       return (
         <View style={[styles.containerNotification]}>
@@ -155,9 +192,21 @@ export const NotesScreen = () => {
                 </Text>
               </View>
               <View style={styles.viewDescNotification}>
-                <Text style={[GLOBAL_STYLES.bold, styles.titleNotification]}>
-                  {item.title}
-                </Text>
+                <Wrapper style={GLOBAL_STYLES.row}>
+                  <Text style={[GLOBAL_STYLES.bold, styles.titleNotification]}>
+                    {item.title}
+                    {/* {(item as any)._pending ? ' (pending)' : ''} */}
+                  </Text>
+                  {item._pending && (
+                    <Icons.HourglassClock
+                      style={{marginLeft: 5}}
+                      color={COLORS.error}
+                      width={15}
+                      height={15}
+                    />
+                  )}
+                </Wrapper>
+
                 <Text
                   numberOfLines={2}
                   ellipsizeMode="tail"
@@ -171,7 +220,7 @@ export const NotesScreen = () => {
                     {marginTop: 2},
                   ]}>
                   {getFormattedDateWithTimezone(
-                    item.update_time!,
+                    item.update_time ?? new Date().toISOString(),
                     'YYYY-MM-DD hh:mm A',
                   )}
                 </Text>
@@ -191,7 +240,6 @@ export const NotesScreen = () => {
       <View style={GLOBAL_STYLES.bgwhite}>
         <View style={GLOBAL_STYLES.containerBtnOptTop}>
           <BackButton title="Tasks" onPress={goBack} />
-
           <View style={GLOBAL_STYLES.row}>
             <TouchableOpacity
               onPress={initCreate}
@@ -211,7 +259,6 @@ export const NotesScreen = () => {
             style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, styles.topsheet]}>
             Notes
           </Text>
-          {/* <OfflineValidation id={props.jobDetail.id} offline={[NOTES_OFFLINE_VALIDATION]}/> */}
         </View>
       </View>
 
@@ -219,9 +266,9 @@ export const NotesScreen = () => {
 
       <SwipeableListProvider>
         <FlatList
-          data={list}
+          data={list as NoteListItem[] | undefined}
           renderItem={renderItem}
-          keyExtractor={(it) => it.id?.toString() ?? it.clientId!}
+          keyExtractor={(it) => (it.id?.toString() ?? (it as any).clientId)!}
           refreshing={isRefetching}
           onRefresh={refetch}
           removeClippedSubviews
@@ -249,10 +296,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     gap: 10,
   },
-  containerNotification: {
-    overflow: 'hidden',
-    borderRadius: 20,
-  },
+  containerNotification: {overflow: 'hidden', borderRadius: 20},
   viewNotification: {
     backgroundColor: '#F7F5F4',
     padding: 10,
@@ -274,14 +318,8 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
-  viewDescNotification: {
-    paddingLeft: 10,
-    paddingRight: 40,
-  },
-  titleNotification: {
-    color: '#464646',
-    fontSize: 16,
-  },
+  viewDescNotification: {paddingLeft: 10, paddingRight: 40},
+  titleNotification: {color: '#464646', fontSize: 16},
   subtitleNotification: {
     color: '#3C424A',
     opacity: 0.66,
@@ -316,7 +354,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 10,
   },
-  topsheet: {
-    color: '#3a3a3a',
-  },
+  topsheet: {color: '#3a3a3a'},
 });

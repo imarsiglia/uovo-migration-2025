@@ -1,7 +1,9 @@
+import 'react-native-get-random-values';
 import {QUERY_KEYS} from '@api/contants/constants';
 import {
   useGetReportMaterials,
   useGetReportMaterialsInventory,
+  useGetReportMaterialsInventoryAll,
   useRegisterOneReportMaterial,
   useRegisterReportMaterials,
 } from '@api/hooks/HooksTaskServices';
@@ -10,9 +12,9 @@ import {AutocompleteContext} from '@components/commons/form/AutocompleteContext'
 import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
 import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
 import {InputTextContext} from '@components/commons/form/InputTextContext';
-import { Label } from '@components/commons/text/Label';
+import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import { Wrapper } from '@components/commons/wrappers/Wrapper';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {
   SaveReportMaterialSchema,
   SaveReportMaterialSchemaType,
@@ -33,6 +35,16 @@ import {useWatch} from 'react-hook-form';
 import {StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
+import {useQueryClient} from '@tanstack/react-query';
+import {useOnline} from '@hooks/useOnline';
+import {v4 as uuid} from 'uuid';
+import {
+  offlineCreateOneReportMaterial,
+  offlineUpdateOneReportMaterial,
+  offlineUpsertMaterialsList,
+} from '@features/materials/offline';
+import {ReportMaterialType} from '@api/types/Task';
+
 type Props = NativeStackScreenProps<RootStackParamList, 'SaveReportMaterials'>;
 export const SaveReportMaterialScreen = (props: Props) => {
   const itemToEdit = props.route.params?.item;
@@ -41,15 +53,13 @@ export const SaveReportMaterialScreen = (props: Props) => {
 
   const {goBack} = useCustomNavigation();
   const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
-  const [filter, setFilter] = useState('');
-  const {user_id: idUser} = useAuth((d) => d.user!);
+  const sessionUser = useAuth((d) => d.user!);
   const showDialog = useModalDialogStore((d) => d.showVisible);
 
   const {mutateAsync: registerReportMaterials} = useRegisterReportMaterials();
   const {mutateAsync: createNewReportMaterial} = useRegisterOneReportMaterial();
-  const {data: materials} = useGetReportMaterialsInventory({
+  const {data: materials} = useGetReportMaterialsInventoryAll({
     idJob,
-    filter,
   });
   const {data: reportMaterials, isLoading} = useGetReportMaterials({
     idJob,
@@ -61,41 +71,160 @@ export const SaveReportMaterialScreen = (props: Props) => {
     [QUERY_KEYS.REPORT_MATERIALS, {idJob}],
   ]);
 
+  const qc = useQueryClient();
+  const {online} = useOnline();
+  const materialsQueryKey = [QUERY_KEYS.REPORT_MATERIALS, {idJob}];
+
+  /** Upsert optimista dentro del cache de lista */
+  const upsertInCache = useCallback(
+    (patch: ReportMaterialType) => {
+      qc.setQueryData<any[] | undefined>(materialsQueryKey, (old) => {
+        const arr = old ? [...old] : [];
+        const idx = arr.findIndex((m) =>
+          patch.id
+            ? m.id === patch.id
+            : patch.clientId
+            ? m.clientId === patch.clientId
+            : false,
+        );
+        if (idx >= 0) arr[idx] = {...arr[idx], ...patch};
+        else arr.unshift(patch);
+        return arr;
+      });
+    },
+    [qc, materialsQueryKey],
+  );
+
   const confirmSaveMaterial = useCallback(
-    (props: SaveReportMaterialSchemaType) => {
-      if (itemToEdit) {
-        return registerReportMaterials({
-          idJob,
-          list: [
-            ...reportMaterials!
-              ?.filter((x) => x.id != itemToEdit.id)
-              ?.map((x) => ({
-                idMaterial: x.id_material?.id,
-                idUser: x.id_user,
-                ...x,
-              })),
-            {
-              ...itemToEdit,
-              idMaterial: props.material.id,
-              quantity: parseFloat(props.quantity),
-              idUser: null,
-            },
-          ],
-        });
+    async (form: SaveReportMaterialSchemaType) => {
+      if (online) {
+        // --- ONLINE: tu flujo existente tal cual ---
+        if (itemToEdit) {
+          // actualizar por LISTA completa
+          const list = (reportMaterials ?? []).map((x) =>
+            x.id && itemToEdit.id && x.id === itemToEdit.id
+              ? {
+                  ...x,
+                  idMaterial: form.material.id,
+                  quantity: parseFloat(form.quantity),
+                  idUser: null,
+                }
+              : {
+                  ...x,
+                  idMaterial: x.id_material?.id,
+                  idUser: x._pending ? null : x.user_info?.user_id,
+                },
+          );
+          return registerReportMaterials({idJob, list});
+        } else {
+          // crear individual
+          return createNewReportMaterial({
+            idJob,
+            idMaterial: form.material.id,
+            quantity: parseFloat(form.quantity),
+            idUser: null,
+          });
+        }
       } else {
-        return createNewReportMaterial({
-          idJob,
-          idMaterial: props.material.id,
-          quantity: parseFloat(props.quantity),
-          idUser,
-        });
+        // --- OFFLINE: encolar y actualizar cache ---
+        if (itemToEdit?.id) {
+          // EDITAR por LISTA: reflejamos en cache y encolamos lista completa
+          const newListToQueue = (reportMaterials ?? [])
+            .filter((x) => !!x.id)
+            .map((x) =>
+              itemToEdit.id && x.id === itemToEdit.id
+                ? {
+                    id: x.id,
+                    idMaterial: form.material.id,
+                    quantity: parseFloat(form.quantity),
+                    idUser: null,
+                    modified: true,
+                    _pending: true,
+                  }
+                : {
+                    ...x,
+                    idMaterial: x.id_material?.id,
+                    idUser: x._pending ? null : x.user_info?.user_id,
+                  },
+            );
+
+          const newListToCache = (reportMaterials ?? []).map((x) =>
+            x.id && itemToEdit.id && x.id === itemToEdit.id
+              ? {
+                  ...x,
+                  quantity: parseFloat(form.quantity),
+                  id_material: form.material,
+                  user_info: sessionUser,
+                  updated_date: new Date().toISOString(),
+                  modified: true,
+                  _pending: true,
+                }
+              : x,
+          );
+
+          // cache optimista
+          qc.setQueryData<any[] | undefined>(materialsQueryKey, newListToCache);
+          // encolamos update por LISTA
+          await offlineUpsertMaterialsList({idJob, list: newListToQueue});
+          return true;
+        } else {
+          // CREAR individual: agregamos al cache con clientId y encolamos create
+          const clientId = itemToEdit?.clientId ?? uuid();
+          const quantity = parseFloat(form.quantity);
+
+          // cache optimista
+          upsertInCache({
+            clientId,
+            _pending: true,
+            id_job: idJob,
+            quantity,
+            id_material: {
+              id: form.material.id,
+              // @ts-ignore
+              name: form.material?.title ?? form.material.name,
+              unit: form.material.unit,
+              active: true,
+              uuid: form.material.uuid,
+              visible_to_sf: form.material.visible_to_sf,
+            },
+            user_info: sessionUser,
+            updated_date: new Date().toISOString(),
+          });
+
+          if (!!itemToEdit?.clientId) {
+            // encolamos update individual
+            await offlineUpdateOneReportMaterial({
+              idJob,
+              clientId,
+              idMaterial: form.material.id,
+              quantity,
+              idUser: null,
+            });
+          } else {
+            // encolamos create individual
+            await offlineCreateOneReportMaterial({
+              idJob,
+              clientId,
+              idMaterial: form.material.id,
+              quantity,
+              idUser: null,
+            });
+          }
+          return true;
+        }
       }
     },
     [
+      online,
+      itemToEdit,
       reportMaterials,
       registerReportMaterials,
       createNewReportMaterial,
-      itemToEdit,
+      idJob,
+      sessionUser,
+      qc,
+      materialsQueryKey,
+      upsertInCache,
     ],
   );
 
@@ -123,9 +252,7 @@ export const SaveReportMaterialScreen = (props: Props) => {
                 }
               })
               .catch(() =>
-                showErrorToastMessage(
-                  'Error while saving material, try again',
-                ),
+                showErrorToastMessage('Error while saving material, try again'),
               ),
           );
         },
@@ -139,13 +266,6 @@ export const SaveReportMaterialScreen = (props: Props) => {
       itemRef.current.close();
     }
   }, []);
-
-  const checkItem = useCallback(
-    (value: string) => {
-      setFilter(value.trim());
-    },
-    [setFilter],
-  );
 
   if (isLoading) {
     return <></>;
@@ -201,7 +321,6 @@ export const SaveReportMaterialScreen = (props: Props) => {
                 controllerRef={(controller) => {
                   itemRef.current = controller;
                 }}
-                onChangeText={checkItem}
                 initialValue={
                   itemToEdit?.id_material
                     ? {
@@ -215,6 +334,7 @@ export const SaveReportMaterialScreen = (props: Props) => {
                   closeAutocomplete();
                   itemRef.current.open();
                 }}
+                useFilter
               />
             </Wrapper>
           </Wrapper>

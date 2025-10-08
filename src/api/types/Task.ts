@@ -47,6 +47,9 @@ export type ReportMaterialType = {
   updated_date?: string;
   user_info?: UserInfoReportMaterialType;
   idUser?: number | null;
+  // offline
+  clientId?: string;
+  _pending?: boolean;
 };
 
 export type HistoryReportMaterialType = {

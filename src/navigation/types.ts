@@ -103,7 +103,7 @@ export type RootStackParamList = {
   [RoutesNavigation.ReportMaterials]: undefined;
   [RoutesNavigation.SaveReportMaterials]: {
     item?: ReportMaterialType;
-  };
+  } | undefined;
   [RoutesNavigation.BaseImageScreen]: Base64ImageCarouselProps;
   [RoutesNavigation.WoAttachment]: undefined;
   [RoutesNavigation.EditPieceCount]: undefined;

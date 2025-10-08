@@ -76,7 +76,6 @@ const deleteSignature = async ({id}: {id: number}): Promise<boolean> => {
 };
 
 const getNotes = async ({idJob}: TaskBaseApiProps): Promise<NoteType[]> => {
-  console.log("getNotes....");
   const response = await getRequest<Paginated<NoteType[]>>(
     `${API_GET_NOTES}?idJob=${idJob}`,
   );
@@ -149,12 +148,24 @@ const getReportMaterialsInventory = async ({
   return response.body?.data ?? [];
 };
 
+export type ReportMaterialsInventoryAllProps = {
+  idJob: number;
+};
+const getReportMaterialsInventoryAll = async ({
+  idJob,
+}: ReportMaterialsInventoryAllProps): Promise<IdReportMaterialType[]> => {
+  const response = await getRequest<Paginated<IdReportMaterialType[]>>(
+    `${API_GET_REPORT_MATERIALS_INVENTORY}?downloadAll=1&idJob=${idJob}`,
+  );
+  return response.body?.data ?? [];
+};
+
 export type RegisterOneReportMaterialApiProps = {
   id?: number;
   idJob: number;
   idMaterial: number;
   quantity: number;
-  idUser: number;
+  idUser: number | null;
 };
 
 const registerOneReportMaterial = async (
@@ -258,4 +269,5 @@ export const taskServices = {
   registerLaborReport,
   getEmployees,
   getLaborCodes,
+  getReportMaterialsInventoryAll,
 };

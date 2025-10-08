@@ -1,106 +1,435 @@
-// src/components/SyncProgress.tsx
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { processQueueOnce } from '../offline/processor';
-import { useQueryClient } from '@tanstack/react-query';
-import { getQueue } from '@offline/outbox';
+// src/components/offline/SyncProgressOffline.tsx
+import React, {useEffect, useMemo, useState, useCallback, useRef} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+} from 'react-native';
+import {useQueryClient} from '@tanstack/react-query';
+import NetInfo from '@react-native-community/netinfo';
 
-export default function SyncProgress({ onClose, disallowCloseWhileProcessing = true }: { onClose?: ()=>void; disallowCloseWhileProcessing?: boolean }) {
+import {
+  readProcessingSession,
+  getQueueByStatus,
+  archiveAndClearFailed,
+  readQueue,
+  writeQueue,
+} from '@offline/outbox';
+import {processQueueOnce} from './processor';
+import {OutboxItem} from '@offline/types';
+
+type Props = {
+  onClose?: () => void;
+};
+
+export default function SyncProgressOffline({onClose}: Props) {
   const qc = useQueryClient();
-  const [queue, setQueue] = useState<any[]>(() => getQueue());
-  const [isProcessing, setIsProcessing] = useState(false);
 
+  // -------- live data --------
+  const [session, setSession] = useState<{
+    total: number;
+    processed: number;
+    currentUid: string | null;
+  } | null>(null);
+  const [lists, setLists] = useState<{
+    pending: OutboxItem[];
+    in_progress: OutboxItem[];
+    succeeded: OutboxItem[];
+    failed: OutboxItem[];
+  }>({pending: [], in_progress: [], succeeded: [], failed: []});
+
+  // -------- connectivity --------
+  const [online, setOnline] = useState<boolean>(true);
   useEffect(() => {
-    let t: any = null;
-    const poll = () => {
-      try { setQueue(getQueue()); } catch {}
-      t = setTimeout(poll, 1000);
-    };
-    poll();
-    return () => { if (t) clearTimeout(t); };
+    const sub = NetInfo.addEventListener((s) => {
+      const ok = !!s.isConnected && (s.isInternetReachable ?? true);
+      setOnline(ok);
+    });
+    NetInfo.fetch().then((s) => {
+      const ok = !!s.isConnected && (s.isInternetReachable ?? true);
+      setOnline(ok);
+    });
+    return () => sub && sub();
   }, []);
 
-  const { total, pending, inProgress, succeeded, failed } = useMemo(() => {
-    const total = queue.length;
-    const pending = queue.filter((q) => q.status === 'pending').length;
-    const inProgress = queue.filter((q) => q.status === 'in_progress').length;
-    const succeeded = queue.filter((q) => q.status === 'succeeded').length;
-    const failed = queue.filter((q) => q.status === 'failed').length;
-    return { total, pending, inProgress, succeeded, failed };
-  }, [queue]);
+  const refresh = useCallback(async () => {
+    const s = await readProcessingSession();
+    const l = await getQueueByStatus();
+    setSession(
+      s
+        ? {total: s.total, processed: s.processed, currentUid: s.currentUid}
+        : null,
+    );
+    setLists({
+      pending: l.pending,
+      in_progress: l.in_progress,
+      succeeded: l.succeeded,
+      failed: l.failed,
+    });
+  }, []);
 
-  const percent = total === 0 ? 1 : Math.min(1, succeeded / total);
+  useEffect(() => {
+    refresh();
+    const id = setInterval(refresh, 700);
+    return () => clearInterval(id);
+  }, [refresh]);
 
-  const onForce = useCallback(async () => {
-    setIsProcessing(true);
+  // -------- derived --------
+  const totalBase = useMemo(
+    () =>
+      session ? session.total : lists.pending.length + lists.failed.length,
+    [session, lists.pending.length, lists.failed.length],
+  );
+  const processedBase = useMemo(
+    () => (session ? session.processed : lists.succeeded.length),
+    [session, lists.succeeded.length],
+  );
+  const pct =
+    totalBase > 0
+      ? Math.min(100, Math.round((processedBase / totalBase) * 100))
+      : 100;
+
+  const isProcessing = lists.in_progress.length > 0 || !!session?.currentUid;
+  const hasFailed = lists.failed.length > 0;
+  const finished =
+    !isProcessing &&
+    lists.pending.length === 0 &&
+    lists.in_progress.length === 0;
+
+  // -------- auto-kick (pendientes + internet) --------
+  const kickingRef = useRef(false);
+  const kickSyncIfNeeded = useCallback(async () => {
+    if (kickingRef.current) return;
+    const shouldProcess =
+      online && lists.pending.length > 0 && lists.in_progress.length === 0;
+    if (!shouldProcess) return;
+
+    kickingRef.current = true;
     try {
-      await processQueueOnce(qc);
-    } catch (e) {
-      console.warn('force sync error', e);
+      // No pasamos pingBefore para evitar bloqueo por health
+      await processQueueOnce(qc, {processFailedItems: false});
     } finally {
-      setIsProcessing(false);
+      kickingRef.current = false;
     }
-  }, [qc]);
+  }, [online, lists.pending.length, lists.in_progress.length, qc]);
 
-  const isActive = pending > 0 || inProgress > 0;
+  useEffect(() => {
+    void kickSyncIfNeeded();
+  }, [kickSyncIfNeeded]);
 
+  // -------- actions --------
+  const ensureInternet = async () => {
+    const n = await NetInfo.fetch();
+    return !!n.isConnected && n.isInternetReachable !== false;
+  };
+
+  const retryFailed = async () => {
+    if (!hasFailed) return;
+    if (!(await ensureInternet())) {
+      Alert.alert('No internet', 'Please connect to the internet to retry.');
+      return;
+    }
+    await processQueueOnce(qc, {processFailedItems: true});
+  };
+
+  const purgeNonFailedFromQueue = useCallback(async () => {
+    const q = await readQueue();
+    const failedOnly = q.filter((i) => i.status === 'failed');
+    await writeQueue(failedOnly);
+  }, []);
+
+  const handleClose = useCallback(async () => {
+    if (!finished) return; // deshabilitado hasta terminar
+
+    if (hasFailed) {
+      const archived = await archiveAndClearFailed();
+      if (archived > 0) {
+        Alert.alert(
+          'Archived',
+          `${archived} failed item(s) were archived for later review.`,
+        );
+      }
+      await purgeNonFailedFromQueue();
+    } else {
+      await purgeNonFailedFromQueue();
+    }
+
+    onClose?.();
+  }, [finished, hasFailed, onClose, purgeNonFailedFromQueue]);
+
+  // -------- UI --------
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sincronización</Text>
-      <View style={styles.progressBarBackground}>
-        <View style={[styles.progressBarFill, { width: `${Math.round(percent*100)}%` }]} />
-      </View>
-      <Text style={styles.progressText}>{Math.round(percent*100)}% — {succeeded}/{total} sincronizados</Text>
+    <View style={styles.root}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.title}>Offline synchronization</Text>
 
-      <View style={styles.counters}>
-        <Text>Total: {total}</Text>
-        <Text>Pendientes: {pending}</Text>
-        <Text>En proceso: {inProgress}</Text>
-        <Text>Errores: {failed}</Text>
+        <View style={styles.progressBar}>
+          <View style={[styles.progressFill, {width: `${pct}%`}]} />
+        </View>
+        <Text style={styles.percent}>{pct}%</Text>
+
+        <View style={styles.stateRow}>
+          <StatePill
+            label={online ? 'Online' : 'Waiting for network…'}
+            kind={online ? 'ok' : 'warn'}
+          />
+          <StatePill
+            label={
+              isProcessing
+                ? 'Processing…'
+                : finished
+                ? hasFailed
+                  ? 'Finished with errors'
+                  : 'Finished successfully'
+                : lists.pending.length > 0
+                ? 'Ready to process'
+                : 'Idle'
+            }
+            kind={
+              isProcessing
+                ? 'ok'
+                : finished
+                ? hasFailed
+                  ? 'warn'
+                  : 'ok'
+                : 'muted'
+            }
+          />
+        </View>
       </View>
 
-      <View style={styles.controls}>
-        {failed > 0 ? (
-          <TouchableOpacity style={styles.btn} onPress={onForce} disabled={isProcessing}>
-            {isProcessing ? <ActivityIndicator color="#fff" /> : <Text style={styles.btnText}>Forzar sincronización</Text>}
-          </TouchableOpacity>
-        ) : null}
-        <TouchableOpacity style={[styles.btn, styles.btnGhost]} onPress={() => { if (!isActive || !disallowCloseWhileProcessing) onClose?.(); }} disabled={isActive && disallowCloseWhileProcessing}>
-          <Text style={[styles.btnText, styles.btnGhostText]}>Cerrar</Text>
+      {/* Body (scrollable) */}
+      <ScrollView
+        style={styles.body}
+        contentContainerStyle={styles.bodyContent}
+        nestedScrollEnabled
+        keyboardShouldPersistTaps="handled">
+        <CountersRow
+          pending={lists.pending.length}
+          in_progress={lists.in_progress.length}
+          succeeded={lists.succeeded.length}
+          failed={lists.failed.length}
+        />
+
+        <ListSection title="In-progress items" data={lists.in_progress} />
+        <ListSection title="Pending items" data={lists.pending} />
+        <ListSection title="Succeeded items" data={lists.succeeded} />
+        <ListSection title="Failed items" data={lists.failed} showError />
+      </ScrollView>
+
+      {/* Footer (fixed) */}
+      <View style={styles.footer}>
+        <TouchableOpacity
+          style={[styles.btn, !hasFailed && styles.btnDisabled]}
+          onPress={retryFailed}
+          disabled={!hasFailed || isProcessing || !online}>
+          <Text
+            style={[
+              styles.btnText,
+              (!hasFailed || isProcessing || !online) && styles.btnTextDisabled,
+            ]}>
+            Retry failed
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            hasFailed ? styles.btnDanger : styles.btnPrimary,
+            !finished &&
+              (hasFailed ? styles.btnDangerMuted : styles.btnPrimaryMuted),
+          ]}
+          onPress={handleClose}
+          disabled={!finished}>
+          <Text
+            style={hasFailed ? styles.btnDangerText : styles.btnPrimaryText}>
+            {hasFailed ? 'Close & Archive errors' : 'Close'}
+          </Text>
         </TouchableOpacity>
       </View>
+    </View>
+  );
+}
 
+/* ---------- Subcomponents ---------- */
+
+function ListSection({
+  title,
+  data,
+  showError = false,
+}: {
+  title: string;
+  data: OutboxItem[];
+  showError?: boolean;
+}) {
+  return (
+    <View style={styles.listSection}>
+      <Text style={styles.sectionTitle}>{title}</Text>
       <FlatList
-        data={[...queue].reverse()}
-        keyExtractor={(i) => i.uid}
-        renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text style={styles.kind}>{item.payload.entity} — {item.op}</Text>
-            <Text style={styles.uid}>{item.uid} • {item.attempts}x • {item.status}</Text>
-            {item.lastError ? <Text style={styles.err}>{item.lastError}</Text> : null}
+        data={data}
+        keyExtractor={(it) => it.uid}
+        scrollEnabled={false}
+        renderItem={({item}) => (
+          <View style={styles.line}>
+            <Text style={styles.lineText}>
+              [{item.payload.entity}] {item.op.toUpperCase()}{' '}
+              {item.payload.id ?? item.payload.clientId ?? item.uid}
+            </Text>
+            {showError && item.lastError ? (
+              <Text style={styles.lineError}>({item.lastError})</Text>
+            ) : null}
           </View>
         )}
-        style={{ marginTop: 12, maxHeight: 300 }}
-        ListEmptyComponent={() => <Text style={{ textAlign: 'center', color: '#666' }}>Sin operaciones pendientes</Text>}
+        ListEmptyComponent={<Text style={styles.empty}>None</Text>}
       />
     </View>
   );
 }
 
+function CountersRow({
+  pending,
+  in_progress,
+  succeeded,
+  failed,
+}: {
+  pending: number;
+  in_progress: number;
+  succeeded: number;
+  failed: number;
+}) {
+  return (
+    <View style={styles.countersRow}>
+      <Badge label="Pending" value={pending} />
+      <Badge label="In progress" value={in_progress} />
+      <Badge label="Succeeded" value={succeeded} />
+      <Badge label="Failed" value={failed} />
+    </View>
+  );
+}
+
+function Badge({label, value}: {label: string; value: number}) {
+  return (
+    <View style={styles.badge}>
+      <Text style={styles.badgeLabel}>{label}</Text>
+      <Text style={styles.badgeValue}>{value}</Text>
+    </View>
+  );
+}
+
+function StatePill({
+  label,
+  kind,
+}: {
+  label: string;
+  kind: 'ok' | 'warn' | 'muted';
+}) {
+  const bg =
+    kind === 'ok' ? '#D1FAE5' : kind === 'warn' ? '#FEF3C7' : '#E5E7EB';
+  const fg =
+    kind === 'ok' ? '#065F46' : kind === 'warn' ? '#92400E' : '#374151';
+  return (
+    <View style={[styles.pill, {backgroundColor: bg}]}>
+      <Text style={[styles.pillText, {color: fg}]}>{label}</Text>
+    </View>
+  );
+}
+
+/* ---------- Styles ---------- */
+
 const styles = StyleSheet.create({
-  container: { padding: 16, backgroundColor: '#fff', minHeight: 200 },
-  title: { fontSize: 18, fontWeight: '700', marginBottom: 8 },
-  progressBarBackground: { height: 10, backgroundColor: '#eee', borderRadius: 6, overflow: 'hidden', marginBottom: 8 },
-  progressBarFill: { height: 10, backgroundColor: '#2b8aef' },
-  progressText: { fontSize: 12, color: '#444', marginBottom: 8 },
-  counters: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
-  controls: { flexDirection: 'row', gap: 8, marginBottom: 8 },
-  btn: { backgroundColor: '#2b8aef', padding: 8, borderRadius: 8 },
-  btnText: { color: '#fff', fontWeight: '700' },
-  btnGhost: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#ccc', marginLeft: 8 },
-  btnGhostText: { color: '#444' },
-  item: { padding: 8, borderRadius: 6, backgroundColor: '#fafafa', marginBottom: 8 },
-  kind: { fontWeight: '700' },
-  uid: { color: '#666', fontSize: 12 },
-  err: { color: '#c53030', marginTop: 4 }
+  root: {
+    flex: 1, // ocupa toda la altura dada por el modal (80% de pantalla)
+    backgroundColor: 'white',
+  },
+  header: {
+    paddingHorizontal: 12,
+    paddingTop: 12,
+    paddingBottom: 6,
+  },
+  title: {fontWeight: '700', fontSize: 18, marginBottom: 10},
+  progressBar: {
+    height: 8,
+    backgroundColor: '#E7E9EE',
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
+  progressFill: {height: 8, backgroundColor: '#2563EB'},
+  percent: {marginTop: 6, fontWeight: '600'},
+
+  stateRow: {flexDirection: 'row', gap: 8, alignItems: 'center', marginTop: 8},
+
+  // Body scroll area uses remaining space between header and footer
+  body: {flex: 1, marginTop: 8},
+  bodyContent: {paddingHorizontal: 12, paddingBottom: 12},
+
+  countersRow: {flexDirection: 'row', gap: 8, marginTop: 6, flexWrap: 'wrap'},
+
+  pill: {paddingHorizontal: 10, paddingVertical: 6, borderRadius: 9999},
+  pillText: {fontWeight: '600'},
+
+  badge: {
+    backgroundColor: '#F2F3F7',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 9999,
+    flexDirection: 'row',
+    gap: 6,
+  },
+  badgeLabel: {color: '#4B5563'},
+  badgeValue: {fontWeight: '700'},
+
+  listSection: {marginTop: 10},
+  sectionTitle: {fontWeight: '700', marginBottom: 6},
+  empty: {color: '#6B7280', fontStyle: 'italic'},
+  line: {
+    paddingVertical: 8,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E5E7EB',
+  },
+  lineText: {color: '#111827'},
+  lineError: {color: '#DC2626'},
+
+  // Footer fijo
+  footer: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#E5E7EB',
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    gap: 8,
+  },
+
+  btn: {
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    backgroundColor: '#F3F4F6',
+  },
+  btnText: {fontWeight: '600', color: '#111827'},
+  btnDisabled: {backgroundColor: '#E5E7EB'},
+  btnTextDisabled: {color: '#9CA3AF'},
+
+  btnPrimary: {
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    backgroundColor: '#2563EB',
+  },
+  btnPrimaryMuted: {backgroundColor: '#93C5FD'},
+  btnPrimaryText: {color: 'white', fontWeight: '700'},
+
+  btnDanger: {
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    backgroundColor: '#FEE2E2',
+  },
+  btnDangerMuted: {backgroundColor: '#FECACA'},
+  btnDangerText: {color: '#991B1B', fontWeight: '700'},
 });

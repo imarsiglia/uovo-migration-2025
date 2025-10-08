@@ -1,16 +1,43 @@
 // src/features/notes/offline.ts
-import { useQueryClient } from '@tanstack/react-query';
-import { QUERY_KEYS } from '@api/contants/constants';
-import { createEntityOffline, deleteEntityOffline, updateEntityOffline } from '@features/helpers/offlineHelpers';
+import { enqueueCoalesced } from '@offline/outbox';
 
-export function createNoteOffline(qc = useQueryClient(), params: { idJob: number; body: any }) {
-  return createEntityOffline(qc, { entity: 'note', idJob: params.idJob, body: params.body, queryKey: [QUERY_KEYS.NOTES, { idJob: params.idJob }] });
+export type NoteOfflineProps = {
+  idJob: number;
+  id?: number;
+  clientId?: string; // required for offline create
+  title?: string;
+  description?: string;
+};
+
+const ENTITY = 'note';
+
+export async function offlineCreateNote({ idJob, clientId, title, description }: NoteOfflineProps) {
+  if (!clientId) throw new Error('offlineCreateNote requires clientId');
+  return enqueueCoalesced('create', {
+    entity: ENTITY,
+    idJob,
+    clientId,
+    body: { title, description },
+  });
 }
 
-export function updateNoteOffline(qc = useQueryClient(), params: { idJob: number; id?: number; clientId?: string; body: any }) {
-  return updateEntityOffline(qc, { entity: 'note', idJob: params.idJob, id: params.id, clientId: params.clientId, body: params.body, queryKey: [QUERY_KEYS.NOTES, { idJob: params.idJob }] });
+export async function offlineUpdateNote({ idJob, id, clientId, title, description }: NoteOfflineProps) {
+  if (!id && !clientId) throw new Error('offlineUpdateNote requires id or clientId');
+  return enqueueCoalesced('update', {
+    entity: ENTITY,
+    idJob,
+    id,
+    clientId,
+    body: { ...(title !== undefined ? { title } : {}), ...(description !== undefined ? { description } : {}) },
+  });
 }
 
-export function deleteNoteOffline(qc = useQueryClient(), params: { idJob: number; id?: number; clientId?: string }) {
-  return deleteEntityOffline(qc, { entity: 'note', idJob: params.idJob, id: params.id, clientId: params.clientId, queryKey: [QUERY_KEYS.NOTES, { idJob: params.idJob }] });
+export async function offlineDeleteNote({ idJob, id, clientId }: NoteOfflineProps) {
+  if (!id && !clientId) throw new Error('offlineDeleteNote requires id or clientId');
+  return enqueueCoalesced('delete', {
+    entity: ENTITY,
+    idJob,
+    id,
+    clientId,
+  });
 }

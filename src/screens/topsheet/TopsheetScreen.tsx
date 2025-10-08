@@ -36,6 +36,8 @@ import {
 import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
 import useInventoryStore from '@store/inventory';
 import {useCustomInsetBottom} from '@hooks/useCustomInsetBottom';
+import {prefetchReportMaterialsInventoryAll} from '@features/materials/offline';
+import {useQueryClient} from '@tanstack/react-query';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -47,8 +49,8 @@ export const TopsheetScreen = ({route}: Props) => {
   const {setJobDetail, setActiveTab, activeTab, setIsJobQueue} =
     useTopSheetStore();
 
+  const qc = useQueryClient();
   const insetBottom = useCustomInsetBottom();
-
   const [isRefetching, setIsRefetching] = useState(false);
 
   const {
@@ -78,6 +80,13 @@ export const TopsheetScreen = ({route}: Props) => {
   const heightAnim = useRef(new Animated.Value(36)).current;
   const translateY = useRef(new Animated.Value(0)).current; // empieza fuera de pantalla
   const opacity = useRef(new Animated.Value(0)).current;
+
+  // cargar listas grandes (prefetch)
+  useEffect(() => {
+    if (jobDetail?.id) {
+      prefetchReportMaterialsInventoryAll(jobDetail?.id, qc);
+    }
+  }, [jobDetail?.id]);
 
   useEffect(() => {
     if (jobDetail) {
@@ -356,7 +365,7 @@ export const TopsheetScreen = ({route}: Props) => {
                 width: '100%',
                 backgroundColor: 'white',
                 paddingHorizontal: 10,
-                paddingBottom: 5
+                paddingBottom: 5,
               }}>
               <ClockinButton />
             </Wrapper>

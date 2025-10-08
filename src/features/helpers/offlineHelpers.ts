@@ -1,56 +1,31 @@
-// src/features/offlineHelpers.ts
-import 'react-native-get-random-values';
-import { enqueueCoalesced } from '@offline/outbox';
-import { GenericPayload } from '@offline/types';
-import { QueryClient } from '@tanstack/react-query';
-import { v4 as uuid } from 'uuid';
+// src/features/helpers/offlineHelpers.ts
+import type { OutboxItem } from '@offline/types';
 
-export const optimisticAddLocal = (qc: QueryClient, queryKey: any, item: any) => {
-  const prev = qc.getQueryData<any[]>(queryKey) ?? [];
-  qc.setQueryData(queryKey, [item, ...prev]);
-};
-
-export const optimisticUpdateLocal = (qc: QueryClient, queryKey: any, matcher: (i:any)=>boolean, patch: any) => {
-  const prev = qc.getQueryData<any[]>(queryKey) ?? [];
-  qc.setQueryData(queryKey, prev.map(i => matcher(i) ? { ...i, ...patch } : i));
-};
-
-export const optimisticRemoveLocal = (qc: QueryClient, queryKey: any, matcher: (i:any)=>boolean) => {
-  const prev = qc.getQueryData<any[]>(queryKey) ?? [];
-  qc.setQueryData(queryKey, prev.filter(i => !matcher(i)));
-};
-
-/**
- * createEntityOffline: create local with clientId and enqueue create
- * - queryKey: [ENTITY_KEY, { idJob }]
- * - body: object to store in body
- */
-export function createEntityOffline(qc: QueryClient, params: { entity: string; idJob?: number; body: any; queryKey: any }) {
-  const clientId = uuid();
-  const clientCreatedAt = Date.now();
-  const local = { ...params.body, clientId, clientCreatedAt, pending: true };
-  optimisticAddLocal(qc, params.queryKey, local);
-  const payload: GenericPayload = {
-    entity: params.entity,
-    idJob: params.idJob,
-    clientId,
-    body: params.body,
-    clientCreatedAt,
-  };
-  enqueueCoalesced('create', payload);
-  return clientId;
+export function calcBackoffWithJitter(attempts: number): number {
+  // 1s, 2s, 4s, 8s ... capped at 60s; ±20% jitter
+  const base = Math.min(60_000, 1000 * Math.pow(2, Math.max(0, attempts - 1)));
+  const jitter = base * (0.8 + Math.random() * 0.4);
+  return Math.floor(jitter);
 }
 
-export function updateEntityOffline(qc: QueryClient, params: { entity: string; idJob?: number; id?: number; clientId?: string; body: any; queryKey: any }) {
-  const { entity, idJob, id, clientId, body, queryKey } = params;
-  optimisticUpdateLocal(qc, queryKey, (i)=> (id ? i.id === id : (clientId ? i.clientId === clientId : false)), { ...body, pending: true });
-  const payload: GenericPayload = { entity, idJob, id, clientId, body, clientUpdatedAt: Date.now() } as any;
-  enqueueCoalesced('update', payload);
+/** Change this to your health endpoint or base API. */
+export async function pingApiHead(): Promise<boolean> {
+  const url = `https://www.googleapis.com/books/v1/volumes?q=test`;
+  if (!url) return true; // do not block if env missing in dev
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 4000);
+    const res = await fetch(url, { method: 'HEAD', signal: ctrl.signal });
+    clearTimeout(t);
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
 
-export function deleteEntityOffline(qc: QueryClient, params: { entity: string; idJob?: number; id?: number; clientId?: string; queryKey: any }) {
-  const { entity, idJob, id, clientId, queryKey } = params;
-  optimisticRemoveLocal(qc, queryKey, (i) => (id ? i.id === id : (clientId ? i.clientId === clientId : false)));
-  const payload = { entity, idJob, id, clientId } as any;
-  enqueueCoalesced('delete', payload);
+export function labelFromItem(it: OutboxItem) {
+  const e = it.payload.entity ?? 'entity';
+  const op = it.op.toUpperCase();
+  const id = it.payload.id ?? it.payload.clientId ?? it.uid;
+  return `[${e}] ${op} ${id}`;
 }

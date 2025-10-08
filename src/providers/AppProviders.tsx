@@ -10,7 +10,6 @@ import {AutocompleteDropdownContextProvider} from 'react-native-autocomplete-dro
 import {KeyboardProvider} from 'react-native-keyboard-controller';
 import {ColorScheme, EDSProvider} from '@equinor/mad-components';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {OutboxProcessor} from '@components/offline/OutboxProcessor';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -76,12 +75,14 @@ export default function AppProviders({children}: {children: React.ReactNode}) {
                         k === QUERY_KEYS.JOB_QUEUE_LIST ||
                         k === QUERY_KEYS.TOPSHEET ||
                         k === QUERY_KEYS.TASK_COUNT ||
-                        k === QUERY_KEYS.NOTES;
+                        k === QUERY_KEYS.NOTES ||
+                        k === QUERY_KEYS.REPORT_MATERIALS ||
+                        k === QUERY_KEYS.ALL_REPORT_MATERIALS_INVENTORY;
                       return allow && q.state.status === 'success';
                     },
                   },
                   // Limpia el cache persistido si cambias la “versión” de datos:
-                  buster: 'app-v7', // cambia a 'app-v2' tras cambios de schema o logout
+                  buster: 'app-v8', // cambia a 'app-v2' tras cambios de schema o logout
                 }}>
                 {children}
                 {/* <OutboxProcessor /> */}

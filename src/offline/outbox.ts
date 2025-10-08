@@ -2,167 +2,181 @@
 import 'react-native-get-random-values';
 import { MMKV } from 'react-native-mmkv';
 import { v4 as uuid } from 'uuid';
-import type { OutboxItem, GenericPayload, OutboxOpKind } from './types';
+import type { OutboxItem, GenericPayload, OutboxOpKind, OutboxStatus, ProcessingSession } from './types';
 
-const STORE_ID = 'uovo-offbox-v1';
-const KEY = 'OUTBOX_QUEUE_V1';
-const PROC_FLAG = 'OUTBOX_PROCESSING_FLAG_V1';
+const STORE_ID = 'offline-outbox-v5';
+const KEY_QUEUE = 'OUTBOX_QUEUE_V5';
+const KEY_LOCK  = 'OUTBOX_LOCK_V5';
+const KEY_SESSION = 'OUTBOX_SESSION_V5';
+const KEY_FAILED_ARCHIVE = 'OUTBOX_FAILED_ARCHIVE_V3';
+
+export const LOCK_STALE_MS = 2 * 60 * 1000;      // stale lock takeover window
+export const STUCK_THRESHOLD_MS = 3 * 60 * 1000; // requeue in_progress older than this
 
 const store = new MMKV({ id: STORE_ID });
 
-export const readQueue = (): OutboxItem[] => {
-  const raw = store.getString(KEY);
+/** ------------ storage helpers (sync, wrapped as async) ------------ */
+const r = async (k: string) => store.getString(k) ?? null;
+const w = async (k: string, v: string) => store.set(k, v);
+const d = async (k: string) => store.delete(k);
+
+/** ------------ queue helpers ------------ */
+export async function readQueue(): Promise<OutboxItem[]> {
+  const raw = await r(KEY_QUEUE);
+
   if (!raw) return [];
-  try {
-    return JSON.parse(raw) as OutboxItem[];
-  } catch (e) {
-    console.warn('[OUTBOX] parse error', e);
-    return [];
-  }
-};
+  try { return JSON.parse(raw) as OutboxItem[]; } catch { return []; }
+}
+export async function writeQueue(q: OutboxItem[]) { await w(KEY_QUEUE, JSON.stringify(q)); }
+export async function replaceQueue(q: OutboxItem[]) { await writeQueue(q); }
+export async function clearQueue() { await d(KEY_QUEUE); }
 
-export const writeQueue = (q: OutboxItem[]) => {
-  try {
-    store.set(KEY, JSON.stringify(q));
-  } catch (e) {
-    console.warn('[OUTBOX] writeQueue error', e);
-  }
-};
-
-export const getQueue = () => readQueue();
-export const replaceQueue = (newQ: OutboxItem[]) => writeQueue(newQ);
-export const clearQueue = () => writeQueue([]);
-export const isProcessingPersisted = () => !!store.getString(PROC_FLAG);
-export const setProcessingPersisted = (val: boolean) => {
-  if (val) store.set(PROC_FLAG, String(Date.now()));
-  else store.delete(PROC_FLAG);
-};
-
-/**
- * enqueueCoalesced: agrega operación a la cola y aplica reglas de coalescing por (entity + clientId|id)
- * Retorna uid del item creado o el uid existente si se coalesció; retorna null si la operación se anuló (create+delete)
- */
-export const enqueueCoalesced = (op: OutboxOpKind, payload: GenericPayload): string | null => {
-  const q = readQueue();
-  const now = Date.now();
-
-  const match = (it: OutboxItem) => {
-    const p = it.payload;
-    if (payload.clientId && p.clientId) return p.clientId === payload.clientId && p.entity === payload.entity;
-    if (payload.id && p.id) return p.id === payload.id && p.entity === payload.entity;
-    // fallback: if entity and idJob match and body has an identifier you could match, but avoid heuristics here
-    return false;
+export async function getQueueCounts(): Promise<{ pending: number; in_progress: number; succeeded: number; failed: number; total: number; }> {
+  const q = await readQueue();
+  const c = { pending: 0, in_progress: 0, succeeded: 0, failed: 0 };
+  for (const it of q) (c as any)[it.status] += 1;
+  return { ...c, total: q.length };
+}
+export async function getQueueByStatus(): Promise<Record<OutboxStatus, OutboxItem[]>> {
+  const q = await readQueue();
+  return {
+    pending: q.filter(i => i.status === 'pending'),
+    in_progress: q.filter(i => i.status === 'in_progress'),
+    succeeded: q.filter(i => i.status === 'succeeded'),
+    failed: q.filter(i => i.status === 'failed'),
   };
+}
 
-  const idx = q.findIndex(match);
+/** ------------ failed archive ------------ */
+export type FailedArchiveItem = OutboxItem & { archivedAt: number };
 
-  if (idx === -1) {
-    const item: OutboxItem = {
-      uid: uuid(),
-      op,
-      createdAt: now,
-      attempts: 0,
-      status: 'pending',
-      lastError: null,
-      payload: { ...payload },
-      updatedAt: now,
-    };
-    q.push(item);
-    writeQueue(q);
-    return item.uid;
+export async function readFailedArchive(): Promise<FailedArchiveItem[]> {
+  const raw = await r(KEY_FAILED_ARCHIVE);
+  if (!raw) return [];
+  try { return JSON.parse(raw) as FailedArchiveItem[]; } catch { return []; }
+}
+export async function writeFailedArchive(items: FailedArchiveItem[]) {
+  await w(KEY_FAILED_ARCHIVE, JSON.stringify(items));
+}
+/** Moves all failed from the outbox to the archive and clears them from queue. */
+export async function archiveAndClearFailed(): Promise<number> {
+  const q = await readQueue();
+  const failed = q.filter(i => i.status === 'failed');
+  if (!failed.length) return 0;
+  const remaining = q.filter(i => i.status !== 'failed');
+  const old = await readFailedArchive();
+  const now = Date.now();
+  const merged = [...old, ...failed.map(i => ({ ...i, archivedAt: now }))];
+  await writeQueue(remaining);
+  await writeFailedArchive(merged);
+  return failed.length;
+}
+
+/** ------------ processing session ------------ */
+export async function readProcessingSession(): Promise<ProcessingSession | null> {
+  const raw = await r(KEY_SESSION);
+  if (!raw) return null;
+  try { return JSON.parse(raw) as ProcessingSession; } catch { return null; }
+}
+export async function writeProcessingSession(s: ProcessingSession) {
+  await w(KEY_SESSION, JSON.stringify(s));
+}
+export async function clearProcessingSession() { await d(KEY_SESSION); }
+
+/** ------------ lock with session takeover ------------ */
+export async function tryAcquireProcessingLock(sessionId: string): Promise<boolean> {
+  const raw = await r(KEY_LOCK);
+  const now = Date.now();
+  if (!raw) {
+    await w(KEY_LOCK, JSON.stringify({ sessionId, ts: now }));
+    return true;
+  }
+  try {
+    const lock = JSON.parse(raw) as { sessionId: string; ts: number };
+    if (now - lock.ts > LOCK_STALE_MS) {
+      await w(KEY_LOCK, JSON.stringify({ sessionId, ts: now })); // takeover
+      return true;
+    }
+    return lock.sessionId === sessionId;
+  } catch {
+    await w(KEY_LOCK, JSON.stringify({ sessionId, ts: now }));
+    return true;
+  }
+}
+export async function refreshProcessingLock(sessionId: string) {
+  const raw = await r(KEY_LOCK);
+  if (!raw) return;
+  try {
+    const lock = JSON.parse(raw) as { sessionId: string; ts: number };
+    if (lock.sessionId === sessionId) {
+      lock.ts = Date.now();
+      await w(KEY_LOCK, JSON.stringify(lock));
+    }
+  } catch {}
+}
+export async function releaseProcessingLock(sessionId: string) {
+  const raw = await r(KEY_LOCK);
+  if (!raw) return;
+  try {
+    const lock = JSON.parse(raw) as { sessionId: string; ts: number };
+    if (lock.sessionId === sessionId) await d(KEY_LOCK);
+  } catch { await d(KEY_LOCK); }
+}
+
+/** ------------ enqueue with coalescing ------------ */
+function sameRecord(a: GenericPayload, b: GenericPayload): boolean {
+  if (a.entity !== b.entity) return false;
+  if (a.clientId && b.clientId) return a.clientId === b.clientId;
+  if (a.id && b.id) return a.id === b.id;
+  return false;
+}
+
+export async function enqueueCoalesced(op: OutboxOpKind, payload: GenericPayload): Promise<string> {
+  const q = await readQueue();
+  const matches = q.map((it, i) => ({ it, i })).filter(({ it }) => sameRecord(it.payload, payload));
+
+  if (op === 'update') {
+    for (const { it, i } of matches) {
+      if (it.op === 'create' || it.op === 'update') {
+        const merged: GenericPayload = {
+          ...it.payload,
+          ...payload,
+          body: { ...(it.payload.body ?? {}), ...(payload.body ?? {}) },
+          clientUpdatedAt: Date.now(),
+        };
+        q[i] = { ...it, payload: merged, updatedAt: Date.now() };
+        await writeQueue(q);
+        return it.uid;
+      }
+    }
+  }
+  if (op === 'delete') {
+    let removed = false;
+    for (let k = q.length - 1; k >= 0; k--) {
+      const it = q[k];
+      if (sameRecord(it.payload, payload) && (it.op === 'create' || it.op === 'update')) {
+        q.splice(k, 1);
+        removed = true;
+      }
+    }
+    if (removed && !payload.id && payload.clientId) {
+      await writeQueue(q);
+      return uuid(); // net-zero (create+delete collapsed)
+    }
   }
 
-  const existing = q[idx];
-
-  // Reglas de coalescing:
-  // existing.create + new.update => merge into create (update payload)
-  // existing.create + new.delete => remove existing (no op)
-  // existing.update + new.update => merge (last wins)
-  // existing.update + new.delete => replace with delete
-  // existing.delete + new.create => replace with create (re-create)
-  // others => append
-
-  if (existing.op === 'create') {
-    if (op === 'update') {
-      existing.payload = { ...existing.payload, ...payload, clientUpdatedAt: now };
-      existing.updatedAt = now;
-      existing.status = 'pending';
-      writeQueue(q);
-      return existing.uid;
-    }
-    if (op === 'delete') {
-      // create then delete => remove both (no server op needed)
-      q.splice(idx, 1);
-      writeQueue(q);
-      return null;
-    }
-    // create + create => merge
-    existing.payload = { ...existing.payload, ...payload, clientUpdatedAt: now };
-    existing.updatedAt = now;
-    writeQueue(q);
-    return existing.uid;
-  }
-
-  if (existing.op === 'update') {
-    if (op === 'update') {
-      existing.payload = { ...existing.payload, ...payload, clientUpdatedAt: now };
-      existing.updatedAt = now;
-      existing.status = 'pending';
-      writeQueue(q);
-      return existing.uid;
-    }
-    if (op === 'delete') {
-      existing.op = 'delete';
-      existing.payload = {
-        entity: existing.payload.entity,
-        id: payload.id ?? existing.payload.id,
-        clientId: payload.clientId ?? existing.payload.clientId,
-      } as GenericPayload;
-      existing.updatedAt = now;
-      existing.status = 'pending';
-      writeQueue(q);
-      return existing.uid;
-    }
-    // update + create improbable -> treat as update
-    existing.payload = { ...existing.payload, ...payload, clientUpdatedAt: now };
-    existing.updatedAt = now;
-    writeQueue(q);
-    return existing.uid;
-  }
-
-  if (existing.op === 'delete') {
-    if (op === 'create') {
-      // delete then create => convert to create
-      const newItem: OutboxItem = {
-        uid: uuid(),
-        op: 'create',
-        createdAt: now,
-        attempts: 0,
-        status: 'pending',
-        lastError: null,
-        payload: { ...payload },
-        updatedAt: now,
-      };
-      q.splice(idx, 1, newItem);
-      writeQueue(q);
-      return newItem.uid;
-    }
-    // delete + delete -> ignore
-    return existing.uid;
-  }
-
-  // fallback append
+  const now = Date.now();
   const item: OutboxItem = {
     uid: uuid(),
     op,
+    payload: { ...payload, clientUpdatedAt: now, clientCreatedAt: payload.clientCreatedAt ?? now },
     createdAt: now,
+    updatedAt: now,
     attempts: 0,
     status: 'pending',
     lastError: null,
-    payload: { ...payload },
-    updatedAt: now,
   };
   q.push(item);
-  writeQueue(q);
+  await writeQueue(q);
   return item.uid;
-};
+}

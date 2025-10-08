@@ -1,5 +1,5 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {Alert, StyleSheet, View} from 'react-native';
 // import {removeAllStorageOffline} from '../utils/functions';
 import {HomeFloatingAction} from '@components/floating/HomeFloatingAction';
@@ -25,6 +25,7 @@ import {JobQueueView} from './JobQueueView';
 import {useJobQueueStore} from '@store/jobqueue';
 import {NationalShuttleView} from './NationalShuttleView';
 import { useCustomInsetBottom } from '@hooks/useCustomInsetBottom';
+import { useQueryClient } from '@tanstack/react-query';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -37,8 +38,9 @@ export const HomeScreen = () => {
     setSyncroNS,
   } = useGeneralStore();
 
-  const insetBottom = useCustomInsetBottom();
+  const qc = useQueryClient()
 
+  const insetBottom = useCustomInsetBottom();
   const selectedDate = useGeneralStore((d) => d.selectedDate);
 
   const {
