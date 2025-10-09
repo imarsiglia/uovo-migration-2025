@@ -6,14 +6,21 @@ import {
 import {SignatureType} from '@api/types/Task';
 import {Icons} from '@assets/icons/icons';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
-import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
+import {
+  BasicFormHandle,
+  BasicFormProvider,
+} from '@components/commons/form/BasicFormProvider';
 import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
 import {InputTextContext} from '@components/commons/form/InputTextContext';
 import {SelectRadioButtonContext} from '@components/commons/form/SelectRadioButtonContext';
+import {PendingIcon} from '@components/commons/icons/PendingIcon';
 import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {offlineDeleteSignature} from '@features/signatures/offline';
+import {useOnline} from '@hooks/useOnline';
 import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {useRemoveFromArrayCache} from '@hooks/useToolsReactQueryCache';
 import {RoutesNavigation} from '@navigation/types';
 import {useRoute} from '@react-navigation/native';
 import {loadingWrapperPromise} from '@store/actions';
@@ -23,7 +30,7 @@ import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {capitalize} from '@utils/functions';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -51,6 +58,18 @@ export const SignaturesScreen = () => {
   const signatureForce = useTopSheetStore((d) => d.signatureForce);
   const setSignatureForce = useTopSheetStore((d) => d.setSignatureForce);
 
+  const formRef = useRef<BasicFormHandle<PreSaveSignatureSchemaType>>(null);
+
+  const signaturesKey = [
+    QUERY_KEYS.SIGNATURES,
+    {idJob, forceSend: signatureForce},
+  ];
+
+  const {online} = useOnline();
+
+  const removeSignatureFromCache =
+    useRemoveFromArrayCache<SignatureType>(signaturesKey);
+
   const {
     data: signatures,
     isLoading,
@@ -66,6 +85,12 @@ export const SignaturesScreen = () => {
       refetch();
     }
   }, [route.params?.changed]);
+
+  useEffect(() => {
+    formRef.current?.reset({
+      type: DEFAULT_VALUE_TYPE,
+    });
+  }, [signatures?.length]);
 
   const initSaveSignature = useCallback(
     (props: PreSaveSignatureSchemaType) => {
@@ -117,42 +142,64 @@ export const SignaturesScreen = () => {
           </Wrapper>
         ),
         onConfirm: () => {
-          showDialog({modalVisible: false});
-          loadingWrapperPromise(
-            deleteAsync({id: item.id})
-              .then((d) => {
-                if (d) {
-                  refetchAll();
-                  showToastMessage('Signature removed successfully');
-                } else {
-                  showErrorToastMessage('Error while deleting signatures');
-                }
-              })
-              .catch(() =>
-                showErrorToastMessage('Error while deleting signatures'),
-              ),
-          );
+          if (online && item.id) {
+            loadingWrapperPromise(
+              deleteAsync({id: item.id})
+                .then((d) => {
+                  if (d) {
+                    refetch();
+                    refetchAll();
+                    showToastMessage('Signature removed successfully');
+                  } else {
+                    showErrorToastMessage('Error while deleting signatures');
+                  }
+                })
+                .catch(() =>
+                  showErrorToastMessage('Error while deleting signatures'),
+                ),
+            );
+          } else {
+            // OFFLINE: enqueue + optimistic removal from cache
+            offlineDeleteSignature({idJob, ...item});
+            // aqui removemos para que desaparezca de la lista
+            removeSignatureFromCache({id: item.id, clientId: item.clientId});
+            showToastMessage('Signature deleted (queued)');
+          }
         },
       });
     },
-    [showDialog, deleteAsync, refetchAll],
+    [
+      online,
+      showDialog,
+      deleteAsync,
+      refetch,
+      refetchAll,
+      offlineDeleteSignature,
+      removeSignatureFromCache,
+    ],
   );
 
   const renderItem = useCallback(
-    ({item, index}: ListRenderItemInfo<SignatureType>) => {
+    ({item}: ListRenderItemInfo<SignatureType>) => {
       return (
-        <Wrapper key={item.id} style={styles.containerNotification}>
+        <Wrapper
+          key={item.id ?? item.clientId}
+          style={styles.containerNotification}>
           <Wrapper style={styles.viewNotification}>
             <PressableOpacity
+              style={GLOBAL_STYLES.row}
               onPress={() =>
                 navigate(RoutesNavigation.BaseImageScreen, {
                   images: [item.signature_data],
                 })
               }>
-              <Label style={[GLOBAL_STYLES.bold, styles.titleNotification]}>
-                {item.print_name}
-              </Label>
-              <Label style={styles.subtitleNotification}>{item.type}</Label>
+              <Wrapper>
+                <Label style={[GLOBAL_STYLES.bold, styles.titleNotification]}>
+                  {item.print_name}
+                </Label>
+                <Label style={styles.subtitleNotification}>{item.type}</Label>
+              </Wrapper>
+              {item._pending && <PendingIcon />}
             </PressableOpacity>
             <Wrapper style={GLOBAL_STYLES.row}>
               <PressableOpacity
@@ -215,6 +262,7 @@ export const SignaturesScreen = () => {
         <MinRoundedView />
 
         <BasicFormProvider
+          ref={formRef}
           schema={PreSaveSignatureSchema}
           defaultValue={{
             type: DEFAULT_VALUE_TYPE,

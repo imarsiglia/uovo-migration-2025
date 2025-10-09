@@ -4,11 +4,11 @@ import { MMKV } from 'react-native-mmkv';
 import { v4 as uuid } from 'uuid';
 import type { OutboxItem, GenericPayload, OutboxOpKind, OutboxStatus, ProcessingSession } from './types';
 
-const STORE_ID = 'offline-outbox-v5';
-const KEY_QUEUE = 'OUTBOX_QUEUE_V5';
-const KEY_LOCK  = 'OUTBOX_LOCK_V5';
-const KEY_SESSION = 'OUTBOX_SESSION_V5';
-const KEY_FAILED_ARCHIVE = 'OUTBOX_FAILED_ARCHIVE_V3';
+const STORE_ID = 'offline-outbox-v7';
+const KEY_QUEUE = 'OUTBOX_QUEUE_V7';
+const KEY_LOCK  = 'OUTBOX_LOCK_V7';
+const KEY_SESSION = 'OUTBOX_SESSION_V7';
+const KEY_FAILED_ARCHIVE = 'OUTBOX_FAILED_ARCHIVE_V5';
 
 export const LOCK_STALE_MS = 2 * 60 * 1000;      // stale lock takeover window
 export const STUCK_THRESHOLD_MS = 3 * 60 * 1000; // requeue in_progress older than this

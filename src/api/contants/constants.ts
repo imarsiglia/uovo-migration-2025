@@ -378,3 +378,12 @@ export const PHOTOS_REPORT_TYPES = {
 export const GLOBAL_FONT_SIZE_MULTIPLIER_XS = 1.2
 export const GLOBAL_FONT_SIZE_MULTIPLIER_SM = 1.4
 export const GLOBAL_FONT_SIZE_MULTIPLIER_MD = 1.7
+
+
+export const ENTITY_TYPES = {
+  NOTE: 'note',
+  SIGNATURE: 'signature',
+  REPORT_MATERIAL: 'report_material',
+  REPORT_MATERIALS: 'report_materials',
+  BOL_COUNT: 'bol_count',
+}

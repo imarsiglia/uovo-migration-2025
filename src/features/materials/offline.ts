@@ -4,11 +4,8 @@ import type {ReportMaterialType} from '@api/types/Task';
 import {enqueueCoalesced, readQueue, replaceQueue} from '@offline/outbox';
 import type {GenericPayload, OutboxItem} from '@offline/types';
 import {QueryClient} from '@tanstack/react-query';
-import {QUERY_KEYS} from '@api/contants/constants';
+import {ENTITY_TYPES, QUERY_KEYS} from '@api/contants/constants';
 import {taskServices} from '@api/services/taskServices';
-
-const ENTITY_CREATE = 'report_material';
-const ENTITY_LIST = 'report_materials';
 
 export type ListPayloadItem = {
   id?: number;
@@ -59,7 +56,7 @@ function pickIdUser(x: any): number | null {
   return null;
 }
 
-/** Adaptador de tu modelo a payload de lista (incluye id si existe) */
+/** Adaptador del modelo a payload de lista (incluye id si existe) */
 export function toListPayload(
   list: Array<Partial<ReportMaterialType>>,
 ): ListPayloadItem[] {
@@ -84,7 +81,7 @@ export async function offlineCreateOneReportMaterial(p: {
 }) {
   const clientId = p.clientId ?? uuid();
   await enqueueCoalesced('create', {
-    entity: ENTITY_CREATE,
+    entity: ENTITY_TYPES.REPORT_MATERIAL,
     idJob: p.idJob,
     clientId,
     body: {
@@ -124,7 +121,7 @@ export async function offlineUpdateOneReportMaterial(p: {
     const pay = it.payload as GenericPayload;
     if (
       it.status === 'pending' &&
-      pay?.entity === ENTITY_CREATE &&
+      pay?.entity === ENTITY_TYPES.REPORT_MATERIAL &&
       Number(pay?.idJob ?? 0) === idJob &&
       ((p.clientId && pay?.clientId === p.clientId) ||
         (!p.clientId && keyMatch(pay?.body)))
@@ -160,7 +157,8 @@ export async function offlineUpdateOneReportMaterial(p: {
     .findIndex(
       (it) =>
         it.status === 'pending' &&
-        (it.payload as GenericPayload)?.entity === ENTITY_LIST &&
+        (it.payload as GenericPayload)?.entity ===
+          ENTITY_TYPES.REPORT_MATERIALS &&
         Number((it.payload as GenericPayload)?.idJob ?? 0) === idJob,
     );
   if (lastListIdx >= 0) {
@@ -201,7 +199,7 @@ export async function offlineUpdateOneReportMaterial(p: {
 
   if (typeof p.idMaterial === 'number' && typeof p.quantity === 'number') {
     await enqueueCoalesced('update', {
-      entity: ENTITY_LIST,
+      entity: ENTITY_TYPES.REPORT_MATERIALS,
       idJob,
       body: {
         list: [
@@ -225,7 +223,7 @@ export async function offlineUpdateListOfReportMaterials(p: {
   list: Array<Partial<ReportMaterialType>>;
 }) {
   await enqueueCoalesced('update', {
-    entity: ENTITY_LIST,
+    entity: ENTITY_TYPES.REPORT_MATERIALS,
     idJob: p.idJob,
     body: {list: toListPayload(p.list)},
   });
@@ -241,7 +239,7 @@ export async function offlineDeleteOneOfflineReportMaterial(p: {
   for (const it of q) {
     const pay = it.payload as GenericPayload;
     if (
-      pay.entity === ENTITY_CREATE &&
+      pay.entity === ENTITY_TYPES.REPORT_MATERIAL &&
       pay.idJob === p.idJob &&
       pay.clientId === p.clientId
     ) {
@@ -269,8 +267,8 @@ export async function coalesceMaterialsPlanFromQueue(
     (it) =>
       it.status === 'pending' &&
       it.payload?.idJob === idJob &&
-      (it.payload?.entity === ENTITY_CREATE ||
-        it.payload?.entity === ENTITY_LIST),
+      (it.payload?.entity === ENTITY_TYPES.REPORT_MATERIAL ||
+        it.payload?.entity === ENTITY_TYPES.REPORT_MATERIALS),
   );
 
   const createsMap = new Map<
@@ -281,7 +279,7 @@ export async function coalesceMaterialsPlanFromQueue(
 
   for (const it of candidates) {
     const p = it.payload as GenericPayload;
-    if (p.entity === ENTITY_CREATE) {
+    if (p.entity === ENTITY_TYPES.REPORT_MATERIAL) {
       const b = p.body ?? {};
       createsMap.set(String(p.clientId), {
         clientId: String(p.clientId),
@@ -289,7 +287,7 @@ export async function coalesceMaterialsPlanFromQueue(
         quantity: Number(b.quantity ?? 0),
         idUser: (b.idUser ?? null) as number | null,
       });
-    } else if (p.entity === ENTITY_LIST) {
+    } else if (p.entity === ENTITY_TYPES.REPORT_MATERIALS) {
       const raw = (p.body?.list ?? []) as any[];
       lastList = raw.map((x) => {
         const id = pickId(x);
@@ -330,10 +328,6 @@ export async function coalesceMaterialsPlanFromQueue(
       filteredFinal.push(item);
     }
     lastList = filteredFinal;
-
-    // ⚠️ IMPORTANTE: NO borro creates que “no están” en la lista,
-    // porque tu UI encola LISTA solo con items con id. Ese filtro
-    // haría desaparecer creates legítimos.
   }
 
   return {

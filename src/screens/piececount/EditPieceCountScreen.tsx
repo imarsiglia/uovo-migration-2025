@@ -1,27 +1,32 @@
-import { useGetBOLCount, useSaveBOLCount } from '@api/hooks/HooksTaskServices';
-import { Icons } from '@assets/icons/icons';
-import { PressableOpacity } from '@components/commons/buttons/PressableOpacity';
-import { BasicFormProvider } from '@components/commons/form/BasicFormProvider';
-import { ButtonSubmit } from '@components/commons/form/ButtonSubmit';
-import { InputTextContext } from '@components/commons/form/InputTextContext';
-import { SelectRadioButtonContext } from '@components/commons/form/SelectRadioButtonContext';
-import { GeneralLoading } from '@components/commons/loading/GeneralLoading';
-import { Label } from '@components/commons/text/Label';
+import {QUERY_KEYS} from '@api/contants/constants';
+import {useGetBOLCount, useSaveBOLCount} from '@api/hooks/HooksTaskServices';
+import {BolCountType} from '@api/types/Task';
+import {Icons} from '@assets/icons/icons';
+import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
+import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
+import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
+import {InputTextContext} from '@components/commons/form/InputTextContext';
+import {SelectRadioButtonContext} from '@components/commons/form/SelectRadioButtonContext';
+import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
+import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import { Wrapper } from '@components/commons/wrappers/Wrapper';
-import { loadingWrapperPromise } from '@store/actions';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {offlineUpdateBOLCount} from '@features/bolCount/offline';
+import {useOnline} from '@hooks/useOnline';
+import {useUpsertObjectCache} from '@hooks/useToolsReactQueryCache';
+import {loadingWrapperPromise} from '@store/actions';
 import useTopSheetStore from '@store/topsheet';
-import { COLORS } from '@styles/colors';
-import { GLOBAL_STYLES } from '@styles/globalStyles';
-import { showErrorToastMessage, showToastMessage } from '@utils/toast';
-import { useCallback } from 'react';
-import { Keyboard, StyleSheet } from 'react-native';
+import {COLORS} from '@styles/colors';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {showErrorToastMessage, showToastMessage} from '@utils/toast';
+import {useCallback} from 'react';
+import {Keyboard, StyleSheet} from 'react-native';
 import {
   KeyboardAwareScrollView,
   KeyboardStickyView,
 } from 'react-native-keyboard-controller';
-import { useCustomNavigation } from 'src/hooks/useCustomNavigation';
-import { PieceCountSchema, PieceCountSchemaType } from 'src/types/schemas';
+import {useCustomNavigation} from 'src/hooks/useCustomNavigation';
+import {PieceCountSchema, PieceCountSchemaType} from 'src/types/schemas';
 
 export const EditPieceCountScreen = () => {
   const {goBack} = useCustomNavigation();
@@ -33,26 +38,58 @@ export const EditPieceCountScreen = () => {
     idJob,
   });
 
-  const saveReport = useCallback((props: PieceCountSchemaType) => {
-    Keyboard.dismiss();
-    loadingWrapperPromise(
-      mutateAsync({
-        idJob,
-        packageCount: parseInt(props.packageCount),
-        pbs: props.pbs,
-      }),
-    )
-      .then((d) => {
-        if (d) {
-          refetch();
-          showToastMessage('BOL updated successfully');
+  const {online} = useOnline();
+  const upsertPieceCount = useUpsertObjectCache<BolCountType>([
+    QUERY_KEYS.BOL_COUNT,
+    {idJob},
+  ]);
+
+  const saveReport = useCallback(
+    (props: PieceCountSchemaType) => {
+      Keyboard.dismiss();
+
+      if (online) {
+        loadingWrapperPromise(
+          mutateAsync({
+            idJob,
+            packageCount: parseInt(props.packageCount),
+            pbs: props.pbs,
+          }),
+        )
+          .then((d) => {
+            if (d) {
+              refetch();
+              showToastMessage('BOL updated successfully');
+              goBack();
+            } else {
+              showErrorToastMessage('Error while updating BOL');
+            }
+          })
+          .catch(() => showErrorToastMessage('Error while updating BOL'));
+      } else {
+        offlineUpdateBOLCount({
+          idJob,
+          packageCount: parseInt(props.packageCount),
+          pbs: props.pbs,
+        }).then(() => {
+          upsertPieceCount({
+            packageCount: parseInt(props.packageCount),
+            pbs: props.pbs,
+          });
+          showToastMessage('BOL updated (queued)');
           goBack();
-        } else {
-          showErrorToastMessage('Error while updating BOL');
-        }
-      })
-      .catch(() => showErrorToastMessage('Error while updating BOL'));
-  }, []);
+        });
+      }
+    },
+    [
+      online,
+      mutateAsync,
+      upsertPieceCount,
+      refetch,
+      goBack,
+      offlineUpdateBOLCount,
+    ],
+  );
 
   if (isLoading) {
     return <GeneralLoading />;

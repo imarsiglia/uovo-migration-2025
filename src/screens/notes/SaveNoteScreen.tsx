@@ -23,7 +23,7 @@ import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {useQueryClient} from '@tanstack/react-query';
-import {showErrorToastMessage} from '@utils/toast';
+import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import React, {useCallback, useMemo, useRef} from 'react';
 import {StyleSheet} from 'react-native';
 import {
@@ -144,22 +144,36 @@ export const SaveNoteScreen = (props: Props) => {
           } else {
             // create a new offline draft with auto clientId
             const clientId = uuid();
-            offlineCreateNote({idJob, clientId, title, description});
-            upsertInCache({
-              clientId,
-              idJob,
-              title,
-              description,
-              _pending: true,
-            });
+            offlineCreateNote({idJob, clientId, title, description}).then(
+              () => {
+                upsertInCache({
+                  clientId,
+                  idJob,
+                  title,
+                  description,
+                  _pending: true,
+                });
+                showToastMessage('Note save successfully (queued)');
+                goBack();
+              },
+            );
           }
-          goBack();
         } catch (e) {
           console.log(e);
         }
       }
     },
-    [online, mutateAsync, idJob, item, upsertInCache, refetchAll, goBack],
+    [
+      online,
+      mutateAsync,
+      idJob,
+      item,
+      offlineUpdateNote,
+      offlineCreateNote,
+      upsertInCache,
+      refetchAll,
+      goBack,
+    ],
   );
 
   return (

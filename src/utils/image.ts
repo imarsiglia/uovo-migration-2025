@@ -1,8 +1,9 @@
 import ImageCropPicker from 'react-native-image-crop-picker';
-import { PERMISSIONS, request, RESULTS } from 'react-native-permissions';
-import { isAndroid } from './functions';
-import { showToastMessage } from './toast';
-import { ImageType } from '@generalTypes/general';
+import {PERMISSIONS, request, RESULTS} from 'react-native-permissions';
+import {isAndroid} from './functions';
+import {showToastMessage} from './toast';
+import {ImageType} from '@generalTypes/general';
+import {Skia, ImageFormat as SkiaImageFormat} from '@shopify/react-native-skia';
 
 export const onLaunchCamera = async (
   closeModal: () => void,
@@ -83,7 +84,7 @@ const manageImage = async (
     // var tempExtension = responseName
     //   ?.substring(responseName?.lastIndexOf('.') + 1)
     //   ?.toLowerCase();
-    callback(response, response.filename ?? response.path );
+    callback(response, response.filename ?? response.path);
     // if (
     //   tempExtension != null &&
     //   (tempExtension.includes('jpg') ||
@@ -172,3 +173,33 @@ export const requestReadMediaPermission = async () => {
   }
   return false;
 };
+
+export function flattenBase64OnWhite(
+  base64: string,
+  outFormat: 'png' | 'jpeg' = 'png',
+  quality: number = 0.92,
+): string | undefined {
+  // 1) Decodificar
+  const data = Skia.Data.fromBase64(base64);
+  const img = Skia.Image.MakeImageFromEncoded(data);
+  if (!img) return base64; // fallback: si no se pudo decodificar
+
+  // 2) Crear surface destino
+  const surface = Skia.Surface.MakeOffscreen(img.width(), img.height());
+  if (!surface) {
+    return undefined;
+  }
+  const canvas = surface.getCanvas();
+
+  // 3) Pintar fondo blanco y luego la imagen
+  //    (clear con blanco asegura que no quede alfa)
+  const white = Skia.Color('white');
+  canvas.clear(white);
+  canvas.drawImage(img, 0, 0);
+
+  // 4) Snapshot + encode
+  const snapshot = surface?.makeImageSnapshot();
+  const fmt = outFormat === 'jpeg' ? SkiaImageFormat.JPEG : SkiaImageFormat.PNG;
+  const outBase64 = snapshot.encodeToBase64(fmt, Math.round(quality * 100));
+  return outBase64;
+}

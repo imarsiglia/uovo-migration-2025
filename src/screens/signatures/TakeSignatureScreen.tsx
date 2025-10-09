@@ -1,5 +1,7 @@
 import {QUERY_KEYS} from '@api/contants/constants';
 import {useSaveSignature} from '@api/hooks/HooksTaskServices';
+import {SaveSignatureApiProps} from '@api/services/taskServices';
+import {SignatureType} from '@api/types/Task';
 import {BackButton} from '@components/commons/buttons/BackButton';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {Label} from '@components/commons/text/Label';
@@ -10,16 +12,21 @@ import {
   CanvasControlProvider,
   CanvasControls,
 } from '@equinor/react-native-skia-draw';
+import {offlineCreateSignature} from '@features/signatures/offline';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {useOnline} from '@hooks/useOnline';
 import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {useUpsertArrayCache} from '@hooks/useToolsReactQueryCache';
 import {RootStackParamList} from '@navigation/types';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {ImageFormat} from '@shopify/react-native-skia';
 import {loadingWrapperPromise} from '@store/actions';
+import {useAuth} from '@store/auth';
 import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {lockToLandscape, lockToPortrait} from '@utils/functions';
+import {generateUUID, lockToLandscape, lockToPortrait} from '@utils/functions';
+import {flattenBase64OnWhite} from '@utils/image';
 import {showErrorToastMessage} from '@utils/toast';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {StyleSheet} from 'react-native';
@@ -43,15 +50,26 @@ export const TakeSignatureScreen = (props: Props) => {
 const _TakeSignatureScreen = (props: Props) => {
   const {name, type} = props.route.params;
 
-  const {goBack, getState, goBackAndUpdate} = useCustomNavigation();
+  const {goBack, getState} = useCustomNavigation();
   const {mutateAsync} = useSaveSignature();
-  const {id: idJob} = useTopSheetStore((d) => d.jobDetail);
+  const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
+
   const signatureForce = useTopSheetStore((d) => d.signatureForce);
+  const {user_id} = useAuth((d) => d.user!);
+
+  const signaturesKey = [
+    QUERY_KEYS.SIGNATURES,
+    {idJob, forceSend: signatureForce},
+  ];
+
   const {refetchAll} = useRefreshIndicator([
-    [QUERY_KEYS.SIGNATURES, {idJob, forceSend: signatureForce}],
+    signaturesKey,
     [QUERY_KEYS.TASK_COUNT, {idJob}],
   ]);
   const refCanvas = useRef<CanvasControls>(null);
+  const {online} = useOnline();
+
+  const upsertSignature = useUpsertArrayCache<SignatureType>(signaturesKey);
 
   useEffect(() => {
     lockToLandscape();
@@ -89,45 +107,85 @@ const _TakeSignatureScreen = (props: Props) => {
     const snap = refCanvas.current?.makeImageSnapshot?.({
       imageFormat: ImageFormat.PNG,
     });
-    const b64 = snap?.data;
-    if (!b64) return;
+    let signatureBase64 = snap?.data?.replace(/(\r\n|\n|\r)/gm, '');
+    if (!signatureBase64) return;
 
-    if (blankFP && fingerprint(b64) === blankFP) {
+    if (blankFP && fingerprint(signatureBase64) === blankFP) {
       showErrorToastMessage('Please sign before saving');
       return;
     }
 
-    loadingWrapperPromise(
-      mutateAsync({
-        idJob,
-        force_send: false,
-        printName: name,
-        type,
-        signature: b64.replace(/(\r\n|\n|\r)/gm, ''),
-      })
-        .then((d) => {
-          if (d) {
-            refetchAll();
-            goBack();
-          } else {
-            showErrorToastMessage('Could not save the signature');
-          }
+    signatureBase64 = flattenBase64OnWhite(signatureBase64, 'png');
+
+    if (!signatureBase64) {
+      showErrorToastMessage('Error while processing signature');
+      return;
+    }
+
+    if (online) {
+      loadingWrapperPromise(
+        mutateAsync({
+          idJob,
+          force_send: true,
+          printName: name,
+          type,
+          signature: signatureBase64,
         })
-        .catch((e) => {
-          console.error('error');
-          console.error(e);
-          showErrorToastMessage('Could not save the signature');
-        }),
-    );
+          .then((d) => {
+            if (d) {
+              refetchAll();
+              goBack();
+            } else {
+              showErrorToastMessage('Could not save the signature');
+            }
+          })
+          .catch((e) => {
+            console.error('error');
+            console.error(e);
+            showErrorToastMessage('Could not save the signature');
+          }),
+      );
+    } else {
+      // OFFLINE: enqueue + optimistic cache
+      try {
+        // create a new offline draft with auto clientId
+        const clientId = generateUUID();
+        offlineCreateSignature({
+          idJob,
+          clientId,
+          force_send: true,
+          printName: name,
+          type,
+          signature: signatureBase64,
+        });
+        upsertSignature({
+          clientId,
+          id_job: idJob,
+          id_user: user_id,
+          print_name: name,
+          type,
+          signature_data: signatureBase64,
+          signature_timestamp: new Date().toISOString().split('.')[0],
+        });
+
+        goBack();
+      } catch (e) {
+        console.log(e);
+      }
+    }
   }, [
+    online,
     blankFP,
     fingerprint,
     idJob,
     name,
     type,
-    goBackAndUpdate,
     getState,
     mutateAsync,
+    refetchAll,
+    offlineCreateSignature,
+    upsertSignature,
+    goBack,
   ]);
 
   const clear = useCallback(() => {

@@ -1,3 +1,4 @@
+import 'react-native-get-random-values';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {Alert, Linking, Platform} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
@@ -22,6 +23,7 @@ import {
   WO_CONFIRMED_STATUS,
 } from '@api/contants/constants';
 import Orientation from 'react-native-orientation-locker';
+import {v4 as uuid} from 'uuid';
 
 export function getFormattedDate(date?: string | Date | null, format?: string) {
   if (!date) {
@@ -110,22 +112,6 @@ export async function closeSessionOnGoogle() {
     await GoogleSignin.signOut(); // iOS: limpia sesión
   } catch (e) {}
 }
-
-// export function showAlertDialogWithOptions(onConfirm: () => void) {
-//   Alert.alert(
-//     'Logout',
-//     'Sure want to logout?',
-//     [
-//       {
-//         text: 'Cancel',
-//         onPress: () => console.log('Cancel Pressed'),
-//         style: 'cancel',
-//       },
-//       {text: 'Yes', onPress: onConfirm},
-//     ],
-//     {cancelable: false},
-//   );
-// }
 
 export function adaptAgendaItemsToArray(itemsObj: AgendaSchedule) {
   return Object.keys(itemsObj)
@@ -388,3 +374,7 @@ export function sortList<T>(
 
 export const sleep = (ms: number) =>
   new Promise<void>((res) => setTimeout(res, ms));
+
+export function generateUUID() {
+  return uuid();
+}

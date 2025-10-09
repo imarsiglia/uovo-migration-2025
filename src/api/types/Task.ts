@@ -9,6 +9,8 @@ export type SignatureType = {
   type: string;
   signature_data: string;
   signature_timestamp: string;
+  clientId?: string; // for offline
+  _pending?: boolean;
 };
 
 export type NoteType = {

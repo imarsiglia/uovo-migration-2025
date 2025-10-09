@@ -77,12 +77,14 @@ export default function AppProviders({children}: {children: React.ReactNode}) {
                         k === QUERY_KEYS.TASK_COUNT ||
                         k === QUERY_KEYS.NOTES ||
                         k === QUERY_KEYS.REPORT_MATERIALS ||
-                        k === QUERY_KEYS.ALL_REPORT_MATERIALS_INVENTORY;
+                        k === QUERY_KEYS.ALL_REPORT_MATERIALS_INVENTORY ||
+                        k === QUERY_KEYS.SIGNATURES ||
+                        k === QUERY_KEYS.BOL_COUNT;
                       return allow && q.state.status === 'success';
                     },
                   },
                   // Limpia el cache persistido si cambias la “versión” de datos:
-                  buster: 'app-v8', // cambia a 'app-v2' tras cambios de schema o logout
+                  buster: 'app-v9', // cambia a 'app-v2' tras cambios de schema o logout
                 }}>
                 {children}
                 {/* <OutboxProcessor /> */}

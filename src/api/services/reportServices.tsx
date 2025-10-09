@@ -18,10 +18,6 @@ import {
 import {Paginated} from '@api/types/Response';
 import { TaskBaseApiProps } from './taskServices';
 
-export type SignaturesApiProps = {
-  forceSend?: boolean;
-} & TaskBaseApiProps;
-
 const getResumeConditionReport = async ({
   idJob,
 }: TaskBaseApiProps): Promise<Paginated<ReportResumeType[]>> => {

@@ -32,7 +32,6 @@ import {
   ReportMaterialType,
   SignatureType,
 } from '@api/types/Task';
-import {UserType} from '@api/types/User';
 import {BooleanNumberType} from '@generalTypes/general';
 
 export type TaskBaseApiProps = {
@@ -43,7 +42,7 @@ export type SignaturesApiProps = {
   forceSend?: boolean;
 } & TaskBaseApiProps;
 
-const signatures = async ({
+const getSignatures = async ({
   idJob,
   forceSend = false,
 }: SignaturesApiProps): Promise<SignatureType[]> => {
@@ -64,7 +63,7 @@ const saveSignature = async (
 ): Promise<boolean> => {
   const response = await postRequest(API_SAVE_SIGNATURE, {
     id: null,
-    signatureDatetime: new Date().toISOString().split(',')[0],
+    signatureDatetime: new Date().toISOString().split('.')[0],
     ...props,
   });
   return response.message === SUCCESS_MESSAGES.SUCCESS;
@@ -193,7 +192,7 @@ const getBOLCount = async ({
   return response.body;
 };
 
-type SaveBOLCountApiProps = {
+export type SaveBOLCountApiProps = {
   pbs: string;
   packageCount: number;
 } & TaskBaseApiProps;
@@ -251,7 +250,7 @@ const getLaborCodes = async (): Promise<LaborCodeType[]> => {
 };
 
 export const taskServices = {
-  signatures,
+  getSignatures,
   saveSignature,
   deleteSignature,
   getNotes,

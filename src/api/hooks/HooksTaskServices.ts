@@ -26,7 +26,7 @@ export const useGetSignatures = ({
 }: SignaturesApiProps & {enabled?: boolean}) => {
   return useQuery({
     queryKey: [QUERY_KEYS.SIGNATURES, props],
-    queryFn: () => taskServices.signatures(props),
+    queryFn: () => taskServices.getSignatures(props),
     enabled: !!props?.idJob,
     ...DEFAULT_PERSISTENCE_CONFIG,
   });

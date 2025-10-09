@@ -1,8 +1,8 @@
 import {QUERY_KEYS} from '@api/contants/constants';
 import {useDeleteNote, useGetNotes} from '@api/hooks/HooksTaskServices';
 import {NoteType} from '@api/types/Task';
-import {Icons} from '@assets/icons/icons';
 import {BackButton} from '@components/commons/buttons/BackButton';
+import {PendingIcon} from '@components/commons/icons/PendingIcon';
 import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 import {
   SwipeableListProvider,
@@ -72,26 +72,6 @@ export const NotesScreen = () => {
     [qc, notesQueryKey],
   );
 
-  const markDeletedInCache = useCallback(
-    (ref: {id?: number; clientId?: string}) => {
-      qc.setQueryData<NoteListItem[] | undefined>(notesQueryKey, (old) => {
-        if (!old) return old;
-        const now = new Date().toISOString();
-        return old.map((n) => {
-          const match = ref.id
-            ? n.id === ref.id
-            : ref.clientId
-            ? n.clientId === ref.clientId
-            : false;
-          return match
-            ? {...n, _deleted: true, _pending: true, update_time: now}
-            : n;
-        });
-      });
-    },
-    [qc, notesQueryKey],
-  );
-
   /** ---------- actions ---------- */
   const initRemove = useCallback(
     (note: NoteType) => {
@@ -143,7 +123,15 @@ export const NotesScreen = () => {
         },
       });
     },
-    [online, refetch, refetchAll, idJob, removeFromCache, deleteNoteAsync],
+    [
+      online,
+      refetch,
+      refetchAll,
+      idJob,
+      offlineDeleteNote,
+      removeFromCache,
+      deleteNoteAsync,
+    ],
   );
 
   const initEdit = (item: NoteType) => {
@@ -195,16 +183,8 @@ export const NotesScreen = () => {
                 <Wrapper style={GLOBAL_STYLES.row}>
                   <Text style={[GLOBAL_STYLES.bold, styles.titleNotification]}>
                     {item.title}
-                    {/* {(item as any)._pending ? ' (pending)' : ''} */}
                   </Text>
-                  {item._pending && (
-                    <Icons.HourglassClock
-                      style={{marginLeft: 5}}
-                      color={COLORS.error}
-                      width={15}
-                      height={15}
-                    />
-                  )}
+                  {item._pending && <PendingIcon />}
                 </Wrapper>
 
                 <Text

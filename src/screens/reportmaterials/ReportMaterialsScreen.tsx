@@ -112,9 +112,6 @@ export const ReportMaterialsScreen = () => {
           } else {
             // OFFLINE: cache optimista + encolar update por LISTA
             qc.setQueryData<any[] | undefined>(materialsQueryKey, filtered);
-
-            // const listoToQueue = filtered.filter((x) => !!x.id);
-
             if (item.id) {
               offlineUpsertMaterialsList({
                 idJob,
@@ -126,13 +123,20 @@ export const ReportMaterialsScreen = () => {
                 clientId: item.clientId!,
               });
             }
-
             showToastMessage('Queued deletion for sync (offline)');
           }
         },
       });
     },
-    [showDialog, materials, removeMaterialAsync, refetchAll],
+    [
+      online,
+      showDialog,
+      materials,
+      removeMaterialAsync,
+      refetchAll,
+      offlineDeleteOneOfflineReportMaterial,
+      offlineUpsertMaterialsList,
+    ],
   );
 
   function onSelectCollapse(itemId: number) {

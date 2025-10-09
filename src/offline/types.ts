@@ -1,5 +1,5 @@
 // src/offline/types.ts
-export type EntityKind = 'note' | 'report' | 'image' | 'inventory' | string;
+export type EntityKind = 'note' | 'signature' | 'report' | 'image' | 'inventory' | string;
 
 export type OutboxOpKind = 'create' | 'update' | 'delete';
 export type OutboxStatus = 'pending' | 'in_progress' | 'succeeded' | 'failed';

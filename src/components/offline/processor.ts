@@ -18,7 +18,8 @@ import type {ProcessingSession} from '@offline/types';
 import {pingApiHead} from '@features/helpers/offlineHelpers';
 import {taskServices} from '@api/services/taskServices';
 import {coalesceMaterialsPlanFromQueue} from '@features/materials/offline';
-import {QUERY_KEYS} from '@api/contants/constants';
+import {ENTITY_TYPES, QUERY_KEYS} from '@api/contants/constants';
+import {runItemThroughEntityServices} from '@api/services/entityServices';
 
 type ProcessOnceOpts = {
   processFailedItems?: boolean;
@@ -123,8 +124,8 @@ async function processCore(
       const firstMat = q.find(
         (i: any) =>
           i.status === 'pending' &&
-          (i.payload?.entity === 'report_material' ||
-            i.payload?.entity === 'report_materials'),
+          (i.payload?.entity === ENTITY_TYPES.REPORT_MATERIAL ||
+            i.payload?.entity === ENTITY_TYPES.REPORT_MATERIALS),
       );
 
       if (firstMat) {
@@ -132,10 +133,8 @@ async function processCore(
         if (idJob) {
           const plan = await coalesceMaterialsPlanFromQueue(idJob);
 
-          console.log("iniciando registro de lista")
           // 1) Lista (sin creates). Enviamos incluso []: tu backend puede usarlo para “vaciar”
           if (plan.finalList) {
-            console.log('register final list');
             await taskServices.registerReportMaterials({
               idJob,
               list: plan.finalList.map((x) => ({
@@ -147,11 +146,8 @@ async function processCore(
             });
           }
 
-          console.log("iniciando creates individuales")
-
           // 2) Creates individuales (respetando idUser)
           for (const cr of plan.creates) {
-            console.log('register one report material');
             await taskServices.registerOneReportMaterial({
               idJob,
               idMaterial: cr.idMaterial,
@@ -160,7 +156,6 @@ async function processCore(
             });
           }
 
-          console.log("invalidando cache")
           // 3) Invalida cache
           try {
             await qc.invalidateQueries({
@@ -182,7 +177,7 @@ async function processCore(
         }
       }
 
-      // --- procesamiento genérico de otros entities (si los tienes) ---
+      // --- procesamiento genérico de otras entidades
       // Marcamos el item como in_progress, ejecutamos lo que toque y luego succeeded/failed.
       q = await readQueue();
       const idx = q.findIndex((it: any) => it.uid === next.uid);
@@ -195,6 +190,8 @@ async function processCore(
 
       try {
         // Aquí despacha tus otros servicios según payload.entity/op si aplica.
+        await runItemThroughEntityServices(qc, it);
+
         // En esta base, lo marcamos como éxito directo.
         q = await readQueue();
         const idx2 = q.findIndex((x: any) => x.uid === it.uid);

@@ -37,7 +37,7 @@ export const API_REMOVE_TEAM_MEMBER = '/job/team/remove';
 //signatures
 export const API_GET_SIGNATURES = '/signature/query';
 export const API_SAVE_SIGNATURE = '/signature/register';
-export const API_DELETE_SIGNATURE = '/signature/remove/';
+export const API_DELETE_SIGNATURE = '/signature/remove';
 
 // notes
 export const API_GET_NOTES = '/notes/query';
