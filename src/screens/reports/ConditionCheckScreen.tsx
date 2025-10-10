@@ -79,18 +79,9 @@ export const ConditionCheckScreen = (props: Props) => {
   const {mutateAsync: saveConditionAsync} = useSaveConditionCheck();
 
   const {data: placeOfExamList} = useGetPlacesConditionReport();
-  const {data: items} = useGetJobInventory(
-    {
-      idJob: jobDetail?.id!,
-      filter: filterItem,
-      limit: 10,
-      start: 0,
-    },
-    // @ts-ignore
-    {
-      enabled: !!jobDetail?.id && filterItem.trim().length > 0,
-    },
-  );
+  const {data: items} = useGetJobInventory({
+    idJob: jobDetail?.id!,
+  });
 
   const {data: artists} = useGetArtists({
     filter: filterArtist,

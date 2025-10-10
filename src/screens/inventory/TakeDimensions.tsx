@@ -1,5 +1,8 @@
+import {QUERY_KEYS} from '@api/contants/constants';
 import {useGetPackingDetails} from '@api/hooks/HooksGeneralServices';
 import {useUpdateInventoryItem} from '@api/hooks/HooksInventoryServices';
+import {GetJobInventoryApiProps} from '@api/services/inventoryServices';
+import {JobInventoryType} from '@api/types/Inventory';
 import {BackButton} from '@components/commons/buttons/BackButton';
 import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
 import {BottomSheetSelectInputContext} from '@components/commons/form/BottomSheetSelectInputContext';
@@ -9,16 +12,26 @@ import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {offlineUpdateItemInventory} from '@features/inventory/offline';
 import {
   TakeDimensionsSchema,
   TakeDimensionsSchemaType,
 } from '@generalTypes/schemas';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {useOnline} from '@hooks/useOnline';
+import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {
+  useUpsertArrayCache,
+  useUpsertObjectCache,
+} from '@hooks/useToolsReactQueryCache';
 import {RootStackParamList} from '@navigation/types';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {loadingWrapperPromise} from '@store/actions';
+import useInventoryStore from '@store/inventory';
+import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {generateUUID} from '@utils/functions';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import {useCallback} from 'react';
 import {Keyboard, StyleSheet} from 'react-native';
@@ -29,42 +42,98 @@ type Props = NativeStackScreenProps<RootStackParamList, 'TakeDimensions'>;
 export const TakeDimensionsScreen = (props: Props) => {
   const {item} = props.route.params;
 
+  const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
   const {goBack} = useCustomNavigation();
   const {data: packingDetails, isLoading} = useGetPackingDetails();
   const {mutateAsync: updateAsync} = useUpdateInventoryItem();
 
+  const itemQueryKey = [QUERY_KEYS.INVENTORY_ITEM_DETAIL, {id: item.id}];
+  const {orderFilter, orderType, topSheetFilter, setTopSheetFilter} =
+    useInventoryStore();
+  const inventoryQueryKey = [
+    QUERY_KEYS.JOB_INVENTORY,
+    {idJob, filter: topSheetFilter, orderFilter, orderType},
+  ];
+
+  const upsertItem = useUpsertObjectCache<JobInventoryType>(itemQueryKey);
+  const upsertInventoryList =
+    useUpsertArrayCache<JobInventoryType>(inventoryQueryKey);
+
+  const {refetchAll} = useRefreshIndicator([itemQueryKey]);
+  const {online} = useOnline();
+
   const updateItem = useCallback(
-    ({additional_info, packing_detail, ...rest}: TakeDimensionsSchemaType) => {
+    ({packing_detail, ...rest}: TakeDimensionsSchemaType) => {
       Keyboard.dismiss();
       const packDetailObject = packingDetails?.find(
         (x) => x.id === packing_detail,
       );
       if (packDetailObject) {
-        loadingWrapperPromise(
-          updateAsync({
+        if (online) {
+          loadingWrapperPromise(
+            updateAsync({
+              idInventory: item.id,
+              current_packing_detail_id: packing_detail!,
+              current_packing_detail: packDetailObject.name,
+              ...rest,
+            })
+              .then((d) => {
+                if (d) {
+                  refetchAll().finally(() => refetchAll());
+                  showToastMessage('Dimensions saved successfully');
+                  goBack();
+                } else {
+                  showErrorToastMessage('Error while saving dimensions');
+                }
+              })
+              .catch((e) => {
+                // showErrorToastMessage('Error while saving dimensions');
+              }),
+          );
+        } else {
+          const clientId = item?.clientId ?? generateUUID();
+          offlineUpdateItemInventory({
+            clientId,
             idInventory: item.id,
-            additional_info: additional_info!,
             current_packing_detail_id: packing_detail!,
             current_packing_detail: packDetailObject.name,
             ...rest,
-          })
-            .then((d) => {
-              if (d) {
-                showToastMessage('Dimensions saved successfully');
-                goBack();
-              } else {
-                showErrorToastMessage('Error while saving dimensions');
-              }
-            })
-            .catch((e) => {
-              showErrorToastMessage('Error while saving dimensions');
-            }),
-        );
+          }).then(() => {
+            const newItem: JobInventoryType = {
+              ...item,
+              clientId,
+              additional_info: rest.additional_info,
+              current_packing_detail: packDetailObject.name,
+              current_packing_detail_id: packing_detail!,
+              packing_details_display: packDetailObject.name,
+              packed_height: rest.packed_height,
+              packed_length: rest.packed_length,
+              packed_width: rest.packed_width,
+              unpacked_height: rest.un_packed_height,
+              unpacked_length: rest.un_packed_length,
+              unpacked_width: rest.un_packed_width,
+              weight: rest.weight,
+            };
+            upsertItem(newItem);
+            upsertInventoryList(newItem);
+            showToastMessage('Dimensions saved successfully (queued)');
+            goBack();
+          });
+        }
       } else {
         showErrorToastMessage('Packing detail not found');
       }
     },
-    [updateAsync, goBack, item, packingDetails],
+    [
+      updateAsync,
+      goBack,
+      item,
+      packingDetails,
+      refetchAll,
+      online,
+      offlineUpdateItemInventory,
+      upsertItem,
+    ],
   );
 
   return (
@@ -89,9 +158,9 @@ export const TakeDimensionsScreen = (props: Props) => {
       <BasicFormProvider
         schema={TakeDimensionsSchema}
         defaultValue={{
-          unpacked_height: item?.unpacked_height ?? '0',
-          unpacked_length: item?.unpacked_length ?? '0',
-          unpacked_width: item?.unpacked_width ?? '0',
+          un_packed_height: item?.unpacked_height ?? '0',
+          un_packed_length: item?.unpacked_length ?? '0',
+          un_packed_width: item?.unpacked_width ?? '0',
           packed_height: item?.packed_height ?? '0',
           packed_length: item?.packed_length ?? '0',
           packed_width: item?.packed_width ?? '0',
@@ -126,7 +195,7 @@ export const TakeDimensionsScreen = (props: Props) => {
                   ]}>
                   <Label>Height</Label>
                   <InputTextContext
-                    currentId="unpacked_height"
+                    currentId="un_packed_height"
                     maxLength={10}
                     multiline={true}
                     numberOfLines={1}
@@ -138,7 +207,7 @@ export const TakeDimensionsScreen = (props: Props) => {
                 <Wrapper style={[styles.containerItemDetail]}>
                   <Label>Length</Label>
                   <InputTextContext
-                    currentId="unpacked_length"
+                    currentId="un_packed_length"
                     maxLength={10}
                     multiline={true}
                     numberOfLines={1}
@@ -150,7 +219,7 @@ export const TakeDimensionsScreen = (props: Props) => {
                 <Wrapper style={[styles.containerItemDetail]}>
                   <Label>Width</Label>
                   <InputTextContext
-                    currentId="unpacked_width"
+                    currentId="un_packed_width"
                     maxLength={10}
                     multiline={true}
                     numberOfLines={1}

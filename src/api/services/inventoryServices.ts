@@ -135,7 +135,7 @@ const getInventoryItemDetail = async ({
 
 export type UpdateInventoryDetailApiProps = {
   idInventory: number;
-  additional_info?: string;
+  additional_info?: string | null;
   packed_height?: string;
   packed_length?: string;
   packed_width?: string;

@@ -4,12 +4,12 @@ import {enqueueCoalesced} from '@offline/outbox';
 
 export type SignatureOfflineProps = {
   idJob: number;
-  clientId?: string; // required for offline create
   force_send?: boolean;
   printName?: string;
   type?: string;
   signature?: string; //base64
   id?: number;
+  clientId?: string; // required for offline support
 };
 
 export async function offlineCreateSignature({

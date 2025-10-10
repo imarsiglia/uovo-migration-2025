@@ -29,9 +29,9 @@ type Props = {
   disabled: boolean;
   viewDetail: () => void;
   onCheck: () => Promise<Boolean>;
-  packedHeight: string;
-  packedLength: string;
-  packedWidth: string;
+  packedHeight?: string;
+  packedLength?: string;
+  packedWidth?: string;
   hasConditionReport: BooleanStringType;
   hasConditionCheck: BooleanStringType;
   user: UserType | null;

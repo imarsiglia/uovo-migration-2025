@@ -1,7 +1,7 @@
 import {BooleanStringType} from '@generalTypes/general';
 
 export type JobInventoryType = {
-  additional_info: string;
+  additional_info?: string | null;
   art_type: string;
   art_type_id: string;
   artist: string;
@@ -24,10 +24,10 @@ export type JobInventoryType = {
   must_update: number;
   netsuite_image: string | null;
   packed_cubit_foot: string;
-  packed_height: string;
-  packed_length: string;
+  packed_height?: string;
+  packed_length?: string;
   packed_square_foot: string;
-  packed_width: string;
+  packed_width?: string;
   packing_details_display: string;
   parent: string;
   parent_url: string;
@@ -35,14 +35,17 @@ export type JobInventoryType = {
   provenance: null;
   status: string | null;
   unpacked_cubit_foot: string;
-  unpacked_height: string;
-  unpacked_length: string;
+  unpacked_height?: string;
+  unpacked_length?: string;
   unpacked_square_foot: string;
-  unpacked_width: string;
+  unpacked_width?: string;
   url: string;
-  weight: string;
+  weight?: string;
   year: string;
   parent_id?: string;
+
+  // offline
+  clientId?: string;
 };
 
 export type MinimalInventoryType = {

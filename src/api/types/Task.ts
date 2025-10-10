@@ -73,6 +73,8 @@ export type AttachmentType = {
 export type BolCountType = {
   pbs: string;
   packageCount: number;
+  // offline
+  clientId?: string;
 };
 
 export type LaborReportType = {

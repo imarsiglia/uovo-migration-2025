@@ -12,7 +12,11 @@ import {
   API_GET_ART_TYPES,
 } from '@api/contants/endpoints';
 import {getFetcher} from '@api/general/fetchers';
-import {getRequest, getRequestString, postRequest} from '@api/helpers/apiClientHelper';
+import {
+  getRequest,
+  getRequestString,
+  postRequest,
+} from '@api/helpers/apiClientHelper';
 import {GeneralListApi, Paginated} from '@api/types/Response';
 import {cleanAddress} from '@utils/functions';
 import {API_GOOGLE_MAPS} from '@env';
@@ -165,5 +169,5 @@ export const generalServices = {
   getPackingDetails,
   getPlacesConditionReport,
   getArtists,
-  getArtTypes
+  getArtTypes,
 };

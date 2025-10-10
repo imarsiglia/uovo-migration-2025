@@ -79,12 +79,36 @@ export default function AppProviders({children}: {children: React.ReactNode}) {
                         k === QUERY_KEYS.REPORT_MATERIALS ||
                         k === QUERY_KEYS.ALL_REPORT_MATERIALS_INVENTORY ||
                         k === QUERY_KEYS.SIGNATURES ||
-                        k === QUERY_KEYS.BOL_COUNT;
+                        k === QUERY_KEYS.BOL_COUNT ||
+                        k === QUERY_KEYS.JOB_INVENTORY ||
+                        k === QUERY_KEYS.INVENTORY_ITEM_DETAIL ||
+                        k === QUERY_KEYS.RESUME_CONDITION_REPORT ||
+                        k === QUERY_KEYS.RESUME_CONDITION_CHECK ||
+                        k === QUERY_KEYS.CONDITION_REPORT_BY_INVENTORY ||
+                        k === QUERY_KEYS.CONDITION_CHECK_BY_INVENTORY ||
+                        k === QUERY_KEYS.WO_ATTACHMENTS ||
+                        k === QUERY_KEYS.TOTAL_PHOTOS_CONDITION_CHECK ||
+                        k === QUERY_KEYS.TOTAL_PHOTOS_CONDITION_REPORT ||
+                        k === QUERY_KEYS.PLACES_CONDITION_REPORT ||
+                        k === QUERY_KEYS.PACKING_DETAILS ||
+                        k === QUERY_KEYS.LABOR_CODES ||
+                        k === QUERY_KEYS.NS_EAST_COAST_DROPOFF ||
+                        k === QUERY_KEYS.NS_EAST_COAST_PICKUP ||
+                        k === QUERY_KEYS.NS_INVENTORY_EAST_COAST_DROPOFF ||
+                        k === QUERY_KEYS.NS_INVENTORY_EAST_COAST_PICKUP ||
+                        k === QUERY_KEYS.NS_INVENTORY_UNIQUE_ROUTE_DROPOFF ||
+                        k === QUERY_KEYS.NS_INVENTORY_UNIQUE_ROUTE_PICKUP ||
+                        k === QUERY_KEYS.NS_INVENTORY_WEST_COAST_DROPOFF ||
+                        k === QUERY_KEYS.NS_INVENTORY_WEST_COAST_PICKUP ||
+                        k === QUERY_KEYS.NS_UNIQUE_ROUTE_DROPOFF ||
+                        k === QUERY_KEYS.NS_UNIQUE_ROUTE_PICKUP ||
+                        k === QUERY_KEYS.NS_WEST_COAST_DROPOFF ||
+                        k === QUERY_KEYS.NS_WEST_COAST_PICKUP;
                       return allow && q.state.status === 'success';
                     },
                   },
                   // Limpia el cache persistido si cambias la “versión” de datos:
-                  buster: 'app-v9', // cambia a 'app-v2' tras cambios de schema o logout
+                  buster: 'app-v13', // cambia a 'app-v2' tras cambios de schema o logout
                 }}>
                 {children}
                 {/* <OutboxProcessor /> */}

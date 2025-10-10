@@ -1,4 +1,3 @@
-import 'react-native-get-random-values';
 import {QUERY_KEYS} from '@api/contants/constants';
 import {useSaveNote} from '@api/hooks/HooksTaskServices';
 import {Icons} from '@assets/icons/icons';
@@ -32,7 +31,7 @@ import {
 } from 'react-native-keyboard-controller';
 import {useCustomNavigation} from 'src/hooks/useCustomNavigation';
 import {HelpDeskSchema, SaveNoteSchemaType} from 'src/types/schemas';
-import {v4 as uuid} from 'uuid';
+import { generateUUID } from '@utils/functions';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SaveNote'>;
 
@@ -143,7 +142,7 @@ export const SaveNoteScreen = (props: Props) => {
             });
           } else {
             // create a new offline draft with auto clientId
-            const clientId = uuid();
+            const clientId = generateUUID();
             offlineCreateNote({idJob, clientId, title, description}).then(
               () => {
                 upsertInCache({

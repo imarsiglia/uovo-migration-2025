@@ -38,6 +38,7 @@ export const ReportsScreen = () => {
   } = useGetResumeConditionReport({
     idJob: jobDetail!.id,
   });
+  
   const {
     data: conditionCheck,
     isLoading: isLoadingConditionCheck,

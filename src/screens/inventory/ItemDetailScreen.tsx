@@ -61,6 +61,7 @@ export const ItemDetailScreen = (props: Props) => {
   } = useGetInventoryItemDetail({
     id,
   });
+
   useEffect(() => {
     lockToPortrait();
     // async function init() {
@@ -183,7 +184,7 @@ export const ItemDetailScreen = (props: Props) => {
 
   type RowItemDetailProps = {
     title: string;
-    description?: string;
+    description?: string | null;
     hideBorder?: boolean;
   };
   const rowItemDetail = useCallback(

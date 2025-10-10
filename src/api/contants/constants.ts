@@ -137,7 +137,7 @@ export const NATIONAL_SHUTTLE_TYPE = {
   UNIQUE_ROUTE_DROPOFF: 'unique_route_dropoff',
 } as const;
 
-export type NationalShuttleType = typeof NATIONAL_SHUTTLE_TYPE
+export type NationalShuttleType = typeof NATIONAL_SHUTTLE_TYPE;
 
 export const STATUS_NATIONAL_SHUTTLE = {
   UNLOADED: {
@@ -375,10 +375,9 @@ export const PHOTOS_REPORT_TYPES = {
   DETAIL: 'detail',
 };
 
-export const GLOBAL_FONT_SIZE_MULTIPLIER_XS = 1.2
-export const GLOBAL_FONT_SIZE_MULTIPLIER_SM = 1.4
-export const GLOBAL_FONT_SIZE_MULTIPLIER_MD = 1.7
-
+export const GLOBAL_FONT_SIZE_MULTIPLIER_XS = 1.2;
+export const GLOBAL_FONT_SIZE_MULTIPLIER_SM = 1.4;
+export const GLOBAL_FONT_SIZE_MULTIPLIER_MD = 1.7;
 
 export const ENTITY_TYPES = {
   NOTE: 'note',
@@ -386,4 +385,5 @@ export const ENTITY_TYPES = {
   REPORT_MATERIAL: 'report_material',
   REPORT_MATERIALS: 'report_materials',
   BOL_COUNT: 'bol_count',
-}
+  ITEM_INVENTORY_DETAIL: 'item_inventory_detail',
+};

@@ -254,9 +254,9 @@ export const ClockInSchema = yup.object().shape({
 export type ClockInSchemaType = yup.InferType<typeof ClockInSchema>;
 
 export const TakeDimensionsSchema = yup.object().shape({
-  unpacked_height: decimalString(),
-  unpacked_length: decimalString(),
-  unpacked_width: decimalString(),
+  un_packed_height: decimalString(),
+  un_packed_length: decimalString(),
+  un_packed_width: decimalString(),
   packed_height: decimalString(),
   packed_length: decimalString(),
   packed_width: decimalString(),

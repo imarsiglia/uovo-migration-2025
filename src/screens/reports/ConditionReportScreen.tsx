@@ -21,7 +21,7 @@ import {
   useGetTotalPhotosConditionReport,
   useSaveConditionReport,
 } from '@api/hooks/HooksReportServices';
-import {JobInventoryType} from '@api/types/Inventory';
+import {ConditionReportType, JobInventoryType} from '@api/types/Inventory';
 import {CustomAutocomplete} from '@components/commons/autocomplete/CustomAutocomplete';
 import {BackButton} from '@components/commons/buttons/BackButton';
 import {AutocompleteContext} from '@components/commons/form/AutocompleteContext';
@@ -47,7 +47,7 @@ import {loadingWrapperPromise} from '@store/actions';
 import {useAuth} from '@store/auth';
 import useTopSheetStore from '@store/topsheet';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {moveOtherToEnd} from '@utils/functions';
+import {generateUUID, moveOtherToEnd} from '@utils/functions';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import {useFormContext, useWatch} from 'react-hook-form';
 import {AutocompleteDropdownItem} from 'react-native-autocomplete-dropdown';
@@ -74,7 +74,7 @@ export const ConditionReportScreen = (props: Props) => {
   const [renderForm, setRenderForm] = useState(false);
 
   // filters and select
-  const [filterItem, setFilterItem] = useState('');
+  // const [filterItem, setFilterItem] = useState('');
   const [filterArtist, setFilterArtist] = useState('');
   const [filterTypes, setFilterTypes] = useState('');
   const [selectedItem, setSelectedItem] = useState<JobInventoryType | null>(
@@ -98,18 +98,9 @@ export const ConditionReportScreen = (props: Props) => {
   const {mutateAsync: saveConditionAsync} = useSaveConditionReport();
   const {data: packingDetailList} = useGetPackingDetails();
   const {data: placeOfExamList} = useGetPlacesConditionReport();
-  const {data: items} = useGetJobInventory(
-    {
-      idJob: jobDetail?.id!,
-      filter: filterItem,
-      limit: 10,
-      start: 0,
-    },
-    // @ts-ignore
-    {
-      enabled: !!jobDetail?.id && filterItem.trim().length > 0,
-    },
-  );
+  const {data: items} = useGetJobInventory({
+    idJob: jobDetail?.id!,
+  });
 
   const {data: artists} = useGetArtists({
     filter: filterArtist,
@@ -123,6 +114,7 @@ export const ConditionReportScreen = (props: Props) => {
     data: conditionReportJson,
     isLoading: isLoadingConditionReport,
     refetch,
+    isFetched,
   } = useGetConditionReportbyInventory({
     idJobInventory:
       receivedReport?.id_job_inventory ?? receivedItem?.id ?? selectedItem?.id!,
@@ -158,6 +150,8 @@ export const ConditionReportScreen = (props: Props) => {
 
   //Take dictation
   const refVoiceCondArt = useRef(null);
+
+  useEffect(() => {}, [isFetched]);
 
   // useFocusEffect(
   //   React.useCallback(() => {
@@ -222,6 +216,10 @@ export const ConditionReportScreen = (props: Props) => {
     // }
   };
 
+  const currentInventoryItem = useMemo(() => {
+    return receivedItem ?? selectedItem;
+  }, [selectedItem, receivedItem]);
+
   const currentItem = useMemo(() => {
     if (selectedItem || receivedReport || receivedItem) {
       return {
@@ -249,15 +247,15 @@ export const ConditionReportScreen = (props: Props) => {
     [QUERY_KEYS.INVENTORY_ITEM_DETAIL, {id: currentItem?.id!}],
   ]);
 
-  const checkItem = useCallback(
-    (value: string) => {
-      setFilterItem(value.trim());
-      if (autocompleteRefs[0].current) {
-        autocompleteRefs[0].current.open();
-      }
-    },
-    [setFilterItem],
-  );
+  // const checkItem = useCallback(
+  //   (value: string) => {
+  //     setFilterItem(value.trim());
+  //     if (autocompleteRefs[0].current) {
+  //       autocompleteRefs[0].current.open();
+  //     }
+  //   },
+  //   [setFilterItem],
+  // );
 
   const checkArtist = useCallback(
     (value: string) => {
@@ -349,13 +347,30 @@ export const ConditionReportScreen = (props: Props) => {
     [items, setSelectedItem],
   );
 
-  const initialConditionReport = useMemo(() => {
-    if (conditionReportJson?.data?.length! > 0) {
-      return conditionReportJson!.data[conditionReportJson!.data.length - 1];
-    } else {
-      return null;
-    }
-  }, [conditionReportJson]);
+  const initialConditionReport: ConditionReportType | null =
+    useMemo(() => {
+      if (conditionReportJson?.data?.length! > 0) {
+        return conditionReportJson!.data[conditionReportJson!.data.length - 1];
+      } else {
+        if (currentInventoryItem?.id) {
+          return {
+            medium_name: currentInventoryItem.medium,
+            artist_name: currentInventoryItem.artist,
+            title: currentInventoryItem.clientinv_display,
+            year: currentInventoryItem.year,
+            edition: currentInventoryItem.edition,
+            packed_height: currentInventoryItem.packed_height,
+            packed_length: currentInventoryItem.packed_length,
+            packed_width: currentInventoryItem.packed_width,
+            un_packed_height: currentInventoryItem.unpacked_height,
+            un_packed_length: currentInventoryItem.unpacked_length,
+            un_packed_width: currentInventoryItem.unpacked_width,
+          } as ConditionReportType;
+        } else {
+          return null;
+        }
+      }
+    }, [conditionReportJson, currentInventoryItem]);
 
   const {data: photosTotal} = useGetTotalPhotosConditionReport({
     id: initialConditionReport?.id!,
@@ -582,7 +597,7 @@ export const ConditionReportScreen = (props: Props) => {
         <Wrapper style={[styles.lateralPadding, styles.row]}>
           <Label
             style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, styles.topsheet]}
-           allowFontScaling={false} >
+            allowFontScaling={false}>
             Condition Report
           </Label>
         </Wrapper>
@@ -618,7 +633,6 @@ export const ConditionReportScreen = (props: Props) => {
             controller={(controller) => {
               autocompleteRefs[0].current = controller;
             }}
-            onChangeText={checkItem}
             onSelectItem={(item) => onSelectItem(item)}
             initialValue={
               selectedItem?.id
@@ -637,7 +651,7 @@ export const ConditionReportScreen = (props: Props) => {
               Platform.select({ios: {zIndex: 999 + 0}, android: {}}),
             ]}
             showClear={false}
-            useFilter={false}
+            useFilter={true}
           />
         )}
 

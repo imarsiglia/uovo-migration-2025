@@ -7,6 +7,10 @@ import {ENTITY_TYPES, QUERY_KEYS} from '@api/contants/constants';
 import {SaveBOLCountApiProps, taskServices} from './taskServices';
 import type {OutboxItem} from '@offline/types';
 import {readQueue, replaceQueue} from '@offline/outbox';
+import {
+  inventoryServices,
+  UpdateInventoryDetailApiProps,
+} from './inventoryServices';
 
 type CreateFn = (payload: any) => Promise<any>;
 type UpdateFn = (payload: any) => Promise<any>;
@@ -78,9 +82,17 @@ const REGISTRY: Record<string, Service> = {
     }) => taskServices.saveBOLCount({...body, idJob}),
     delete: async ({id}: any) => taskServices.deleteSignature({id}),
   },
+  item_inventory_detail: {
+    update: async ({body}: {body: UpdateInventoryDetailApiProps}) =>
+      inventoryServices.updateInventoryItemDetail({...body}),
+    delete: async ({id}: {id: number}) => inventoryServices.deleteItem({id}),
+  },
 };
 
-export function getEntityQueryKey(entity: string, params?: {idJob?: number}) {
+export function getEntityQueryKey(
+  entity: string,
+  params?: {idJob?: number; id?: number},
+) {
   if (entity === ENTITY_TYPES.NOTE)
     return [QUERY_KEYS.NOTES, {idJob: params?.idJob}];
   // ambas entidades de materials invalidan la misma lista
@@ -97,6 +109,8 @@ export function getEntityQueryKey(entity: string, params?: {idJob?: number}) {
     ];
   if (entity === ENTITY_TYPES.BOL_COUNT)
     return [[QUERY_KEYS.BOL_COUNT, {idJob: params?.idJob}]];
+  if (entity === ENTITY_TYPES.ITEM_INVENTORY_DETAIL)
+    return [[QUERY_KEYS.INVENTORY_ITEM_DETAIL, {id: params?.id}]];
 
   return [entity, params ?? {}];
 }

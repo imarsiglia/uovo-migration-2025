@@ -378,3 +378,23 @@ export const sleep = (ms: number) =>
 export function generateUUID() {
   return uuid();
 }
+
+export async function promisePool<T>(
+  tasks: Array<() => Promise<T>>,
+  concurrency = 4,
+): Promise<void> {
+  if (!tasks.length) return;
+  const queue = tasks.slice(); // copia
+  const worker = async () => {
+    while (queue.length) {
+      const job = queue.shift();
+      if (!job) break;
+      await job();
+    }
+  };
+  const workers = Array.from(
+    {length: Math.min(concurrency, tasks.length)},
+    worker,
+  );
+  await Promise.allSettled(workers);
+}

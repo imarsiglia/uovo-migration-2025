@@ -18,6 +18,7 @@ import {loadingWrapperPromise} from '@store/actions';
 import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {generateUUID} from '@utils/functions';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import {useCallback} from 'react';
 import {Keyboard, StyleSheet} from 'react-native';
@@ -67,12 +68,15 @@ export const EditPieceCountScreen = () => {
           })
           .catch(() => showErrorToastMessage('Error while updating BOL'));
       } else {
+        const clientId = data?.clientId ?? generateUUID();
         offlineUpdateBOLCount({
+          clientId,
           idJob,
           packageCount: parseInt(props.packageCount),
           pbs: props.pbs,
         }).then(() => {
           upsertPieceCount({
+            clientId,
             packageCount: parseInt(props.packageCount),
             pbs: props.pbs,
           });

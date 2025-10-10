@@ -24,8 +24,10 @@ import {useMinBusy} from '@hooks/useMinBusy';
 import {JobQueueView} from './JobQueueView';
 import {useJobQueueStore} from '@store/jobqueue';
 import {NationalShuttleView} from './NationalShuttleView';
-import { useCustomInsetBottom } from '@hooks/useCustomInsetBottom';
-import { useQueryClient } from '@tanstack/react-query';
+import {useCustomInsetBottom} from '@hooks/useCustomInsetBottom';
+import {useGetPackingDetails} from '@api/hooks/HooksGeneralServices';
+import {prefetchPackingDetailsAll} from '@features/general/offline';
+import {useQueryClient} from '@tanstack/react-query';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -37,8 +39,6 @@ export const HomeScreen = () => {
     setActiveTab,
     setSyncroNS,
   } = useGeneralStore();
-
-  const qc = useQueryClient()
 
   const insetBottom = useCustomInsetBottom();
   const selectedDate = useGeneralStore((d) => d.selectedDate);
@@ -69,6 +69,13 @@ export const HomeScreen = () => {
   });
 
   const loading = useMinBusy(isRefetching, 1000);
+
+  const qc = useQueryClient();
+
+  // load general data
+  useEffect(() => {
+    prefetchPackingDetailsAll(qc);
+  }, []);
 
   // useEffect(() => {
   //   createIdsInventory();
