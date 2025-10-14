@@ -1,9 +1,15 @@
 import {JobInventoryType, ReportResumeType} from '@api/types/Inventory';
 import {CrewMemberType, NSItemListType} from '@api/types/Jobs';
-import {LaborReportType, NoteType, ReportMaterialType} from '@api/types/Task';
+import {
+  LaborReportType,
+  NoteType,
+  ReportMaterialType,
+  TaskImageType,
+} from '@api/types/Task';
 import {BooleanNumberType} from '@generalTypes/general';
 import {ImageType} from '@generalTypes/images';
 import {Base64ImageCarouselProps} from '@screens/commons/BaseImageScreen';
+import {TaskPhotoCarouselType} from '@screens/commons/TaskPhotoCarouselScreen';
 
 // 👉 Constantes reutilizables (sin strings mágicos)
 export const RoutesNavigation = {
@@ -29,6 +35,7 @@ export const RoutesNavigation = {
   SaveReportMaterials: 'SaveReportMaterials',
   WoAttachment: 'WoAttachment',
   BaseImageScreen: 'BaseImageScreen',
+  TaskPhotoCarouselScreen: 'TaskPhotoCarouselScreen',
   EditPieceCount: 'EditPieceCount',
   LaborReport: 'LaborReport',
   AddLaborReport: 'AddLaborReport',
@@ -40,6 +47,8 @@ export const RoutesNavigation = {
   ConditionReport: 'ConditionReport',
   ConditionCheck: 'ConditionCheck',
   InventoryNationalShuttle: 'InventoryNationalShuttle',
+  Images: 'Images',
+  SaveImages: 'SaveImages',
 } as const;
 
 // Union de nombres de ruta: "Home" | "ContactUs" | ...
@@ -101,10 +110,13 @@ export type RootStackParamList = {
       }
     | undefined;
   [RoutesNavigation.ReportMaterials]: undefined;
-  [RoutesNavigation.SaveReportMaterials]: {
-    item?: ReportMaterialType;
-  } | undefined;
+  [RoutesNavigation.SaveReportMaterials]:
+    | {
+        item?: ReportMaterialType;
+      }
+    | undefined;
   [RoutesNavigation.BaseImageScreen]: Base64ImageCarouselProps;
+  [RoutesNavigation.TaskPhotoCarouselScreen]: TaskPhotoCarouselType;
   [RoutesNavigation.WoAttachment]: undefined;
   [RoutesNavigation.EditPieceCount]: undefined;
   [RoutesNavigation.LaborReport]: undefined;
@@ -137,6 +149,13 @@ export type RootStackParamList = {
   [RoutesNavigation.InventoryNationalShuttle]:
     | {
         initialList?: NSItemListType[];
+      }
+    | undefined;
+  [RoutesNavigation.Images]: undefined;
+  [RoutesNavigation.SaveImages]:
+    | {
+        item?: TaskImageType;
+        editedImage?: any
       }
     | undefined;
 };

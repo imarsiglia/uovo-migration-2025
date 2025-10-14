@@ -117,15 +117,8 @@ export const TaskTopsheet = () => {
             icon="image"
             color="#7966E0"
             quantity={taskCount?.[1]?.quantity}
-            onPressLeft={
-              () => {}
-              // navigate(RoutesNavigation.Account)
-            }
-            onPressRight={
-              () => {}
-              // @ts-ignore
-              // navigate(RoutesNavigation.Account, {fromList: false})
-            }
+            onPressLeft={() => navigate(RoutesNavigation.Images)}
+            onPressRight={() => navigate(RoutesNavigation.SaveImages)}
             // offline={[IMAGES_OFFLINE_VALIDATION]}
             idJob={jobDetail?.id!}
           />
@@ -135,7 +128,6 @@ export const TaskTopsheet = () => {
             color="#F2DA31"
             quantity={taskCount?.[2]?.quantity}
             onPressLeft={() => navigate(RoutesNavigation.Notes)}
-            // @ts-ignore
             onPressRight={() => navigate(RoutesNavigation.SaveNote)}
             // offline={[NOTES_OFFLINE_VALIDATION]}
             idJob={jobDetail.id}
@@ -146,7 +138,6 @@ export const TaskTopsheet = () => {
             color="#E95818"
             quantity={taskCount?.[3]?.quantity}
             onPressLeft={() => navigate(RoutesNavigation.ReportMaterials)}
-            // @ts-ignore
             onPressRight={() => navigate(RoutesNavigation.SaveReportMaterials)}
             // offline={[MATERIAL_OFFLINE_VALIDATION]}
             idJob={jobDetail.id}
@@ -312,7 +303,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 10,
     minWidth: 160,
-    gap: 15
+    gap: 15,
   },
   menuItem: {
     justifyContent: 'center',

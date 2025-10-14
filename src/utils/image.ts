@@ -1,13 +1,17 @@
-import ImageCropPicker from 'react-native-image-crop-picker';
+import ImageCropPicker, {Options} from 'react-native-image-crop-picker';
 import {PERMISSIONS, request, RESULTS} from 'react-native-permissions';
 import {isAndroid} from './functions';
 import {showToastMessage} from './toast';
 import {ImageType} from '@generalTypes/general';
 import {Skia, ImageFormat as SkiaImageFormat} from '@shopify/react-native-skia';
+import RNFS from 'react-native-fs';
+
+const PHOTO_DIR = `${RNFS.CachesDirectoryPath}/photos`;
 
 export const onLaunchCamera = async (
   closeModal: () => void,
-  callback: (photo?: ImageType, path?: string) => void,
+  callback: (photo?: ImageType | ImageType[], path?: string) => void,
+  options?: Options,
 ) => {
   let granted = true;
   if (isAndroid()) {
@@ -23,6 +27,7 @@ export const onLaunchCamera = async (
       writeTempFile: false,
       mediaType: 'photo',
       forceJpg: true,
+      ...options,
     })
       .then((image) => {
         if (closeModal) {
@@ -38,7 +43,8 @@ export const onLaunchCamera = async (
 
 export const onSelectImage = async (
   closeModal: () => void,
-  callback: (photo?: ImageType, path?: string) => void,
+  callback: (photo?: ImageType | ImageType[], path?: string) => void,
+  options?: Options,
 ) => {
   let granted = true;
   if (isAndroid()) {
@@ -51,6 +57,7 @@ export const onSelectImage = async (
       writeTempFile: false,
       compressImageQuality: 0.5,
       forceJpg: true,
+      ...options,
     })
       .then((image) => {
         closeModal();
@@ -74,33 +81,18 @@ type ResponseImagePickerProps = {
 } & ImageType;
 
 const manageImage = async (
-  response: ImageType,
-  callback?: (photo?: ImageType, imagePath?: string) => void,
+  response: ImageType | ImageType[],
+  callback?: (photo?: ImageType | ImageType[], imagePath?: string) => void,
 ) => {
-  if (response.data && callback) {
-    // var responseName = isAndroid()
-    //   ? response.path
-    //   : response.filename ?? response.path;
-    // var tempExtension = responseName
-    //   ?.substring(responseName?.lastIndexOf('.') + 1)
-    //   ?.toLowerCase();
-    callback(response, response.filename ?? response.path);
-    // if (
-    //   tempExtension != null &&
-    //   (tempExtension.includes('jpg') ||
-    //     tempExtension.includes('jpeg') ||
-    //     tempExtension.includes('png'))
-    // ) {
-    //   var attached: any = {};
-    //   let tempName = responseName?.substring(responseName.lastIndexOf('/') + 1);
-    //   attached.name = tempName;
-    //   attached.data = response.data;
-    //   if (callback) {
-    //     callback(attached, response.path);
-    //   }
-    // } else {
-    //   Alert.alert('Error', 'Image not allowed');
-    // }
+  if (!callback) return;
+  if (Array.isArray(response)) {
+    callback(response);
+  } else {
+    if (response.data) {
+      callback(response, response.filename ?? response.path);
+    } else {
+      callback(response);
+    }
   }
 };
 
@@ -202,4 +194,73 @@ export function flattenBase64OnWhite(
   const fmt = outFormat === 'jpeg' ? SkiaImageFormat.JPEG : SkiaImageFormat.PNG;
   const outBase64 = snapshot.encodeToBase64(fmt, Math.round(quality * 100));
   return outBase64;
+}
+
+export async function base64ToFile(
+  base64: string,
+  ext: 'jpg' | 'jpeg' | 'png' | 'webp' = 'jpg',
+) {
+  const name = `ph_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+  const path = `${RNFS.CachesDirectoryPath}/${name}`;
+  await RNFS.writeFile(path, base64, 'base64');
+  return `file://${path}`;
+}
+
+async function ensureDir() {
+  try {
+    const exists = await RNFS.exists(PHOTO_DIR);
+    if (!exists) await RNFS.mkdir(PHOTO_DIR);
+  } catch {}
+}
+
+function safe(str: string) {
+  // clientId a nombre seguro de archivo
+  return str.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 120);
+}
+
+export type PhotoRef = {id?: number; clientId?: string};
+
+export function buildPhotoPath(
+  ref: PhotoRef,
+  ext: 'jpg' | 'jpeg' | 'png' | 'webp' = 'jpg',
+) {
+  if (ref.id != null) return `${PHOTO_DIR}/ph_${ref.id}.${ext}`;
+  if (ref.clientId) return `${PHOTO_DIR}/ph_c_${safe(ref.clientId)}.${ext}`;
+  throw new Error('PhotoRef inválido: requiere id o clientId');
+}
+
+export async function writePhotoFileForRef(
+  ref: PhotoRef,
+  base64: string,
+  ext: 'jpg' | 'jpeg' | 'png' | 'webp' = 'jpg',
+) {
+  await ensureDir();
+  const path = buildPhotoPath(ref, ext);
+  await RNFS.writeFile(path, base64, 'base64'); // sobrescribe si existe
+  return `file://${path}`;
+}
+
+export async function getExistingPhotoUriForRef(
+  ref: PhotoRef,
+  ext: 'jpg' | 'jpeg' | 'png' | 'webp' = 'jpg',
+) {
+  const path = buildPhotoPath(ref, ext);
+  try {
+    const exists = await RNFS.exists(path);
+    if (!exists) return undefined;
+    const stat = await RNFS.stat(path);
+    if (!stat || Number(stat.size) <= 0) return undefined;
+    return `file://${path}`;
+  } catch {
+    return undefined;
+  }
+}
+
+export async function ensureDataFileFromBase64(
+  ref: {id?: number; clientId?: string},
+  fetchBase64: () => Promise<string>,
+  ext: 'jpg' | 'jpeg' | 'png' = 'jpg',
+) {
+  const b64 = await fetchBase64();
+  return writePhotoFileForRef(ref, b64, ext);
 }

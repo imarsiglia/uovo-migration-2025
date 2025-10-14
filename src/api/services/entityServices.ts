@@ -11,6 +11,7 @@ import {
   inventoryServices,
   UpdateInventoryDetailApiProps,
 } from './inventoryServices';
+import {reportServices, SaveConditionReportApiProps} from './reportServices';
 
 type CreateFn = (payload: any) => Promise<any>;
 type UpdateFn = (payload: any) => Promise<any>;
@@ -86,6 +87,13 @@ const REGISTRY: Record<string, Service> = {
     update: async ({body}: {body: UpdateInventoryDetailApiProps}) =>
       inventoryServices.updateInventoryItemDetail({...body}),
     delete: async ({id}: {id: number}) => inventoryServices.deleteItem({id}),
+  },
+
+  condition_report: {
+    create: async ({body}: {body: SaveConditionReportApiProps}) =>
+      reportServices.saveConditionReport({...body, id: null}),
+    update: async ({body}: {body: SaveConditionReportApiProps}) =>
+      reportServices.saveConditionReport({...body}),
   },
 };
 

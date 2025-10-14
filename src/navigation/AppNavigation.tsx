@@ -99,6 +99,9 @@ import {navigationRef} from '@utils/navigationService';
 import {InventoryNSScreen} from '@screens/nationalshuttle/InventoryNSScreen';
 import {OfflineBanner} from '@components/offline/OfflineBanner';
 import {ModalOffline} from '@components/offline/ModalOffline';
+import {ImagesScreen} from '@screens/images/ImagesScreen';
+import TaskPhotoCarouselScreen from '@screens/commons/TaskPhotoCarouselScreen';
+import { SaveImagesScreen } from '@screens/images/SaveImagesScreen';
 // import InventoryNS from '../screens/nationalShuttle/InventoryNS';
 
 // LogBox.ignoreLogs([
@@ -276,11 +279,26 @@ export const AppNavigation = () => {
               component={InventoryNSScreen}
             />
 
+            <Stack.Screen
+              name={RoutesNavigation.Images}
+              component={ImagesScreen}
+            />
+
+            <Stack.Screen
+              name={RoutesNavigation.SaveImages}
+              component={SaveImagesScreen}
+            />
+
             {/* visualizar imagenes */}
             <Stack.Screen
               name={RoutesNavigation.BaseImageScreen}
               component={BaseImageScreen}
             />
+            <Stack.Screen
+              name={RoutesNavigation.TaskPhotoCarouselScreen}
+              component={TaskPhotoCarouselScreen}
+            />
+            
           </Stack.Navigator>
           <ModalDialog />
           <ModalLoading />

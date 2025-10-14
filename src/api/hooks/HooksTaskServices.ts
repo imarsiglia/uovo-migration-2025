@@ -1,5 +1,9 @@
 import {QUERY_KEYS} from '@api/contants/constants';
 import {
+  fullPhotoQueryById,
+  localPhotoQueryByClientId,
+} from '@api/queries/fullPhotoQuery';
+import {
   EmployeesApiProps,
   HistoryReportMaterialsApiProps,
   LaborReportsApiProps,
@@ -8,6 +12,7 @@ import {
   TaskBaseApiProps,
   taskServices,
 } from '@api/services/taskServices';
+import {TaskImageType, TaskPhotoType} from '@api/types/Task';
 import {keepPreviousData, useMutation, useQuery} from '@tanstack/react-query';
 
 export const DAYS_IN_MS = 24 * 60 * 60 * 1000;
@@ -108,7 +113,11 @@ export const useGetReportMaterialsInventory = (
   });
 };
 
-export const useGetReportMaterialsInventoryAll = ({idJob}: {idJob?: number}) => {
+export const useGetReportMaterialsInventoryAll = ({
+  idJob,
+}: {
+  idJob?: number;
+}) => {
   return useQuery({
     queryKey: [QUERY_KEYS.ALL_REPORT_MATERIALS_INVENTORY, {idJob}],
     queryFn: () => taskServices.getReportMaterialsInventoryAll({idJob: idJob!}),
@@ -188,3 +197,96 @@ export const useGetLaborCodes = () => {
     ...DEFAULT_PERSISTENCE_CONFIG,
   });
 };
+
+export const useGetPictures = (props: TaskBaseApiProps) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.IMAGES, props],
+    queryFn: () => taskServices.getImages(props),
+    enabled: !!props?.idJob,
+    ...DEFAULT_PERSISTENCE_CONFIG,
+  });
+};
+
+export const useRegisterPictures = () => {
+  return useMutation({
+    mutationFn: taskServices.registerImage,
+  });
+};
+
+export const useUpdatePictures = () => {
+  return useMutation({
+    mutationFn: taskServices.updateImage,
+  });
+};
+
+export const useDeletePicture = () => {
+  return useMutation({
+    mutationFn: taskServices.deleteImage,
+  });
+};
+
+export function useDeletePictureGroup() {
+  const {mutateAsync: delPhoto} = useDeletePicture();
+  return {
+    deleteAll: async (image: TaskImageType) => {
+      const ids =
+        image?.photos?.map((p) => p.id).filter((x): x is number => !!x) ?? [];
+      if (ids.length === 0) return true; // nada que borrar en server
+      const results = await Promise.allSettled(ids.map((id) => delPhoto({id})));
+      return results.every(
+        (r) => r.status === 'fulfilled' && (r as any).value === true,
+      );
+    },
+  };
+}
+
+// export const useGetFullPicture = ({
+//   enabled,
+//   ...rest
+// }: {
+//   id: number;
+//   enabled?: boolean;
+// }) => {
+//   const q = fullPhotoQuery(rest.id);
+//   return useQuery({
+//     enabled: !!rest?.id && enabled,
+//     ...DEFAULT_PERSISTENCE_CONFIG,
+//     queryKey: q.key,
+//     queryFn: q.fn,
+//     staleTime: q.staleTime,
+//     gcTime: q.gcTime,
+//   });
+// };
+
+export function useGetPhotoUri(photo: TaskPhotoType, enabled = true) {
+  if (photo.id != null) {
+    const q = fullPhotoQueryById(photo.id);
+    return useQuery({
+      ...DEFAULT_PERSISTENCE_CONFIG,
+      queryKey: q.key,
+      queryFn: q.fn,
+      staleTime: q.staleTime,
+      gcTime: q.gcTime,
+      enabled: !!photo.id && enabled,
+    });
+  }
+
+  // sin id → offline con clientId + base64 local
+  if (photo.clientId) {
+    const q = localPhotoQueryByClientId(photo.clientId, photo.photo!);
+    return useQuery({
+      queryKey: q.key,
+      queryFn: q.fn,
+      staleTime: q.staleTime,
+      gcTime: q.gcTime,
+      enabled: !!photo.clientId && enabled,
+    });
+  }
+
+  // fallback: sin id ni clientId (caso raro)
+  return useQuery({
+    queryKey: ['__invalid_photo__', {x: Math.random()}],
+    queryFn: async () => undefined,
+    enabled: false,
+  });
+}

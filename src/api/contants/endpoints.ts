@@ -44,6 +44,13 @@ export const API_GET_NOTES = '/notes/query';
 export const API_SAVE_NOTE = '/notes/register';
 export const API_DELETE_NOTE = '/notes/remove';
 
+// task images
+export const API_GET_IMAGES = '/jobimage/query';
+export const API_REGISTER_IMAGES = '/jobimage/register';
+export const API_UPDATE_IMAGES = '/jobimage/update';
+export const API_DELETE_IMAGE = '/jobimage/remove';
+export const API_GET_FULL_IMAGE = '/jobimage/loadimgfull';
+
 // report materials
 export const API_GET_REPORT_MATERIALS = '/material/register/query';
 export const API_REGISTER_REPORT_MATERIALS = '/material/register';

@@ -50,6 +50,8 @@ export const QUERY_KEYS = {
   TOTAL_PHOTOS_CONDITION_REPORT: 'total_photos_condition_report',
   TOTAL_PHOTOS_CONDITION_CHECK: 'total_photos_condition_check',
   GET_BOL_PDF: 'get_bol_pdf',
+  IMAGES: 'images',
+  LOAD_FULL_IMAGE: 'load_full_image'
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';
@@ -386,4 +388,5 @@ export const ENTITY_TYPES = {
   REPORT_MATERIALS: 'report_materials',
   BOL_COUNT: 'bol_count',
   ITEM_INVENTORY_DETAIL: 'item_inventory_detail',
+  CONDITION_REPORT: 'condition_report',
 };

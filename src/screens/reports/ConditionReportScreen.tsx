@@ -59,6 +59,8 @@ import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {COLORS} from '@styles/colors';
 import useInventoryStore from '@store/inventory';
 import isEqual from 'lodash.isequal';
+import {offlineUpdateConditionReport} from '@features/conditionReport/offline';
+import {useOnline} from '@hooks/useOnline';
 // import OfflineValidation from '../components/offline/OfflineValidation';
 
 var offlineInventory = {};
@@ -120,6 +122,8 @@ export const ConditionReportScreen = (props: Props) => {
       receivedReport?.id_job_inventory ?? receivedItem?.id ?? selectedItem?.id!,
   });
 
+  const {online} = useOnline();
+
   const {hardRefreshMany} = useRefreshIndicator([
     [
       QUERY_KEYS.JOB_INVENTORY,
@@ -174,46 +178,6 @@ export const ConditionReportScreen = (props: Props) => {
 
   const initAll = async () => {
     // await initOfflineInventory();
-  };
-
-  const getTotalPhotos = async (id: string) => {
-    // if (id || (props.reportId != null && props.reportId != '')) {
-    //   const isConnected = await isInternet();
-    //   if (isConnected) {
-    //     const response = await fetchData.Get(
-    //       'resources/conditionreport/totalPhotos?id=' +
-    //       (id ? id : props.reportId),
-    //     );
-    //     if (response.ok) {
-    //       if (response.data.message == 'SUCCESS') {
-    //         setTotalPhotos(response.data.body);
-    //       }
-    //     } else {
-    //       Toast.show('Error while retreiving total photos', Toast.LONG, [
-    //         'UIAlertController',
-    //       ]);
-    //     }
-    //   } else {
-    //     setTotalPhotos([
-    //       {
-    //         type: 'back',
-    //         total: 0,
-    //       },
-    //       {
-    //         type: 'front',
-    //         total: 0,
-    //       },
-    //       {
-    //         type: 'sides',
-    //         total: 0,
-    //       },
-    //       {
-    //         type: 'details',
-    //         total: 0,
-    //       },
-    //     ]);
-    //   }
-    // }
   };
 
   const currentInventoryItem = useMemo(() => {
@@ -347,30 +311,29 @@ export const ConditionReportScreen = (props: Props) => {
     [items, setSelectedItem],
   );
 
-  const initialConditionReport: ConditionReportType | null =
-    useMemo(() => {
-      if (conditionReportJson?.data?.length! > 0) {
-        return conditionReportJson!.data[conditionReportJson!.data.length - 1];
+  const initialConditionReport: ConditionReportType | null = useMemo(() => {
+    if (conditionReportJson?.data?.length! > 0) {
+      return conditionReportJson!.data[conditionReportJson!.data.length - 1];
+    } else {
+      if (currentInventoryItem?.id) {
+        return {
+          medium_name: currentInventoryItem.medium,
+          artist_name: currentInventoryItem.artist,
+          title: currentInventoryItem.clientinv_display,
+          year: currentInventoryItem.year,
+          edition: currentInventoryItem.edition,
+          packed_height: currentInventoryItem.packed_height,
+          packed_length: currentInventoryItem.packed_length,
+          packed_width: currentInventoryItem.packed_width,
+          un_packed_height: currentInventoryItem.unpacked_height,
+          un_packed_length: currentInventoryItem.unpacked_length,
+          un_packed_width: currentInventoryItem.unpacked_width,
+        } as ConditionReportType;
       } else {
-        if (currentInventoryItem?.id) {
-          return {
-            medium_name: currentInventoryItem.medium,
-            artist_name: currentInventoryItem.artist,
-            title: currentInventoryItem.clientinv_display,
-            year: currentInventoryItem.year,
-            edition: currentInventoryItem.edition,
-            packed_height: currentInventoryItem.packed_height,
-            packed_length: currentInventoryItem.packed_length,
-            packed_width: currentInventoryItem.packed_width,
-            un_packed_height: currentInventoryItem.unpacked_height,
-            un_packed_length: currentInventoryItem.unpacked_length,
-            un_packed_width: currentInventoryItem.unpacked_width,
-          } as ConditionReportType;
-        } else {
-          return null;
-        }
+        return null;
       }
-    }, [conditionReportJson, currentInventoryItem]);
+    }
+  }, [conditionReportJson, currentInventoryItem]);
 
   const {data: photosTotal} = useGetTotalPhotosConditionReport({
     id: initialConditionReport?.id!,
@@ -446,36 +409,87 @@ export const ConditionReportScreen = (props: Props) => {
     },
     [
       saveConditionAsync,
-      partial,
       currentItem?.id,
       jobDetail?.id,
       initialConditionReport?.id,
     ],
   );
 
+  const saveReportOffline = useCallback(
+    (form: ConditionReportSchemaType, partial?: string) => {
+      const clientId = initialConditionReport?.clientId ?? generateUUID();
+      return offlineUpdateConditionReport({
+        id: initialConditionReport?.id ?? null,
+        clientId,
+        idJob: jobDetail?.id!,
+        idInventory: currentItem?.id!,
+        partial: partial === 'true',
+        artistName: form.artistName?.title,
+        artTypeName: form.artTypeName?.title,
+
+        placeOfExam: form.placeOfExam,
+        conditionArtWork: form.conditionArtWork,
+        edition: form.edition,
+        frame_height: form.frame_height,
+        frame_length: form.frame_length,
+        frame_width: form.frame_width,
+        labeled: form.labeled,
+        mediumName: form.mediumName,
+        otherText: form.packing_details_other,
+        signature: form.signature,
+        title: form.title,
+        year: form.year,
+
+        packed_height: form.packed_height,
+        packed_length: form.packed_length,
+        packed_width: form.packed_width,
+        un_packed_height: form.un_packed_height,
+        un_packed_length: form.un_packed_length,
+        un_packed_width: form.un_packed_width,
+        unpacked_weight: form.unpacked_weight,
+        weight: form.weight,
+
+        frameFixture: form.frameFixture?.map((x) => x.title),
+        hangingSystem: form.hangingSystem?.map((x) => x.title),
+        packingDetail: form.packingDetail?.map((x) => x.title),
+      });
+    },
+    [
+      partial,
+      currentItem?.id,
+      jobDetail?.id,
+      initialConditionReport?.id,
+      offlineUpdateConditionReport,
+    ],
+  );
+
   const confirmSave = useCallback(() => {
     if (partial && temporalForm) {
-      loadingWrapperPromise(
-        saveAsync(temporalForm, partial)
-          .then((d) => {
-            if (d) {
-              showToastMessage('Condition report saved successfully');
-              refetchAll();
-              refetch();
-              hardRefreshMany();
-              goBack();
-            } else {
+      if (online) {
+        loadingWrapperPromise(
+          saveAsync(temporalForm, partial)
+            .then((d) => {
+              if (d) {
+                showToastMessage('Condition report saved successfully');
+                refetchAll();
+                refetch();
+                hardRefreshMany();
+                goBack();
+              } else {
+                showErrorToastMessage('Error while saving condition report');
+              }
+            })
+            .catch(() => {
               showErrorToastMessage('Error while saving condition report');
-            }
-          })
-          .catch(() => {
-            showErrorToastMessage('Error while saving condition report');
-          }),
-      );
+            }),
+        );
+      } else {
+        saveReportOffline(temporalForm, partial);
+      }
     } else {
       showToastMessage('Please, select a valid option');
     }
-  }, [temporalForm, partial, saveAsync]);
+  }, [temporalForm, partial, saveAsync, online]);
 
   const onInitSubmit = useCallback(
     (props: ConditionReportSchemaType) => {

@@ -10,11 +10,11 @@ import type {
   ProcessingSession,
 } from './types';
 
-const STORE_ID = 'offline-outbox-v10';
-const KEY_QUEUE = 'OUTBOX_QUEUE_V10';
-const KEY_LOCK = 'OUTBOX_LOCK_V10';
-const KEY_SESSION = 'OUTBOX_SESSION_V10';
-const KEY_FAILED_ARCHIVE = 'OUTBOX_FAILED_ARCHIVE_V8';
+const STORE_ID = 'offline-outbox-v11';
+const KEY_QUEUE = 'OUTBOX_QUEUE_V11';
+const KEY_LOCK = 'OUTBOX_LOCK_V11';
+const KEY_SESSION = 'OUTBOX_SESSION_V11';
+const KEY_FAILED_ARCHIVE = 'OUTBOX_FAILED_ARCHIVE_V9';
 
 export const LOCK_STALE_MS = 2 * 60 * 1000; // stale lock takeover window
 export const STUCK_THRESHOLD_MS = 3 * 60 * 1000; // requeue in_progress older than this

@@ -116,6 +116,9 @@ export type ConditionReportType = {
   unpacked_weight: string;
   weight: string;
   year: string;
+
+  // offline
+  clientId?: string;
 };
 
 export type TotalPhotoReportType = {

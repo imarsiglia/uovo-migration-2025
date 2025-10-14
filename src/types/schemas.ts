@@ -355,3 +355,9 @@ export const ProfileSchema = yup.object({
 });
 
 export type ProfileSchemaType = yup.InferType<typeof ProfileSchema>;
+
+export const SaveTaskImageSchema = yup.object({
+  title: yup.string().trim().min(1, 'Please, enter a title').required('Please, enter a title'),
+  description: yup.string().optional().nullable(),
+});
+export type SaveTaskImageSchemaType = yup.InferType<typeof SaveTaskImageSchema>;

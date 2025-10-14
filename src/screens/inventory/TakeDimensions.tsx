@@ -1,7 +1,6 @@
 import {QUERY_KEYS} from '@api/contants/constants';
 import {useGetPackingDetails} from '@api/hooks/HooksGeneralServices';
 import {useUpdateInventoryItem} from '@api/hooks/HooksInventoryServices';
-import {GetJobInventoryApiProps} from '@api/services/inventoryServices';
 import {JobInventoryType} from '@api/types/Inventory';
 import {BackButton} from '@components/commons/buttons/BackButton';
 import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
@@ -47,13 +46,36 @@ export const TakeDimensionsScreen = (props: Props) => {
   const {data: packingDetails, isLoading} = useGetPackingDetails();
   const {mutateAsync: updateAsync} = useUpdateInventoryItem();
 
-  const itemQueryKey = [QUERY_KEYS.INVENTORY_ITEM_DETAIL, {id: item.id}];
-  const {orderFilter, orderType, topSheetFilter, setTopSheetFilter} =
+  const {orderFilter, orderType, topSheetFilter, inventoryFilter} =
     useInventoryStore();
+
+  const {hardRefreshMany} = useRefreshIndicator([
+    [
+      QUERY_KEYS.JOB_INVENTORY,
+      {
+        idJob,
+        filter: topSheetFilter,
+        orderFilter,
+        orderType,
+      },
+    ],
+    [
+      QUERY_KEYS.JOB_INVENTORY,
+      {
+        idJob,
+        filter: inventoryFilter,
+        orderFilter,
+        orderType,
+      },
+    ],
+  ]);
+
   const inventoryQueryKey = [
     QUERY_KEYS.JOB_INVENTORY,
     {idJob, filter: topSheetFilter, orderFilter, orderType},
   ];
+
+  const itemQueryKey = [QUERY_KEYS.INVENTORY_ITEM_DETAIL, {id: item.id}];
 
   const upsertItem = useUpsertObjectCache<JobInventoryType>(itemQueryKey);
   const upsertInventoryList =
@@ -79,7 +101,11 @@ export const TakeDimensionsScreen = (props: Props) => {
             })
               .then((d) => {
                 if (d) {
-                  refetchAll().finally(() => refetchAll());
+                  refetchAll().finally(() => {
+                    refetchAll().finally(() => {
+                      hardRefreshMany();
+                    });
+                  });
                   showToastMessage('Dimensions saved successfully');
                   goBack();
                 } else {

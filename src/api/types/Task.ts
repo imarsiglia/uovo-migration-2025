@@ -1,5 +1,5 @@
-import { OfflineItemType } from "@generalTypes/general";
-import { LaborCodeType } from "./Jobs";
+import {OfflineItemType} from '@generalTypes/general';
+import {LaborCodeType} from './Jobs';
 
 export type SignatureType = {
   id: number;
@@ -9,7 +9,8 @@ export type SignatureType = {
   type: string;
   signature_data: string;
   signature_timestamp: string;
-  clientId?: string; // for offline
+  // for offline
+  clientId?: string; 
   _pending?: boolean;
 };
 
@@ -95,4 +96,29 @@ export type LaborReportType = {
 export type EmployeeType = {
   id: string;
   name: string;
+};
+
+export type TaskPhotoType = {
+  id?: number;
+  path?: string;
+  photo?: string; // base64 image data
+  // for offline
+  _fileUri?: string;
+  _dirty?: boolean;
+  clientId?: string; 
+  _pending?: boolean;
+  _deleted?: boolean;
+};
+
+export type TaskImageType = {
+  id_job: number;
+  id_user: number;
+  title: string;
+  description: string | undefined;
+  update_time: string;
+  photos: TaskPhotoType[];
+  // for offline
+  clientId?: string; 
+  _pending?: boolean;
+  _deleted?: boolean;
 };

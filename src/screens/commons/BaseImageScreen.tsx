@@ -15,7 +15,7 @@ import {
   Platform,
 } from 'react-native';
 
-type ImageType = 'jpeg' | 'png' | 'webp' | 'gif';
+export type ImageType = 'jpeg' | 'png' | 'webp' | 'gif';
 
 export type Base64ImageCarouselProps = {
   /** Arreglo de cadenas base64 o data URIs (e.g. "data:image/jpeg;base64,...") */
