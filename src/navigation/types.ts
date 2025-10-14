@@ -155,7 +155,8 @@ export type RootStackParamList = {
   [RoutesNavigation.SaveImages]:
     | {
         item?: TaskImageType;
-        editedImage?: any
+        editedImage?: any;
+        index?: number;
       }
     | undefined;
 };

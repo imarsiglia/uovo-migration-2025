@@ -13,7 +13,7 @@ import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {useOnline} from '@hooks/useOnline';
 import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
-import {useQueries, useQueryClient} from '@tanstack/react-query';
+import {useQueryClient} from '@tanstack/react-query';
 import useTopSheetStore from '@store/topsheet';
 import {loadingWrapperPromise} from '@store/actions';
 import {COLORS} from '@styles/colors';
@@ -74,6 +74,7 @@ export const SaveImagesScreen = (props: Props) => {
   const refVoice = useRef<SpeechFormInputRef>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
+  const [loading, setLoading] = useState(false);
   const [photos, setPhotos] = useState<TaskPhotoType[]>([]);
 
   const [removedIds, setRemovedIds] = useState<number[]>([]);
@@ -82,11 +83,6 @@ export const SaveImagesScreen = (props: Props) => {
   const {mutateAsync: updateImages} = useUpdatePictures();
   const {mutateAsync: deletePictureAsync} = useDeletePicture(); // 👈 para borrar por id
 
-  const initialGroupPhotos = useMemo(
-    () => (item?.photos ? item.photos.slice(0, MAX_PHOTOS) : []),
-    [item],
-  );
-
   const upsertImages = useUpsertArrayCache<TaskImageType>(imagesQueryKey);
 
   const {refetchAll} = useRefreshIndicator([
@@ -94,76 +90,44 @@ export const SaveImagesScreen = (props: Props) => {
     imagesQueryKey,
   ]);
 
-  // Dispara una query por cada foto con id (full-res). Usamos update_time como "rev".
-  const photoQueries = useQueries({
-    queries: initialGroupPhotos.map((p) => ({
-      queryKey: [
-        QUERY_KEYS.LOAD_FULL_IMAGE,
-        {id: p.id, rev: item?.update_time ?? 'nov'},
-      ],
-      queryFn: () => taskServices.getFullImage({id: p.id!}),
-      enabled: !!p.id && !!item && online, // no consultes cuando no hay id o estás offline
-      // forzamos que al entrar siempre traiga la última si cambió la rev
-      staleTime: 0,
-      refetchOnMount: 'always',
-    })),
-  });
-
-  // 1) Bootstrap inicial del estado "photos" SOLO cuando entro con item (modo edición)
+  // Carga inicial (modo edición): trae full-res (cuando tenga id) o usa el base64 del item
   useEffect(() => {
-    if (!item) return; // modo crear: no hay nada que hidratar
-    if (photos.length > 0) return; // ya tengo estado del usuario (no lo pises)
-    // arranca con las fotos tal cual vienen del listing (miniaturas/base64 local)
-    setPhotos(initialGroupPhotos.map((p) => ({...p})));
-    setRemovedIds([]); // limpia marcados para borrar
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [item]);
-
-  // 2) A medida que llegan los full-res, actualiza SOLO esas posiciones sin pisar nuevas
-  useEffect(() => {
-    if (!item || initialGroupPhotos.length === 0) return;
-
-    // usamos dataUpdatedAt para evitar dependencias gigantes con base64
-    const sig = photoQueries.map((q) => q.dataUpdatedAt).join(',');
-    // cuando cambie "sig", intentamos aplicar mejoras
-    setPhotos((prev) => {
-      if (prev.length === 0) return prev; // ya se hidratará con el bootstrap
-      const next = [...prev];
-      let changed = false;
-
-      // mapear por índice uno a uno con las fotos del grupo
-      for (let i = 0; i < initialGroupPhotos.length; i++) {
-        const base = initialGroupPhotos[i];
-        const q = photoQueries[i];
-        if (!base?.id) continue; // sin id → se queda tal cual (offline/new)
-        if (!q?.data) continue; // aún no llegó
-        // si ya es el mismo base64, no toques
-        if (next[i]?.photo === q.data) continue;
-
-        // Actualiza la foto i con el full-res descargado
-        const prevSlot = next[i] ?? base;
-        next[i] = {
-          ...prevSlot,
-          id: prevSlot.id ?? base.id,
-          photo: q.data, // sustituye miniatura por full-res
-        };
-        changed = true;
+    let cancelled = false;
+    (async () => {
+      if (!item) return;
+      try {
+        setLoading(true);
+        const next: TaskPhotoType[] = [];
+        for (let i = 0; i < Math.min(item.photos.length, MAX_PHOTOS); i++) {
+          const p = item.photos[i];
+          if (p.id) {
+            const base64 = p.id
+              ? await taskServices.getFullImage({id: p.id!})
+              : p.photo;
+            next.push({
+              ...p,
+              photo: base64,
+            });
+          } else {
+            next.push({
+              ...p,
+            });
+          }
+        }
+        if (!cancelled) {
+          setPhotos(next);
+          setRemovedIds([]); // reset lista de borrados al entrar
+        }
+      } catch (e) {
+        console.log('init load full photos error', e);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      return changed ? next : prev;
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    item,
-    online,
-    initialGroupPhotos.length,
-    photoQueries.map((q) => q.dataUpdatedAt).join(','),
-  ]);
-
-  const isHydratingFullRes =
-    !!item &&
-    photoQueries.length > 0 &&
-    photoQueries.some((q) => q.isFetching) &&
-    photos.length > 0;
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [item]);
 
   /** ---------- pickers ---------- */
   const closeSheet = useCallback(() => refCallSheet.current?.close(), []);
@@ -265,6 +229,7 @@ export const SaveImagesScreen = (props: Props) => {
       const descriptionValidated = description?.trim() ?? '';
 
       try {
+        setLoading(true);
         // Fotos nuevas (sin id)
         const newList = photos.filter((p) => !p.id);
         // Fotos editadas existentes (con id)
@@ -442,6 +407,8 @@ export const SaveImagesScreen = (props: Props) => {
       } catch (e) {
         console.log(e);
         showErrorToastMessage('Error while saving images');
+      } finally {
+        setLoading(false);
       }
     },
     [
@@ -470,7 +437,7 @@ export const SaveImagesScreen = (props: Props) => {
 
   return (
     <View style={styles.container}>
-      {isHydratingFullRes && <GeneralLoading />}
+      {loading && <GeneralLoading />}
 
       <View style={GLOBAL_STYLES.bgwhite}>
         <View style={GLOBAL_STYLES.containerBtnOptTop}>

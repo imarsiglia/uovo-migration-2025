@@ -80,6 +80,7 @@ export default function AppProviders({children}: {children: React.ReactNode}) {
                         k === QUERY_KEYS.LOAD_FULL_IMAGE ||
                         k === QUERY_KEYS.REPORT_MATERIALS ||
                         k === QUERY_KEYS.ALL_REPORT_MATERIALS_INVENTORY ||
+                        k === QUERY_KEYS.ALL_ARTIST ||
                         k === QUERY_KEYS.SIGNATURES ||
                         k === QUERY_KEYS.BOL_COUNT ||
                         k === QUERY_KEYS.JOB_INVENTORY ||
@@ -110,7 +111,7 @@ export default function AppProviders({children}: {children: React.ReactNode}) {
                     },
                   },
                   // Limpia el cache persistido si cambias la “versión” de datos:
-                  buster: 'app-v14', // cambia a 'app-v2' tras cambios de schema o logout
+                  buster: 'app-v15', // cambia a 'app-v2' tras cambios de schema o logout
                 }}>
                 {children}
                 {/* <OutboxProcessor /> */}

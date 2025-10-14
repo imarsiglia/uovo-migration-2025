@@ -108,6 +108,7 @@ export type TaskPhotoType = {
   clientId?: string; 
   _pending?: boolean;
   _deleted?: boolean;
+  _updated_at?: number;
 };
 
 export type TaskImageType = {
@@ -121,4 +122,6 @@ export type TaskImageType = {
   clientId?: string; 
   _pending?: boolean;
   _deleted?: boolean;
+  clientIdEdit?: string; 
+  clientIdDelete?: string; 
 };

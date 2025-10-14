@@ -14,6 +14,7 @@ import {
 } from '@api/services/taskServices';
 import {TaskImageType, TaskPhotoType} from '@api/types/Task';
 import {keepPreviousData, useMutation, useQuery} from '@tanstack/react-query';
+import {generateUUID} from '@utils/functions';
 
 export const DAYS_IN_MS = 24 * 60 * 60 * 1000;
 
@@ -204,6 +205,16 @@ export const useGetPictures = (props: TaskBaseApiProps) => {
     queryFn: () => taskServices.getImages(props),
     enabled: !!props?.idJob,
     ...DEFAULT_PERSISTENCE_CONFIG,
+    select: (rows) =>
+      rows?.map((row) => {
+        console.log('desde el select -> row client id');
+        console.log(row.clientId);
+        const clientId = row.clientId ?? generateUUID();
+        return {
+          ...row,
+          clientId,
+        };
+      }) ?? [],
   });
 };
 
@@ -258,35 +269,66 @@ export function useDeletePictureGroup() {
 //   });
 // };
 
-export function useGetPhotoUri(photo: TaskPhotoType, enabled = true) {
-  if (photo.id != null) {
-    const q = fullPhotoQueryById(photo.id);
-    return useQuery({
-      ...DEFAULT_PERSISTENCE_CONFIG,
-      queryKey: q.key,
-      queryFn: q.fn,
-      staleTime: q.staleTime,
-      gcTime: q.gcTime,
-      enabled: !!photo.id && enabled,
-    });
-  }
+export function useFullPhotoUri(
+  photo: TaskPhotoType,
+  group: Pick<TaskImageType, 'update_time'>, // pásale el grupo
+  enabled?: boolean
+) {
+  // “rev” que fuerza un nuevo caché cuando cambie el grupo
+  const groupRev = group?.update_time ?? 'nogrev';
 
-  // sin id → offline con clientId + base64 local
-  if (photo.clientId) {
-    const q = localPhotoQueryByClientId(photo.clientId, photo.photo!);
-    return useQuery({
-      queryKey: q.key,
-      queryFn: q.fn,
-      staleTime: q.staleTime,
-      gcTime: q.gcTime,
-      enabled: !!photo.clientId && enabled,
-    });
-  }
+  const q = photo.id
+    ? fullPhotoQueryById({id: photo.id!, groupRev})
+    : localPhotoQueryByClientId({
+        clientId: photo.clientId!,
+        base64: photo.photo!,
+        groupRev, // si aún no hay update_time del server, omítelo y usa localRev
+        localRev: photo.photo?.length, // fallback razonable
+      });
 
-  // fallback: sin id ni clientId (caso raro)
   return useQuery({
-    queryKey: ['__invalid_photo__', {x: Math.random()}],
-    queryFn: async () => undefined,
-    enabled: false,
+    queryKey: q.key,
+    queryFn: q.fn,
+    staleTime: q.staleTime,
+    gcTime: q.gcTime,
+    refetchOnMount: q.refetchOnMount,
+    enabled
   });
 }
+
+// export function useGetPhotoUri(photo: TaskPhotoType, enabled = true) {
+//   if (photo.id != null) {
+//     const q = fullPhotoQueryById({id: photo.id, rev: photo._updated_at});
+//     return useQuery({
+//       ...DEFAULT_PERSISTENCE_CONFIG,
+//       queryKey: q.key,
+//       queryFn: q.fn,
+//       staleTime: q.staleTime,
+//       gcTime: q.gcTime,
+//       enabled: !!photo.id && enabled,
+//     });
+//   }
+
+//   // sin id → offline con clientId + base64 local
+//   if (photo.clientId) {
+//     const q = localPhotoQueryByClientId({
+//       clientId: photo.clientId,
+//       base64: photo.photo!,
+//       rev: photo._updated_at,
+//     });
+//     return useQuery({
+//       queryKey: q.key,
+//       queryFn: q.fn,
+//       staleTime: q.staleTime,
+//       gcTime: q.gcTime,
+//       enabled: !!photo.clientId && enabled,
+//     });
+//   }
+
+//   // fallback: sin id ni clientId (caso raro)
+//   return useQuery({
+//     queryKey: ['__invalid_photo__', {x: Math.random()}],
+//     queryFn: async () => undefined,
+//     enabled: false,
+//   });
+// }

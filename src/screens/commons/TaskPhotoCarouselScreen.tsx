@@ -3,15 +3,15 @@ import {
   fullPhotoQueryById,
   localPhotoQueryByClientId,
 } from '@api/queries/fullPhotoQuery';
-import type { TaskPhotoType } from '@api/types/Task';
-import { BackButton } from '@components/commons/buttons/BackButton';
-import { Label } from '@components/commons/text/Label';
-import { Wrapper } from '@components/commons/wrappers/Wrapper';
-import { useCustomNavigation } from '@hooks/useCustomNavigation';
-import type { RootStackParamList } from '@navigation/types';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import type {TaskPhotoType} from '@api/types/Task';
+import {BackButton} from '@components/commons/buttons/BackButton';
+import {Label} from '@components/commons/text/Label';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import type {RootStackParamList} from '@navigation/types';
+import type {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {useQueryClient} from '@tanstack/react-query';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {
   FlatList,
   NativeScrollEvent,
@@ -19,8 +19,8 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
-import { ImageType } from './BaseImageScreen';
-import { ProgressivePhoto } from './ProgressivePhoto';
+import {ImageType} from './BaseImageScreen';
+import {ProgressivePhoto} from './ProgressivePhoto';
 
 export type TaskPhotoCarouselType = {
   photos: TaskPhotoType[];
@@ -30,6 +30,7 @@ export type TaskPhotoCarouselType = {
   contentFit?: 'cover' | 'contain';
   onIndexChange?: (index: number) => void;
   showIndicators?: boolean;
+  groupRev: string;
 };
 
 type Props = NativeStackScreenProps<
@@ -42,12 +43,18 @@ const TaskPhotoCarouselScreen = (props: Props) => {
   const {goBack} = useCustomNavigation();
   const qc = useQueryClient();
 
-  const {photos, initialIndex = 0, contentFit = 'contain'} = props.route.params;
+  const {
+    photos,
+    initialIndex = 0,
+    contentFit = 'contain',
+    groupRev,
+  } = props.route.params;
 
   const listRef = useRef<FlatList<TaskPhotoType>>(null);
   const [index, setIndex] = useState(
     Math.min(Math.max(initialIndex, 0), Math.max(photos.length - 1, 0)),
   );
+  const [scrollEnabled, setScrollEnabled] = useState(true); // 👈
 
   const getItemLayout = useCallback(
     (_: unknown, i: number) => ({length: width, offset: width * i, index: i}),
@@ -68,30 +75,27 @@ const TaskPhotoCarouselScreen = (props: Props) => {
     [index, width],
   );
 
-  // Prefetch del vecino (siguiente y anterior) para high-res
+  // Prefetch vecino
   useEffect(() => {
-    const prev = photos[index - 1];
-    const next = photos[index + 1];
-    const neigh = [prev, next].filter(Boolean) as TaskPhotoType[];
-
-    neigh.forEach((p) => {
-      if (p.id != null) {
-        const q = fullPhotoQueryById(p.id);
-        qc.prefetchQuery({
-          queryKey: q.key,
-          queryFn: q.fn,
-          staleTime: q.staleTime,
-        }).catch(() => {});
-      } else if (p.clientId) {
-        const q = localPhotoQueryByClientId(p.clientId, p.photo!);
-        qc.prefetchQuery({
-          queryKey: q.key,
-          queryFn: q.fn,
-          staleTime: q.staleTime,
-        }).catch(() => {});
-      }
-    });
-  }, [index, photos, qc]);
+    const prefetch = (p?: TaskPhotoType) => {
+      if (!p) return;
+      const q = p.id
+        ? fullPhotoQueryById({id: p.id!, groupRev})
+        : localPhotoQueryByClientId({
+            clientId: p.clientId!,
+            base64: p.photo!,
+            groupRev,
+          });
+      qc.prefetchQuery({
+        queryKey: q.key,
+        queryFn: q.fn,
+        staleTime: q.staleTime,
+        gcTime: q.gcTime,
+      }).catch(() => {});
+    };
+    prefetch(photos[index + 1]);
+    prefetch(photos[index - 1]);
+  }, [index, photos, groupRev, qc]);
 
   const renderItem = useCallback(
     ({item, index: i}: {item: TaskPhotoType; index: number}) => (
@@ -103,10 +107,12 @@ const TaskPhotoCarouselScreen = (props: Props) => {
           photo={item}
           visible={i === index}
           contentFit={contentFit}
+          groupRev={groupRev}
+          onZoomActiveChange={(active) => setScrollEnabled(!active)} // 👈
         />
       </Wrapper>
     ),
-    [index, width, contentFit],
+    [index, width, contentFit, groupRev],
   );
 
   const onRefReady = useCallback(
@@ -152,6 +158,7 @@ const TaskPhotoCarouselScreen = (props: Props) => {
         removeClippedSubviews
         getItemLayout={getItemLayout}
         onMomentumScrollEnd={onMomentumEnd}
+        scrollEnabled={scrollEnabled} // 👈 desactiva mientras hay zoom
       />
     </Wrapper>
   );

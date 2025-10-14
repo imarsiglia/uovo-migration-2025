@@ -12,11 +12,16 @@ import {useEffect, useMemo} from 'react';
 import {Paginated} from '@api/types/Response';
 import {seedDetailsFromList, useWarmItemDetails} from './useWarmItemDetails';
 import {DAYS_IN_MS} from './HooksTaskServices';
+import {TaskImageType} from '@api/types/Task';
+import {useWarmFullPhotos} from './useWarmFullPhotos';
+import {base64ToFileCache} from '@utils/imageCache';
 
 const ttl = {
-  NOTES: 1 * DAYS_IN_MS,
-  REPORT_MATERIALS: 1 * DAYS_IN_MS,
-  BOL_COUNT: 2 * DAYS_IN_MS,
+  NOTES: 3 * DAYS_IN_MS,
+  IMAGES: 3 * DAYS_IN_MS,
+  FULL_IMAGES: 3 * DAYS_IN_MS,
+  REPORT_MATERIALS: 3 * DAYS_IN_MS,
+  BOL_COUNT: 3 * DAYS_IN_MS,
   SIGNATURES: 3 * DAYS_IN_MS,
   CONDITION_RESUMES: 3 * DAYS_IN_MS,
   INVENTORY_ALL: 3 * DAYS_IN_MS,
@@ -37,6 +42,11 @@ export const useGetJobData = (idJob?: number) => {
         key: [QUERY_KEYS.NOTES, {idJob}],
         fn: () => taskServices.getNotes({idJob}),
         ttlMS: ttl.NOTES,
+      },
+      {
+        key: [QUERY_KEYS.IMAGES, {idJob}],
+        fn: () => taskServices.getImages({idJob}),
+        ttlMS: ttl.IMAGES,
       },
       {
         key: [QUERY_KEYS.SIGNATURES, {idJob, forceSend: signatureForce}],
@@ -126,6 +136,20 @@ export const useGetJobData = (idJob?: number) => {
     concurrency: 4,
     ttlMs: ttl.CONDITION_RESUMES,
     enabled: reportsWarm.done, // ← encadenado
+  });
+
+  const _imagesList = useCachedQueryData<TaskImageType[]>(
+    [QUERY_KEYS.IMAGES, {idJob}],
+    () => taskServices.getImages({idJob: idJob!}),
+  );
+
+  // Prefetch full-res con versión
+  useWarmFullPhotos({
+    groups: _imagesList,
+    enabled: !!_imagesList?.length,
+    concurrency: 4,
+    ttlMs: ttl.FULL_IMAGES,
+    maxPrefetch: 100,
   });
 
   useEffect(() => {

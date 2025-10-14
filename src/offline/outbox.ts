@@ -1,7 +1,5 @@
 // src/offline/outbox.ts
-import 'react-native-get-random-values';
 import {MMKV} from 'react-native-mmkv';
-import {v4 as uuid} from 'uuid';
 import type {
   OutboxItem,
   GenericPayload,
@@ -9,12 +7,13 @@ import type {
   OutboxStatus,
   ProcessingSession,
 } from './types';
+import {generateUUID} from '@utils/functions';
 
-const STORE_ID = 'offline-outbox-v11';
-const KEY_QUEUE = 'OUTBOX_QUEUE_V11';
-const KEY_LOCK = 'OUTBOX_LOCK_V11';
-const KEY_SESSION = 'OUTBOX_SESSION_V11';
-const KEY_FAILED_ARCHIVE = 'OUTBOX_FAILED_ARCHIVE_V9';
+const STORE_ID = 'offline-outbox-v14';
+const KEY_QUEUE = 'OUTBOX_QUEUE_V14';
+const KEY_LOCK = 'OUTBOX_LOCK_V14';
+const KEY_SESSION = 'OUTBOX_SESSION_V14';
+const KEY_FAILED_ARCHIVE = 'OUTBOX_FAILED_ARCHIVE_V12';
 
 export const LOCK_STALE_MS = 2 * 60 * 1000; // stale lock takeover window
 export const STUCK_THRESHOLD_MS = 3 * 60 * 1000; // requeue in_progress older than this
@@ -173,6 +172,11 @@ export async function enqueueCoalesced(
   op: OutboxOpKind,
   payload: GenericPayload,
 ): Promise<string> {
+  console.log('props para encolar petición');
+  console.log('op');
+  console.log(op);
+  console.log('payload');
+  console.log(payload);
   const q = await readQueue();
   const matches = q
     .map((it, i) => ({it, i}))
@@ -195,25 +199,33 @@ export async function enqueueCoalesced(
   }
   if (op === 'delete') {
     let removed = false;
+    console.log('recorriendo q');
+    console.log(JSON.stringify(q));
     for (let k = q.length - 1; k >= 0; k--) {
       const it = q[k];
+      console.log('comparando');
+      console.log(it);
       if (
         sameRecord(it.payload, payload) &&
         (it.op === 'create' || it.op === 'update')
       ) {
+        console.log('same record');
         q.splice(k, 1);
         removed = true;
+      } else {
+        console.log('not same record');
       }
     }
     if (removed && !payload.id && payload.clientId) {
+      console.log('write Queue delete');
       await writeQueue(q);
-      return uuid(); // net-zero (create+delete collapsed)
+      return generateUUID(); // net-zero (create+delete collapsed)
     }
   }
 
   const now = Date.now();
   const item: OutboxItem = {
-    uid: uuid(),
+    uid: generateUUID(),
     op,
     payload: {
       ...payload,
@@ -226,7 +238,13 @@ export async function enqueueCoalesced(
     status: 'pending',
     lastError: null,
   };
+  console.log('new push of outbox item');
+  console.log(JSON.stringify(item));
   q.push(item);
   await writeQueue(q);
+  console.log('finalizó write queue ');
+  const qqq = await readQueue();
+  console.log("queue final");
+  console.log(qqq);
   return item.uid;
 }

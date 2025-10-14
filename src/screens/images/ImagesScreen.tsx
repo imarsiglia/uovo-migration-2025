@@ -17,10 +17,11 @@ import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {CustomImage} from '@components/images/CustomImage';
-import {offlineDeleteNote} from '@features/notes/offline';
+import {offlineDeleteImage} from '@features/images/offline';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {useOnline} from '@hooks/useOnline';
 import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {useRemoveFromArrayCache} from '@hooks/useToolsReactQueryCache';
 import {RoutesNavigation} from '@navigation/types';
 import {loadingWrapperPromise} from '@store/actions';
 import {useModalDialogStore} from '@store/modals';
@@ -30,9 +31,10 @@ import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {useQueryClient} from '@tanstack/react-query';
 import {getFormattedDateWithTimezone} from '@utils/functions';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
-import {useCallback, useMemo} from 'react';
+import {useCallback, useEffect, useMemo} from 'react';
 import {
   FlatList,
+  InteractionManager,
   ListRenderItemInfo,
   StyleSheet,
   Text,
@@ -51,6 +53,9 @@ export const ImagesScreen = () => {
 
   const imagesQueryKey = useMemo(() => [QUERY_KEYS.IMAGES, {idJob}], [idJob]);
 
+  const removeImageFromCache =
+    useRemoveFromArrayCache<TaskImageType>(imagesQueryKey);
+
   const {
     data: list,
     isLoading,
@@ -58,26 +63,17 @@ export const ImagesScreen = () => {
     refetch,
   } = useGetPictures({idJob});
 
+  useEffect(() => {
+    if (online) {
+      qc.setQueryData(imagesQueryKey, list);
+    }
+  }, [online, list]);
+
   const {deleteAll} = useDeletePictureGroup();
 
-  /** ---------- cache helpers (optimistic UI) ---------- */
-  const removeFromCache = useCallback(
-    (ref: {id?: number; clientId?: string}) => {
-      qc.setQueryData<TaskImageType[] | undefined>(imagesQueryKey, (old) => {
-        if (!old) return old;
-        return old.filter((n) =>
-          ref.id
-            ? n.id !== ref.id
-            : ref.clientId
-            ? n.clientId !== ref.clientId
-            : true,
-        );
-      });
-    },
-    [qc, imagesQueryKey],
-  );
+  const yieldFrame = () =>
+    new Promise<void>((r) => requestAnimationFrame(() => r()));
 
-  /** ---------- actions ---------- */
   const initRemove = useCallback(
     (image: TaskImageType) => {
       showDialog({
@@ -101,13 +97,10 @@ export const ImagesScreen = () => {
         type: 'warning',
         onConfirm: () => {
           if (online) {
-            // ONLINE: borra todas las photos con id
             loadingWrapperPromise(
               deleteAll(image)
                 .then((ok) => {
                   if (ok) {
-                    // Optimista: sácalo de la lista y refresca contadores
-                    // removeFromCache({clientId: image.clientId});
                     refetch();
                     refetchAll();
                     showToastMessage('Image deleted successfully');
@@ -119,12 +112,43 @@ export const ImagesScreen = () => {
                   showErrorToastMessage('Error while deleting image'),
                 ),
             );
-          } else {
-            // OFFLINE: encola una request por cada photo.id + optimista
-            // offlineDeleteImage({idJob, image});
-            // removeFromCache({id: image.id, clientId: image.clientId});
-            showToastMessage('Image deleted (queued)');
+            return;
           }
+
+          // OFFLINE: pintar loader → luego correr cola sin congelar
+          loadingWrapperPromise(
+            runAfterPaint(async () => {
+              const uniqueIds = Array.from(
+                new Set(
+                  (image.photos ?? [])
+                    .map((p) => p?.id)
+                    .filter((v): v is number => typeof v === 'number'),
+                ),
+              );
+
+              // 1) Optimista: quita el grupo de la lista ya mismo
+              removeImageFromCache({clientId: image.clientId} as any);
+
+              // 2) Encola deletes
+              if (uniqueIds.length > 0) {
+                // procesar en orden, cediendo la thread cada 2 ops
+                for (let i = 0; i < uniqueIds.length; i++) {
+                  await offlineDeleteImage({idJob, id: uniqueIds[i]!});
+                  if ((i + 1) % 2 === 0) await yieldFrame();
+                }
+              } else {
+                // grupo 100% offline → una sola entrada por clientId
+                await offlineDeleteImage({idJob, clientId: image.clientId});
+              }
+
+              // 3) listo
+              showToastMessage('Image deleted (queued)');
+            }),
+            {
+              onError: () =>
+                showErrorToastMessage('Error while deleting image(s)'),
+            },
+          );
         },
       });
     },
@@ -132,15 +156,38 @@ export const ImagesScreen = () => {
       online,
       idJob,
       deleteAll,
-      removeFromCache,
+      offlineDeleteImage,
+      removeImageFromCache,
       refetch,
       refetchAll,
       showDialog,
     ],
   );
 
-  const initEdit = (item: TaskImageType) => {
-    navigate(RoutesNavigation.SaveImages, {item});
+  function runAfterPaint<T>(fn: () => Promise<T> | T): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      const go = () => {
+        InteractionManager.runAfterInteractions(async () => {
+          try {
+            const res = await fn();
+            resolve(res);
+          } catch (e) {
+            reject(e);
+          }
+        });
+      };
+
+      const raf =
+        // @ts-ignore
+        (global as any)?.requestAnimationFrame ??
+        ((cb: (t?: number) => void) => setTimeout(() => cb(Date.now()), 16));
+
+      raf(go);
+    });
+  }
+
+  const initEdit = (item: TaskImageType, index: number) => {
+    navigate(RoutesNavigation.SaveImages, {item, index: index});
   };
 
   const initCreate = useCallback(() => {
@@ -151,6 +198,7 @@ export const ImagesScreen = () => {
     (item: TaskImageType) => {
       navigate(RoutesNavigation.TaskPhotoCarouselScreen, {
         photos: item.photos,
+        groupRev: item.update_time,
       });
     },
     [navigate],
@@ -168,7 +216,7 @@ export const ImagesScreen = () => {
                   style={styles.rightActionsEdit}
                   onPress={() => {
                     close();
-                    initEdit(item);
+                    initEdit(item, index);
                   }}>
                   <Icon name="pen" size={25} color="white" type="solid" />
                 </TouchableOpacity>
@@ -263,7 +311,7 @@ export const ImagesScreen = () => {
         <FlatList
           data={list}
           renderItem={renderItem}
-          keyExtractor={(it) => it?.photos[0].id?.toString() ?? it.clientId!}
+          keyExtractor={(it) => it?.clientId}
           refreshing={isRefetching}
           onRefresh={refetch}
           removeClippedSubviews

@@ -8,7 +8,7 @@ import {
   DEFAULT_WO_TYPE_LIST,
   QUERY_KEYS,
 } from '@api/contants/constants';
-import { DAYS_IN_MS } from './HooksTaskServices';
+import {DAYS_IN_MS} from './HooksTaskServices';
 
 const DEFAULT_PERSISTENCE_CONFIG = {
   staleTime: 5 * 60 * 1000,

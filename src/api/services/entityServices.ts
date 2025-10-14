@@ -4,7 +4,12 @@
 
 import {QueryClient} from '@tanstack/react-query';
 import {ENTITY_TYPES, QUERY_KEYS} from '@api/contants/constants';
-import {SaveBOLCountApiProps, taskServices} from './taskServices';
+import {
+  SaveBOLCountApiProps,
+  SaveImageApiProps,
+  taskServices,
+  UpdateImageApiProps,
+} from './taskServices';
 import type {OutboxItem} from '@offline/types';
 import {readQueue, replaceQueue} from '@offline/outbox';
 import {
@@ -95,6 +100,16 @@ const REGISTRY: Record<string, Service> = {
     update: async ({body}: {body: SaveConditionReportApiProps}) =>
       reportServices.saveConditionReport({...body}),
   },
+
+  // task pictures
+  image: {
+    list: async ({idJob}: {idJob: number}) => taskServices.getImages({idJob}),
+    create: async ({body}: {body: SaveImageApiProps}) =>
+      taskServices.registerImage(body),
+    update: async ({body}: {body: UpdateImageApiProps}) =>
+      taskServices.updateImage({...body}),
+    delete: async ({id}: {id: number}) => taskServices.deleteImage({id}),
+  },
 };
 
 export function getEntityQueryKey(
@@ -119,6 +134,9 @@ export function getEntityQueryKey(
     return [[QUERY_KEYS.BOL_COUNT, {idJob: params?.idJob}]];
   if (entity === ENTITY_TYPES.ITEM_INVENTORY_DETAIL)
     return [[QUERY_KEYS.INVENTORY_ITEM_DETAIL, {id: params?.id}]];
+
+  if (entity === ENTITY_TYPES.IMAGE)
+    return [[QUERY_KEYS.IMAGES, {idJob: params?.idJob}]];
 
   return [entity, params ?? {}];
 }

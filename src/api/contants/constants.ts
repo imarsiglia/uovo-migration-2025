@@ -44,6 +44,7 @@ export const QUERY_KEYS = {
   RESUME_CONDITION_CHECK: 'resume_condition_check',
   PLACES_CONDITION_REPORT: 'places_condition_report',
   ARTISTS: 'artists',
+  ALL_ARTIST: 'all_artist',
   ART_TYPES: 'art_types',
   CONDITION_REPORT_BY_INVENTORY: 'condition_report_by_inventory',
   CONDITION_CHECK_BY_INVENTORY: 'condition_check_by_inventory',
@@ -389,4 +390,5 @@ export const ENTITY_TYPES = {
   BOL_COUNT: 'bol_count',
   ITEM_INVENTORY_DETAIL: 'item_inventory_detail',
   CONDITION_REPORT: 'condition_report',
+  IMAGE: 'image',
 };

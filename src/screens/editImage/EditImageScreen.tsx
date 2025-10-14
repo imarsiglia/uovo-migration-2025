@@ -1,23 +1,5 @@
-import {Icons} from '@assets/icons/icons';
-import MinRoundedView from '@components/commons/view/MinRoundedView';
-import {Wrapper} from '@components/commons/wrappers/Wrapper';
-import {
-  Canvas,
-  CanvasControlProvider,
-  CanvasControls,
-} from '@equinor/react-native-skia-draw';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {RootStackParamList} from '@navigation/types';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {
-  Image as SkImageNode,
-  ImageFormat,
-  Rect,           // 👈 importa Rect de Skia
-  Skia
-} from '@shopify/react-native-skia';
-import {COLORS} from '@styles/colors';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
-import React, {useCallback, useMemo, useRef} from 'react';
+// EditImageScreen.tsx
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -25,67 +7,176 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {
+  Canvas,
+  CanvasControlProvider,
+  CanvasControls,
+} from '@equinor/react-native-skia-draw';
+import {
+  Image as SkImageNode,
+  ImageFormat,
+  Rect,
+  Skia,
+} from '@shopify/react-native-skia';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+
+import {Icons} from '@assets/icons/icons';
+import MinRoundedView from '@components/commons/view/MinRoundedView';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {COLORS} from '@styles/colors';
+import {RootStackParamList} from '@navigation/types';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditImage'>;
 
-// Cambia este modo según lo que necesites:
-const SAVE_BG_MODE: 'white' | 'transparent' = 'white'; // 'transparent' → PNG
+// 'white' = fondo blanco; 'transparent' = PNG con alfa
+const SAVE_BG_MODE: 'white' | 'transparent' = 'white';
+const HEADER_H = 48;
 
-export const EditImageScreen = (props: Props) => {
+export const EditImageScreen: React.FC<Props> = (props) => {
+  // No necesitamos el ref externo del provider
   const dummyRef: any = undefined;
   return (
     <CanvasControlProvider
       canvasRef={dummyRef}
       initialToolColor={COLORS.strokeRed}
       initialToolType="pen"
-      initialStrokeWeight={3}>
+      initialStrokeWeight={4} // grosor por defecto, ajustable
+    >
       <DrawImage {...props} />
     </CanvasControlProvider>
   );
 };
 
-const HEADER_H = 48;
-
-const DrawImage = (props: Props) => {
+const DrawImage: React.FC<Props> = (props) => {
   const refCanvas = useRef<CanvasControls>(null);
   const {width, height} = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const {goBack, navigate, getState} = useCustomNavigation();
 
-  // Carga de imagen desde base64
+  const [exportOverlay, setExportOverlay] = useState(false);
+
+  // Carga base64 → SkImage
   const skImage = useMemo(() => {
     const b64 = props.route.params?.photo?.data;
     return b64 ? Skia.Image.MakeImageFromEncoded(Skia.Data.fromBase64(b64)) : null;
   }, [props.route.params?.photo?.data]);
 
-  // Área fija del lienzo (lo que exportarás en el snapshot)
+  // Área del canvas visible (edición en pantalla)
   const canvasW = width;
   const canvasH = Math.max(1, height - insets.top - HEADER_H - 8);
 
-  const saveImage = useCallback(() => {
-    // Si quieres transparencia real, conviene PNG
-    const usePng = SAVE_BG_MODE === 'white';
-    const snap = refCanvas.current?.makeImageSnapshot?.({
-      imageFormat: usePng ? ImageFormat.PNG : ImageFormat.JPEG,
-      quality: usePng ? undefined : 85,
-    });
-    const b64 = snap?.data?.replace(/(\r\n|\n|\r)/gm, '');
-    if (!b64) return;
+  // Paint único (evita "expected an Object")
+  const paint = useMemo(() => {
+    const p = Skia.Paint();
+    p.setAntiAlias(true);
+    return p;
+  }, []);
 
-    navigate(
-      getState().routes[getState().index - 1]?.name as any,
-      {
-        editedImage: {
-          ...props.route.params.photo,
-          data: b64,
-          compress: false,
+  // Calcula dónde “cae” la imagen dentro del canvas visible (fit=contain)
+  const viewRectOfImage = useCallback((imgW: number, imgH: number, boxW: number, boxH: number) => {
+    const s = Math.min(boxW / imgW, boxH / imgH);
+    const w = imgW * s;
+    const h = imgH * s;
+    const x = (boxW - w) / 2;
+    const y = (boxH - h) / 2;
+    return { x, y, w, h };
+  }, []);
+
+  const saveImage = useCallback(async () => {
+    try {
+      if (!skImage || !refCanvas.current) return;
+
+      // 1) Captura SOLO trazos (oculta base para el snapshot)
+      setExportOverlay(true);
+      await new Promise<void>(r => requestAnimationFrame(() => r()));
+      await new Promise<void>(r => requestAnimationFrame(() => r()));
+
+      const overlaySnap = refCanvas.current.makeImageSnapshot?.({
+        imageFormat: ImageFormat.PNG, // overlay sin pérdida
+      });
+
+      setExportOverlay(false);
+      const overlayB64 = overlaySnap?.data?.replace(/(\r\n|\n|\r)/gm, '');
+      if (!overlayB64) {
+        // Sin trazos: devolvemos la imagen original (PNG)
+        const originalPNG = skImage.encodeToBase64(ImageFormat.PNG);
+        if (!originalPNG) return;
+        return navigate(
+          getState().routes[getState().index - 1]?.name as any,
+          {
+            editedImage: { ...props.route.params.photo, data: originalPNG, compress: false },
+            photos: props.route.params?.photos,
+          },
+          { merge: true, pop: true }
+        );
+      }
+
+      const overlayImg = Skia.Image.MakeImageFromEncoded(Skia.Data.fromBase64(overlayB64));
+      if (!overlayImg) return;
+
+      // 2) Surface offscreen a resolución ORIGINAL
+      const origW = skImage.width();
+      const origH = skImage.height();
+      const surface = Skia.Surface.MakeOffscreen(origW, origH);
+      if (!surface) return;
+      const canvas = surface.getCanvas();
+
+      // 3) Fondo
+      if (SAVE_BG_MODE === 'white') {
+        const bg = Skia.Paint();
+        bg.setColor(Skia.Color('#FFFFFF'));
+        canvas.drawRect(Skia.XYWHRect(0, 0, origW, origH), bg);
+      } else {
+        canvas.clear(Skia.Color('transparent'));
+      }
+
+      // 4) Dibuja base (full-res)
+      const srcFull = Skia.XYWHRect(0, 0, origW, origH);
+      const dstFull = Skia.XYWHRect(0, 0, origW, origH);
+      canvas.drawImageRect(skImage, srcFull, dstFull, paint);
+
+      // 5) Proyecta overlay desde coords de la vista → coords originales
+      //    - overlayImg: tamaño = (canvasW, canvasH) del snapshot
+      const viewRect = viewRectOfImage(origW, origH, canvasW, canvasH);
+      const sx = overlayImg.width() / canvasW;   // pxOverlay por dp
+      const sy = overlayImg.height() / canvasH;
+
+      // Recorta del overlay SOLO el área donde estuvo la imagen base
+      const srcOverlay = Skia.XYWHRect(viewRect.x * sx, viewRect.y * sy, viewRect.w * sx, viewRect.h * sy);
+      // Ese recorte lo estiramos al tamaño original completo (para que las trazos queden encima de la base nativa)
+      canvas.drawImageRect(overlayImg, srcOverlay, dstFull, paint);
+
+      // 6) Exporta PNG full-res sin pérdida
+      const outImage = surface.makeImageSnapshot();
+      const outPNG = outImage.encodeToBase64(ImageFormat.PNG);
+      if (!outPNG) return;
+
+      navigate(
+        getState().routes[getState().index - 1]?.name as any,
+        {
+          editedImage: { ...props.route.params.photo, data: outPNG, compress: false },
+          photos: props.route.params?.photos,
         },
-        photos: props.route.params?.photos,
-      },
-      {merge: true, pop: true},
-    );
-  }, [getState, navigate, props.route.params?.photo, props.route.params?.photos]);
+        { merge: true, pop: true }
+      );
+    } catch (e) {
+      console.error('[EditImage] saveImage error:', e);
+      setExportOverlay(false);
+    }
+  }, [
+    skImage,
+    refCanvas,
+    canvasW,
+    canvasH,
+    viewRectOfImage,
+    paint,
+    navigate,
+    getState,
+    props.route.params?.photo,
+    props.route.params?.photos,
+  ]);
 
   const undo = useCallback(() => refCanvas.current?.undo?.(), []);
   const clear = useCallback(() => refCanvas.current?.clear?.(), []);
@@ -115,7 +206,7 @@ const DrawImage = (props: Props) => {
 
       <MinRoundedView />
 
-      {/* Toolbar fija */}
+      {/* Herramientas fijas */}
       <View pointerEvents="box-none" style={[styles.toolsOverlay, {top: HEADER_H + 8, right: 12}]}>
         <TouchableOpacity onPress={undo} style={styles.functionButtonRound}>
           <Icons.Undo fontSize={15} color={COLORS.white} />
@@ -123,23 +214,23 @@ const DrawImage = (props: Props) => {
         <TouchableOpacity onPress={clear} style={styles.functionButtonRound}>
           <Icons.PaintRoller fontSize={15} color={COLORS.white} />
         </TouchableOpacity>
+        {/* Aquí podrías añadir botones de color/grosor si lo deseas */}
       </View>
 
-      {/* Lienzo */}
+      {/* Canvas visible de edición */}
       <View style={styles.canvasHost}>
         {skImage && (
-          <Canvas
-            ref={refCanvas}
-            style={{width: canvasW, height: canvasH, alignSelf: 'center'}}
-          >
-            {/* ⬇️ Fondo pintado dentro del Canvas (se incluye en el snapshot) */}
-            {SAVE_BG_MODE === 'white' && (
+          <Canvas ref={refCanvas} style={{width: canvasW, height: canvasH, alignSelf: 'center'}}>
+            {/* Fondo visible (NO se incluye cuando exportOverlay = true) */}
+            {!exportOverlay && SAVE_BG_MODE === 'white' && (
               <Rect x={0} y={0} width={canvasW} height={canvasH} color="#FFFFFF" />
             )}
 
-            {/* Imagen centrada/contain sobre el fondo */}
-            <SkImageNode image={skImage} width={canvasW} height={canvasH} fit="contain" />
-            {/* Las pinceladas del CanvasControlProvider se dibujan encima */}
+            {/* Imagen base (oculta al exportar overlay) */}
+            {!exportOverlay && (
+              <SkImageNode image={skImage} width={canvasW} height={canvasH} fit="contain" />
+            )}
+            {/* Encima van las trazos que pinta el provider */}
           </Canvas>
         )}
       </View>
@@ -149,10 +240,8 @@ const DrawImage = (props: Props) => {
 
 const styles = StyleSheet.create({
   root: {flex: 1, backgroundColor: COLORS.bgWhite ?? '#fbfbfb'},
-
   headerOverlay: {backgroundColor: COLORS.white},
   headerTitle: {color: COLORS.titleColor, fontSize: 20},
-
   backBtn: {
     flexDirection: 'row',
     opacity: 0.8,
@@ -162,7 +251,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backBtnText: {color: COLORS.gray, fontSize: 18, paddingBottom: 1},
-
   functionButton: {
     paddingHorizontal: 10,
     marginVertical: 8,
@@ -172,7 +260,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 25,
   },
-
   toolsOverlay: {
     position: 'absolute',
     zIndex: 25,
@@ -190,12 +277,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 50,
   },
-
   canvasHost: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    // este color NO se guarda; sólo decorativo de pantalla
+    // decorativo: NO se guarda
     backgroundColor: '#fff',
   },
 });
