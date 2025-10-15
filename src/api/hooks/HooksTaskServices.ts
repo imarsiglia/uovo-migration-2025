@@ -207,8 +207,6 @@ export const useGetPictures = (props: TaskBaseApiProps) => {
     ...DEFAULT_PERSISTENCE_CONFIG,
     select: (rows) =>
       rows?.map((row) => {
-        console.log('desde el select -> row client id');
-        console.log(row.clientId);
         const clientId = row.clientId ?? generateUUID();
         return {
           ...row,
@@ -251,39 +249,19 @@ export function useDeletePictureGroup() {
   };
 }
 
-// export const useGetFullPicture = ({
-//   enabled,
-//   ...rest
-// }: {
-//   id: number;
-//   enabled?: boolean;
-// }) => {
-//   const q = fullPhotoQuery(rest.id);
-//   return useQuery({
-//     enabled: !!rest?.id && enabled,
-//     ...DEFAULT_PERSISTENCE_CONFIG,
-//     queryKey: q.key,
-//     queryFn: q.fn,
-//     staleTime: q.staleTime,
-//     gcTime: q.gcTime,
-//   });
-// };
-
 export function useFullPhotoUri(
   photo: TaskPhotoType,
-  group: Pick<TaskImageType, 'update_time'>, // pásale el grupo
-  enabled?: boolean
+  group: Pick<TaskImageType, 'update_time'>,
+  enabled?: boolean,
 ) {
-  // “rev” que fuerza un nuevo caché cuando cambie el grupo
+  // “rev” que fuerza un nuevo caché cuando cambie el update_time del grupo
   const groupRev = group?.update_time ?? 'nogrev';
 
   const q = photo.id
-    ? fullPhotoQueryById({id: photo.id!, groupRev})
+    ? fullPhotoQueryById({id: photo.id!})
     : localPhotoQueryByClientId({
         clientId: photo.clientId!,
         base64: photo.photo!,
-        groupRev, // si aún no hay update_time del server, omítelo y usa localRev
-        localRev: photo.photo?.length, // fallback razonable
       });
 
   return useQuery({
@@ -292,7 +270,7 @@ export function useFullPhotoUri(
     staleTime: q.staleTime,
     gcTime: q.gcTime,
     refetchOnMount: q.refetchOnMount,
-    enabled
+    enabled,
   });
 }
 

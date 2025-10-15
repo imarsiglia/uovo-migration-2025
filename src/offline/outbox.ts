@@ -172,11 +172,6 @@ export async function enqueueCoalesced(
   op: OutboxOpKind,
   payload: GenericPayload,
 ): Promise<string> {
-  console.log('props para encolar petición');
-  console.log('op');
-  console.log(op);
-  console.log('payload');
-  console.log(payload);
   const q = await readQueue();
   const matches = q
     .map((it, i) => ({it, i}))
@@ -199,25 +194,17 @@ export async function enqueueCoalesced(
   }
   if (op === 'delete') {
     let removed = false;
-    console.log('recorriendo q');
-    console.log(JSON.stringify(q));
     for (let k = q.length - 1; k >= 0; k--) {
       const it = q[k];
-      console.log('comparando');
-      console.log(it);
       if (
         sameRecord(it.payload, payload) &&
         (it.op === 'create' || it.op === 'update')
       ) {
-        console.log('same record');
         q.splice(k, 1);
         removed = true;
-      } else {
-        console.log('not same record');
       }
     }
     if (removed && !payload.id && payload.clientId) {
-      console.log('write Queue delete');
       await writeQueue(q);
       return generateUUID(); // net-zero (create+delete collapsed)
     }
@@ -238,13 +225,8 @@ export async function enqueueCoalesced(
     status: 'pending',
     lastError: null,
   };
-  console.log('new push of outbox item');
-  console.log(JSON.stringify(item));
   q.push(item);
   await writeQueue(q);
-  console.log('finalizó write queue ');
   const qqq = await readQueue();
-  console.log("queue final");
-  console.log(qqq);
   return item.uid;
 }

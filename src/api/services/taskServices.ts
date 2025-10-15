@@ -270,8 +270,6 @@ export type SaveImageApiProps = {
   photos: string[];
 } & TaskBaseApiProps;
 const registerImage = async (props: SaveImageApiProps): Promise<boolean> => {
-  console.log("props")
-  console.log(props)
   const response = await postRequest(API_REGISTER_IMAGES, props);
   return response.message === SUCCESS_MESSAGES.SUCCESS;
 };

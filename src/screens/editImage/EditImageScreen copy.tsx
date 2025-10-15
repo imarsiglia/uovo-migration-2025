@@ -27,8 +27,6 @@ import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {COLORS} from '@styles/colors';
 import {RootStackParamList} from '@navigation/types';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {loadingWrapperPromise} from '@store/actions';
-import { sleep } from '@utils/functions';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditImage'>;
 
@@ -62,9 +60,7 @@ const DrawImage: React.FC<Props> = (props) => {
   // Carga base64 → SkImage
   const skImage = useMemo(() => {
     const b64 = props.route.params?.photo?.data;
-    return b64
-      ? Skia.Image.MakeImageFromEncoded(Skia.Data.fromBase64(b64))
-      : null;
+    return b64 ? Skia.Image.MakeImageFromEncoded(Skia.Data.fromBase64(b64)) : null;
   }, [props.route.params?.photo?.data]);
 
   // Área del canvas visible (edición en pantalla)
@@ -79,117 +75,96 @@ const DrawImage: React.FC<Props> = (props) => {
   }, []);
 
   // Calcula dónde “cae” la imagen dentro del canvas visible (fit=contain)
-  const viewRectOfImage = useCallback(
-    (imgW: number, imgH: number, boxW: number, boxH: number) => {
-      const s = Math.min(boxW / imgW, boxH / imgH);
-      const w = imgW * s;
-      const h = imgH * s;
-      const x = (boxW - w) / 2;
-      const y = (boxH - h) / 2;
-      return {x, y, w, h};
-    },
-    [],
-  );
+  const viewRectOfImage = useCallback((imgW: number, imgH: number, boxW: number, boxH: number) => {
+    const s = Math.min(boxW / imgW, boxH / imgH);
+    const w = imgW * s;
+    const h = imgH * s;
+    const x = (boxW - w) / 2;
+    const y = (boxH - h) / 2;
+    return { x, y, w, h };
+  }, []);
 
-  const saveImage = useCallback(() => {
-    if (!skImage || !refCanvas.current) return;
+  const saveImage = useCallback(async () => {
+    try {
+      if (!skImage || !refCanvas.current) return;
 
-    return loadingWrapperPromise(
-      (async () => {
-        await sleep(180);
-        // 1) Capturar SOLO el overlay (trazos) en PNG, sin base
-        setExportOverlay(true);
-        // dos frames para asegurar re-render sin base
-        // await new Promise<void>((r) => requestAnimationFrame(() => r()));
-        // await new Promise<void>((r) => requestAnimationFrame(() => r()));
+      // 1) Captura SOLO trazos (oculta base para el snapshot)
+      setExportOverlay(true);
+      await new Promise<void>(r => requestAnimationFrame(() => r()));
+      await new Promise<void>(r => requestAnimationFrame(() => r()));
 
-        const overlaySnap = refCanvas.current!.makeImageSnapshot?.({
-          imageFormat: ImageFormat.PNG,
-        });
+      const overlaySnap = refCanvas.current.makeImageSnapshot?.({
+        imageFormat: ImageFormat.PNG, // overlay sin pérdida
+      });
 
-        setExportOverlay(false);
-
-        const overlayB64 = overlaySnap?.data?.replace(/(\r\n|\n|\r)/gm, '');
-        // Si no hubo trazos, devolvemos la original en PNG
-        if (!overlayB64) {
-          const originalPNG = skImage.encodeToBase64(ImageFormat.PNG);
-          if (!originalPNG) return;
-          navigate(
-            getState().routes[getState().index - 1]?.name as any,
-            {
-              editedImage: {
-                ...props.route.params.photo,
-                data: originalPNG,
-                compress: false,
-              },
-              photos: props.route.params?.photos,
-            },
-            {merge: true, pop: true},
-          );
-          return;
-        }
-
-        const overlayImg = Skia.Image.MakeImageFromEncoded(
-          Skia.Data.fromBase64(overlayB64),
-        );
-        if (!overlayImg) return;
-
-        // 2) Componer en surface offscreen a resolución ORIGINAL
-        const origW = skImage.width();
-        const origH = skImage.height();
-        const surface = Skia.Surface.MakeOffscreen(origW, origH);
-        if (!surface) return;
-        const canvas = surface.getCanvas();
-
-        // Fondo final
-        if (SAVE_BG_MODE === 'white') {
-          const bg = Skia.Paint();
-          bg.setColor(Skia.Color('#FFFFFF'));
-          canvas.drawRect(Skia.XYWHRect(0, 0, origW, origH), bg);
-        } else {
-          canvas.clear(Skia.Color('transparent'));
-        }
-
-        // Base full-res
-        const srcFull = Skia.XYWHRect(0, 0, origW, origH);
-        const dstFull = Skia.XYWHRect(0, 0, origW, origH);
-        canvas.drawImageRect(skImage, srcFull, dstFull, paint);
-
-        // 3) Recortar del overlay sólo el área visible de la imagen (fit=contain)
-        const vr = viewRectOfImage(origW, origH, canvasW, canvasH);
-        const sx = overlayImg.width() / canvasW;
-        const sy = overlayImg.height() / canvasH;
-
-        // Recorte del overlay que corresponde a la imagen
-        const srcOverlay = Skia.XYWHRect(
-          vr.x * sx,
-          vr.y * sy,
-          vr.w * sx,
-          vr.h * sy,
-        );
-
-        // Estirar ese recorte al tamaño original completo (sobre la base)
-        canvas.drawImageRect(overlayImg, srcOverlay, dstFull, paint);
-
-        // 4) Exportar PNG sin pérdida
-        const outImage = surface.makeImageSnapshot();
-        const outPNG = outImage.encodeToBase64(ImageFormat.PNG);
-        if (!outPNG) return;
-
-        navigate(
+      setExportOverlay(false);
+      const overlayB64 = overlaySnap?.data?.replace(/(\r\n|\n|\r)/gm, '');
+      if (!overlayB64) {
+        // Sin trazos: devolvemos la imagen original (PNG)
+        const originalPNG = skImage.encodeToBase64(ImageFormat.PNG);
+        if (!originalPNG) return;
+        return navigate(
           getState().routes[getState().index - 1]?.name as any,
           {
-            editedImage: {
-              ...props.route.params.photo,
-              data: outPNG,
-              compress: false,
-            },
+            editedImage: { ...props.route.params.photo, data: originalPNG, compress: false },
             photos: props.route.params?.photos,
           },
-          {merge: true, pop: true},
+          { merge: true, pop: true }
         );
-      })(),
-    );
+      }
+
+      const overlayImg = Skia.Image.MakeImageFromEncoded(Skia.Data.fromBase64(overlayB64));
+      if (!overlayImg) return;
+
+      // 2) Surface offscreen a resolución ORIGINAL
+      const origW = skImage.width();
+      const origH = skImage.height();
+      const surface = Skia.Surface.MakeOffscreen(origW, origH);
+      if (!surface) return;
+      const canvas = surface.getCanvas();
+
+      // 3) Fondo
+      if (SAVE_BG_MODE === 'white') {
+        const bg = Skia.Paint();
+        bg.setColor(Skia.Color('#FFFFFF'));
+        canvas.drawRect(Skia.XYWHRect(0, 0, origW, origH), bg);
+      } else {
+        canvas.clear(Skia.Color('transparent'));
+      }
+
+      // 4) Dibuja base (full-res)
+      const srcFull = Skia.XYWHRect(0, 0, origW, origH);
+      const dstFull = Skia.XYWHRect(0, 0, origW, origH);
+      canvas.drawImageRect(skImage, srcFull, dstFull, paint);
+
+      // 5) Proyecta overlay desde coords de la vista → coords originales
+      //    - overlayImg: tamaño = (canvasW, canvasH) del snapshot
+      const viewRect = viewRectOfImage(origW, origH, canvasW, canvasH);
+      const sx = overlayImg.width() / canvasW;   // pxOverlay por dp
+      const sy = overlayImg.height() / canvasH;
+
+      // Recorta del overlay SOLO el área donde estuvo la imagen base
+      const srcOverlay = Skia.XYWHRect(viewRect.x * sx, viewRect.y * sy, viewRect.w * sx, viewRect.h * sy);
+      // Ese recorte lo estiramos al tamaño original completo (para que las trazos queden encima de la base nativa)
+      canvas.drawImageRect(overlayImg, srcOverlay, dstFull, paint);
+
+      // 6) Exporta PNG full-res sin pérdida
+      const outImage = surface.makeImageSnapshot();
+      const outPNG = outImage.encodeToBase64(ImageFormat.PNG);
+      if (!outPNG) return;
+
+      navigate(
+        getState().routes[getState().index - 1]?.name as any,
+        {
+          editedImage: { ...props.route.params.photo, data: outPNG, compress: false },
+          photos: props.route.params?.photos,
+        },
+        { merge: true, pop: true }
+      );
+    } catch (e) {
+      console.error('[EditImage] saveImage error:', e);
+      setExportOverlay(false);
+    }
   }, [
     skImage,
     refCanvas,
@@ -218,18 +193,11 @@ const DrawImage: React.FC<Props> = (props) => {
             </View>
           </TouchableOpacity>
 
-          <Text
-            style={[
-              GLOBAL_STYLES.title,
-              GLOBAL_STYLES.bold,
-              styles.headerTitle,
-            ]}>
+          <Text style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, styles.headerTitle]}>
             Edit image
           </Text>
 
-          <TouchableOpacity
-            style={[styles.functionButton, GLOBAL_STYLES.row]}
-            onPress={saveImage}>
+          <TouchableOpacity style={[styles.functionButton, GLOBAL_STYLES.row]} onPress={saveImage}>
             <Icons.Check fontSize={15} color={COLORS.white} />
             <Text style={{color: 'white', marginLeft: 5}}>OK</Text>
           </TouchableOpacity>
@@ -239,9 +207,7 @@ const DrawImage: React.FC<Props> = (props) => {
       <MinRoundedView />
 
       {/* Herramientas fijas */}
-      <View
-        pointerEvents="box-none"
-        style={[styles.toolsOverlay, {top: HEADER_H + 8, right: 12}]}>
+      <View pointerEvents="box-none" style={[styles.toolsOverlay, {top: HEADER_H + 8, right: 12}]}>
         <TouchableOpacity onPress={undo} style={styles.functionButtonRound}>
           <Icons.Undo fontSize={15} color={COLORS.white} />
         </TouchableOpacity>
@@ -254,28 +220,15 @@ const DrawImage: React.FC<Props> = (props) => {
       {/* Canvas visible de edición */}
       <View style={styles.canvasHost}>
         {skImage && (
-          <Canvas
-            ref={refCanvas}
-            style={{width: canvasW, height: canvasH, alignSelf: 'center'}}>
+          <Canvas ref={refCanvas} style={{width: canvasW, height: canvasH, alignSelf: 'center'}}>
             {/* Fondo visible (NO se incluye cuando exportOverlay = true) */}
             {!exportOverlay && SAVE_BG_MODE === 'white' && (
-              <Rect
-                x={0}
-                y={0}
-                width={canvasW}
-                height={canvasH}
-                color="#FFFFFF"
-              />
+              <Rect x={0} y={0} width={canvasW} height={canvasH} color="#FFFFFF" />
             )}
 
             {/* Imagen base (oculta al exportar overlay) */}
             {!exportOverlay && (
-              <SkImageNode
-                image={skImage}
-                width={canvasW}
-                height={canvasH}
-                fit="contain"
-              />
+              <SkImageNode image={skImage} width={canvasW} height={canvasH} fit="contain" />
             )}
             {/* Encima van las trazos que pinta el provider */}
           </Canvas>

@@ -66,11 +66,11 @@ export const VisualizeBolScreen = () => {
         <Wrapper style={GLOBAL_STYLES.containerBtnOptTop}>
           <BackButton title="Back" onPress={goBack} />
 
-          {filePath && (
+          {/* {filePath && (
             <PressableOpacity onPress={handleShare} style={styles.shareButton}>
               <Icon name="share-alt" color="white" type="solid" size={14} />
             </PressableOpacity>
-          )}
+          )} */}
         </Wrapper>
       </Wrapper>
 

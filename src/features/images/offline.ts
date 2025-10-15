@@ -46,8 +46,6 @@ export async function offlineDeleteImage({
   id,
   clientId,
 }: ImageOfflineProps) {
-  console.log('offline delete image');
-  console.log(id);
   if (!id && !clientId)
     throw new Error('offlineDeleteImage requires id or clientId');
   return enqueueCoalesced('delete', {

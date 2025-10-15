@@ -43,7 +43,7 @@ import {
 } from '@generalTypes/schemas';
 import {InputTextContext} from '@components/commons/form/InputTextContext';
 import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
-import {onLaunchCamera, onSelectImage} from '@utils/image';
+import {onLaunchCamera, onSelectImage, uriToBase64} from '@utils/image';
 import {useUpsertArrayCache} from '@hooks/useToolsReactQueryCache';
 import {useAuth} from '@store/auth';
 import {
@@ -99,7 +99,7 @@ export const SaveImagesScreen = (props: Props) => {
     queries: initialGroupPhotos.map((p) => ({
       queryKey: [
         QUERY_KEYS.LOAD_FULL_IMAGE,
-        {id: p.id, rev: item?.update_time ?? 'nov'},
+        {id: p.id, groupRev: item?.update_time ?? 'nov'},
       ],
       queryFn: () => taskServices.getFullImage({id: p.id!}),
       enabled: !!p.id && !!item && online, // no consultes cuando no hay id o estás offline
@@ -162,7 +162,7 @@ export const SaveImagesScreen = (props: Props) => {
   const isHydratingFullRes =
     !!item &&
     photoQueries.length > 0 &&
-    photoQueries.some((q) => q.isFetching) &&
+    photoQueries.some((q) => q.isLoading) &&
     photos.length > 0;
 
   /** ---------- pickers ---------- */
@@ -172,16 +172,30 @@ export const SaveImagesScreen = (props: Props) => {
     [photos],
   );
 
-  const generateImagePathIOS = useCallback((pictures: ImageType[]) => {
-    setPhotos((prev) =>
-      [
-        ...prev,
-        ...pictures.map((x) => ({
-          photo: x.data!,
-        })),
-      ].slice(0, MAX_PHOTOS),
-    );
-  }, []);
+  const generateImagePathIOS = useCallback(
+    (pictures: ImageType[] | ImageType) => {
+      if (Array.isArray(pictures)) {
+        setPhotos((prev) =>
+          [
+            ...prev,
+            ...pictures.map((x) => ({
+              photo: x.data!,
+            })),
+          ].slice(0, MAX_PHOTOS),
+        );
+      } else {
+        setPhotos((prev) =>
+          [
+            ...prev,
+            {
+              photo: pictures.data!,
+            },
+          ].slice(0, MAX_PHOTOS),
+        );
+      }
+    },
+    [],
+  );
 
   const initOptions = useCallback(() => {
     refVoice.current?.stop();
@@ -194,7 +208,6 @@ export const SaveImagesScreen = (props: Props) => {
     onLaunchCamera(closeSheet, generateImagePathIOS, {
       maxFiles: totalMissingPhotos,
       compressImageQuality: 1,
-      multiple: true,
     });
   }, [closeSheet, generateImagePathIOS, totalMissingPhotos]);
 
@@ -226,7 +239,8 @@ export const SaveImagesScreen = (props: Props) => {
   }, [editedImage]);
 
   const editSlot = useCallback(
-    async (index: number) => {
+    (index: number) => {
+      // const base64 = uriToBase64(photos[index].photo!);
       setSelectedIndex(index);
       navigate(RoutesNavigation.EditImage, {
         photo: {data: photos[index].photo},
@@ -461,6 +475,12 @@ export const SaveImagesScreen = (props: Props) => {
     ],
   );
 
+  const clearImages = useCallback(() => {
+    const idsToRemove = photos?.filter((x) => !!x.id).map((x) => x.id!) ?? [];
+    setRemovedIds((prev) => [...prev, ...idsToRemove]);
+    setPhotos([]);
+  }, [photos]);
+
   /** ---------- UI ---------- */
   const grid = useMemo(() => {
     const arr = [...photos];
@@ -571,7 +591,7 @@ export const SaveImagesScreen = (props: Props) => {
               ]}>
               <PressableOpacity
                 style={styles.btnDeletePhoto}
-                onPress={() => setPhotos([])}>
+                onPress={clearImages}>
                 <Icon
                   name="trash"
                   type="solid"

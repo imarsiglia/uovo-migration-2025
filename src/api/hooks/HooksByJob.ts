@@ -14,7 +14,7 @@ import {seedDetailsFromList, useWarmItemDetails} from './useWarmItemDetails';
 import {DAYS_IN_MS} from './HooksTaskServices';
 import {TaskImageType} from '@api/types/Task';
 import {useWarmFullPhotos} from './useWarmFullPhotos';
-import {base64ToFileCache} from '@utils/imageCache';
+import useInventoryStore from '@store/inventory';
 
 const ttl = {
   NOTES: 3 * DAYS_IN_MS,
@@ -32,6 +32,8 @@ const ttl = {
 export const useGetJobData = (idJob?: number) => {
   const qc = useQueryClient();
   const signatureForce = useTopSheetStore((d) => d.signatureForce);
+
+  const {orderFilter, orderType, topSheetFilter} = useInventoryStore();
 
   const jobs = useMemo(() => {
     if (!idJob) {
@@ -70,8 +72,17 @@ export const useGetJobData = (idJob?: number) => {
         ttlMS: ttl.BOL_COUNT,
       },
       {
-        key: [QUERY_KEYS.JOB_INVENTORY, {idJob}],
-        fn: () => inventoryServices.getJobInventory({idJob}),
+        key: [
+          QUERY_KEYS.JOB_INVENTORY,
+          {idJob, filter: topSheetFilter, orderFilter, orderType},
+        ],
+        fn: () =>
+          inventoryServices.getJobInventory({
+            idJob,
+            filter: topSheetFilter,
+            orderFilter,
+            orderType,
+          }),
         ttlMS: ttl.JOB_INVENTORY,
       },
       {
@@ -91,8 +102,17 @@ export const useGetJobData = (idJob?: number) => {
 
   // Lee la lista de inventario DESDE EL CACHE (sin fetch)
   const _inventoryList = useCachedQueryData<JobInventoryType[]>(
-    [QUERY_KEYS.JOB_INVENTORY, {idJob}],
-    () => inventoryServices.getJobInventory({idJob: idJob!}),
+    [
+      QUERY_KEYS.JOB_INVENTORY,
+      {idJob, filter: topSheetFilter, orderFilter, orderType},
+    ],
+    () =>
+      inventoryServices.getJobInventory({
+        idJob: idJob!,
+        filter: topSheetFilter,
+        orderFilter,
+        orderType,
+      }),
   );
 
   const _conditionReportList = useCachedQueryData<
@@ -146,7 +166,7 @@ export const useGetJobData = (idJob?: number) => {
   // Prefetch full-res con versión
   useWarmFullPhotos({
     groups: _imagesList,
-    enabled: !!_imagesList?.length,
+    enabled: !!_imagesList?.length && checksWarm.done,
     concurrency: 4,
     ttlMs: ttl.FULL_IMAGES,
     maxPrefetch: 100,
@@ -193,9 +213,9 @@ export function useBatchPrefetch(jobs: PrefetchJob[], concurrency = 4) {
           if (j.force) return true;
           const state = qc.getQueryState(j.key);
           if (!state?.data) return true;
-          if (!j.ttlMs) return false; // hay data, sin TTL => no refetch
+          // if (!j.ttlMs) return false; // hay data, sin TTL => no refetch
           const age = Date.now() - (state.dataUpdatedAt ?? 0);
-          return age > j.ttlMs;
+          return age > (j.ttlMs ?? 0);
         })
         .map((j) => async () => {
           if (cancelled) return;

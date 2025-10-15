@@ -80,11 +80,10 @@ const TaskPhotoCarouselScreen = (props: Props) => {
     const prefetch = (p?: TaskPhotoType) => {
       if (!p) return;
       const q = p.id
-        ? fullPhotoQueryById({id: p.id!, groupRev})
+        ? fullPhotoQueryById({id: p.id!})
         : localPhotoQueryByClientId({
             clientId: p.clientId!,
             base64: p.photo!,
-            groupRev,
           });
       qc.prefetchQuery({
         queryKey: q.key,

@@ -13,7 +13,7 @@ type Props = CustomInputPasswordProps & {
   currentId: string;
 };
 
-export const InputPasswordContext= forwardRef(
+export const InputPasswordContext = forwardRef(
   ({currentId, ...restProps}: Props, ref?: React.Ref<TextInput>) => {
     const {
       control,
@@ -31,10 +31,10 @@ export const InputPasswordContext= forwardRef(
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
-              style={[
-                restProps.style,
-                errors[currentId] ? {borderColor: 'red'} : {},
-              ]}
+              style={restProps.style}
+              inputProps={{
+                style: errors[currentId] ? {borderColor: 'red'} : {},
+              }}
             />
           )}
           name={currentId}

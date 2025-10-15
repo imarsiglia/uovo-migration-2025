@@ -54,12 +54,15 @@ export function useWarmFullPhotos(params: {
       // 2) Crear tareas de prefetch para cada foto (online/offline)
       const tasks = entries.map(({photo, groupRev}) => {
         const q = photo.id
-          ? fullPhotoQueryById({id: photo.id!, groupRev})
+          ? fullPhotoQueryById({
+              id: photo.id!,
+              // groupRev
+            })
           : photo.clientId && photo.photo
           ? localPhotoQueryByClientId({
               clientId: photo.clientId!,
               base64: photo.photo!,
-              groupRev,
+              // groupRev,
             })
           : undefined;
 
@@ -73,7 +76,6 @@ export function useWarmFullPhotos(params: {
           const age = Date.now() - (state.dataUpdatedAt ?? 0);
           return age < ttlMs;
         };
-
         return async () => {
           if (cancelled || shouldSkip()) return;
           try {

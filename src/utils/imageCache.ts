@@ -3,9 +3,9 @@ import {Platform} from 'react-native';
 
 export async function base64ToFileCache(
   base64: string,
-  filename: string, // incluye la versión: ej. jobimg_123_v1699999999.png
+  filename: string,
 ): Promise<string> {
-  const dir = `${RNFS.CachesDirectoryPath}/images`;
+  const dir = `${RNFS.CachesDirectoryPath}/photos`;
   const path = `${dir}/${filename}`;
   try {
     const exists = await RNFS.exists(dir);

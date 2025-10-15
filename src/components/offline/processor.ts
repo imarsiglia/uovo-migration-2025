@@ -180,9 +180,7 @@ async function processCore(
       // --- procesamiento genérico de otras entidades
       // Marcamos el item como in_progress, ejecutamos lo que toque y luego succeeded/failed.
       q = await readQueue();
-
-      console.log('queue to process');
-      console.log(q);
+      
       const idx = q.findIndex((it: any) => it.uid === next.uid);
       if (idx < 0) continue;
 

@@ -1,6 +1,12 @@
 // components/ProgressivePhoto.tsx
 import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {Animated as RNAnimated, Image, Platform, StyleSheet, View} from 'react-native';
+import {
+  Animated as RNAnimated,
+  Image,
+  Platform,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Reanimated, {
   runOnJS,
@@ -52,7 +58,6 @@ export const ProgressivePhoto: React.FC<Props> = ({
   blurPreview = Platform.OS === 'ios' ? 2 : 0,
   fadeDurationMs = 220,
   groupRev,
-
   zoomEnabled = true,
   minScale = 1,
   maxScale = 4,
@@ -60,10 +65,17 @@ export const ProgressivePhoto: React.FC<Props> = ({
   onZoomActiveChange,
 }) => {
   // Preview (siempre base64 pequeño del item)
-  const lowResUri = useMemo(() => ensureDataUri(photo.photo!, type), [photo.photo, type]);
+  const lowResUri = useMemo(
+    () => ensureDataUri(photo.photo!, type),
+    [photo.photo, type],
+  );
 
   // URI final (file://) — ya sea desde servidor (id) o local (clientId)
-  const {data: hiUri} = useFullPhotoUri(photo, {update_time: groupRev}, visible);
+  const {data: hiUri} = useFullPhotoUri(
+    photo,
+    {update_time: groupRev},
+    visible,
+  );
 
   // ---- Fade del high-res ----
   const hiOpacity = useRef(new RNAnimated.Value(0)).current;
@@ -96,9 +108,9 @@ export const ProgressivePhoto: React.FC<Props> = ({
   // Reset de transformaciones cuando cambia la imagen/versión
   const depKey = useMemo(
     () =>
-      `${photo.id ?? photo.clientId ?? 'noid'}:${groupRev ?? 'norev'}:${
-        (photo.photo ?? '').slice(0, 32)
-      }`,
+      `${photo.id ?? photo.clientId ?? 'noid'}:${groupRev ?? 'norev'}:${(
+        photo.photo ?? ''
+      ).slice(0, 32)}`,
     [photo.id, photo.clientId, photo.photo, groupRev],
   );
 
@@ -131,7 +143,8 @@ export const ProgressivePhoto: React.FC<Props> = ({
       'worklet';
       // clamp inline (worklet-safe)
       const next = savedScale.value * e.scale;
-      const clamped = next < minScale ? minScale : next > maxScale ? maxScale : next;
+      const clamped =
+        next < minScale ? minScale : next > maxScale ? maxScale : next;
       scale.value = clamped;
 
       if (clamped <= 1.001) {
@@ -195,7 +208,7 @@ export const ProgressivePhoto: React.FC<Props> = ({
           {/* High-res (encima) con fade */}
           {hiMounted && hiUri && (
             <RNAnimated.Image
-              source={{uri: hiUri}}
+              source={{uri: `data:image/jpeg;base64,${hiUri}`}}
               resizeMode={contentFit}
               onLoad={onHighLoad}
               style={[styles.absoluteImg, {opacity: hiOpacity}]}

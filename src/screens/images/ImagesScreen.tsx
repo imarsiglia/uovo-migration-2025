@@ -1,6 +1,5 @@
 import {QUERY_KEYS} from '@api/contants/constants';
 import {
-  useDeletePicture,
   useDeletePictureGroup,
   useGetPictures,
 } from '@api/hooks/HooksTaskServices';

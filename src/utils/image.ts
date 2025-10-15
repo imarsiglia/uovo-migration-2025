@@ -5,6 +5,7 @@ import {showToastMessage} from './toast';
 import {ImageType} from '@generalTypes/general';
 import {Skia, ImageFormat as SkiaImageFormat} from '@shopify/react-native-skia';
 import RNFS from 'react-native-fs';
+import {Platform} from 'react-native';
 
 const PHOTO_DIR = `${RNFS.CachesDirectoryPath}/photos`;
 
@@ -169,7 +170,7 @@ export const requestReadMediaPermission = async () => {
 export function flattenBase64OnWhite(
   base64: string,
   outFormat: 'png' | 'jpeg' = 'png',
-  quality: number = 0.92,
+  quality: number = 1,
 ): string | undefined {
   // 1) Decodificar
   const data = Skia.Data.fromBase64(base64);
@@ -196,71 +197,37 @@ export function flattenBase64OnWhite(
   return outBase64;
 }
 
-export async function base64ToFile(
-  base64: string,
-  ext: 'jpg' | 'jpeg' | 'png' | 'webp' = 'jpg',
-) {
-  const name = `ph_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-  const path = `${RNFS.CachesDirectoryPath}/${name}`;
-  await RNFS.writeFile(path, base64, 'base64');
-  return `file://${path}`;
-}
+type ConvertImageOptions = {
+  /** Si true, devuelve "data:<mime>;base64,<b64>" */
+  withDataUri?: boolean;
+  /** Mime a usar en el data URI (por defecto image/jpeg) */
+  mime?: string;
+};
 
-async function ensureDir() {
+/**
+ * Convierte una imagen local (file://, content://, ph://) a base64.
+ * @returns base64 (con o sin data URI, según withDataUri)
+ */
+export async function uriToBase64(
+  uri: string,
+  {withDataUri = false, mime = 'image/jpeg'}: ConvertImageOptions = {},
+): Promise<string> {
+  let path = uri;
+
   try {
-    const exists = await RNFS.exists(PHOTO_DIR);
-    if (!exists) await RNFS.mkdir(PHOTO_DIR);
-  } catch {}
-}
+    // Quitar el prefijo file:// para RNFS.readFile
+    if (path.startsWith('file://')) {
+      path = path.replace('file://', '');
+    }
 
-function safe(str: string) {
-  // clientId a nombre seguro de archivo
-  return str.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 120);
-}
+    // ANDROID: content:// (muchas veces RNFS.readFile ya lo soporta)
+    // Si tu versión de RNFS no soporta content://, considera usar react-native-blob-util como fallback.
+    const b64 = await RNFS.readFile(path, 'base64');
 
-export type PhotoRef = {id?: number; clientId?: string};
-
-export function buildPhotoPath(
-  ref: PhotoRef,
-  ext: 'jpg' | 'jpeg' | 'png' | 'webp' = 'jpg',
-) {
-  if (ref.id != null) return `${PHOTO_DIR}/ph_${ref.id}.${ext}`;
-  if (ref.clientId) return `${PHOTO_DIR}/ph_c_${safe(ref.clientId)}.${ext}`;
-  throw new Error('PhotoRef inválido: requiere id o clientId');
-}
-
-export async function writePhotoFileForRef(
-  ref: PhotoRef,
-  base64: string,
-  ext: 'jpg' | 'jpeg' | 'png' | 'webp' = 'jpg',
-) {
-  await ensureDir();
-  const path = buildPhotoPath(ref, ext);
-  await RNFS.writeFile(path, base64, 'base64'); // sobrescribe si existe
-  return `file://${path}`;
-}
-
-export async function getExistingPhotoUriForRef(
-  ref: PhotoRef,
-  ext: 'jpg' | 'jpeg' | 'png' | 'webp' = 'jpg',
-) {
-  const path = buildPhotoPath(ref, ext);
-  try {
-    const exists = await RNFS.exists(path);
-    if (!exists) return undefined;
-    const stat = await RNFS.stat(path);
-    if (!stat || Number(stat.size) <= 0) return undefined;
-    return `file://${path}`;
-  } catch {
-    return undefined;
+    if (withDataUri) {
+      return `data:${mime};base64,${b64}`;
+    }
+    return b64;
+  } finally {
   }
-}
-
-export async function ensureDataFileFromBase64(
-  ref: {id?: number; clientId?: string},
-  fetchBase64: () => Promise<string>,
-  ext: 'jpg' | 'jpeg' | 'png' = 'jpg',
-) {
-  const b64 = await fetchBase64();
-  return writePhotoFileForRef(ref, b64, ext);
 }
