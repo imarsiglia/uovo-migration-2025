@@ -1,3 +1,4 @@
+import { ConditionPhotoType } from '@api/types/Condition';
 import {JobInventoryType, ReportResumeType} from '@api/types/Inventory';
 import {CrewMemberType, NSItemListType} from '@api/types/Jobs';
 import {
@@ -49,6 +50,8 @@ export const RoutesNavigation = {
   InventoryNationalShuttle: 'InventoryNationalShuttle',
   Images: 'Images',
   SaveImages: 'SaveImages',
+  GalleryCondition: 'GalleryCondition',
+  PhotoDetailCondition: 'PhotoDetailCondition',
 } as const;
 
 // Union de nombres de ruta: "Home" | "ContactUs" | ...
@@ -159,6 +162,15 @@ export type RootStackParamList = {
         index?: number;
       }
     | undefined;
+  [RoutesNavigation.GalleryCondition]: undefined;
+  [RoutesNavigation.PhotoDetailCondition]: {
+    photo?: string;
+    note?: number | null;
+    refresh?: boolean;
+    updateRefreshGallery?: boolean;
+    subType?: string;
+    item?: ConditionPhotoType
+  };
 };
 
 export const TopSheetRoutesNavigation = {

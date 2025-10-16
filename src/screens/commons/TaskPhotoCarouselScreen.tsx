@@ -107,6 +107,7 @@ const TaskPhotoCarouselScreen = (props: Props) => {
           visible={i === index}
           contentFit={contentFit}
           groupRev={groupRev}
+          externalScrollRef={listRef}            // 👈 permite simultaneidad de gestos
           onZoomActiveChange={(active) => setScrollEnabled(!active)} // 👈
         />
       </Wrapper>

@@ -103,10 +103,12 @@ export const ContactScreen = () => {
   }, []);
 
   const initCamera = useCallback(() => {
+    // @ts-ignore
     onLaunchCamera(closeSheet, generateImagePathIOS);
   }, [closeSheet, generateImagePathIOS]);
 
   const initGallery = useCallback(() => {
+    // @ts-ignore
     onSelectImage(closeSheet, generateImagePathIOS);
   }, [closeSheet, generateImagePathIOS]);
 

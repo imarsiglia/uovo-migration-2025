@@ -1,11 +1,15 @@
 import {
   API_GET_CONDITION_CHECK_BY_INVENTORY,
   API_GET_CONDITION_REPORT_BY_INVENTORY,
+  API_GET_PHOTO_CONDITION_DETAIL,
+  API_GET_PHOTO_CONDITION_OVERVIEW,
+  API_GET_PHOTOS_CONDITION,
   API_GET_RESUME_CONDITION_REPORT,
   API_GET_TOTAL_PHOTOS_CONDITION_CHECK,
   API_GET_TOTAL_PHOTOS_CONDITION_REPORT,
   API_SAVE_CONDITION_CHECK,
   API_SAVE_CONDITION_REPORT,
+  API_SAVE_PHOTO_CONDITION,
   SUCCESS_MESSAGES,
 } from '@api/contants/endpoints';
 import {getRequest, postRequest} from '@api/helpers/apiClientHelper';
@@ -16,7 +20,14 @@ import {
   TotalPhotoReportType,
 } from '@api/types/Inventory';
 import {Paginated} from '@api/types/Response';
-import { TaskBaseApiProps } from './taskServices';
+import {TaskBaseApiProps} from './taskServices';
+import {
+  ConditionPhotoSideType,
+  ConditionPhotoType,
+  ConditionType,
+  PhotoDetailType,
+  PhotoOverviewType,
+} from '@api/types/Condition';
 
 const getResumeConditionReport = async ({
   idJob,
@@ -161,6 +172,92 @@ const getTotalPhotosConditionCheck = async ({
   return response.body;
 };
 
+export type GetPhotosConditionApiProps = {
+  conditionType: ConditionType;
+  sideType: ConditionPhotoSideType;
+  reportId: number;
+};
+const getPhotosCondition = async ({
+  conditionType,
+  sideType,
+  reportId,
+}: GetPhotosConditionApiProps): Promise<ConditionPhotoType[]> => {
+  const response = await getRequest<Paginated<ConditionPhotoType[]>>(
+    `/${conditionType}${API_GET_PHOTOS_CONDITION}?reportType=${sideType}&reportId=${reportId}`,
+  );
+  return response.body?.data ?? [];
+};
+
+type RemovePhotoConditionApiProps = {
+  conditionType: ConditionType;
+  isOverview: boolean;
+  id: number;
+};
+const removePhotoCondition = async ({
+  conditionType,
+  isOverview = false,
+  id,
+}: RemovePhotoConditionApiProps): Promise<boolean> => {
+  const response = await postRequest(
+    `/${conditionType}${
+      isOverview ? 'deleteImageOverview' : 'deleteImageDetail'
+    }/${id}`,
+  );
+  return response.message === SUCCESS_MESSAGES.SUCCESS;
+};
+
+type SavePhotoConditionApiProps = {
+  conditionType: ConditionType;
+  idJob: number;
+  reportId: number;
+  idJobInventory: number;
+  type: ConditionPhotoSideType;
+  title?: string;
+  description?: string | null;
+  id?: number | null;
+  photo: string;
+  idStickyNote?: number | null;
+  subType?: string | null;
+};
+const savePhotoCondition = async ({
+  conditionType,
+  ...props
+}: SavePhotoConditionApiProps): Promise<boolean> => {
+  const response = await postRequest(
+    `/${conditionType}${API_SAVE_PHOTO_CONDITION}`,
+    props,
+  );
+  return response.message === SUCCESS_MESSAGES.SUCCESS;
+};
+
+export type PhotoConditionOverviewApiProps = {
+  conditionType: ConditionType;
+  id?: number;
+};
+const getPhotoConditionOverview = async ({
+  conditionType,
+  id,
+}: PhotoConditionOverviewApiProps): Promise<PhotoOverviewType> => {
+  const response = await getRequest<PhotoOverviewType>(
+    `/${conditionType}${API_GET_PHOTO_CONDITION_OVERVIEW}?id=${id}`,
+  );
+  return response.body;
+};
+
+export type PhotoConditionDetailApiProps = {
+  conditionType: ConditionType;
+  id?: number;
+};
+const getPhotoConditionDetail = async ({
+  conditionType,
+  id,
+}: PhotoConditionDetailApiProps): Promise<PhotoDetailType> => {
+  const response = await getRequest<PhotoDetailType>(
+    `/${conditionType}${API_GET_PHOTO_CONDITION_DETAIL}?id=${id}`,
+  );
+  return response.body;
+};
+
 export const reportServices = {
   getResumeConditionReport,
   getResumeConditionCheck,
@@ -170,4 +267,9 @@ export const reportServices = {
   saveConditionCheck,
   getTotalPhotosConditionReport,
   getTotalPhotosConditionCheck,
+  getPhotosCondition,
+  removePhotoCondition,
+  savePhotoCondition,
+  getPhotoConditionOverview,
+  getPhotoConditionDetail,
 };

@@ -6,7 +6,6 @@ import {
   CONDITION_STATES_LIST,
   FRAME_FIXTURE_LIST,
   HANGING_SYSTEM_LIST,
-  PHOTOS_REPORT_TYPES,
   QUERY_KEYS,
 } from '@api/contants/constants';
 import {
@@ -41,7 +40,7 @@ import {
   ConditionReportSchema,
   ConditionReportSchemaType,
 } from '@generalTypes/schemas';
-import {RootStackParamList} from '@navigation/types';
+import {RootStackParamList, RoutesNavigation} from '@navigation/types';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {loadingWrapperPromise} from '@store/actions';
 import {useAuth} from '@store/auth';
@@ -61,9 +60,13 @@ import useInventoryStore from '@store/inventory';
 import isEqual from 'lodash.isequal';
 import {offlineUpdateConditionReport} from '@features/conditionReport/offline';
 import {useOnline} from '@hooks/useOnline';
+import useConditionStore from '@store/condition';
+import {
+  CONDITION_PHOTO_SIDE_TYPE,
+  CONDITION_TYPES,
+  ConditionPhotoSideType,
+} from '@api/types/Condition';
 // import OfflineValidation from '../components/offline/OfflineValidation';
-
-var offlineInventory = {};
 
 let autosaveInitial = false;
 const delay = 3000;
@@ -90,7 +93,7 @@ export const ConditionReportScreen = (props: Props) => {
     useInventoryStore();
   const jobDetail = useTopSheetStore((d) => d.jobDetail);
   const sessionUser = useAuth((d) => d.user);
-  const {goBack} = useCustomNavigation();
+  const {goBack, navigate} = useCustomNavigation();
 
   // received params
   const fromReports = props.route.params.fromReports;
@@ -165,20 +168,16 @@ export const ConditionReportScreen = (props: Props) => {
   //   }, [props.reportId]),
   // );
 
-  useEffect(() => {
-    // props.dispatch(ActionsConditionReport.copyConditionType('conditionreport'));
-    initAll();
-  }, []);
+  const {
+    setConditionPhotoType,
+    setConditionType,
+    setConditionId,
+    setInventoryId,
+  } = useConditionStore();
 
   useEffect(() => {
-    // return () => {
-    //   props.dispatch(ActionsConditionReport.clearAllReport());
-    // };
+    setConditionType(CONDITION_TYPES.ConditionReport);
   }, []);
-
-  const initAll = async () => {
-    // await initOfflineInventory();
-  };
 
   const currentInventoryItem = useMemo(() => {
     return receivedItem ?? selectedItem;
@@ -221,6 +220,10 @@ export const ConditionReportScreen = (props: Props) => {
   //   [setFilterItem],
   // );
 
+  useEffect(() => {
+    setInventoryId(currentItem?.id);
+  }, [currentItem?.id]);
+
   const checkArtist = useCallback(
     (value: string) => {
       setFilterArtist(value.trim());
@@ -241,17 +244,13 @@ export const ConditionReportScreen = (props: Props) => {
     [setFilterTypes],
   );
 
-  const goToGallery = (type: string) => {
-    // Keyboard.dismiss();
-    // if (item.id) {
-    //   props.dispatch(ActionsConditionReport.copyReportType(type));
-    //   props.dispatch(ActionsConditionReport.copyReportInventory(item.id));
-    //   // navigate("Gallery", { type, type, idInventory: item.id })
-    //   navigate('Gallery', { type: type, idInventory: item.id });
-    // } else {
-    //   Alert.alert('You must select an item');
-    // }
-  };
+  const goToGallery = useCallback(
+    (type: ConditionPhotoSideType) => {
+      setConditionPhotoType(type);
+      navigate(RoutesNavigation.GalleryCondition);
+    },
+    [setConditionPhotoType, navigate],
+  );
 
   const goToSides = () => {
     // Keyboard.dismiss();
@@ -263,24 +262,6 @@ export const ConditionReportScreen = (props: Props) => {
     //   Alert.alert('You must select an item');
     // }
   };
-
-  useEffect(() => {
-    // if (!initial) {
-    //   clearTimeout(idTimeOut);
-    //   idTimeOut = setTimeout(
-    //     () => {
-    //       onPartialSave();
-    //     },
-    //     props.route.params.condition == null &&
-    //       (props.reportId == null || props.reportId == '')
-    //       ? 500
-    //       : 3000,
-    //   );
-    // }
-    // return () => {
-    //   clearTimeout(idTimeOut);
-    // };
-  }, []);
 
   const closeAll = (exceptIndex: number) => {
     autocompleteRefs.forEach((r, i) => {
@@ -339,6 +320,10 @@ export const ConditionReportScreen = (props: Props) => {
     id: initialConditionReport?.id!,
   });
 
+  useEffect(() => {
+    setConditionId(initialConditionReport?.id!);
+  }, [initialConditionReport?.id!]);
+
   const totalPhotos = useMemo(() => {
     const init = {
       front: 0,
@@ -351,16 +336,16 @@ export const ConditionReportScreen = (props: Props) => {
 
     return photosTotal.reduce((acc, cur) => {
       switch (cur.type) {
-        case PHOTOS_REPORT_TYPES.FRONT:
+        case CONDITION_PHOTO_SIDE_TYPE.Front:
           acc.front = cur.total ?? 0;
           break;
-        case PHOTOS_REPORT_TYPES.BACK:
+        case CONDITION_PHOTO_SIDE_TYPE.Back:
           acc.back = cur.total ?? 0;
           break;
-        case PHOTOS_REPORT_TYPES.DETAIL:
+        case CONDITION_PHOTO_SIDE_TYPE.Detail:
           acc.detail = cur.total ?? 0;
           break;
-        case PHOTOS_REPORT_TYPES.SIDES:
+        case CONDITION_PHOTO_SIDE_TYPE.Sides:
           acc.sides = cur.total ?? 0;
           break;
         default:
@@ -1163,13 +1148,13 @@ export const ConditionReportScreen = (props: Props) => {
                 <ButtonPhotosCount
                   title="Front"
                   total={totalPhotos.front}
-                  onPress={() => goToGallery(PHOTOS_REPORT_TYPES.FRONT)}
+                  onPress={() => goToGallery(CONDITION_PHOTO_SIDE_TYPE.Front)}
                 />
 
                 <ButtonPhotosCount
                   title="Back"
                   total={totalPhotos.back}
-                  onPress={() => goToGallery(PHOTOS_REPORT_TYPES.BACK)}
+                  onPress={() => goToGallery(CONDITION_PHOTO_SIDE_TYPE.Back)}
                 />
               </Wrapper>
 
@@ -1184,7 +1169,7 @@ export const ConditionReportScreen = (props: Props) => {
                 <ButtonPhotosCount
                   title="Sides"
                   total={totalPhotos.sides}
-                  onPress={() => goToGallery(PHOTOS_REPORT_TYPES.DETAIL)}
+                  onPress={() => goToGallery(CONDITION_PHOTO_SIDE_TYPE.Detail)}
                 />
               </Wrapper>
 

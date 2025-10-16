@@ -101,8 +101,9 @@ import {OfflineBanner} from '@components/offline/OfflineBanner';
 import {ModalOffline} from '@components/offline/ModalOffline';
 import {ImagesScreen} from '@screens/images/ImagesScreen';
 import TaskPhotoCarouselScreen from '@screens/commons/TaskPhotoCarouselScreen';
-import { SaveImagesScreen } from '@screens/images/SaveImagesScreen';
-// import InventoryNS from '../screens/nationalShuttle/InventoryNS';
+import {SaveImagesScreen} from '@screens/images/SaveImagesScreen';
+import {GalleryCondition} from '@screens/reports/photos/GalleryConditionScreen';
+import { PhotoDetailCondition } from '@screens/reports/photos/PhotoDetailConditionScreen';
 
 // LogBox.ignoreLogs([
 //   'Non-serializable values were found in the navigation state',
@@ -263,6 +264,19 @@ export const AppNavigation = () => {
               component={TakeDimensionsScreen}
             />
             <Stack.Screen
+              name={RoutesNavigation.InventoryNationalShuttle}
+              component={InventoryNSScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.Images}
+              component={ImagesScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.SaveImages}
+              component={SaveImagesScreen}
+            />
+            {/* condition report / condition check */}
+            <Stack.Screen
               name={RoutesNavigation.Reports}
               component={ReportsScreen}
             />
@@ -275,20 +289,14 @@ export const AppNavigation = () => {
               component={ConditionCheckScreen}
             />
             <Stack.Screen
-              name={RoutesNavigation.InventoryNationalShuttle}
-              component={InventoryNSScreen}
+              name={RoutesNavigation.GalleryCondition}
+              component={GalleryCondition}
             />
-
             <Stack.Screen
-              name={RoutesNavigation.Images}
-              component={ImagesScreen}
+              name={RoutesNavigation.PhotoDetailCondition}
+              component={PhotoDetailCondition}
             />
-
-            <Stack.Screen
-              name={RoutesNavigation.SaveImages}
-              component={SaveImagesScreen}
-            />
-
+            
             {/* visualizar imagenes */}
             <Stack.Screen
               name={RoutesNavigation.BaseImageScreen}
@@ -298,7 +306,6 @@ export const AppNavigation = () => {
               name={RoutesNavigation.TaskPhotoCarouselScreen}
               component={TaskPhotoCarouselScreen}
             />
-            
           </Stack.Navigator>
           <ModalDialog />
           <ModalLoading />

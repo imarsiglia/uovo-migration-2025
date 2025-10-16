@@ -115,6 +115,22 @@ export const API_GET_CONDITION_CHECK_BY_INVENTORY = '/conditioncheck/list';
 export const API_GET_TOTAL_PHOTOS_CONDITION_REPORT = '/conditionreport/totalPhotos';
 export const API_GET_TOTAL_PHOTOS_CONDITION_CHECK = '/conditioncheck/totalPhotos';
 
+export const API_GET_PHOTOS_CONDITION = '/loadImages';
+export const API_SAVE_PHOTO_CONDITION = '/reportImageDetail';
+export const API_GET_PHOTO_CONDITION_DETAIL = '/loadDetail';
+export const API_GET_PHOTO_CONDITION_OVERVIEW = '/loadOverview';
+
+// export const API_GET_TOTAL_PHOTOS_CONDITION_CHECK = '/conditioncheck/totalPhotos';
+
+// const response = await fetchData.Get(
+//         'resources/' +
+//           props.conditionType +
+//           '/loadImages?reportType=' +
+//           props.reportType +
+//           '&reportId=' +
+//           (reportId ? reportId : props.reportId),
+//       );
+
 // GENERAL
 export const API_GET_PACKING_DETAILS = '/conditionreport/load/packingdetail';
 export const API_GET_PLACES_CONDITION_REPORT = '/conditionreport/load/places';

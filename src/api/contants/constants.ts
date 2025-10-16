@@ -50,9 +50,12 @@ export const QUERY_KEYS = {
   CONDITION_CHECK_BY_INVENTORY: 'condition_check_by_inventory',
   TOTAL_PHOTOS_CONDITION_REPORT: 'total_photos_condition_report',
   TOTAL_PHOTOS_CONDITION_CHECK: 'total_photos_condition_check',
+  PHOTOS_CONDITION: 'photos_condition',
+  PHOTO_CONDITION_OVERVIEW: 'photo_condition_overview',
+  PHOTO_CONDITION_DETAIL: 'photo_condition_detail',
   GET_BOL_PDF: 'get_bol_pdf',
   IMAGES: 'images',
-  LOAD_FULL_IMAGE: 'load_full_image'
+  LOAD_FULL_IMAGE: 'load_full_image',
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';
