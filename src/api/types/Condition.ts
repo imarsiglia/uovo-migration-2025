@@ -55,3 +55,55 @@ export type PhotoDetailType = {
   title_sticky_note?: string;
   type?: ConditionPhotoSideType;
 };
+
+export type StickyNoteTranslation = {
+  translationX: number;
+  translationY: number;
+  absoluteX?: number;
+  absoluteY?: number;
+};
+
+type Position = {
+  top: number;
+  left: number;
+  positionX?: number;
+  positionY?: number;
+  scale?: number;
+};
+
+export type StickyNoteType = {
+  id?: number;
+  label?: string;
+  details?: string;
+  width?: number;
+  height?: number;
+  updating?: boolean;
+  position: Position;
+  translation?: {top: number; left: number} | null;
+  stickyNoteTranslation?: StickyNoteTranslation;
+  areaSet?: boolean;
+  // TODO
+};
+
+export type OverviewReportType = {
+  data: {
+    photo: {
+      uri: string;
+      base64: string;
+      data?: string;
+    };
+    notes: StickyNoteType[];
+    mainImageTransforms: null;
+    screen: {
+      width: number;
+      height: number;
+    };
+  };
+  idJob: number;
+  idJobInventory: number;
+  idImg: number;
+  reportId: number;
+  reportType: ConditionPhotoSideType;
+  reportSubType?: string;
+  status: number;
+};

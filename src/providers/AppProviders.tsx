@@ -10,6 +10,10 @@ import {AutocompleteDropdownContextProvider} from 'react-native-autocomplete-dro
 import {KeyboardProvider} from 'react-native-keyboard-controller';
 import {ColorScheme, EDSProvider} from '@equinor/mad-components';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import EditModal from '@components/condition/notes/EditModal';
+import {createModalStack, ModalProvider} from 'react-native-modalfy';
+import {DEFAULT_OPTIONS_MODALFY} from '@utils/functions';
+import EditDeleteModal from '@components/condition/notes/EditDeleteModal';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,6 +45,22 @@ function useReactQueryFocusOnAppState() {
     return () => sub.remove();
   }, []);
 }
+
+const modalConfig = {
+  EditModal: {
+    modal: EditModal,
+    disableFlingGesture: true,
+    backBehavior: 'none',
+  },
+  EditDeleteModal: {
+    modal: EditDeleteModal,
+    disableFlingGesture: true,
+    backBehavior: 'none',
+  },
+};
+
+// @ts-ignore
+const modalStack = createModalStack(modalConfig, DEFAULT_OPTIONS_MODALFY);
 
 export default function AppProviders({children}: {children: React.ReactNode}) {
   useReactQueryFocusOnAppState();
@@ -113,8 +133,7 @@ export default function AppProviders({children}: {children: React.ReactNode}) {
                   // Limpia el cache persistido si cambias la “versión” de datos:
                   buster: 'app-v15', // cambia a 'app-v2' tras cambios de schema o logout
                 }}>
-                {children}
-                {/* <OutboxProcessor /> */}
+                <ModalProvider stack={modalStack}>{children}</ModalProvider>
               </PersistQueryClientProvider>
             </EDSProvider>
           </KeyboardProvider>

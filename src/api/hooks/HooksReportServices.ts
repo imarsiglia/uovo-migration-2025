@@ -160,3 +160,9 @@ export const useGetPhotoConditionDetail = (
     ...DEFAULT_PERSISTENCE_CONFIG,
   });
 };
+
+export const useSaveZoomScreen = () => {
+  return useMutation({
+    mutationFn: reportServices.saveZoomScreen,
+  });
+};

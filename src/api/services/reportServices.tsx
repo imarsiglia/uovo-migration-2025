@@ -10,9 +10,14 @@ import {
   API_SAVE_CONDITION_CHECK,
   API_SAVE_CONDITION_REPORT,
   API_SAVE_PHOTO_CONDITION,
+  API_SAVE_ZOOM_SCREEN,
   SUCCESS_MESSAGES,
 } from '@api/contants/endpoints';
-import {getRequest, postRequest} from '@api/helpers/apiClientHelper';
+import {
+  getRequest,
+  getRequestCustomType,
+  postRequest,
+} from '@api/helpers/apiClientHelper';
 import {
   ConditionReportType,
   JobInventoryType,
@@ -25,6 +30,7 @@ import {
   ConditionPhotoSideType,
   ConditionPhotoType,
   ConditionType,
+  OverviewReportType,
   PhotoDetailType,
   PhotoOverviewType,
 } from '@api/types/Condition';
@@ -199,7 +205,7 @@ const removePhotoCondition = async ({
   id,
 }: RemovePhotoConditionApiProps): Promise<boolean> => {
   const response = await postRequest(
-    `/${conditionType}${
+    `/${conditionType}/${
       isOverview ? 'deleteImageOverview' : 'deleteImageDetail'
     }/${id}`,
   );
@@ -237,11 +243,11 @@ export type PhotoConditionOverviewApiProps = {
 const getPhotoConditionOverview = async ({
   conditionType,
   id,
-}: PhotoConditionOverviewApiProps): Promise<PhotoOverviewType> => {
-  const response = await getRequest<PhotoOverviewType>(
+}: PhotoConditionOverviewApiProps): Promise<OverviewReportType> => {
+  const response = await getRequestCustomType<OverviewReportType>(
     `/${conditionType}${API_GET_PHOTO_CONDITION_OVERVIEW}?id=${id}`,
   );
-  return response.body;
+  return response;
 };
 
 export type PhotoConditionDetailApiProps = {
@@ -258,6 +264,30 @@ const getPhotoConditionDetail = async ({
   return response.body;
 };
 
+type SaveZoomScreenProps = {
+  conditionType: ConditionType;
+  idJob: number;
+  reportId?: number;
+  idJobInventory: number;
+  data: any;
+  idImg?: number;
+  reportType?: string;
+  reportSubType?: string;
+};
+const saveZoomScreen = async ({
+  conditionType,
+  ...props
+}: SaveZoomScreenProps): Promise<boolean> => {
+  console.log(`/${conditionType}${API_SAVE_ZOOM_SCREEN}`);
+  const response = await postRequest(
+    `/${conditionType}${API_SAVE_ZOOM_SCREEN}`,
+    props,
+  );
+  console.log('RESPONSE SAVE ZOOM SCREEN');
+  console.log(response);
+  return response.message === SUCCESS_MESSAGES.SUCCESS;
+};
+
 export const reportServices = {
   getResumeConditionReport,
   getResumeConditionCheck,
@@ -272,4 +302,5 @@ export const reportServices = {
   savePhotoCondition,
   getPhotoConditionOverview,
   getPhotoConditionDetail,
+  saveZoomScreen,
 };

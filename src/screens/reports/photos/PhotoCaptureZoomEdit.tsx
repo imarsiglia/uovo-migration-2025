@@ -1,24 +1,23 @@
-import React, { useCallback } from 'react';
-import { View } from 'react-native';
-import Camera from '../../components/conditionReport/Camera';
-import { compressImageDefault } from '../../utils/functions';
+import React, {useCallback} from 'react';
+import {View} from 'react-native';
+import CameraScreenVC from '@components/condition/Camera';
 
 const PhotoCaptureZoomEdit = React.memo(function PhotoCapture({
-  navigation: { navigate, goBack},
-  route: { params }
-}) {
+  navigation: {navigate, goBack},
+  route: {params},
+}: any) {
   const onCapture = useCallback(
-    async ({ photo }) => {
-      const base64Compressed = await compressImageDefault(photo.base64);
-      params.updatePhoto(base64Compressed);
+    async ({photo}: any) => {
+      // const base64Compressed = await compressImageDefault(photo.base64);
+      params.updatePhoto(photo.base64);
       goBack();
     },
     [navigate],
   );
 
   return (
-    <View style={{ flex: 1 }}>
-      <Camera onCapture={onCapture} />
+    <View style={{flex: 1}}>
+      <CameraScreenVC onCapture={onCapture} />
     </View>
   );
 });

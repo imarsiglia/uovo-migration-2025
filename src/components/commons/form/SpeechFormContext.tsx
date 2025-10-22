@@ -6,9 +6,9 @@ import {
   startListening,
   stopListening,
 } from '@ascendtis/react-native-voice-to-text';
-import { Icons } from '@assets/icons/icons';
-import { COLORS } from '@styles/colors';
-import { requestMicrophonePermission } from '@utils/permissions';
+import {Icons} from '@assets/icons/icons';
+import {COLORS} from '@styles/colors';
+import {requestMicrophonePermission} from '@utils/permissions';
 import {
   forwardRef,
   useEffect,
@@ -16,11 +16,11 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useFormContext } from 'react-hook-form';
-import { StyleSheet } from 'react-native';
-import { PressableOpacity } from '../buttons/PressableOpacity';
-import { Label } from '../text/Label';
-import { VOICE_EVENTS } from '@api/contants/constants';
+import {useFormContext} from 'react-hook-form';
+import {StyleSheet} from 'react-native';
+import {PressableOpacity} from '../buttons/PressableOpacity';
+import {Label} from '../text/Label';
+import {VOICE_EVENTS} from '@api/contants/constants';
 
 export type SpeechFormInputRef = {
   stop: () => Promise<void>;
@@ -28,11 +28,11 @@ export type SpeechFormInputRef = {
 
 type Props = {
   name: string;
-  locale?: string; // por si quieres parametrizar el idioma (default: 'es-ES')
+  locale?: string; // por si quieres parametrizar el idioma (default: 'en-US')
 };
 
 export const SpeechFormContext = forwardRef<SpeechFormInputRef, Props>(
-  ({name, locale = 'es-ES'}, ref) => {
+  ({name, locale = 'en-US'}, ref) => {
     const manuallyStoppedRef = useRef(false);
     const [listening, setListening] = useState(false);
     const {setValue, trigger} = useFormContext();
@@ -62,10 +62,13 @@ export const SpeechFormContext = forwardRef<SpeechFormInputRef, Props>(
 
     useEffect(() => {
       // Parciales (texto en vivo mientras se habla)
-      const partialSub = addEventListener(VOICE_EVENTS.PARTIAL_RESULTS, (e: any) => {
-        const partial = extractText(e);
-        if (partial) setValue(name, partial);
-      });
+      const partialSub = addEventListener(
+        VOICE_EVENTS.PARTIAL_RESULTS,
+        (e: any) => {
+          const partial = extractText(e);
+          if (partial) setValue(name, partial);
+        },
+      );
 
       // Resultados finales
       const resultsSub = addEventListener('onSpeechResults', (e: any) => {
@@ -83,7 +86,9 @@ export const SpeechFormContext = forwardRef<SpeechFormInputRef, Props>(
       });
 
       // Estado de inicio/fin para el spinner y label
-      const startSub = addEventListener('onSpeechStart', () => setListening(true));
+      const startSub = addEventListener('onSpeechStart', () =>
+        setListening(true),
+      );
       const endSub = addEventListener('onSpeechEnd', () => setListening(false));
 
       // Errores
@@ -125,7 +130,7 @@ export const SpeechFormContext = forwardRef<SpeechFormInputRef, Props>(
 
     return (
       <PressableOpacity style={styles.dictationButton} onPress={handlePress}>
-        <Icons.Microphone fontSize={14} color={COLORS.primary} />
+        <Icons.Microphone fontSize={16} color={COLORS.primary} />
         <Label style={styles.dictation}>
           {listening ? 'Stop Dictation' : 'Take Dictation'}
         </Label>

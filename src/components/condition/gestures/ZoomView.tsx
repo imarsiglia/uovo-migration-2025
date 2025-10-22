@@ -1,45 +1,41 @@
-// ZoomView.tsx
-import React from 'react';
-import type {ReactElement} from 'react';
-import {StyleSheet} from 'react-native';
-import {
-  Gesture,
-  GestureDetector,
-  type PinchGestureHandlerEventPayload,
-  type GestureUpdateEvent,
-} from 'react-native-gesture-handler';
+import React, { Component } from 'react';
+import { Dimensions, StyleSheet, View } from 'react-native';
+import { PinchGestureHandler, State } from 'react-native-gesture-handler';
 
-type ZoomViewProps = {
-  children: ReactElement;
-  onPinchProgress?: (scale: number) => void;
-  onPinchStart?: () => void;
-  onPinchEnd?: () => void;
-};
+export default class ZoomView extends Component {
+    onGesturePinch = ({ nativeEvent }) => {
+        this.props.onPinchProgress(nativeEvent.scale);
+    }
 
-const ZoomView: React.FC<ZoomViewProps> = ({
-  children,
-  onPinchProgress = () => {},
-  onPinchStart = () => {},
-  onPinchEnd = () => {},
-}) => {
-  // Definimos el gesto de pinch con la API nueva
-  const pinch = React.useMemo(
-    () =>
-      Gesture.Pinch()
-        .onBegin(() => {
-          onPinchStart?.();
-        })
-        .onUpdate((e: GestureUpdateEvent<PinchGestureHandlerEventPayload>) => {
-          onPinchProgress?.(e.scale);
-        })
-        .onEnd(() => {
-          onPinchEnd?.();
-        }),
-    [onPinchEnd, onPinchProgress, onPinchStart],
-  );
+    onPinchHandlerStateChange = event => {
+        if (event.nativeEvent.state === State.END) {
+            this.props.onPinchEnd();
+        }
+        else if (event.nativeEvent.oldState === State.BEGAN && event.nativeEvent.state === State.ACTIVE) {
+            this.props.onPinchStart();
+        }
+    };
 
-  // GestureDetector exige un único hijo (elemento)
-  return <GestureDetector gesture={pinch}>{children}</GestureDetector>;
-};
+    render() {
+        return (
+            <PinchGestureHandler
+                onGestureEvent={this.onGesturePinch}
+                onHandlerStateChange={this.onPinchHandlerStateChange}>
+                {this.props.children}
+            </PinchGestureHandler>
+        )
+    }
+}
 
-export default ZoomView;
+ZoomView.defaultProps = {
+    onPinchProgress: (p) => { },
+    onPinchStart: () => { },
+    onPinchEnd: () => { },
+}
+
+const styles = StyleSheet.create({
+    preview: {
+        height: Dimensions.get('window').height,
+        width: "100%"
+    },
+})

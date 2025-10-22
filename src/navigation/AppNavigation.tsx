@@ -65,7 +65,7 @@ import {isInternet} from '@utils/internet';
 import {LoginScreen} from '../screens/auth/LoginScreen';
 import {RootStackParamList, RoutesNavigation} from './types';
 import {AccountScreen} from '@screens/account/AccountScreen';
-import {configureFontAwesomePro} from 'react-native-fontawesome-pro';
+import Icon, {configureFontAwesomePro} from 'react-native-fontawesome-pro';
 import {TopsheetScreen} from '@screens/topsheet/TopsheetScreen';
 import {ReportIssueScreen} from '@screens/location/ReportIssueScreen';
 import {LocationNotesScreen} from '@screens/location/LocationNotesScreen';
@@ -103,7 +103,12 @@ import {ImagesScreen} from '@screens/images/ImagesScreen';
 import TaskPhotoCarouselScreen from '@screens/commons/TaskPhotoCarouselScreen';
 import {SaveImagesScreen} from '@screens/images/SaveImagesScreen';
 import {GalleryCondition} from '@screens/reports/photos/GalleryConditionScreen';
-import { PhotoDetailCondition } from '@screens/reports/photos/PhotoDetailConditionScreen';
+import {PhotoDetailCondition} from '@screens/reports/photos/PhotoDetailConditionScreen';
+import PhotoCaptureZoomEdit from '@screens/reports/photos/PhotoCaptureZoomEdit';
+import ZoomScreen from '@screens/reports/photos/ZoomScreen';
+import {COLORS} from '@styles/colors';
+import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
+import {BackButton} from '@components/commons/buttons/BackButton';
 
 // LogBox.ignoreLogs([
 //   'Non-serializable values were found in the navigation state',
@@ -111,6 +116,7 @@ import { PhotoDetailCondition } from '@screens/reports/photos/PhotoDetailConditi
 
 enableScreens(true);
 const Stack = createNativeStackNavigator<RootStackParamList>();
+// @ts-ignore
 configureFontAwesomePro();
 
 export const AppNavigation = () => {
@@ -296,7 +302,59 @@ export const AppNavigation = () => {
               name={RoutesNavigation.PhotoDetailCondition}
               component={PhotoDetailCondition}
             />
-            
+
+            <Stack.Screen
+              name={RoutesNavigation.ZoomScreen}
+              component={ZoomScreen}
+              options={({navigation}) => ({
+                headerShown: true,
+                headerStyle: {
+                  backgroundColor: COLORS.bgWhite,
+                },
+                headerTitleStyle: {
+                  color: COLORS.titleColor,
+                },
+                headerLeft: () => (
+                  <BackButton
+                    style={{marginLeft: -10}}
+                    title="Back"
+                    onPress={navigation.goBack}
+                  />
+                ),
+                headerBackTitleStyle: {
+                  color: COLORS.gray,
+                },
+                headerBackTitle: 'Sisa',
+              })}
+
+              // options={{
+              //   headerShown: true,
+              //   headerStyle: {
+              //     backgroundColor: COLORS.bgWhite,
+              //   },
+              //   headerTitleStyle: {
+              //     color: COLORS.titleColor,
+              //   },
+              //   headerBackImageSource: (
+              //     <Icon
+              //       name="chevron-left"
+              //       color={COLORS.gray}
+              //       type="light"
+              //       size={15}
+              //     />
+              //   ),
+              //   headerBackTitleStyle: {
+              //     color: COLORS.gray
+              //   }
+              // }}
+            />
+
+            <Stack.Screen
+              name={RoutesNavigation.PhotoCaptureZoomEdit}
+              component={PhotoCaptureZoomEdit}
+              options={{headerShown: true}}
+            />
+
             {/* visualizar imagenes */}
             <Stack.Screen
               name={RoutesNavigation.BaseImageScreen}

@@ -1,6 +1,6 @@
 import 'react-native-get-random-values';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {Alert, Linking, Platform} from 'react-native';
+import {Dimensions, Easing, Linking, Platform} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import * as RNLocalize from 'react-native-localize';
 import moment from 'moment';
@@ -398,3 +398,33 @@ export async function promisePool<T>(
   );
   await Promise.allSettled(workers);
 }
+
+const {height} = Dimensions.get('screen');
+
+export const DEFAULT_OPTIONS_MODALFY = {
+  backdropOpacity: 0.5,
+  animateInConfig: {
+    easing: Easing.bezier(0.42, -0.03, 0.27, 0.95),
+    duration: 450,
+  },
+  animateOutConfig: {
+    easing: Easing.bezier(0.42, -0.03, 0.27, 0.95),
+    duration: 450,
+  },
+  transitionOptions: (animatedValue: any) => ({
+    opacity: animatedValue.interpolate({
+      inputRange: [0, 1, 2],
+      outputRange: [0, 1, 0.9],
+    }),
+    transform: [
+      {perspective: 2000},
+      {
+        translateY: animatedValue.interpolate({
+          inputRange: [0, 1, 2],
+          outputRange: [height / 1.5, 0, -height / 1.5],
+          extrapolate: 'clamp',
+        }),
+      },
+    ],
+  }),
+};

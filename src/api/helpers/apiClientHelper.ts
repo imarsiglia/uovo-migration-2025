@@ -61,6 +61,23 @@ export const getRequest = async <T>(
   }
 };
 
+export const getRequestCustomType = async <T>(endpoint: string): Promise<T> => {
+  try {
+    const response = await apiClient.get<T>(endpoint);
+    return {
+      ...response.data,
+      status: response.status,
+      statusText: response.statusText,
+    };
+  } catch (error: any) {
+    handleError(error);
+    if (axios.isAxiosError(error)) {
+      throw error;
+    }
+    throw new Error(error?.message || 'Error en la solicitud');
+  }
+};
+
 export const getRequestString = async <T>(
   endpoint: string,
 ): Promise<ApiResponse<T>> => {

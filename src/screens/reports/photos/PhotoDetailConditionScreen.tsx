@@ -39,7 +39,7 @@ import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {onSelectImage} from '@utils/image';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Alert, Keyboard, StyleSheet} from 'react-native';
+import {Alert, Keyboard, Platform, StyleSheet} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-controller';
 import {Image as ImageType} from 'react-native-image-crop-picker';
 
@@ -47,8 +47,16 @@ type Props = NativeStackScreenProps<RootStackParamList, 'PhotoDetailCondition'>;
 export const PhotoDetailCondition = (props: Props) => {
   const {goBack, navigate} = useCustomNavigation();
   const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
-  const {conditionType, conditionPhotoType, conditionId, inventoryId} =
-    useConditionStore();
+  const {
+    conditionType,
+    conditionPhotoType,
+    conditionId,
+    inventoryId,
+    editModalFunction,
+    setEditModalFunction,
+    copyNote: note,
+    setCopyNote,
+  } = useConditionStore();
 
   const {photo, item} = props.route.params;
   const [image, setImage] = useState<string | null | undefined>(photo);
@@ -79,6 +87,18 @@ export const PhotoDetailCondition = (props: Props) => {
     }
   }, [data]);
 
+  useEffect(() => {
+    return () => {
+      if (editModalFunction) {
+        editModalFunction();
+        setEditModalFunction(undefined);
+      }
+      if (note) {
+        setCopyNote(undefined);
+      }
+    };
+  }, [editModalFunction, note]);
+
   const closeSheet = useCallback(() => {
     if (refCallSheet.current) {
       refCallSheet.current.close();
@@ -92,7 +112,15 @@ export const PhotoDetailCondition = (props: Props) => {
     [setImage],
   );
 
-  const initCamera = useCallback(() => {}, []);
+  const initCamera = useCallback(() => {
+    if (Platform.OS == 'ios') {
+      // @ts-ignore
+      navigate(RoutesNavigation.PhotoCaptureZoomEdit, {
+        edit: true,
+        updatePhoto: setImage.bind(this),
+      });
+    }
+  }, [navigate, setImage]);
 
   const initGallery = useCallback(() => {
     onSelectImage(closeSheet, (img) => manageImage(img as ImageType));
@@ -121,7 +149,7 @@ export const PhotoDetailCondition = (props: Props) => {
           description: form.description,
           id: item?.id,
           photo: image!,
-          idStickyNote: item?.id_sticky_note,
+          idStickyNote: item?.id_sticky_note ?? note?.id ?? null,
           subType: item?.subtype,
         })
           .then((isSuccess) => {
@@ -185,10 +213,11 @@ export const PhotoDetailCondition = (props: Props) => {
         <MinRoundedView />
 
         <BasicFormProvider
+          key={note?.details ?? data?.description}
           schema={SaveTaskImageSchema}
           defaultValue={{
-            title: item?.title,
-            description: data?.description,
+            title: note?.label ?? item?.title,
+            description: note?.details ?? data?.description,
           }}>
           <KeyboardAwareScrollView
             bottomOffset={220}

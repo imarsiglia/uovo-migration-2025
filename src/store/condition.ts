@@ -1,4 +1,8 @@
-import {ConditionPhotoSideType, ConditionType} from '@api/types/Condition';
+import {
+  ConditionPhotoSideType,
+  ConditionType,
+  StickyNoteType,
+} from '@api/types/Condition';
 import {create} from 'zustand';
 
 export type ConditionStore = {
@@ -10,6 +14,12 @@ export type ConditionStore = {
   setConditionId: (val?: number) => void;
   inventoryId?: number;
   setInventoryId: (val?: number) => void;
+  editModalFunction?: () => void;
+  setEditModalFunction: (val?: () => void) => void;
+  copyNote?: StickyNoteType;
+  setCopyNote: (val?: StickyNoteType) => void;
+  reportIdImage?: number;
+  setReportIdImage: (val?: number) => void;
 };
 
 export const useConditionStore = create<ConditionStore>((set) => ({
@@ -22,6 +32,13 @@ export const useConditionStore = create<ConditionStore>((set) => ({
   setConditionId: (val) => set((state) => ({...state, conditionId: val})),
   inventoryId: undefined,
   setInventoryId: (val) => set((state) => ({...state, inventoryId: val})),
+  editModalFunction: undefined,
+  setEditModalFunction: (val) =>
+    set((state) => ({...state, editModalFunction: val})),
+  copyNote: undefined,
+  setCopyNote: (val) => set((state) => ({...state, copyNote: val})),
+  reportIdImage: undefined,
+  setReportIdImage: (val) => set((state) => ({...state, reportIdImage: val})),
 }));
 
 export default useConditionStore;

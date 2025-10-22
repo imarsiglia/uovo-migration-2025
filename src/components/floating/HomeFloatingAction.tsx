@@ -109,52 +109,6 @@ export const HomeFloatingAction = () => {
         onPress={logout}
       />
     </SpeedDial>
-    //    <FloatingAction
-    //              onClose={() => setFloating(false)}
-    //              onOpen={() => setFloating(!floating)}
-    //              animated
-    //              color={activeFilter ? 'green' : COLORS.terceary}
-    //              actionsPaddingTopBottom={0}
-    //              dismissKeyboardOnPress
-    //              overlayColor="#FFFFFF70"
-    //              shadow={{
-    //                shadowOpacity: 0.1,
-    //                shadowRadius: 0,
-    //                shadowOffset: {height: 2, width: 0},
-    //              }}
-    //              floatingIcon={
-    //                !floating ? (
-    //                  <Icon color="white" size={26} name="th" type="solid" />
-    //                ) : (
-    //                  <Icon color="white" size={26} name="times" type="solid" />
-    //                )
-    //              }
-    //              actions={[
-    //                {
-    //                  name: 'active_jobs',
-    //                  text: activeFilter ? 'Show all jobs' : 'Show active jobs',
-    //                  color: COLORS.terceary,
-    //                  icon: <Icon name="filter" size={15} color="white" type="solid" />,
-    //                  animated: true,
-    //                  tintColor: 'red',
-    //                },
-    //                {
-    //                  name: 'account',
-    //                  text: 'Account',
-    //                  color: COLORS.terceary,
-    //                  icon: <Icon name="user" size={15} color="white" type="solid" />,
-    //                },
-    //                {
-    //                  name: 'help_desk',
-    //                  text: 'Help Desk',
-    //                  color: COLORS.terceary,
-    //                  icon: (
-    //                    <Icon name="question" size={15} color="white" type="solid" />
-    //                  ),
-    //                },
-    //              ]}
-    //              onPressItem={onPressMenuAction}
-    //            />
   );
 };
 
@@ -177,7 +131,7 @@ type CustomSpeedDialoActionProps = {
   onPress: () => void;
 };
 
-const CustomSpeedDialoAction = ({
+export const CustomSpeedDialoAction = ({
   title,
   icon,
   onPress,

@@ -395,3 +395,4 @@ export const ENTITY_TYPES = {
   CONDITION_REPORT: 'condition_report',
   IMAGE: 'image',
 };
+

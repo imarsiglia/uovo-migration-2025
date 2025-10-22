@@ -25,7 +25,7 @@ import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {onSelectImage} from '@utils/image';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
-import {useCallback, useRef} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 import {FlatList, ImageBackground, StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 import type {Image as ImageType} from 'react-native-image-crop-picker';
@@ -34,13 +34,15 @@ export const GalleryCondition = () => {
   const {goBack, navigate} = useCustomNavigation();
   const refCallSheet = useRef<RBSheetRef>(null);
 
-  const {conditionType, conditionPhotoType, conditionId} = useConditionStore();
+  const {conditionType, conditionPhotoType, conditionId, setReportIdImage} =
+    useConditionStore();
   const showDialog = useModalDialogStore((d) => d.showVisible);
   const {mutateAsync: deleteAsync} = useRemovePhotoCondition();
 
   const {
     data: photos,
     isLoading,
+    isSuccess,
     isFetching,
     refetch,
   } = useGetPhotosCondition({
@@ -48,6 +50,14 @@ export const GalleryCondition = () => {
     sideType: conditionPhotoType!,
     reportId: conditionId!,
   });
+
+  useEffect(() => {
+    if (isSuccess && !(photos?.length > 0)) {
+      setTimeout(() => {
+        takeNewPhoto();
+      }, 300);
+    }
+  }, [isSuccess, photos]);
 
   const takeNewPhoto = useCallback(() => {
     if (refCallSheet.current) {
@@ -57,28 +67,46 @@ export const GalleryCondition = () => {
 
   const checkOverview = useCallback(
     (item: ConditionPhotoType, index: number) => {
-      navigate(RoutesNavigation.PhotoDetailCondition, {
-        item: item,
-        photo: item.thumbnail!,
-      });
+      console.log("item")
+      console.log(item)
+      if (item.is_overview) {
+        navigate(RoutesNavigation.ZoomScreen, {
+          data: {
+            photo: {base64: item.thumbnail},
+          },
+          item: item,
+          edit: true,
+        });
+      } else {
+        navigate(RoutesNavigation.PhotoDetailCondition, {
+          item: item,
+          photo: item.thumbnail!,
+        });
+      }
     },
     [navigate],
   );
 
   const generateImagePathIOS = useCallback(
     (photo?: ImageType) => {
+      setReportIdImage(undefined);
       if (
         photos?.some((x) => x.is_overview) ||
         conditionPhotoType == 'detail'
       ) {
         navigate(RoutesNavigation.PhotoDetailCondition, {
           photo: photo?.data!,
-          note: null,
           refresh: true,
           updateRefreshGallery: false,
           subType: conditionPhotoType,
         });
       } else {
+        const image = {uri: photo?.path, base64: photo?.data, data: ''};
+        navigate(RoutesNavigation.ZoomScreen, {
+          photo: image,
+          // refreshGallery: (() => {}).bind(this),
+          subType: null,
+        });
         // navigate('ZoomScreen', {
         //   photo,
         //   refreshGallery: getImages.bind(this),
