@@ -1,4 +1,8 @@
-import {ConditionPhotoType, StickyNoteType} from '@api/types/Condition';
+import {
+  ConditionPhotoSideSubtype,
+  ConditionPhotoType,
+  StickyNoteType,
+} from '@api/types/Condition';
 import {JobInventoryType, ReportResumeType} from '@api/types/Inventory';
 import {CrewMemberType, NSItemListType} from '@api/types/Jobs';
 import {
@@ -54,6 +58,7 @@ export const RoutesNavigation = {
   PhotoDetailCondition: 'PhotoDetailCondition',
   PhotoCaptureZoomEdit: 'PhotoCaptureZoomEdit',
   ZoomScreen: 'ZoomScreen',
+  ConditionSides: 'ConditionSides',
 } as const;
 
 // Union de nombres de ruta: "Home" | "ContactUs" | ...
@@ -164,7 +169,11 @@ export type RootStackParamList = {
         index?: number;
       }
     | undefined;
-  [RoutesNavigation.GalleryCondition]: undefined;
+  [RoutesNavigation.GalleryCondition]:
+    | {
+        type?: ConditionPhotoSideSubtype;
+      }
+    | undefined;
   [RoutesNavigation.PhotoDetailCondition]: {
     photo?: string;
     refresh?: boolean;
@@ -178,8 +187,9 @@ export type RootStackParamList = {
       uri?: string;
     };
     subType?: string | null;
-    item?: ConditionPhotoType
+    item?: ConditionPhotoType;
   };
+  [RoutesNavigation.ConditionSides]: undefined;
 };
 
 export const TopSheetRoutesNavigation = {

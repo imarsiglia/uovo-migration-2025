@@ -278,13 +278,10 @@ const saveZoomScreen = async ({
   conditionType,
   ...props
 }: SaveZoomScreenProps): Promise<boolean> => {
-  console.log(`/${conditionType}${API_SAVE_ZOOM_SCREEN}`);
   const response = await postRequest(
     `/${conditionType}${API_SAVE_ZOOM_SCREEN}`,
     props,
   );
-  console.log('RESPONSE SAVE ZOOM SCREEN');
-  console.log(response);
   return response.message === SUCCESS_MESSAGES.SUCCESS;
 };
 

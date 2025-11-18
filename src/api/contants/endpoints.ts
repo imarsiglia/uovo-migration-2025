@@ -119,6 +119,7 @@ export const API_GET_PHOTOS_CONDITION = '/loadImages';
 export const API_SAVE_PHOTO_CONDITION = '/reportImageDetail';
 export const API_GET_PHOTO_CONDITION_DETAIL = '/loadDetail';
 export const API_GET_PHOTO_CONDITION_OVERVIEW = '/loadOverview';
+
 // Photo zoom
 export const API_SAVE_ZOOM_SCREEN = '/reportImage';
 

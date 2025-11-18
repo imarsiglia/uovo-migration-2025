@@ -1,4 +1,5 @@
 import {
+  ConditionPhotoSideSubtype,
   ConditionPhotoSideType,
   ConditionType,
   StickyNoteType,
@@ -20,6 +21,8 @@ export type ConditionStore = {
   setCopyNote: (val?: StickyNoteType) => void;
   reportIdImage?: number;
   setReportIdImage: (val?: number) => void;
+  conditionPhotoSubtype?: ConditionPhotoSideSubtype;
+  setConditionPhotoSubtype: (val?: ConditionPhotoSideSubtype) => void;
 };
 
 export const useConditionStore = create<ConditionStore>((set) => ({
@@ -39,6 +42,9 @@ export const useConditionStore = create<ConditionStore>((set) => ({
   setCopyNote: (val) => set((state) => ({...state, copyNote: val})),
   reportIdImage: undefined,
   setReportIdImage: (val) => set((state) => ({...state, reportIdImage: val})),
+  conditionPhotoSubtype: undefined,
+  setConditionPhotoSubtype: (val) =>
+    set((state) => ({...state, conditionPhotoSubtype: val})),
 }));
 
 export default useConditionStore;

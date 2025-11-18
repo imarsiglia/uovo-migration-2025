@@ -40,7 +40,6 @@ import {QUERY_KEYS} from '@api/contants/constants';
 
 const {height: dimensionsHeight, width: dimensionsWidth} =
   Dimensions.get('window');
-const {width} = {...Dimensions.get('window')};
 
 const stateUpdate: any = {
   add: {
@@ -131,7 +130,11 @@ const ZoomScreen = (props: any) => {
   const mainImageTransformsRef = useRef<any>(null);
   const {online} = useOnline();
 
-  const {item} = props.route.params;
+  const params = props.route.params;
+  const item = params.item;
+  const uri = params?.photo?.uri;
+
+  const navigation = props.navigation;
 
   const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
   const {
@@ -145,6 +148,7 @@ const ZoomScreen = (props: any) => {
     setConditionId,
     setInventoryId,
     setReportIdImage,
+    conditionPhotoSubtype,
   } = useConditionStore();
 
   const {navigate, goBack} = useCustomNavigation();
@@ -153,6 +157,7 @@ const ZoomScreen = (props: any) => {
     data: conditionOverview,
     isLoading,
     isFetching,
+    refetch,
   } = useGetPhotoConditionOverview({
     id: item?.id,
     conditionType: conditionType!,
@@ -168,6 +173,7 @@ const ZoomScreen = (props: any) => {
         reportId: conditionId!,
       },
     ],
+    [QUERY_KEYS.TOTAL_PHOTOS_CONDITION_REPORT, {id: conditionId}],
   ]);
 
   // ======= estado base equivalente a _getState(props) =======
@@ -196,14 +202,6 @@ const ZoomScreen = (props: any) => {
         };
       }
 
-      const {
-        route: {
-          params: {
-            photo: {uri},
-          },
-        },
-      } = props;
-
       return {
         notes: [],
         helperVisible: true,
@@ -219,21 +217,10 @@ const ZoomScreen = (props: any) => {
         photoSource: {uri},
       };
     },
-    [props, conditionOverview?.idJob],
+    [conditionOverview, dimensionsHeight],
   );
 
   const [state, setState] = useState<any>(() => getInitialState(props));
-
-  console.log('STATE__STATE__STATE__STATE');
-  console.log(state);
-
-  useEffect(() => {
-    if (conditionOverview?.idJob) {
-      console.log('set state');
-      console.log(getInitialState(props))
-      setState(getInitialState(props));
-    }
-  }, [props, conditionOverview?.idJob]);
 
   useEffect(() => {
     if (conditionOverview?.idJob) {
@@ -290,61 +277,28 @@ const ZoomScreen = (props: any) => {
 
   // ======= componentDidMount =======
   useEffect(() => {
-    const {
-      route: {params},
-      navigation,
-    } = props;
-
     initVariables();
 
     // reset zoom
     zoomRef.current?.reset?.();
     zoomRef.current?.panResponderReleaseResolve?.();
 
-    // tamaños originales
-    originalImageWidthRef.current = params?.photo?.width;
-    originalImageHeightRef.current = params?.photo?.height;
-
-    // transforms previos
-    if (props.route.params?.data?.mainImageTransforms) {
-      const {mainImageTransforms} = props.route.params.data;
-      mainImageTransformsRef.current = mainImageTransforms;
-      const location = {
-        x: mainImageTransforms?.positionX || 0,
-        y: mainImageTransforms?.positionY || 0,
-        scale: mainImageTransforms?.scale || 1,
-        duration: 0,
-      };
-      zoomRef.current?.centerOn?.(location);
-    }
-
-    // esconder teclado
-    setTimeout(() => {
-      Keyboard.dismiss();
-    }, 500);
-
-    if (params && params.edit) {
-      postConstruct();
-    } else {
-      initNewHeight();
-    }
-
     // ======= componentWillUnmount =======
     return () => {
       zoomRef.current?.reset?.();
       zoomRef.current?.panResponderReleaseResolve?.();
-      if (refreshGalleryRef.current) {
-        props.route.params?.refreshGallery?.();
+      if (refreshGalleryRef.current && params?.refreshGallery) {
+        params.refreshGallery();
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [params]);
 
   // ======= componentDidUpdate (note -> photoZoom) =======
   useEffect(() => {
     _updatePhotoZoom();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.route?.params?.note, state.notes]);
+  }, [params?.note, state.notes]);
 
   useEffect(() => {
     return () => {
@@ -354,11 +308,6 @@ const ZoomScreen = (props: any) => {
   }, []);
 
   const _updatePhotoZoom = useCallback(() => {
-    const {
-      route: {params},
-      navigation,
-    } = props;
-
     if (params?.note) {
       const note = state.notes?.find((n: any) => n.id === params?.note?.id);
       if (!note?.photoZoom) {
@@ -373,45 +322,37 @@ const ZoomScreen = (props: any) => {
         setState((s: any) => ({...s, notes}));
       }
     }
-  }, [props, state.notes]);
+  }, [params, state.notes]);
 
   // ======= initNewHeight =======
   const initNewHeight = useCallback(() => {
-    const {
-      route: {params},
-      navigation,
-    } = props;
-
-    ratioRef.current = width / params?.photo?.width;
+    ratioRef.current = dimensionsWidth / params?.photo?.width;
     newHeightRef.current = dimensionsHeight;
     setM({height: dimensionsHeight});
-  }, [props, setM]);
+  }, [params]);
 
   // ======= postConstruct =======
   const postConstruct = useCallback(() => {
-    const {
-      route: {params},
-      navigation,
-    } = props;
+    const width = conditionOverview?.data?.screen?.width;
+    const height = conditionOverview?.data?.screen?.height;
 
     var deviceDimensions = {
-      width: params?.data?.screen?.width,
-      height: params?.data?.screen?.height,
+      width: width,
+      height: height,
     };
 
-    ratioRef.current = width / params?.data?.screen?.width;
-    newHeightRef.current = params?.data?.screen?.height * ratioRef.current;
+    ratioRef.current = dimensionsWidth / (deviceDimensions?.width ?? 1);
+    newHeightRef.current = (deviceDimensions.height ?? 1) * ratioRef.current;
 
-    setM({height: newHeightRef.current});
-
-    width_ratioRef.current = width / deviceDimensions.width;
-    imgAspRatioRef.current = width / newHeightRef.current;
-    realImgheightRef.current = deviceDimensions.width / imgAspRatioRef.current;
+    width_ratioRef.current = dimensionsWidth / (deviceDimensions.width ?? 1);
+    imgAspRatioRef.current = dimensionsWidth / newHeightRef.current;
+    realImgheightRef.current =
+      (deviceDimensions.width ?? 1) / imgAspRatioRef.current;
     height_ratioRef.current = newHeightRef.current / realImgheightRef.current;
     var fixY = 0;
     var newNotes: any[] = [];
 
-    state.notes.forEach((element: any) => {
+    conditionOverview?.data?.notes?.map((element: any) => {
       var elWidth = element.width;
       var elHeight = element.height;
 
@@ -452,14 +393,54 @@ const ZoomScreen = (props: any) => {
       element.diffTop = diffTop;
       element.diffLeft = diffLeft;
 
-      element.screenWidth = width;
+      element.screenWidth = dimensionsWidth;
       element.screenHeight = newHeightRef.current;
 
       newNotes.push({...element});
     });
 
-    setM({notes: newNotes});
-  }, [props, setM, state.notes]);
+    setM({notes: newNotes, height: newHeightRef.current});
+  }, [conditionOverview]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (conditionOverview?.idJob) {
+        setState(getInitialState(props));
+
+        // tamaños originales
+        originalImageWidthRef.current = conditionOverview.data.screen.width;
+        originalImageHeightRef.current = conditionOverview.data.screen.height;
+
+        // transforms previos
+        if (conditionOverview.data?.mainImageTransforms) {
+          const mainImageTransforms =
+            conditionOverview.data.mainImageTransforms;
+          mainImageTransformsRef.current = mainImageTransforms;
+          const location = {
+            // @ts-ignore
+            x: mainImageTransforms?.positionX || 0,
+            // @ts-ignore
+            y: mainImageTransforms?.positionY || 0,
+            // @ts-ignore
+            scale: mainImageTransforms?.scale || 1,
+            duration: 0,
+          };
+          zoomRef.current?.centerOn?.(location);
+        }
+
+        postConstruct();
+
+        // esconder teclado
+        setTimeout(() => {
+          Keyboard.dismiss();
+        }, 500);
+      } else {
+        if (!(params && params.edit)) {
+          initNewHeight();
+        }
+      }
+    }
+  }, [props, params, conditionOverview?.idJob, isLoading, isFetching]);
 
   // ======= handlers =======
   const _onPhotoPress = useCallback(
@@ -588,21 +569,13 @@ const ZoomScreen = (props: any) => {
   }, [state]);
 
   const _getPhoto = useCallback(() => {
-    if (props?.route?.params?.edit) {
-      const {
-        route: {
-          params: {data},
-        },
-      } = props;
+    if (params?.edit) {
+      const data = params?.data;
       return data?.photo;
     }
-    const {
-      route: {
-        params: {photo},
-      },
-    } = props;
+    const photo = params?.photo;
     return photo;
-  }, [props]);
+  }, [params]);
 
   const _handleFAB = useCallback(
     async (buttonName: string) => {
@@ -631,7 +604,7 @@ const ZoomScreen = (props: any) => {
               notes,
               mainImageTransforms: mainImageTransformsRef.current,
               screen: {
-                width: width,
+                width: dimensionsWidth,
                 height: state.height,
               },
             },
@@ -640,17 +613,13 @@ const ZoomScreen = (props: any) => {
             idImg: reportIdImage ?? null,
             reportId: conditionId ?? null,
             reportType: conditionPhotoType ?? null,
-            reportSubType: props.route.params.subType
-              ? props.route.params.subType
-              : null,
+            reportSubType: conditionPhotoSubtype ?? null,
           };
 
           var mJson = {
             id_sticky_note: null,
             is_overview: true,
-            subtype: props.route.params.subType
-              ? props.route.params.subType
-              : null,
+            subtype: conditionPhotoSubtype ?? null,
             thumbnail: '',
             title: conditionPhotoType + ' Overview',
             type: conditionPhotoType,
@@ -705,7 +674,7 @@ const ZoomScreen = (props: any) => {
         setM({...stateUpdate[buttonName]});
       }
     },
-    [_getPhoto, props, setM, state, online],
+    [_getPhoto, props, setM, state, online, params],
   );
 
   const functSave = useCallback(
@@ -718,7 +687,10 @@ const ZoomScreen = (props: any) => {
           })
             .then((response) => {
               if (response) {
-                refetchAll();
+                setTimeout(() => {
+                  refetchAll();
+                  refetch();
+                }, 500);
                 goBack();
               }
             })
@@ -984,7 +956,7 @@ const ZoomScreen = (props: any) => {
               diffTop: note.position.top - measure.translation.top,
               originalWidth: measure.width,
               originalHeight: measure.height,
-              screenWidth: width,
+              screenWidth: dimensionsWidth,
               screenHeight: state.height,
               areaSet: true,
               updating: false,
@@ -1091,11 +1063,11 @@ const ZoomScreen = (props: any) => {
       // this.setState({loading: false});
       navigate(RoutesNavigation.PhotoDetailCondition, {
         photo: image.data!,
-        subType: props.conditionPhotoType,
+        subType: conditionPhotoType,
         refresh: false,
       });
     },
-    [props.navigation, props.route?.params?.subType],
+    [conditionPhotoType],
   );
 
   const initGallery = useCallback(() => {
@@ -1118,20 +1090,20 @@ const ZoomScreen = (props: any) => {
 
       const fittedSize = {width: 0, height: 0};
       if (originalImageWidthRef.current > originalImageHeightRef.current) {
-        const ratio = width / originalImageWidthRef.current;
-        fittedSize.width = width;
+        const ratio = dimensionsWidth / originalImageWidthRef.current;
+        fittedSize.width = dimensionsWidth;
         fittedSize.height = originalImageHeightRef.current * ratio;
       } else if (
         originalImageWidthRef.current < originalImageHeightRef.current
       ) {
-        const ratio = width / originalImageWidthRef.current;
-        fittedSize.width = width;
+        const ratio = dimensionsWidth / originalImageWidthRef.current;
+        fittedSize.width = dimensionsWidth;
         fittedSize.height = originalImageHeightRef.current * ratio;
       } else if (
         originalImageWidthRef.current === originalImageHeightRef.current
       ) {
-        fittedSize.width = width;
-        fittedSize.height = width;
+        fittedSize.width = dimensionsWidth;
+        fittedSize.height = dimensionsWidth;
       }
 
       const scaledCropWidth = cropWidth / position.scale;
@@ -1225,9 +1197,6 @@ const ZoomScreen = (props: any) => {
     },
     [getPercentDiffNumberFromNumber, getPercentFromNumber, state?.notes],
   );
-
-  console.log('state.photoSource');
-  console.log(state.photoSource);
 
   return (
     <Wrapper style={styles.container}>

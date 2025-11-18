@@ -32,10 +32,8 @@ const NoteArea: React.FC<Props> = ({note, headerHeight, onFinishAreaEdit}) => {
   // Mide y envía el resultado cuando el componente se desmonta (mismo comportamiento)
   useEffect(() => {
     return () => {
-      console.log('on destroy component');
       if (measureStyles) {
         const {w, h, px, py} = measureStyles;
-        console.log({w, h, px, py});
         onFinishAreaEdit({
           note,
           measure: {
@@ -57,7 +55,6 @@ const NoteArea: React.FC<Props> = ({note, headerHeight, onFinishAreaEdit}) => {
   const updateLayout = useCallback(() => {
     if (!componentRef.current) return;
     componentRef.current.measure((_x, _y, w, h, px, py) => {
-      console.log({w, h, px, py});
       setMeasureStyles({w, h, px, py});
     });
   }, [setMeasureStyles]);

@@ -109,6 +109,7 @@ import ZoomScreen from '@screens/reports/photos/ZoomScreen';
 import {COLORS} from '@styles/colors';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {BackButton} from '@components/commons/buttons/BackButton';
+import {ConditionSides} from '@screens/reports/photos/ConditionSidesScreen';
 
 // LogBox.ignoreLogs([
 //   'Non-serializable values were found in the navigation state',
@@ -306,6 +307,7 @@ export const AppNavigation = () => {
             <Stack.Screen
               name={RoutesNavigation.ZoomScreen}
               component={ZoomScreen}
+              // @ts-ignore
               options={({navigation}) => ({
                 headerShown: true,
                 headerStyle: {
@@ -353,6 +355,10 @@ export const AppNavigation = () => {
               name={RoutesNavigation.PhotoCaptureZoomEdit}
               component={PhotoCaptureZoomEdit}
               options={{headerShown: true}}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.ConditionSides}
+              component={ConditionSides}
             />
 
             {/* visualizar imagenes */}

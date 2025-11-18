@@ -489,16 +489,7 @@ const ZoomScreen: React.FC<Props> = (props) => {
             n.anchor.imgY * S + getDiffPositionY() - globalPositionY.current;
 
           const finalWidth = ((n.originalWidth ?? 0) / S0) * S;
-          const finalHeight = ((n.originalHeight ?? 0) / S0) * S;
-
-          console.log('MOVE proj', {
-            anchor: n.anchor,
-            S,
-            offX: globalPositionX.current,
-            offY: globalPositionY.current,
-            diffY: getDiffPositionY(),
-            out: {left: finalLeft, top: finalTop},
-          });
+          const finalHeight = ((n.originalHeight ?? 0) / S0) * S;          
 
           return {
             ...n,
@@ -941,28 +932,6 @@ const ZoomScreen: React.FC<Props> = (props) => {
             };
           }),
         );
-
-        const n = notes.find((x) => x.id === activeNoteId)!;
-        console.log('SET:', {
-          t: n.translation,
-          tFallback: {
-            left: n.position.left - (n.diffLeft ?? 0),
-            top: n.position.top - (n.diffTop ?? 0),
-          },
-          anchorCalc: {
-            imgX:
-              ((n.translation?.left ?? n.position.left - (n.diffLeft ?? 0)) +
-                globalPositionX.current) /
-              (zoomScale.current || 1),
-            imgY:
-              ((n.translation?.top ?? n.position.top - (n.diffTop ?? 0)) +
-                globalPositionY.current -
-                getDiffPositionY()) /
-              (zoomScale.current || 1),
-          },
-          S: zoomScale.current,
-        });
-
         setSetModeActive(false);
         setAreaDraggable(false);
         setActiveNoteId(null);
@@ -1196,10 +1165,6 @@ const ZoomScreen: React.FC<Props> = (props) => {
   const onCloseFab = useCallback(() => {
     setFabOpen(false);
   }, []);
-
-  useEffect(() => {
-    // console.log('notes: ', notes);
-  }, [notes]);
 
   // =========================
   // Render

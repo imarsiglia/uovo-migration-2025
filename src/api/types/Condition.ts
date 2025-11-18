@@ -17,14 +17,29 @@ export type ConditionPhotoSideType =
   (typeof CONDITION_PHOTO_SIDE_TYPE)[keyof typeof CONDITION_PHOTO_SIDE_TYPE];
 
 export const CONDITION_PHOTO_SIDE_LABELS: Record<
-  ConditionPhotoSideType,
+  ConditionPhotoSideType | ConditionPhotoSideSubtype,
   string
 > = {
   front: 'Front',
   back: 'Back',
   detail: 'Details',
   sides: 'Sides',
+  top: 'Top',
+  bottom: 'Bottom',
+  left: 'Left',
+  right: 'Right',
 };
+
+
+export const CONDITION_PHOTO_SIDE_SUBTYPE = {
+  Top: 'top',
+  Bottom: 'bottom',
+  Left: 'left',
+  Right: 'right',
+} as const;
+
+export type ConditionPhotoSideSubtype =
+  (typeof CONDITION_PHOTO_SIDE_SUBTYPE)[keyof typeof CONDITION_PHOTO_SIDE_SUBTYPE];
 
 export type ConditionPhotoType = {
   id: number;

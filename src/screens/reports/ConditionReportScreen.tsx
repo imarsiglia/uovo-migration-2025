@@ -173,6 +173,7 @@ export const ConditionReportScreen = (props: Props) => {
     setConditionType,
     setConditionId,
     setInventoryId,
+    setConditionPhotoSubtype
   } = useConditionStore();
 
   useEffect(() => {
@@ -246,6 +247,7 @@ export const ConditionReportScreen = (props: Props) => {
 
   const goToGallery = useCallback(
     (type: ConditionPhotoSideType) => {
+      setConditionPhotoSubtype(undefined);
       setConditionPhotoType(type);
       navigate(RoutesNavigation.GalleryCondition);
     },
@@ -253,6 +255,8 @@ export const ConditionReportScreen = (props: Props) => {
   );
 
   const goToSides = () => {
+    setConditionPhotoType("sides");
+    navigate(RoutesNavigation.ConditionSides);
     // Keyboard.dismiss();
     // if (item.id) {
     //   props.dispatch(ActionsConditionReport.copyReportType('sides'));

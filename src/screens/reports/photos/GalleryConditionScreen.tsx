@@ -1,3 +1,4 @@
+import {QUERY_KEYS} from '@api/contants/constants';
 import {
   useGetPhotosCondition,
   useRemovePhotoCondition,
@@ -17,7 +18,9 @@ import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {RoutesNavigation} from '@navigation/types';
+import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {RootStackParamList, RoutesNavigation} from '@navigation/types';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {loadingWrapperPromise} from '@store/actions';
 import useConditionStore from '@store/condition';
 import {useModalDialogStore} from '@store/modals';
@@ -25,12 +28,13 @@ import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {onSelectImage} from '@utils/image';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
-import {useCallback, useEffect, useRef} from 'react';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 import {FlatList, ImageBackground, StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 import type {Image as ImageType} from 'react-native-image-crop-picker';
 
-export const GalleryCondition = () => {
+type Props = NativeStackScreenProps<RootStackParamList, 'GalleryCondition'>;
+export const GalleryCondition = (props: Props) => {
   const {goBack, navigate} = useCustomNavigation();
   const refCallSheet = useRef<RBSheetRef>(null);
 
@@ -39,8 +43,10 @@ export const GalleryCondition = () => {
   const showDialog = useModalDialogStore((d) => d.showVisible);
   const {mutateAsync: deleteAsync} = useRemovePhotoCondition();
 
+  const subtype = props.route.params?.type;
+
   const {
-    data: photos,
+    data: remotePhotos = [],
     isLoading,
     isSuccess,
     isFetching,
@@ -50,6 +56,18 @@ export const GalleryCondition = () => {
     sideType: conditionPhotoType!,
     reportId: conditionId!,
   });
+
+  const {refetchAll} = useRefreshIndicator([
+    [QUERY_KEYS.TOTAL_PHOTOS_CONDITION_REPORT, {id: conditionId}],
+  ]);
+
+  const photos = useMemo(() => {
+    if (subtype) {
+      return remotePhotos.filter((x) => x.subtype === subtype);
+    } else {
+      return remotePhotos;
+    }
+  }, [subtype, remotePhotos]);
 
   useEffect(() => {
     if (isSuccess && !(photos?.length > 0)) {
@@ -67,8 +85,6 @@ export const GalleryCondition = () => {
 
   const checkOverview = useCallback(
     (item: ConditionPhotoType, index: number) => {
-      console.log("item")
-      console.log(item)
       if (item.is_overview) {
         navigate(RoutesNavigation.ZoomScreen, {
           data: {
@@ -98,14 +114,12 @@ export const GalleryCondition = () => {
           photo: photo?.data!,
           refresh: true,
           updateRefreshGallery: false,
-          subType: conditionPhotoType,
         });
       } else {
         const image = {uri: photo?.path, base64: photo?.data, data: ''};
         navigate(RoutesNavigation.ZoomScreen, {
           photo: image,
           // refreshGallery: (() => {}).bind(this),
-          subType: null,
         });
         // navigate('ZoomScreen', {
         //   photo,
@@ -183,6 +197,7 @@ export const GalleryCondition = () => {
                 if (isSucess) {
                   showToastMessage('Photo deleted successfully');
                   refetch();
+                  refetchAll();
                 } else {
                   showErrorToastMessage('Error while deleting photo');
                 }
@@ -235,7 +250,7 @@ export const GalleryCondition = () => {
           <Label
             style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, styles.title]}
             allowFontScaling={false}>
-            {CONDITION_PHOTO_SIDE_LABELS[conditionPhotoType!]}
+            {CONDITION_PHOTO_SIDE_LABELS[subtype ?? conditionPhotoType!]}
           </Label>
         </Wrapper>
       </Wrapper>

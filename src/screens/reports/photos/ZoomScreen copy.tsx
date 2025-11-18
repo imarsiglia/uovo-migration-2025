@@ -614,7 +614,6 @@ const ZoomScreen: React.FC<Props> = (props) => {
   }, []);
 
   const onEditPosition = useCallback((note: Note) => {
-    console.log('on edit position ON EDIT POSITION');
     setNotes((prev) =>
       prev.map((n) =>
         n.id === note.id
@@ -826,7 +825,6 @@ const ZoomScreen: React.FC<Props> = (props) => {
       }
 
       if (buttonName === 'set') {
-        console.log('button set pressed');
         setNotes((prev) =>
           prev.map((n) =>
             n.id === activeNoteId

@@ -56,6 +56,7 @@ export const PhotoDetailCondition = (props: Props) => {
     setEditModalFunction,
     copyNote: note,
     setCopyNote,
+    conditionPhotoSubtype,
   } = useConditionStore();
 
   const {photo, item} = props.route.params;
@@ -79,6 +80,7 @@ export const PhotoDetailCondition = (props: Props) => {
         reportId: conditionId!,
       },
     ],
+    [QUERY_KEYS.TOTAL_PHOTOS_CONDITION_REPORT, {id: conditionId}],
   ]);
 
   useEffect(() => {
@@ -150,7 +152,7 @@ export const PhotoDetailCondition = (props: Props) => {
           id: item?.id,
           photo: image!,
           idStickyNote: item?.id_sticky_note ?? note?.id ?? null,
-          subType: item?.subtype,
+          subType: item?.subtype ?? conditionPhotoSubtype,
         })
           .then((isSuccess) => {
             if (isSuccess) {
