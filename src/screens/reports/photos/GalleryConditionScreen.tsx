@@ -5,6 +5,7 @@ import {
 } from '@api/hooks/HooksReportServices';
 import {
   CONDITION_PHOTO_SIDE_LABELS,
+  CONDITION_PHOTO_SIDE_TYPE,
   ConditionPhotoType,
 } from '@api/types/Condition';
 import {
@@ -35,7 +36,7 @@ import type {Image as ImageType} from 'react-native-image-crop-picker';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'GalleryCondition'>;
 export const GalleryCondition = (props: Props) => {
-  const {goBack, navigate} = useCustomNavigation();
+  const {goBack, navigate, isFocused} = useCustomNavigation();
   const refCallSheet = useRef<RBSheetRef>(null);
 
   const {conditionType, conditionPhotoType, conditionId, setReportIdImage} =
@@ -59,6 +60,7 @@ export const GalleryCondition = (props: Props) => {
 
   const {refetchAll} = useRefreshIndicator([
     [QUERY_KEYS.TOTAL_PHOTOS_CONDITION_REPORT, {id: conditionId}],
+    [QUERY_KEYS.TOTAL_PHOTOS_CONDITION_CHECK, {id: conditionId}],
   ]);
 
   const photos = useMemo(() => {
@@ -83,32 +85,29 @@ export const GalleryCondition = (props: Props) => {
     }
   }, []);
 
-  const checkOverview = useCallback(
-    (item: ConditionPhotoType, index: number) => {
-      if (item.is_overview) {
-        navigate(RoutesNavigation.ZoomScreen, {
-          data: {
-            photo: {base64: item.thumbnail},
-          },
-          item: item,
-          edit: true,
-        });
-      } else {
-        navigate(RoutesNavigation.PhotoDetailCondition, {
-          item: item,
-          photo: item.thumbnail!,
-        });
-      }
-    },
-    [navigate],
-  );
+  const checkOverview = useCallback((item: ConditionPhotoType) => {
+    if (item.is_overview) {
+      navigate(RoutesNavigation.ZoomScreen, {
+        data: {
+          photo: {base64: item.thumbnail},
+        },
+        item: item,
+        edit: true,
+      });
+    } else {
+      navigate(RoutesNavigation.PhotoDetailCondition, {
+        item: item,
+        photo: item.thumbnail!,
+      });
+    }
+  }, []);
 
   const generateImagePathIOS = useCallback(
     (photo?: ImageType) => {
       setReportIdImage(undefined);
       if (
         photos?.some((x) => x.is_overview) ||
-        conditionPhotoType == 'detail'
+        conditionPhotoType == CONDITION_PHOTO_SIDE_TYPE.Details
       ) {
         navigate(RoutesNavigation.PhotoDetailCondition, {
           photo: photo?.data!,
@@ -221,7 +220,7 @@ export const GalleryCondition = (props: Props) => {
               borderColor: COLORS.primary,
             },
           ]}
-          onPress={() => checkOverview(item, index)}
+          onPress={() => checkOverview(item)}
           onLongPress={() => initRemove(item, index)}>
           <ImageBackground
             resizeMode="cover"
@@ -259,9 +258,10 @@ export const GalleryCondition = (props: Props) => {
 
       <FlatList
         onRefresh={refetch}
-        refreshing={isFetching}
+        refreshing={isFetching && isFocused()}
         numColumns={3}
-        columnWrapperStyle={styles.flatlistStyle}
+        columnWrapperStyle={styles.flatlistRow}
+        contentContainerStyle={styles.listContent}
         data={photos}
         renderItem={({item, index}) => renderPhoto(item, index)}
         keyExtractor={(x) => x?.id?.toString() ?? x?.clientId}
@@ -304,14 +304,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 50,
   },
-  flatlistStyle: {
-    flex: 1,
-    gap: 2,
+  flatlistRow: {
+    justifyContent: 'flex-start',
+    marginBottom: 3,
+    gap: 4
   },
   image: {
-    width: '33%',
-    height: 120,
-    // marginBottom: 2,
-    // marginRight: 2,
+    minWidth: '33.33%',   // 👈 3 columnas iguales
+    aspectRatio: 1,
+    // height: 120,
+  },
+  listContent: {
+    paddingTop: 5,
+    gap: 1
   },
 });

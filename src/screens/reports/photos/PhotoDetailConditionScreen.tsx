@@ -3,7 +3,11 @@ import {
   useGetPhotoConditionDetail,
   useSavePhotoCondition,
 } from '@api/hooks/HooksReportServices';
-import {CONDITION_PHOTO_SIDE_LABELS} from '@api/types/Condition';
+import {
+  CONDITION_PHOTO_SIDE_LABELS,
+  CONDITION_PHOTO_SIDE_TYPE,
+  CONDITION_TYPES,
+} from '@api/types/Condition';
 import {Icons} from '@assets/icons/icons';
 import {
   ImageOptionSheet,
@@ -81,6 +85,7 @@ export const PhotoDetailCondition = (props: Props) => {
       },
     ],
     [QUERY_KEYS.TOTAL_PHOTOS_CONDITION_REPORT, {id: conditionId}],
+    [QUERY_KEYS.TOTAL_PHOTOS_CONDITION_CHECK, {id: conditionId}],
   ]);
 
   useEffect(() => {
@@ -185,12 +190,19 @@ export const PhotoDetailCondition = (props: Props) => {
   );
 
   const titleHeader = useMemo(() => {
-    return conditionPhotoType == 'detail'
+    return conditionPhotoType == CONDITION_PHOTO_SIDE_TYPE.Details
       ? CONDITION_PHOTO_SIDE_LABELS[conditionPhotoType]
       : conditionType == 'conditionreport'
       ? 'Photo zoom'
       : conditionPhotoType + ' overview';
   }, [conditionPhotoType, conditionType]);
+
+  const isRequired = useMemo(() => {
+    return (
+      conditionType == CONDITION_TYPES.ConditionReport ||
+      conditionPhotoType == CONDITION_PHOTO_SIDE_TYPE.Details
+    );
+  }, [conditionType, conditionPhotoType]);
 
   return (
     <Wrapper style={GLOBAL_STYLES.safeAreaLight}>
@@ -215,10 +227,10 @@ export const PhotoDetailCondition = (props: Props) => {
         <MinRoundedView />
 
         <BasicFormProvider
-          key={note?.details ?? data?.description}
-          schema={SaveTaskImageSchema}
+          key={note?.details ?? data?.title ?? data?.description}
+          schema={isRequired ? SaveTaskImageSchema : undefined}
           defaultValue={{
-            title: note?.label ?? item?.title,
+            title: note?.label ?? item?.title ?? data?.title,
             description: note?.details ?? data?.description,
           }}>
           <KeyboardAwareScrollView
@@ -231,11 +243,7 @@ export const PhotoDetailCondition = (props: Props) => {
                 style={[
                   styles.containerEditImage,
                   {
-                    height:
-                      conditionType == 'conditionreport' ||
-                      conditionPhotoType == 'detail'
-                        ? 250
-                        : 350,
+                    height: isRequired ? 250 : 350,
                   },
                 ]}
                 onPress={() =>
@@ -249,28 +257,32 @@ export const PhotoDetailCondition = (props: Props) => {
               </PressableOpacity>
             )}
 
-            <InputTextContext
-              label="Title*"
-              currentId="title"
-              placeholder="Title for image (required)"
-            />
-            <InputTextContext
-              label="Description"
-              currentId="description"
-              placeholder="(Optional)"
-              multiline={true}
-              containerProps={{
-                style: {
-                  marginTop: 10,
-                },
-              }}
-              style={styles.inputTextArea}
-              isErrorHidden={true}
-            />
+            {isRequired && (
+              <>
+                <InputTextContext
+                  label="Title*"
+                  currentId="title"
+                  placeholder="Title for image (required)"
+                />
+                <InputTextContext
+                  label="Description"
+                  currentId="description"
+                  placeholder="(Optional)"
+                  multiline={true}
+                  containerProps={{
+                    style: {
+                      marginTop: 10,
+                    },
+                  }}
+                  style={styles.inputTextArea}
+                  isErrorHidden={true}
+                />
 
-            <Wrapper style={{top: 0}}>
-              <SpeechFormContext ref={refVoice} name="description" />
-            </Wrapper>
+                <Wrapper style={{top: 0}}>
+                  <SpeechFormContext ref={refVoice} name="description" />
+                </Wrapper>
+              </>
+            )}
 
             <Wrapper
               style={{
@@ -346,6 +358,7 @@ const styles = StyleSheet.create({
   },
   topsheet: {
     color: COLORS.titleColor,
+    textTransform: 'capitalize',
   },
   inputTextArea: {
     textAlignVertical: 'top',

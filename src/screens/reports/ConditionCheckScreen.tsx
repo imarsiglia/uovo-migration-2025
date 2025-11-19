@@ -11,6 +11,7 @@ import {
 import {useGetJobInventory} from '@api/hooks/HooksInventoryServices';
 import {
   useGetConditionCheckbyInventory,
+  useGetTotalPhotosConditionCheck,
   useSaveConditionCheck,
 } from '@api/hooks/HooksReportServices';
 import {JobInventoryType} from '@api/types/Inventory';
@@ -28,7 +29,7 @@ import {
   ConditionCheckSchema,
   ConditionCheckSchemaType,
 } from '@generalTypes/schemas';
-import {RootStackParamList} from '@navigation/types';
+import {RootStackParamList, RoutesNavigation} from '@navigation/types';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {loadingWrapperPromise} from '@store/actions';
 import {useAuth} from '@store/auth';
@@ -44,6 +45,21 @@ import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {COLORS} from '@styles/colors';
 import useInventoryStore from '@store/inventory';
 import isEqual from 'lodash.isequal';
+import {reportServices} from '@api/services/reportServices';
+import {
+  CONDITION_PHOTO_SIDE_TYPE,
+  CONDITION_TYPES,
+  ConditionPhotoSideType,
+  ConditionPhotoType,
+} from '@api/types/Condition';
+import useConditionStore from '@store/condition';
+import {ButtonPhotosCount} from '@components/commons/buttons/ButtonPhotosCount';
+import {
+  ImageOptionSheet,
+  RBSheetRef,
+} from '@components/commons/bottomsheets/ImageOptionSheet';
+import type {Image as ImageType} from 'react-native-image-crop-picker';
+import { onSelectImage } from '@utils/image';
 // import OfflineValidation from '../components/offline/OfflineValidation';
 
 var offlineInventory = {};
@@ -54,8 +70,11 @@ const delay = 3000;
 type Props = NativeStackScreenProps<RootStackParamList, 'ConditionCheck'>;
 
 export const ConditionCheckScreen = (props: Props) => {
+  const refCallSheet = useRef<RBSheetRef>(null);
   const examinationDate = new Date();
   const [renderForm, setRenderForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const {navigate} = useCustomNavigation();
 
   // filters and select
   const [filterItem, setFilterItem] = useState('');
@@ -64,6 +83,15 @@ export const ConditionCheckScreen = (props: Props) => {
   const [selectedItem, setSelectedItem] = useState<JobInventoryType | null>(
     null,
   );
+  const {
+    conditionId,
+    setConditionType,
+    setInventoryId,
+    setConditionId,
+    setReportIdImage,
+    setConditionPhotoSubtype,
+    setConditionPhotoType,
+  } = useConditionStore();
 
   const {topSheetFilter, inventoryFilter, orderFilter, orderType} =
     useInventoryStore();
@@ -131,27 +159,8 @@ export const ConditionCheckScreen = (props: Props) => {
   //Take dictation
   const refVoiceCondArt = useRef(null);
 
-  const [totalPhotos, setTotalPhotos] = useState([
-    {
-      type: 'back',
-      total: 0,
-    },
-    {
-      type: 'front',
-      total: 0,
-    },
-    {
-      type: 'sides',
-      total: 0,
-    },
-    {
-      type: 'details',
-      total: 0,
-    },
-  ]);
-
   useEffect(() => {
-    // props.dispatch(ActionsConditionReport.copyConditionType('conditionreport'));
+    setConditionType(CONDITION_TYPES.ConditionCheck);
     initAll();
   }, []);
 
@@ -163,46 +172,6 @@ export const ConditionCheckScreen = (props: Props) => {
 
   const initAll = async () => {
     // await initOfflineInventory();
-  };
-
-  const getTotalPhotos = async (id: string) => {
-    // if (id || (props.reportId != null && props.reportId != '')) {
-    //   const isConnected = await isInternet();
-    //   if (isConnected) {
-    //     const response = await fetchData.Get(
-    //       'resources/conditionreport/totalPhotos?id=' +
-    //       (id ? id : props.reportId),
-    //     );
-    //     if (response.ok) {
-    //       if (response.data.message == 'SUCCESS') {
-    //         setTotalPhotos(response.data.body);
-    //       }
-    //     } else {
-    //       Toast.show('Error while retreiving total photos', Toast.LONG, [
-    //         'UIAlertController',
-    //       ]);
-    //     }
-    //   } else {
-    //     setTotalPhotos([
-    //       {
-    //         type: 'back',
-    //         total: 0,
-    //       },
-    //       {
-    //         type: 'front',
-    //         total: 0,
-    //       },
-    //       {
-    //         type: 'sides',
-    //         total: 0,
-    //       },
-    //       {
-    //         type: 'details',
-    //         total: 0,
-    //       },
-    //     ]);
-    //   }
-    // }
   };
 
   const currentItem = useMemo(() => {
@@ -225,6 +194,10 @@ export const ConditionCheckScreen = (props: Props) => {
       return null;
     }
   }, [selectedItem, receivedReport, receivedItem]);
+
+  useEffect(() => {
+    setInventoryId(currentItem?.id);
+  }, [currentItem?.id, setInventoryId]);
 
   const {refetchAll} = useRefreshIndicator([
     [QUERY_KEYS.RESUME_CONDITION_CHECK, {idJob: jobDetail?.id}],
@@ -262,19 +235,56 @@ export const ConditionCheckScreen = (props: Props) => {
     [setFilterTypes],
   );
 
-  const goToGallery = (type: string) => {
-    // Keyboard.dismiss();
-    // if (item.id) {
-    //   props.dispatch(ActionsConditionReport.copyReportType(type));
-    //   props.dispatch(ActionsConditionReport.copyReportInventory(item.id));
-    //   // navigate("Gallery", { type, type, idInventory: item.id })
-    //   navigate('Gallery', { type: type, idInventory: item.id });
-    // } else {
-    //   Alert.alert('You must select an item');
-    // }
-  };
+  const goToGallery = useCallback(
+    async (type: ConditionPhotoSideType) => {
+      setConditionPhotoSubtype(undefined);
+      setConditionPhotoType(type);
+      if (conditionId) {
+        setIsLoading(true);
+        const res = await reportServices.getPhotosCondition({
+          conditionType: CONDITION_TYPES.ConditionCheck,
+          sideType: type,
+          reportId: conditionId!,
+        });
+        setIsLoading(false);
+        if (res?.length > 0) {
+          checkOverview(res[res.length - 1]);
+        } else {
+          takeNewPhoto();
+        }
+      }
+    },
+    [conditionId],
+  );
 
-  const goToSides = () => {
+  const checkOverview = useCallback((item: ConditionPhotoType) => {
+    navigate(RoutesNavigation.PhotoDetailCondition, {
+      item: item,
+      photo: item.thumbnail!,
+    });
+  }, []);
+
+  // const goToGallery = (type: string) => {
+  //   reportServices.getPhotosCondition({
+  //     conditionType: CONDITION_TYPES.ConditionCheck,
+  //     sideType: type,
+  //     reportId: conditionId
+  //   })
+  // Keyboard.dismiss();
+  // if (item.id) {
+  //   props.dispatch(ActionsConditionReport.copyReportType(type));
+  //   props.dispatch(ActionsConditionReport.copyReportInventory(item.id));
+  //   // navigate("Gallery", { type, type, idInventory: item.id })
+  //   navigate('Gallery', { type: type, idInventory: item.id });
+  // } else {
+  //   Alert.alert('You must select an item');
+  // }
+  // };
+
+  const goToDetails = () => {
+    setConditionPhotoType(CONDITION_PHOTO_SIDE_TYPE.Details);
+    setConditionPhotoSubtype(undefined);
+    navigate(RoutesNavigation.GalleryCondition);
     // Keyboard.dismiss();
     // if (item.id) {
     //   props.dispatch(ActionsConditionReport.copyReportType('sides'));
@@ -284,24 +294,6 @@ export const ConditionCheckScreen = (props: Props) => {
     //   Alert.alert('You must select an item');
     // }
   };
-
-  useEffect(() => {
-    // if (!initial) {
-    //   clearTimeout(idTimeOut);
-    //   idTimeOut = setTimeout(
-    //     () => {
-    //       onPartialSave();
-    //     },
-    //     props.route.params.condition == null &&
-    //       (props.reportId == null || props.reportId == '')
-    //       ? 500
-    //       : 3000,
-    //   );
-    // }
-    // return () => {
-    //   clearTimeout(idTimeOut);
-    // };
-  }, []);
 
   const closeAll = (exceptIndex: number) => {
     autocompleteRefs.forEach((r, i) => {
@@ -328,6 +320,44 @@ export const ConditionCheckScreen = (props: Props) => {
       return null;
     }
   }, [conditionReportJson]);
+
+  const {data: photosTotal} = useGetTotalPhotosConditionCheck({
+    id: initialConditionReport?.id!,
+  });
+
+  const totalPhotos = useMemo(() => {
+    const init = {
+      front: 0,
+      back: 0,
+      details: 0,
+      sides: 0,
+    };
+
+    if (!Array.isArray(photosTotal) || photosTotal.length === 0) return init;
+
+    return photosTotal.reduce((acc, cur) => {
+      switch (cur.type) {
+        case CONDITION_PHOTO_SIDE_TYPE.Front:
+          acc.front = cur.total ?? 0;
+          break;
+        case CONDITION_PHOTO_SIDE_TYPE.Back:
+          acc.back = cur.total ?? 0;
+          break;
+        case CONDITION_PHOTO_SIDE_TYPE.Details:
+          acc.details = cur.total ?? 0;
+          break;
+        default:
+          break;
+      }
+      return acc;
+    }, init);
+  }, [photosTotal]);
+
+  useEffect(() => {
+    if (initialConditionReport?.id) {
+      setConditionId(initialConditionReport.id);
+    }
+  }, [initialConditionReport?.id, setConditionId]);
 
   const saveAsync = useCallback(
     (form: ConditionCheckSchemaType) => {
@@ -481,9 +511,38 @@ export const ConditionCheckScreen = (props: Props) => {
     }
   }, [currentItem?.id]);
 
+  const generateImagePathIOS = useCallback((photo?: ImageType) => {
+    setReportIdImage(undefined);
+    navigate(RoutesNavigation.PhotoDetailCondition, {
+      photo: photo?.data!,
+      refresh: true,
+      updateRefreshGallery: false,
+    });
+  }, []);
+
+  // ---------- Seleccionar desde galería ----------
+  const initGallery = useCallback(async () => {
+    // @ts-ignore
+    onSelectImage(closeSheet, generateImagePathIOS);
+  }, [generateImagePathIOS]);
+
+  const initCamera = useCallback(() => {}, []);
+
+  const takeNewPhoto = useCallback(() => {
+    if (refCallSheet.current) {
+      refCallSheet.current.open();
+    }
+  }, []);
+
+  const closeSheet = useCallback(() => {
+    if (refCallSheet.current) {
+      refCallSheet.current.close();
+    }
+  }, []);
+
   return (
     <Wrapper style={[styles.container]}>
-      {isLoadingConditionReport && <GeneralLoading />}
+      {(isLoadingConditionReport || isLoading) && <GeneralLoading />}
 
       <Wrapper style={[{backgroundColor: 'white'}]}>
         <BackButton onPress={goBack} title="Item detail" />
@@ -938,156 +997,25 @@ export const ConditionCheckScreen = (props: Props) => {
                     marginBottom: 10,
                   },
                 ]}>
-                <PressableOpacity
-                  style={[
-                    GLOBAL_STYLES.row,
-                    styles.btnTakePhoto,
-                    {
-                      justifyContent: 'space-between',
-                    },
-                  ]}
-                  onPress={() => goToGallery('front')}>
-                  <Wrapper
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 5,
-                    }}>
-                    <Label style={styles.textTakePhoto}>Front</Label>
-                    {/* <OfflineValidation
-                      idJob={jobDetail.id}
-                      offline={[
-                        DELETE_CREPORT_IMAGE_OVERVIEW_OFFLINE_VALIDATION,
-                        DELETE_CREPORT_IMAGE_DETAIL_OFFLINE_VALIDATION,
-                        REPORT_CONDITION_IMAGE_OFFLINE_VALIDATION[
-                        'conditionreport'
-                        ],
-                        REPORT_CONDITION_IMAGE_DETAIL_OFFLINE_VALIDATION[
-                        'conditionreport'
-                        ],
-                      ]}
-                      idInventory={item?.id}
-                      reportType={'front'}
-                      conditionType={'conditionreport'}
-                    /> */}
-                  </Wrapper>
-
-                  <Wrapper
-                    style={[GLOBAL_STYLES.row, styles.containerCountCamera]}>
-                    <Wrapper style={styles.countTakePhoto}>
-                      <Label
-                        style={styles.numberCount}
-                        allowFontScaling={false}>
-                        {totalPhotos.filter((x) => x.type == 'front')[0].total}
-                      </Label>
-                    </Wrapper>
-                    <Wrapper style={styles.viewCamera}>
-                      <Icon
-                        name="camera"
-                        type="solid"
-                        color="white"
-                        size={25}
-                      />
-                    </Wrapper>
-                  </Wrapper>
-                </PressableOpacity>
-
-                <PressableOpacity
-                  style={[GLOBAL_STYLES.row, styles.btnTakePhoto]}
-                  onPress={() => goToGallery('back')}>
-                  <Wrapper
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 5,
-                    }}>
-                    <Label style={styles.textTakePhoto}>Back</Label>
-                    {/* <OfflineValidation
-                      idJob={jobDetail.id}
-                      offline={[
-                        DELETE_CREPORT_IMAGE_OVERVIEW_OFFLINE_VALIDATION,
-                        DELETE_CREPORT_IMAGE_DETAIL_OFFLINE_VALIDATION,
-                        REPORT_CONDITION_IMAGE_OFFLINE_VALIDATION[
-                        'conditionreport'
-                        ],
-                        REPORT_CONDITION_IMAGE_DETAIL_OFFLINE_VALIDATION[
-                        'conditionreport'
-                        ],
-                      ]}
-                      idInventory={item?.id}
-                      reportType={'back'}
-                      conditionType={'conditionreport'}
-                    /> */}
-                  </Wrapper>
-
-                  <Wrapper
-                    style={[GLOBAL_STYLES.row, styles.containerCountCamera]}>
-                    <Wrapper style={styles.countTakePhoto}>
-                      <Label
-                        style={styles.numberCount}
-                        allowFontScaling={false}>
-                        {totalPhotos.filter((x) => x.type == 'back')[0].total}
-                      </Label>
-                    </Wrapper>
-                    <Wrapper style={styles.viewCamera}>
-                      <Icon
-                        name="camera"
-                        type="solid"
-                        color="white"
-                        size={25}
-                      />
-                    </Wrapper>
-                  </Wrapper>
-                </PressableOpacity>
+                <ButtonPhotosCount
+                  title="Front"
+                  total={totalPhotos.front}
+                  onPress={() => goToGallery('front')}
+                />
+                <ButtonPhotosCount
+                  title="Back"
+                  total={totalPhotos.back}
+                  onPress={() => goToGallery('back')}
+                />
               </Wrapper>
 
               <Wrapper
                 style={[GLOBAL_STYLES.row, {justifyContent: 'space-between'}]}>
-                <PressableOpacity
-                  style={[GLOBAL_STYLES.row, styles.btnTakePhoto]}
-                  onPress={() => goToSides()}>
-                  <Wrapper
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 5,
-                    }}>
-                    <Label style={styles.textTakePhoto}>Details</Label>
-                    {/* <OfflineValidation
-                      idJob={jobDetail.id}
-                      offline={[
-                        DELETE_CREPORT_IMAGE_OVERVIEW_OFFLINE_VALIDATION,
-                        DELETE_CREPORT_IMAGE_DETAIL_OFFLINE_VALIDATION,
-                        REPORT_CONDITION_IMAGE_OFFLINE_VALIDATION,
-                        REPORT_CONDITION_IMAGE_DETAIL_OFFLINE_VALIDATION[
-                        'conditionreport'
-                        ],
-                      ]}
-                      idInventory={item?.id}
-                      reportType={'sides'}
-                      conditionType={'conditionreport'}
-                    /> */}
-                  </Wrapper>
-
-                  <Wrapper
-                    style={[GLOBAL_STYLES.row, styles.containerCountCamera]}>
-                    <Wrapper style={styles.countTakePhoto}>
-                      <Label
-                        style={styles.numberCount}
-                        allowFontScaling={false}>
-                        {totalPhotos.filter((x) => x.type == 'sides')[0].total}
-                      </Label>
-                    </Wrapper>
-                    <Wrapper style={styles.viewCamera}>
-                      <Icon
-                        name="camera"
-                        type="solid"
-                        color="white"
-                        size={25}
-                      />
-                    </Wrapper>
-                  </Wrapper>
-                </PressableOpacity>
+                <ButtonPhotosCount
+                  title="Details"
+                  total={totalPhotos.details}
+                  onPress={goToDetails}
+                />
               </Wrapper>
 
               <Wrapper style={{marginTop: 40, marginBottom: 100}}>
@@ -1105,6 +1033,12 @@ export const ConditionCheckScreen = (props: Props) => {
           <AutoSaveConditionReport />
         </BasicFormProvider>
       </ScrollView>
+
+      <ImageOptionSheet
+        ref={refCallSheet}
+        initCamera={initCamera}
+        initGallery={initGallery}
+      />
     </Wrapper>
   );
 };

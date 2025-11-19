@@ -277,12 +277,20 @@ type SaveZoomScreenProps = {
 const saveZoomScreen = async ({
   conditionType,
   ...props
-}: SaveZoomScreenProps): Promise<boolean> => {
-  const response = await postRequest(
+}: SaveZoomScreenProps): Promise<ZoomScreenResponse> => {
+  const response = await postRequest<ZoomScreenResponse>(
     `/${conditionType}${API_SAVE_ZOOM_SCREEN}`,
     props,
   );
-  return response.message === SUCCESS_MESSAGES.SUCCESS;
+  return response.body;
+};
+
+type ZoomScreenResponse = {
+  reportId: number;
+  reportType: ConditionPhotoSideType;
+  idJob: number;
+  idImg: number;
+  idJobInventory: number;
 };
 
 export const reportServices = {

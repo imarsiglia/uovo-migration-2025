@@ -332,7 +332,7 @@ export const ConditionReportScreen = (props: Props) => {
     const init = {
       front: 0,
       back: 0,
-      detail: 0,
+      details: 0,
       sides: 0,
     };
 
@@ -346,8 +346,8 @@ export const ConditionReportScreen = (props: Props) => {
         case CONDITION_PHOTO_SIDE_TYPE.Back:
           acc.back = cur.total ?? 0;
           break;
-        case CONDITION_PHOTO_SIDE_TYPE.Detail:
-          acc.detail = cur.total ?? 0;
+        case CONDITION_PHOTO_SIDE_TYPE.Details:
+          acc.details = cur.total ?? 0;
           break;
         case CONDITION_PHOTO_SIDE_TYPE.Sides:
           acc.sides = cur.total ?? 0;
@@ -1171,9 +1171,9 @@ export const ConditionReportScreen = (props: Props) => {
                 />
 
                 <ButtonPhotosCount
-                  title="Sides"
-                  total={totalPhotos.sides}
-                  onPress={() => goToGallery(CONDITION_PHOTO_SIDE_TYPE.Detail)}
+                  title="Details"
+                  total={totalPhotos.details}
+                  onPress={() => goToGallery(CONDITION_PHOTO_SIDE_TYPE.Details)}
                 />
               </Wrapper>
 

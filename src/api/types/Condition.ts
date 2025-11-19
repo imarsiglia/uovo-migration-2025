@@ -9,7 +9,7 @@ export type ConditionType =
 export const CONDITION_PHOTO_SIDE_TYPE = {
   Front: 'front',
   Back: 'back',
-  Detail: 'detail',
+  Details: 'details',
   Sides: 'sides',
 } as const;
 
@@ -22,7 +22,7 @@ export const CONDITION_PHOTO_SIDE_LABELS: Record<
 > = {
   front: 'Front',
   back: 'Back',
-  detail: 'Details',
+  details: 'Details',
   sides: 'Sides',
   top: 'Top',
   bottom: 'Bottom',

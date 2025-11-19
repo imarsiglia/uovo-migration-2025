@@ -159,7 +159,7 @@ const ZoomScreen = (props: any) => {
     isFetching,
     refetch,
   } = useGetPhotoConditionOverview({
-    id: item?.id,
+    id: item?.id ?? reportIdImage,
     conditionType: conditionType!,
   });
 
@@ -581,9 +581,6 @@ const ZoomScreen = (props: any) => {
     async (buttonName: string) => {
       setM({fabOpen: false});
       const {notes: stateNotes, activeNoteId, reportId} = state;
-      const {
-        route: {params},
-      } = props;
 
       if (buttonName === 'save') {
         refreshGalleryRef.current = false;
@@ -674,7 +671,20 @@ const ZoomScreen = (props: any) => {
         setM({...stateUpdate[buttonName]});
       }
     },
-    [_getPhoto, props, setM, state, online, params],
+    [
+      _getPhoto,
+      props,
+      setM,
+      state,
+      online,
+      conditionType,
+      reportIdImage,
+      idJob,
+      inventoryId,
+      conditionId,
+      conditionPhotoType,
+      conditionPhotoSubtype,
+    ],
   );
 
   const functSave = useCallback(
@@ -686,10 +696,14 @@ const ZoomScreen = (props: any) => {
             ...bodyRequest,
           })
             .then((response) => {
-              if (response) {
+              if (response?.idImg) {
                 setTimeout(() => {
                   refetchAll();
-                  refetch();
+                  if (item?.id) {
+                    refetch();
+                  } else {
+                    setReportIdImage(response.idImg);
+                  }
                 }, 500);
                 goBack();
               }
@@ -908,7 +922,7 @@ const ZoomScreen = (props: any) => {
       //   }, 400);
       // }
     },
-    [],
+    [item?.id, conditionType],
   );
 
   const suppSaveFunction = useCallback(async (stringListSave: string) => {
