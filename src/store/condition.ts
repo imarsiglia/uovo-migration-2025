@@ -23,6 +23,8 @@ export type ConditionStore = {
   setReportIdImage: (val?: number) => void;
   conditionPhotoSubtype?: ConditionPhotoSideSubtype;
   setConditionPhotoSubtype: (val?: ConditionPhotoSideSubtype) => void;
+  conditionClientId?: string | null;
+  setConditionClientId: (val?: string) => void;
 };
 
 export const useConditionStore = create<ConditionStore>((set) => ({
@@ -45,6 +47,9 @@ export const useConditionStore = create<ConditionStore>((set) => ({
   conditionPhotoSubtype: undefined,
   setConditionPhotoSubtype: (val) =>
     set((state) => ({...state, conditionPhotoSubtype: val})),
+  conditionClientId: undefined,
+  setConditionClientId: (val) =>
+    set((state) => ({...state, conditionClientId: val})),
 }));
 
 export default useConditionStore;

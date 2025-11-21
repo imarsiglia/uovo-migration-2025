@@ -4,6 +4,7 @@ import Icon from 'react-native-fontawesome-pro';
 // import {useFocusEffect} from '@react-navigation/native';
 import {QUERY_KEYS} from '@api/contants/constants';
 import {
+  DEFAULT_PERSISTENCE_CONFIG,
   useGetArtists,
   useGetArtTypes,
   useGetPlacesConditionReport,
@@ -45,7 +46,10 @@ import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {COLORS} from '@styles/colors';
 import useInventoryStore from '@store/inventory';
 import isEqual from 'lodash.isequal';
-import {reportServices} from '@api/services/reportServices';
+import {
+  GetPhotosConditionApiProps,
+  reportServices,
+} from '@api/services/reportServices';
 import {
   CONDITION_PHOTO_SIDE_TYPE,
   CONDITION_TYPES,
@@ -59,7 +63,11 @@ import {
   RBSheetRef,
 } from '@components/commons/bottomsheets/ImageOptionSheet';
 import type {Image as ImageType} from 'react-native-image-crop-picker';
-import { onSelectImage } from '@utils/image';
+import {onSelectImage} from '@utils/image';
+import {offlineUpdateConditionCheck} from '@features/conditionCheck/offline';
+import {generateUUID} from '@utils/functions';
+import {useOnline} from '@hooks/useOnline';
+import {useQueryClient} from '@tanstack/react-query';
 // import OfflineValidation from '../components/offline/OfflineValidation';
 
 var offlineInventory = {};
@@ -70,6 +78,7 @@ const delay = 3000;
 type Props = NativeStackScreenProps<RootStackParamList, 'ConditionCheck'>;
 
 export const ConditionCheckScreen = (props: Props) => {
+  const queryClient = useQueryClient();
   const refCallSheet = useRef<RBSheetRef>(null);
   const examinationDate = new Date();
   const [renderForm, setRenderForm] = useState(false);
@@ -127,6 +136,8 @@ export const ConditionCheckScreen = (props: Props) => {
     idJobInventory:
       receivedReport?.id_job_inventory ?? receivedItem?.id ?? selectedItem?.id!,
   });
+
+  const {online} = useOnline();
 
   const {hardRefreshMany} = useRefreshIndicator([
     [
@@ -241,11 +252,24 @@ export const ConditionCheckScreen = (props: Props) => {
       setConditionPhotoType(type);
       if (conditionId) {
         setIsLoading(true);
-        const res = await reportServices.getPhotosCondition({
+
+        const props: GetPhotosConditionApiProps = {
           conditionType: CONDITION_TYPES.ConditionCheck,
           sideType: type,
           reportId: conditionId!,
+        };
+
+        const res = await queryClient.fetchQuery({
+          queryKey: [QUERY_KEYS.PHOTOS_CONDITION, props],
+          queryFn: () => reportServices.getPhotosCondition(props),
+          ...DEFAULT_PERSISTENCE_CONFIG,
         });
+
+        // const res = await reportServices.getPhotosCondition({
+        //   conditionType: CONDITION_TYPES.ConditionCheck,
+        //   sideType: type,
+        //   reportId: conditionId!,
+        // });
         setIsLoading(false);
         if (res?.length > 0) {
           checkOverview(res[res.length - 1]);
@@ -263,23 +287,6 @@ export const ConditionCheckScreen = (props: Props) => {
       photo: item.thumbnail!,
     });
   }, []);
-
-  // const goToGallery = (type: string) => {
-  //   reportServices.getPhotosCondition({
-  //     conditionType: CONDITION_TYPES.ConditionCheck,
-  //     sideType: type,
-  //     reportId: conditionId
-  //   })
-  // Keyboard.dismiss();
-  // if (item.id) {
-  //   props.dispatch(ActionsConditionReport.copyReportType(type));
-  //   props.dispatch(ActionsConditionReport.copyReportInventory(item.id));
-  //   // navigate("Gallery", { type, type, idInventory: item.id })
-  //   navigate('Gallery', { type: type, idInventory: item.id });
-  // } else {
-  //   Alert.alert('You must select an item');
-  // }
-  // };
 
   const goToDetails = () => {
     setConditionPhotoType(CONDITION_PHOTO_SIDE_TYPE.Details);
@@ -359,6 +366,36 @@ export const ConditionCheckScreen = (props: Props) => {
     }
   }, [initialConditionReport?.id, setConditionId]);
 
+  const saveReportOffline = useCallback(
+    (form: ConditionCheckSchemaType) => {
+      const clientId = initialConditionReport?.clientId ?? generateUUID();
+      return offlineUpdateConditionCheck({
+        id: initialConditionReport?.id ?? null,
+        idJob: jobDetail?.id!,
+        idInventory: currentItem?.id!,
+        artistName: form.artistName?.title,
+        artTypeName: form.artTypeName?.title,
+
+        placeOfExam: form.placeOfExam,
+        overalConditionArtwork: form.overalConditionArtwork,
+        edition: form.edition,
+        labeled: form.labeled,
+        mediumName: form.mediumName,
+        signature: form.signature,
+        title: form.title,
+        year: form.year,
+
+        packed_height: form.packed_height,
+        packed_length: form.packed_length,
+        packed_width: form.packed_width,
+        un_packed_height: form.un_packed_height,
+        un_packed_length: form.un_packed_length,
+        un_packed_width: form.un_packed_width,
+      });
+    },
+    [currentItem?.id, jobDetail?.id, initialConditionReport?.id],
+  );
+
   const saveAsync = useCallback(
     (form: ConditionCheckSchemaType) => {
       return saveConditionAsync({
@@ -395,28 +432,44 @@ export const ConditionCheckScreen = (props: Props) => {
 
   const onSubmit = useCallback(
     (props: ConditionCheckSchemaType) => {
-      loadingWrapperPromise(
-        saveAsync(props)
-          .then((d) => {
-            if (d) {
-              showToastMessage('Condition check saved successfully');
-              refetchAll();
-              refetch();
-              hardRefreshMany();
-              goBack();
-            } else {
-              showErrorToastMessage('Error while saving condition check');
-            }
-          })
-          .catch(() => {
-            showErrorToastMessage('Error while saving condition check');
-          }),
-      );
+      if (props) {
+        if (online) {
+          loadingWrapperPromise(
+            saveAsync(props)
+              .then((d) => {
+                if (d) {
+                  showToastMessage('Condition check saved successfully');
+                  refetchAll();
+                  refetch();
+                  hardRefreshMany();
+                  goBack();
+                } else {
+                  showErrorToastMessage('Error while saving condition check');
+                }
+              })
+              .catch(() => {
+                showErrorToastMessage('Error while saving condition check');
+              }),
+          );
+        } else {
+          saveReportOffline(props);
+        }
+      } else {
+        showToastMessage('Please, select a valid option');
+      }
     },
-    [saveAsync, refetchAll, refetch, hardRefreshMany, goBack],
+    [
+      online,
+      saveAsync,
+      saveReportOffline,
+      refetchAll,
+      refetch,
+      hardRefreshMany,
+      goBack,
+    ],
   );
 
-  const AutoSaveConditionReport = () => {
+  const AutoSaveConditionCheck = () => {
     const formData = useWatch<ConditionCheckSchemaType>(); // valores del formulario
     // @ts-ignore
     const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -466,21 +519,25 @@ export const ConditionCheckScreen = (props: Props) => {
 
         try {
           setSaving(true);
-          // Esperamos la promesa y guardamos. saveAsync viene de tu scope superior.
-          const res = await saveAsync(formData as ConditionCheckSchemaType);
-          if (res) {
-            if (autosaveInitial) {
-              // sólo actualizamos lastSavedRef si save fue exitoso
-              lastSavedRef.current = formData
-                ? JSON.parse(JSON.stringify(formData))
-                : null;
-              // refrescamos datos y otros efectos
-              refetchAll();
-              hardRefreshMany();
-              refetch();
-            } else {
-              autosaveInitial = true;
+          if (online) {
+            // Esperamos la promesa y guardamos. saveAsync viene de tu scope superior.
+            const res = await saveAsync(formData as ConditionCheckSchemaType);
+            if (res) {
+              if (autosaveInitial) {
+                // sólo actualizamos lastSavedRef si save fue exitoso
+                lastSavedRef.current = formData
+                  ? JSON.parse(JSON.stringify(formData))
+                  : null;
+                // refrescamos datos y otros efectos
+                refetchAll();
+                hardRefreshMany();
+                refetch();
+              } else {
+                autosaveInitial = true;
+              }
             }
+          } else {
+            saveReportOffline(formData as ConditionCheckSchemaType);
           }
         } catch (err) {
         } finally {
@@ -495,7 +552,15 @@ export const ConditionCheckScreen = (props: Props) => {
           timerRef.current = null;
         }
       };
-    }, [formData, currentItem?.id, saveAsync, refetchAll, hardRefreshMany]);
+    }, [
+      formData,
+      currentItem?.id,
+      saveAsync,
+      refetchAll,
+      hardRefreshMany,
+      online,
+      saveReportOffline,
+    ]);
 
     return null;
   };
@@ -1030,7 +1095,7 @@ export const ConditionCheckScreen = (props: Props) => {
               </Wrapper>
             </>
           )}
-          <AutoSaveConditionReport />
+          <AutoSaveConditionCheck />
         </BasicFormProvider>
       </ScrollView>
 

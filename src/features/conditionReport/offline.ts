@@ -1,10 +1,15 @@
 // src/features/notes/offline.ts
 import {ENTITY_TYPES} from '@api/contants/constants';
-import {SaveConditionReportApiProps} from '@api/services/reportServices';
+import {
+  RemovePhotoConditionApiProps,
+  SaveConditionReportApiProps,
+  SavePhotoConditionApiProps,
+  SaveZoomScreenProps,
+} from '@api/services/reportServices';
 import {enqueueCoalesced} from '@offline/outbox';
+import {OutboxOpKind} from '@offline/types';
 
 export type ConditionReportOfflineProps = {
-  idJob: number;
   clientId?: string;
 } & SaveConditionReportApiProps;
 
@@ -16,24 +21,155 @@ export async function offlineCreateConditionReport({
     throw new Error('offlineCreateConditionReport requires clientId');
   return enqueueCoalesced('create', {
     entity: ENTITY_TYPES.CONDITION_REPORT,
+    idJob: rest.idJob,
     clientId,
     body: {...rest},
   });
 }
 
 export async function offlineUpdateConditionReport({
-  id,
   clientId,
   ...rest
 }: ConditionReportOfflineProps) {
-  if (!id && !clientId)
+  if (!rest.id && !clientId)
     throw new Error('offlineUpdateConditionReport requires id or clientId');
   return enqueueCoalesced('update', {
     entity: ENTITY_TYPES.CONDITION_REPORT,
-    id: id!,
+    id: rest.id!,
+    clientId,
+    idJob: rest.idJob,
+    body: {
+      ...rest,
+    },
+  });
+}
+
+export async function offlineDeleteConditionReport(params: {
+  idJob: number;
+  id?: number | null;
+  clientId?: string;
+}) {
+  const {idJob, id, clientId} = params;
+  if (!id && !clientId) {
+    throw new Error('offlineDeleteConditionReport requires id or clientId');
+  }
+  return enqueueCoalesced('delete', {
+    entity: ENTITY_TYPES.CONDITION_REPORT,
+    idJob,
+    id: id ?? undefined,
+    clientId,
+  });
+}
+
+export type SavePhotoConditionOfflineProps = {
+  // offline
+  clientId?: string;
+} & SavePhotoConditionApiProps;
+
+export async function offlineCreateConditionPhoto({
+  clientId,
+  ...rest
+}: SavePhotoConditionOfflineProps) {
+  const op = rest.id ? 'update' : 'create';
+
+  if (op === 'create' && !clientId) {
+    throw new Error('offlineSaveConditionPhoto requires clientId on create');
+  }
+
+  return enqueueCoalesced(op, {
+    entity: ENTITY_TYPES.CONDITION_PHOTO,
+    idJob: rest.idJob,
+    id: rest.id ?? undefined,
+    clientId: clientId,
+    body: {
+      ...rest,
+    },
+  });
+}
+
+export async function offlineUpdateConditionPhoto({
+  clientId,
+  ...rest
+}: SavePhotoConditionOfflineProps) {
+  const op = 'update';
+
+  if (!clientId) {
+    throw new Error('offlineUpdateConditionPhoto requires clientId on update');
+  }
+
+  return enqueueCoalesced(op, {
+    entity: ENTITY_TYPES.CONDITION_PHOTO,
+    idJob: rest.idJob,
+    id: rest.id ?? undefined,
+    clientId: clientId,
+    body: {
+      ...rest,
+    },
+  });
+}
+
+export type RemovePhotoConditionOfflineProps = {
+  idJob: number;
+  clientId?: string; // si nunca se subió al servidor
+} & RemovePhotoConditionApiProps;
+
+export async function offlineDeleteConditionPhoto({
+  clientId,
+  ...rest
+}: RemovePhotoConditionOfflineProps) {
+  if (!rest.id && !clientId) {
+    throw new Error('offlineDeleteConditionPhoto requires id or clientPhotoId');
+  }
+
+  return enqueueCoalesced('delete', {
+    entity: rest.isOverview
+      ? ENTITY_TYPES.CONDITION_ZOOM_PHOTO
+      : ENTITY_TYPES.CONDITION_PHOTO,
+    idJob: rest.idJob,
+    id: rest.id ?? undefined,
     clientId,
     body: {
       ...rest,
     },
+  });
+}
+
+export type SaveZoomScreenOfflineProps = {
+  clientId?: string;
+  id?: number;
+} & SaveZoomScreenProps;
+
+export async function offlineCreateZoomScreen({
+  id,
+  clientId,
+  ...rest
+}: SaveZoomScreenOfflineProps) {
+  const op = id ? 'update' : 'create';
+
+  if (op === 'create' && !clientId) {
+    throw new Error('offlineCreateZoomScreen requires clientId on create');
+  }
+
+  return enqueueCoalesced(op, {
+    entity: ENTITY_TYPES.CONDITION_ZOOM_PHOTO,
+    idJob: rest.idJob,
+    clientId,
+    body: {...rest},
+  });
+}
+
+export async function offlineUpdateZoomScreen({
+  id,
+  clientId,
+  ...rest
+}: SaveZoomScreenOfflineProps) {
+  if (!clientId) {
+    throw new Error('offlineCreateZoomScreen requires clientId on create');
+  }
+  return enqueueCoalesced('update', {
+    entity: ENTITY_TYPES.CONDITION_ZOOM_PHOTO,
+    idJob: rest.idJob,
+    clientId,
+    body: {...rest},
   });
 }

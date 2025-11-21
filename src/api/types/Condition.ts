@@ -69,6 +69,8 @@ export type PhotoDetailType = {
   title?: string;
   title_sticky_note?: string;
   type?: ConditionPhotoSideType;
+  // offline
+  clientId?: string;
 };
 
 export type StickyNoteTranslation = {
@@ -115,10 +117,12 @@ export type OverviewReportType = {
     };
   };
   idJob: number;
-  idJobInventory: number;
-  idImg: number;
-  reportId: number;
-  reportType: ConditionPhotoSideType;
-  reportSubType?: string;
+  idJobInventory?: number | null;
+  idImg?: number | null;
+  reportId?: number | null;
+  reportType?: ConditionPhotoSideType |null;
+  reportSubType?: string | null;
   status: number;
+  // offline
+  clientId?: string;
 };

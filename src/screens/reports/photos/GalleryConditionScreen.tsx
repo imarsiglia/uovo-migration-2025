@@ -33,16 +33,34 @@ import {useCallback, useEffect, useMemo, useRef} from 'react';
 import {FlatList, ImageBackground, StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 import type {Image as ImageType} from 'react-native-image-crop-picker';
+import {offlineDeleteConditionPhoto} from '@features/conditionReport/offline';
+import {useOnline} from '@hooks/useOnline';
+import useTopSheetStore from '@store/topsheet';
+import {generateUUID} from '@utils/functions';
+import {useRemoveFromArrayCache} from '@hooks/useToolsReactQueryCache';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'GalleryCondition'>;
 export const GalleryCondition = (props: Props) => {
   const {goBack, navigate, isFocused} = useCustomNavigation();
   const refCallSheet = useRef<RBSheetRef>(null);
+  const {online} = useOnline();
+  const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
 
   const {conditionType, conditionPhotoType, conditionId, setReportIdImage} =
     useConditionStore();
   const showDialog = useModalDialogStore((d) => d.showVisible);
   const {mutateAsync: deleteAsync} = useRemovePhotoCondition();
+
+  const queryKey = [
+    QUERY_KEYS.PHOTOS_CONDITION,
+    {
+      conditionType: conditionType!,
+      sideType: conditionPhotoType!,
+      reportId: conditionId!,
+    },
+  ];
+  const removePhotoFromCache =
+    useRemoveFromArrayCache<ConditionPhotoType>(queryKey);
 
   const subtype = props.route.params?.type;
 
@@ -70,6 +88,8 @@ export const GalleryCondition = (props: Props) => {
       return remotePhotos;
     }
   }, [subtype, remotePhotos]);
+
+  console.log(photos);
 
   useEffect(() => {
     if (isSuccess && !(photos?.length > 0)) {
@@ -186,27 +206,51 @@ export const GalleryCondition = (props: Props) => {
         cancelable: true,
         confirmBtnLabel: 'Confirm',
         onConfirm: () => {
-          loadingWrapperPromise(
-            deleteAsync({
-              conditionType: conditionType!,
-              isOverview: item.is_overview,
-              id: item?.id,
-            })
-              .then((isSucess) => {
-                if (isSucess) {
-                  showToastMessage('Photo deleted successfully');
-                  refetch();
-                  refetchAll();
-                } else {
-                  showErrorToastMessage('Error while deleting photo');
-                }
+          if (online) {
+            loadingWrapperPromise(
+              deleteAsync({
+                conditionType: conditionType!,
+                isOverview: item.is_overview,
+                id: item?.id,
               })
-              .catch(() => {}),
-          );
+                .then((isSucess) => {
+                  if (isSucess) {
+                    showToastMessage('Photo deleted successfully');
+                    refetch();
+                    refetchAll();
+                  } else {
+                    showErrorToastMessage('Error while deleting photo');
+                  }
+                })
+                .catch(() => {}),
+            );
+          } else {
+            if (item.is_overview) {
+              offlineDeleteConditionPhoto({
+                conditionType: conditionType!,
+                isOverview: item.is_overview,
+                id: item?.id,
+                clientId: item.clientId,
+                idJob,
+                
+              });
+            } else {
+              offlineDeleteConditionPhoto({
+                conditionType: conditionType!,
+                isOverview: item.is_overview,
+                id: item?.id,
+                clientId: item.clientId,
+                idJob,
+              });
+            }
+            removePhotoFromCache({id: item.id, clientId: item.clientId});
+
+            showToastMessage('Photo deleted (queued)');
+          }
         },
       });
     },
-    [showDialog, deleteAsync],
+    [showDialog, deleteAsync, online, idJob],
   );
 
   const renderPhoto = useCallback(
@@ -307,15 +351,15 @@ const styles = StyleSheet.create({
   flatlistRow: {
     justifyContent: 'flex-start',
     marginBottom: 3,
-    gap: 4
+    gap: 4,
   },
   image: {
-    minWidth: '33.33%',   // 👈 3 columnas iguales
+    minWidth: '33.33%', // 👈 3 columnas iguales
     aspectRatio: 1,
     // height: 120,
   },
   listContent: {
     paddingTop: 5,
-    gap: 1
+    gap: 1,
   },
 });

@@ -1,51 +1,62 @@
-import {QUERY_KEYS} from '@api/contants/constants';
+import { QUERY_KEYS } from '@api/contants/constants';
 import {
   useGetPhotoConditionDetail,
   useSavePhotoCondition,
 } from '@api/hooks/HooksReportServices';
+import { PhotoConditionDetailApiProps } from '@api/services/reportServices';
 import {
   CONDITION_PHOTO_SIDE_LABELS,
   CONDITION_PHOTO_SIDE_TYPE,
   CONDITION_TYPES,
+  ConditionPhotoType,
 } from '@api/types/Condition';
-import {Icons} from '@assets/icons/icons';
+import { Icons } from '@assets/icons/icons';
 import {
   ImageOptionSheet,
   RBSheetRef,
 } from '@components/commons/bottomsheets/ImageOptionSheet';
-import {BackButton} from '@components/commons/buttons/BackButton';
-import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
-import {RoundedButton} from '@components/commons/buttons/RoundedButton';
-import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
-import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
-import {InputTextContext} from '@components/commons/form/InputTextContext';
+import { BackButton } from '@components/commons/buttons/BackButton';
+import { PressableOpacity } from '@components/commons/buttons/PressableOpacity';
+import { RoundedButton } from '@components/commons/buttons/RoundedButton';
+import { BasicFormProvider } from '@components/commons/form/BasicFormProvider';
+import { ButtonSubmit } from '@components/commons/form/ButtonSubmit';
+import { InputTextContext } from '@components/commons/form/InputTextContext';
 import {
   SpeechFormContext,
   SpeechFormInputRef,
 } from '@components/commons/form/SpeechFormContext';
-import {Label} from '@components/commons/text/Label';
+import { Label } from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import {Wrapper} from '@components/commons/wrappers/Wrapper';
-import {CustomImage} from '@components/images/CustomImage';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
+import { CustomImage } from '@components/images/CustomImage';
+import {
+  offlineCreateConditionPhoto,
+  offlineUpdateConditionPhoto,
+} from '@features/conditionReport/offline';
+import { upsertIntoObjectCache } from '@features/helpers/offlineHelpers';
 import {
   SaveTaskImageSchema,
   SaveTaskImageSchemaType,
 } from '@generalTypes/schemas';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
-import {RootStackParamList, RoutesNavigation} from '@navigation/types';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {loadingWrapperPromise} from '@store/actions';
+import { useCustomNavigation } from '@hooks/useCustomNavigation';
+import { useOnline } from '@hooks/useOnline';
+import { useRefreshIndicator } from '@hooks/useRefreshIndicator';
+import { useUpsertArrayCache } from '@hooks/useToolsReactQueryCache';
+import { RootStackParamList, RoutesNavigation } from '@navigation/types';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { loadingWrapperPromise } from '@store/actions';
 import useConditionStore from '@store/condition';
 import useTopSheetStore from '@store/topsheet';
-import {COLORS} from '@styles/colors';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {onSelectImage} from '@utils/image';
-import {showErrorToastMessage, showToastMessage} from '@utils/toast';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Alert, Keyboard, Platform, StyleSheet} from 'react-native';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-controller';
-import {Image as ImageType} from 'react-native-image-crop-picker';
+import { COLORS } from '@styles/colors';
+import { GLOBAL_STYLES } from '@styles/globalStyles';
+import { useQueryClient } from '@tanstack/react-query';
+import { generateUUID } from '@utils/functions';
+import { onSelectImage } from '@utils/image';
+import { showErrorToastMessage, showToastMessage } from '@utils/toast';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Keyboard, Platform, StyleSheet } from 'react-native';
+import { Image as ImageType } from 'react-native-image-crop-picker';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PhotoDetailCondition'>;
 export const PhotoDetailCondition = (props: Props) => {
@@ -62,34 +73,51 @@ export const PhotoDetailCondition = (props: Props) => {
     setCopyNote,
     conditionPhotoSubtype,
   } = useConditionStore();
+  const queryClient = useQueryClient();
 
   const {photo, item} = props.route.params;
   const [image, setImage] = useState<string | null | undefined>(photo);
+  const {online} = useOnline();
 
-  const {data, refetch, isFetching} = useGetPhotoConditionDetail({
-    conditionType: conditionType!,
-    id: item?.id,
-  });
+  const detailQueryProps = useMemo(
+    () =>
+      ({
+        conditionType: conditionType!,
+        ...(item?.id
+          ? {id: item.id}
+          : item?.clientId
+          ? {clientId: item.clientId}
+          : {}),
+      } as PhotoConditionDetailApiProps),
+    [conditionType, item?.id, item?.clientId],
+  );
+
+  const {data, refetch, isFetching} =
+    useGetPhotoConditionDetail(detailQueryProps);
   const {mutateAsync: savePhotoAsync} = useSavePhotoCondition();
 
   const refCallSheet = useRef<RBSheetRef>(null);
   const refVoice = useRef<SpeechFormInputRef>(null);
 
+  const queryKey = [
+    QUERY_KEYS.PHOTOS_CONDITION,
+    {
+      conditionType: conditionType!,
+      sideType: conditionPhotoType!,
+      reportId: conditionId!,
+    },
+  ];
+
   const {refetchAll} = useRefreshIndicator([
-    [
-      QUERY_KEYS.PHOTOS_CONDITION,
-      {
-        conditionType: conditionType!,
-        sideType: conditionPhotoType!,
-        reportId: conditionId!,
-      },
-    ],
+    queryKey,
     [QUERY_KEYS.TOTAL_PHOTOS_CONDITION_REPORT, {id: conditionId}],
     [QUERY_KEYS.TOTAL_PHOTOS_CONDITION_CHECK, {id: conditionId}],
   ]);
 
+  const upsertPhoto = useUpsertArrayCache<ConditionPhotoType>(queryKey);
+
   useEffect(() => {
-    if (data?.id) {
+    if (data?.photo) {
       setImage(data.photo);
     }
   }, [data]);
@@ -145,8 +173,40 @@ export const PhotoDetailCondition = (props: Props) => {
       if (refVoice?.current) {
         refVoice.current.stop();
       }
-      loadingWrapperPromise(
-        savePhotoAsync({
+      if (online) {
+        loadingWrapperPromise(
+          savePhotoAsync({
+            conditionType: conditionType!,
+            idJob,
+            reportId: conditionId!,
+            idJobInventory: inventoryId!,
+            type: conditionPhotoType!,
+            title: form.title,
+            description: form.description,
+            id: item?.id,
+            photo: image!,
+            idStickyNote: item?.id_sticky_note ?? note?.id ?? null,
+            subType: item?.subtype ?? conditionPhotoSubtype,
+          })
+            .then((isSuccess) => {
+              if (isSuccess) {
+                refetchAll();
+                if (item?.id) {
+                  refetch();
+                }
+                showToastMessage('Photo saved successfully');
+                goBack();
+              } else {
+                showErrorToastMessage(
+                  'Error while saving photo, please reattempt',
+                );
+              }
+            })
+            .catch(() => {}),
+        );
+      } else {
+        const clientId = item?.clientId ?? generateUUID();
+        const jsonRequest = {
           conditionType: conditionType!,
           idJob,
           reportId: conditionId!,
@@ -158,25 +218,58 @@ export const PhotoDetailCondition = (props: Props) => {
           photo: image!,
           idStickyNote: item?.id_sticky_note ?? note?.id ?? null,
           subType: item?.subtype ?? conditionPhotoSubtype,
-        })
-          .then((isSuccess) => {
-            if (isSuccess) {
-              refetchAll();
-              if (item?.id) {
-                refetch();
+        };
+        if (item?.clientId) {
+          offlineUpdateConditionPhoto({
+            ...jsonRequest,
+            clientId: clientId,
+          });
+        } else {
+          offlineCreateConditionPhoto({
+            ...jsonRequest,
+            clientId: clientId,
+          });
+        }
+        upsertPhoto({
+          clientId,
+          id: item?.id,
+          title: form.title,
+          description: form.description!,
+          thumbnail: image!,
+          type: conditionPhotoType,
+          subtype: item?.subtype ?? conditionPhotoSubtype,
+          is_overview: false,
+          id_sticky_note: item?.id_sticky_note ?? note?.id ?? null,
+        });
+
+        // Guardamos en cache
+        const detailKey: [string, PhotoConditionDetailApiProps] = [
+          QUERY_KEYS.PHOTO_CONDITION_DETAIL,
+          item?.id
+            ? {
+                conditionType: conditionType!,
+                id: item.id,
               }
-              showToastMessage('Photo saved successfully');
-              goBack();
-            } else {
-              showErrorToastMessage(
-                'Error while saving photo, please reattempt',
-              );
-            }
-          })
-          .catch(() => {}),
-      );
+            : {
+                conditionType: conditionType!,
+                clientId,
+              },
+        ];
+        upsertIntoObjectCache(queryClient, detailKey, {
+          id: item?.id,
+          clientId,
+          title: form.title,
+          description: form.description,
+          photo: image!,
+          sub_type: item?.subtype ?? conditionPhotoSubtype,
+          type: conditionPhotoType!,
+        });
+
+        goBack();
+      }
     },
     [
+      queryClient,
       savePhotoAsync,
       item,
       image,
@@ -184,8 +277,12 @@ export const PhotoDetailCondition = (props: Props) => {
       conditionId,
       inventoryId,
       conditionPhotoType,
+      conditionPhotoSubtype,
       refetchAll,
       refetch,
+      online,
+      idJob,
+      note,
     ],
   );
 

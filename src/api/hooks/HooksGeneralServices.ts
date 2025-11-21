@@ -10,7 +10,7 @@ import {
 } from '@api/contants/constants';
 import {DAYS_IN_MS} from './HooksTaskServices';
 
-const DEFAULT_PERSISTENCE_CONFIG = {
+export const DEFAULT_PERSISTENCE_CONFIG = {
   staleTime: 5 * 60 * 1000,
   gcTime: 7 * 24 * 60 * 60 * 1000,
   retry: 1,

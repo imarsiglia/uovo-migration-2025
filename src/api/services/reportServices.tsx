@@ -119,9 +119,12 @@ export type SaveConditionReportApiProps = {
 
 const saveConditionReport = async (
   props: SaveConditionReportApiProps,
-): Promise<boolean> => {
-  const response = await postRequest(API_SAVE_CONDITION_REPORT, props);
-  return response.message === SUCCESS_MESSAGES.SUCCESS;
+): Promise<number> => {
+  const response = await postRequest<{reportId: number}>(
+    API_SAVE_CONDITION_REPORT,
+    props,
+  );
+  return response.body?.reportId;
 };
 
 export type SaveConditionCheckApiProps = {
@@ -194,7 +197,7 @@ const getPhotosCondition = async ({
   return response.body?.data ?? [];
 };
 
-type RemovePhotoConditionApiProps = {
+export type RemovePhotoConditionApiProps = {
   conditionType: ConditionType;
   isOverview: boolean;
   id: number;
@@ -212,7 +215,7 @@ const removePhotoCondition = async ({
   return response.message === SUCCESS_MESSAGES.SUCCESS;
 };
 
-type SavePhotoConditionApiProps = {
+export type SavePhotoConditionApiProps = {
   conditionType: ConditionType;
   idJob: number;
   reportId: number;
@@ -239,6 +242,7 @@ const savePhotoCondition = async ({
 export type PhotoConditionOverviewApiProps = {
   conditionType: ConditionType;
   id?: number;
+  clientId?: string;
 };
 const getPhotoConditionOverview = async ({
   conditionType,
@@ -253,6 +257,7 @@ const getPhotoConditionOverview = async ({
 export type PhotoConditionDetailApiProps = {
   conditionType: ConditionType;
   id?: number;
+  clientId?: string;
 };
 const getPhotoConditionDetail = async ({
   conditionType,
@@ -264,15 +269,15 @@ const getPhotoConditionDetail = async ({
   return response.body;
 };
 
-type SaveZoomScreenProps = {
+export type SaveZoomScreenProps = {
   conditionType: ConditionType;
   idJob: number;
-  reportId?: number;
-  idJobInventory: number;
+  reportId?: number | null;
+  idJobInventory?: number | null;
   data: any;
-  idImg?: number;
-  reportType?: string;
-  reportSubType?: string;
+  idImg?: number | null;
+  reportType?: string | null;
+  reportSubType?: string | null;
 };
 const saveZoomScreen = async ({
   conditionType,

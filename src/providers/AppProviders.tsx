@@ -113,6 +113,9 @@ export default function AppProviders({children}: {children: React.ReactNode}) {
                         k === QUERY_KEYS.TOTAL_PHOTOS_CONDITION_CHECK ||
                         k === QUERY_KEYS.TOTAL_PHOTOS_CONDITION_REPORT ||
                         k === QUERY_KEYS.PLACES_CONDITION_REPORT ||
+                        k === QUERY_KEYS.PHOTOS_CONDITION ||
+                        k === QUERY_KEYS.PHOTO_CONDITION_DETAIL ||
+                        k === QUERY_KEYS.PHOTO_CONDITION_OVERVIEW ||
                         k === QUERY_KEYS.PACKING_DETAILS ||
                         k === QUERY_KEYS.LABOR_CODES ||
                         k === QUERY_KEYS.NS_EAST_COAST_DROPOFF ||
@@ -131,7 +134,7 @@ export default function AppProviders({children}: {children: React.ReactNode}) {
                     },
                   },
                   // Limpia el cache persistido si cambias la “versión” de datos:
-                  buster: 'app-v15', // cambia a 'app-v2' tras cambios de schema o logout
+                  buster: 'app-v16', // cambia a 'app-v2' tras cambios de schema o logout
                 }}>
                 <ModalProvider stack={modalStack}>{children}</ModalProvider>
               </PersistQueryClientProvider>

@@ -392,7 +392,10 @@ export const ENTITY_TYPES = {
   REPORT_MATERIALS: 'report_materials',
   BOL_COUNT: 'bol_count',
   ITEM_INVENTORY_DETAIL: 'item_inventory_detail',
-  CONDITION_REPORT: 'condition_report',
   IMAGE: 'image',
+  // CR & CC
+  CONDITION_REPORT: 'condition_report',
+  CONDITION_CHECK: 'condition_check',
+  CONDITION_PHOTO: 'condition_photo',
+  CONDITION_ZOOM_PHOTO: 'condition_zoom_photo',
 };
-

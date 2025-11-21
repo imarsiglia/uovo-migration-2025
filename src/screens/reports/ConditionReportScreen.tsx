@@ -66,6 +66,11 @@ import {
   CONDITION_TYPES,
   ConditionPhotoSideType,
 } from '@api/types/Condition';
+import {
+  useUpsertArrayCache,
+  useUpsertObjectCache,
+} from '@hooks/useToolsReactQueryCache';
+import {Paginated} from '@api/types/Response';
 // import OfflineValidation from '../components/offline/OfflineValidation';
 
 let autosaveInitial = false;
@@ -148,6 +153,19 @@ export const ConditionReportScreen = (props: Props) => {
     ],
   ]);
 
+  const queryKey = [
+    QUERY_KEYS.CONDITION_REPORT_BY_INVENTORY,
+    {
+      idJobInventory:
+        receivedReport?.id_job_inventory ??
+        receivedItem?.id ??
+        selectedItem?.id!,
+    },
+  ];
+
+  const upsertReport =
+    useUpsertObjectCache<Paginated<ConditionReportType[]>>(queryKey);
+
   //Autocompletes inputs
   const autocompleteRefs = [
     useRef<any>(null),
@@ -160,20 +178,13 @@ export const ConditionReportScreen = (props: Props) => {
 
   useEffect(() => {}, [isFetched]);
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     if (props.reportId) {
-  //       getTotalPhotos();
-  //     }
-  //   }, [props.reportId]),
-  // );
-
   const {
     setConditionPhotoType,
     setConditionType,
     setConditionId,
     setInventoryId,
-    setConditionPhotoSubtype
+    setConditionPhotoSubtype,
+    setConditionClientId,
   } = useConditionStore();
 
   useEffect(() => {
@@ -255,7 +266,7 @@ export const ConditionReportScreen = (props: Props) => {
   );
 
   const goToSides = () => {
-    setConditionPhotoType("sides");
+    setConditionPhotoType('sides');
     navigate(RoutesNavigation.ConditionSides);
     // Keyboard.dismiss();
     // if (item.id) {
@@ -327,6 +338,10 @@ export const ConditionReportScreen = (props: Props) => {
   useEffect(() => {
     setConditionId(initialConditionReport?.id!);
   }, [initialConditionReport?.id!]);
+
+  useEffect(() => {
+    setConditionClientId(initialConditionReport?.clientId);
+  }, [initialConditionReport?.clientId]);
 
   const totalPhotos = useMemo(() => {
     const init = {
@@ -443,13 +458,7 @@ export const ConditionReportScreen = (props: Props) => {
         packingDetail: form.packingDetail?.map((x) => x.title),
       });
     },
-    [
-      partial,
-      currentItem?.id,
-      jobDetail?.id,
-      initialConditionReport?.id,
-      offlineUpdateConditionReport,
-    ],
+    [partial, currentItem?.id, jobDetail?.id, initialConditionReport?.id],
   );
 
   const confirmSave = useCallback(() => {
@@ -478,7 +487,7 @@ export const ConditionReportScreen = (props: Props) => {
     } else {
       showToastMessage('Please, select a valid option');
     }
-  }, [temporalForm, partial, saveAsync, online]);
+  }, [temporalForm, partial, saveAsync, online, saveReportOffline]);
 
   const onInitSubmit = useCallback(
     (props: ConditionReportSchemaType) => {
@@ -542,24 +551,28 @@ export const ConditionReportScreen = (props: Props) => {
 
         try {
           setSaving(true);
-          // Esperamos la promesa y guardamos. saveAsync viene de tu scope superior.
-          const res = await saveAsync(
-            formData as ConditionReportSchemaType,
-            'true',
-          );
-          if (res) {
-            if (autosaveInitial) {
-              // sólo actualizamos lastSavedRef si save fue exitoso
-              lastSavedRef.current = formData
-                ? JSON.parse(JSON.stringify(formData))
-                : null;
-              // refrescamos datos y otros efectos
-              refetchAll();
-              hardRefreshMany();
-              refetch();
-            } else {
-              autosaveInitial = true;
+          if (online) {
+            // Esperamos la promesa y guardamos. saveAsync viene de tu scope superior.
+            const res = await saveAsync(
+              formData as ConditionReportSchemaType,
+              'true',
+            );
+            if (res) {
+              if (autosaveInitial) {
+                // sólo actualizamos lastSavedRef si save fue exitoso
+                lastSavedRef.current = formData
+                  ? JSON.parse(JSON.stringify(formData))
+                  : null;
+                // refrescamos datos y otros efectos
+                refetchAll();
+                hardRefreshMany();
+                refetch();
+              } else {
+                autosaveInitial = true;
+              }
             }
+          } else {
+            saveReportOffline(formData as ConditionReportSchemaType, 'true');
           }
         } catch (err) {
         } finally {
@@ -574,7 +587,15 @@ export const ConditionReportScreen = (props: Props) => {
           timerRef.current = null;
         }
       };
-    }, [formData, currentItem?.id, saveAsync, refetchAll, hardRefreshMany]);
+    }, [
+      formData,
+      currentItem?.id,
+      saveAsync,
+      refetchAll,
+      hardRefreshMany,
+      online,
+      saveReportOffline,
+    ]);
 
     return null;
   };
@@ -737,7 +758,7 @@ export const ConditionReportScreen = (props: Props) => {
         </Wrapper>
 
         <BasicFormProvider
-          key={`condition_report_${conditionReportJson?.obj_data?.id}`}
+          key={`condition_report_${initialConditionReport?.title}`}
           // resetDefaultValue
           schema={ConditionReportSchema}
           defaultValue={{

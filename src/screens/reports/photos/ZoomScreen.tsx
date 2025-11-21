@@ -1,42 +1,52 @@
+import {QUERY_KEYS} from '@api/contants/constants';
+import {
+  useGetPhotoConditionOverview,
+  useSaveZoomScreen,
+} from '@api/hooks/HooksReportServices';
+import {
+  PhotoConditionOverviewApiProps,
+  SaveZoomScreenProps,
+} from '@api/services/reportServices';
+import {
+  ConditionPhotoSideType,
+  ConditionPhotoType,
+  OverviewReportType,
+  StickyNoteType,
+} from '@api/types/Condition';
 import {
   ImageOptionSheet,
   RBSheetRef,
 } from '@components/commons/bottomsheets/ImageOptionSheet';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
+import {Label} from '@components/commons/text/Label';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {NOTE_AREA} from '@components/condition/notes/helpers';
 import NoteIssueSelector from '@components/condition/notes/NoteIssueSelector';
 import {CustomSpeedDialoAction} from '@components/floating/HomeFloatingAction';
+import {
+  offlineCreateZoomScreen,
+  offlineUpdateZoomScreen,
+} from '@features/conditionReport/offline';
+import {upsertIntoObjectCache} from '@features/helpers/offlineHelpers';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {useOnline} from '@hooks/useOnline';
+import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {useUpsertArrayCache} from '@hooks/useToolsReactQueryCache';
+import {RoutesNavigation} from '@navigation/types';
 import {CommonActions} from '@react-navigation/native';
 import {SpeedDial} from '@rneui/themed';
+import {loadingWrapperPromise} from '@store/actions';
 import useConditionStore from '@store/condition';
 import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {useQueryClient} from '@tanstack/react-query';
+import {generateUUID} from '@utils/functions';
 import {onSelectImage} from '@utils/image';
-import {useCallback, useEffect, useRef, useState} from 'react';
-import {
-  ActivityIndicator,
-  Dimensions,
-  Image,
-  Keyboard,
-  StyleSheet,
-} from 'react-native';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {Dimensions, Image, Keyboard, StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
-import ImageZoom from 'react-native-image-pan-zoom';
 import type {Image as ImageType} from 'react-native-image-crop-picker';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {RoutesNavigation} from '@navigation/types';
-import {Label} from '@components/commons/text/Label';
-import {StickyNoteType} from '@api/types/Condition';
-import {useOnline} from '@hooks/useOnline';
-import {
-  useGetPhotoConditionOverview,
-  useSaveZoomScreen,
-} from '@api/hooks/HooksReportServices';
-import {loadingWrapperPromise} from '@store/actions';
-import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
-import {QUERY_KEYS} from '@api/contants/constants';
+import ImageZoom from 'react-native-image-pan-zoom';
 
 const {height: dimensionsHeight, width: dimensionsWidth} =
   Dimensions.get('window');
@@ -131,10 +141,14 @@ const ZoomScreen = (props: any) => {
   const {online} = useOnline();
 
   const params = props.route.params;
-  const item = params.item;
+  const item: ConditionPhotoType | undefined = params.item;
   const uri = params?.photo?.uri;
 
   const navigation = props.navigation;
+
+  const skipNextUpdateNotePositionRef = useRef(false);
+
+  const queryClient = useQueryClient();
 
   const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
   const {
@@ -153,15 +167,36 @@ const ZoomScreen = (props: any) => {
 
   const {navigate, goBack} = useCustomNavigation();
 
+  const overviewQueryProps = useMemo(
+    () =>
+      ({
+        conditionType: conditionType!,
+        ...(item?.id || reportIdImage
+          ? {id: item?.id ?? reportIdImage}
+          : item?.clientId
+          ? {clientId: item.clientId}
+          : {}),
+      } as PhotoConditionOverviewApiProps),
+    [conditionType, item?.id, item?.clientId, reportIdImage],
+  );
+
+  const queryKey = [
+    QUERY_KEYS.PHOTOS_CONDITION,
+    {
+      conditionType: conditionType!,
+      sideType: conditionPhotoType!,
+      reportId: conditionId!,
+    },
+  ];
+
   const {
     data: conditionOverview,
     isLoading,
     isFetching,
     refetch,
-  } = useGetPhotoConditionOverview({
-    id: item?.id ?? reportIdImage,
-    conditionType: conditionType!,
-  });
+  } = useGetPhotoConditionOverview(overviewQueryProps);
+
+  const upsertPhoto = useUpsertArrayCache<ConditionPhotoType>(queryKey);
 
   const {mutateAsync: saveZoomScreen} = useSaveZoomScreen();
   const {refetchAll} = useRefreshIndicator([
@@ -179,7 +214,7 @@ const ZoomScreen = (props: any) => {
   // ======= estado base equivalente a _getState(props) =======
   const getInitialState = useCallback(
     (p: any) => {
-      if (p?.route?.params?.edit && conditionOverview?.idJob) {
+      if (conditionOverview?.idJob) {
         const base64 = conditionOverview.data.photo.base64;
         const base64Image = `data:image/jpeg;base64,${base64}`;
         return {
@@ -513,6 +548,7 @@ const ZoomScreen = (props: any) => {
 
   const _onCancel = useCallback(
     (noteId: number) => {
+      skipNextUpdateNotePositionRef.current = true;
       const notes = state.notes.filter((n: any) => n.id !== noteId);
       setM({notes});
     },
@@ -569,13 +605,16 @@ const ZoomScreen = (props: any) => {
   }, [state]);
 
   const _getPhoto = useCallback(() => {
+    if (conditionOverview?.data?.photo) {
+      return conditionOverview?.data?.photo;
+    }
     if (params?.edit) {
       const data = params?.data;
       return data?.photo;
     }
     const photo = params?.photo;
     return photo;
-  }, [params]);
+  }, [conditionOverview, params]);
 
   const _handleFAB = useCallback(
     async (buttonName: string) => {
@@ -594,8 +633,8 @@ const ZoomScreen = (props: any) => {
           setM({loading: true});
           const photo = _getPhoto();
           const {notes, screen} = state;
-          const body = {
-            conditionType: conditionType,
+          const body: SaveZoomScreenProps = {
+            conditionType: conditionType!,
             data: {
               photo,
               notes,
@@ -613,28 +652,26 @@ const ZoomScreen = (props: any) => {
             reportSubType: conditionPhotoSubtype ?? null,
           };
 
-          var mJson = {
-            id_sticky_note: null,
-            is_overview: true,
-            subtype: conditionPhotoSubtype ?? null,
-            thumbnail: '',
-            title: conditionPhotoType + ' Overview',
-            type: conditionPhotoType,
-            detail: {
-              ...body,
-              data: {
-                ...body.data,
-                photo: {
-                  ...body.data.photo,
-                  base64: '',
-                },
-              },
-            },
-          };
+          // var mJson = {
+          //   id_sticky_note: null,
+          //   is_overview: true,
+          //   subtype: conditionPhotoSubtype ?? null,
+          //   thumbnail: '',
+          //   title: conditionPhotoType + ' Overview',
+          //   type: conditionPhotoType,
+          //   detail: {
+          //     ...body,
+          //     data: {
+          //       ...body.data,
+          //       photo: {
+          //         ...body.data.photo,
+          //         base64: '',
+          //       },
+          //     },
+          //   },
+          // };
 
-          if (online) {
-            functSave(online, mJson, photo.base64, body);
-          }
+          functSave(online, body);
           // if (isConnected) {
 
           // }else{
@@ -646,6 +683,7 @@ const ZoomScreen = (props: any) => {
       }
 
       if (buttonName === 'cancelSet') {
+        skipNextUpdateNotePositionRef.current = true;
         const notes = stateNotes.slice(0, -1);
         setM({notes, ...stateUpdate[buttonName]});
         return;
@@ -688,13 +726,10 @@ const ZoomScreen = (props: any) => {
   );
 
   const functSave = useCallback(
-    async (isConnected: boolean, mJson: any, photo: any, bodyRequest: any) => {
+    async (isConnected: boolean, bodyRequest: SaveZoomScreenProps) => {
       if (isConnected) {
         loadingWrapperPromise(
-          saveZoomScreen({
-            conditionType: conditionType,
-            ...bodyRequest,
-          })
+          saveZoomScreen(bodyRequest)
             .then((response) => {
               if (response?.idImg) {
                 setTimeout(() => {
@@ -713,216 +748,59 @@ const ZoomScreen = (props: any) => {
               console.log(e);
             }),
         );
+      } else {
+        const clientId = item?.clientId ?? generateUUID();
+        if (item?.clientId) {
+          offlineUpdateZoomScreen({
+            ...bodyRequest,
+            clientId,
+            id: item?.id ?? reportIdImage,
+          });
+        } else {
+          offlineCreateZoomScreen({
+            ...bodyRequest,
+            clientId,
+            id: item?.id ?? reportIdImage,
+          });
+        }
+        upsertPhoto({
+          clientId,
+          id: item?.id,
+          title: `${conditionPhotoType} overview`,
+          thumbnail: bodyRequest.data?.photo?.base64,
+          type: conditionPhotoType,
+          subtype: item?.subtype ?? conditionPhotoSubtype,
+          is_overview: true,
+          id_sticky_note: null,
+        });
+
+        // Guardamos en cache
+        const detailKey: [string, PhotoConditionOverviewApiProps] = [
+          QUERY_KEYS.PHOTO_CONDITION_OVERVIEW,
+          item?.id
+            ? {
+                conditionType: conditionType!,
+                id: item.id,
+              }
+            : {
+                conditionType: conditionType!,
+                clientId,
+              },
+        ];
+        upsertIntoObjectCache<OverviewReportType>(queryClient, detailKey, {
+          clientId,
+          data: bodyRequest.data,
+          idImg: bodyRequest.idImg,
+          idJob: bodyRequest.idJob,
+          idJobInventory: bodyRequest.idJobInventory,
+          reportId: bodyRequest.reportId,
+          reportType: bodyRequest.reportType as ConditionPhotoSideType | null,
+          reportSubType: bodyRequest.reportSubType,
+        });
+        goBack();
       }
-      // const {navigation} = this.props;
-      // var date = new Date();
-      // var urlRequest = 'resources/' + this.props.conditionType + '/reportImage';
-      // if (isConnected) {
-      //   const response = await fetchData.Post(urlRequest, bodyRequest);
-      //   if (response.ok) {
-      //     if (response.data.message == 'SUCCESS') {
-      //       const {reportId, idImg} = response.data.body;
-      //       var lastIdImg = this.props.reportIdImage;
-      //       if (this.props.reportId == null || this.props.reportId == '') {
-      //         this.props.dispatch(ActionsConditionReport.copyReportId(reportId));
-      //       }
-      //       this.props.dispatch(ActionsConditionReport.copyReportIdImage(idImg));
-      //       var stringGallery = await getFromStorageOffline(
-      //         GALLERY_KEY_STORAGE +
-      //           this.props.jobDetail.id +
-      //           '_' +
-      //           this.props.conditionType +
-      //           this.props.reportType +
-      //           this.props.reportInventory,
-      //       );
-      //       var jsonGallery = [];
-      //       var exist = false;
-      //       if (stringGallery) {
-      //         jsonGallery = JSON.parse(stringGallery);
-      //         var foundIndex = jsonGallery.findIndex((x) => x.id == idImg);
-      //         if (foundIndex != -1) {
-      //           exist = true;
-      //           jsonGallery[foundIndex] = {
-      //             ...jsonGallery[foundIndex],
-      //             ...mJson,
-      //             timestamp: jsonGallery[foundIndex].timestamp
-      //               ? jsonGallery[foundIndex].timestamp
-      //               : date.getTime(),
-      //           };
-      //           await saveToStorageOffline(
-      //             GALLERY_DETAIL_KEY_STORAGE +
-      //               this.props.jobDetail.id +
-      //               '_' +
-      //               (jsonGallery[foundIndex].timestamp ?? date.getTime()),
-      //             photo,
-      //           );
-      //         }
-      //       }
-      //       if (!exist) {
-      //         jsonGallery.push({
-      //           ...mJson,
-      //           id: idImg,
-      //           timestamp: date.getTime(),
-      //           processed: true,
-      //         });
-      //         await saveToStorageOffline(
-      //           GALLERY_DETAIL_KEY_STORAGE +
-      //             this.props.jobDetail.id +
-      //             '_' +
-      //             date.getTime(),
-      //           photo,
-      //         );
-      //       }
-      //       await saveToStorageOffline(
-      //         GALLERY_KEY_STORAGE +
-      //           this.props.jobDetail.id +
-      //           '_' +
-      //           this.props.conditionType +
-      //           this.props.reportType +
-      //           this.props.reportInventory,
-      //         JSON.stringify(jsonGallery),
-      //       );
-      //       //hasta aqui
-      //       this.setState({loading: false});
-      //       Toast.show('Photo saved successfully', Toast.LONG, [
-      //         'UIAlertController',
-      //       ]);
-      //       this.props.route.params.refreshGallery(reportId);
-      //       if (Platform.OS == 'android') {
-      //         navigation.goBack();
-      //         return;
-      //       }
-      //       if (lastIdImg == null) {
-      //         navigation.pop(2);
-      //       } else {
-      //         navigation.goBack();
-      //       }
-      //     } else {
-      //       // console.log(response);
-      //       this.setState({loading: false});
-      //       Toast.show('An error occurred while saving photo', Toast.LONG, [
-      //         'UIAlertController',
-      //       ]);
-      //     }
-      //   } else {
-      //     // console.log(response);
-      //     this.setState({loading: false});
-      //     Toast.show('An error occurred while saving photo', Toast.LONG, [
-      //       'UIAlertController',
-      //     ]);
-      //   }
-      // } else {
-      //   var savedList = [];
-      //   var stringList = await getFromStorageOffline(
-      //     GALLERY_KEY_STORAGE +
-      //       this.props.jobDetail.id +
-      //       '_' +
-      //       this.props.conditionType +
-      //       this.props.reportType +
-      //       this.props.reportInventory,
-      //   );
-      //   if (stringList) {
-      //     var jsonList = JSON.parse(stringList);
-      //     savedList = [...jsonList];
-      //   }
-      //   if (this.props.route.params.edit) {
-      //     var foundIndex = savedList.findIndex(
-      //       (x) => x.timestamp == this.props.route.params.item.timestamp,
-      //     );
-      //     if (foundIndex != -1) {
-      //       exist = true;
-      //       savedList[foundIndex] = {
-      //         ...savedList[foundIndex],
-      //         ...mJson,
-      //         timestamp: savedList[foundIndex].timestamp
-      //           ? savedList[foundIndex].timestamp
-      //           : date.getTime(),
-      //       };
-      //       await saveToStorageOffline(
-      //         GALLERY_DETAIL_KEY_STORAGE +
-      //           this.props.jobDetail.id +
-      //           '_' +
-      //           (savedList[foundIndex].timestamp ?? date.getTime()),
-      //         photo,
-      //       );
-      //     }
-      //     var keyName =
-      //       REQUEST_CONDITION_REPORT_PHOTO_KEY_STORAGE +
-      //       this.props.jobDetail.id +
-      //       '_' +
-      //       savedList[this.props.route.params.itemIndex].timestamp;
-      //     var offlineRequest = {
-      //       url: urlRequest,
-      //       body: bodyRequest,
-      //       time: new Date().getTime(),
-      //       name: keyName,
-      //       idInventory: this.props.reportInventory,
-      //       type: this.props.conditionType,
-      //       job: this.props.jobDetail.id,
-      //       conditionType: this.props.conditionType,
-      //       reportType: this.props.reportType,
-      //       idInventory: this.props.reportInventory,
-      //       reportSubType: this.props.route.params.subType
-      //         ? this.props.route.params.subType
-      //         : null,
-      //     };
-      //     offlineRequest.body.data.photo.base64 = '';
-      //     //await saveToStorageOffline("@image" + savedList[props.route.params.itemIndex].timestamp, encodedImage);
-      //     await saveToStorageOffline(keyName, JSON.stringify(offlineRequest));
-      //     // await saveToStorageOffline("@gallerydetail" + savedList[this.props.route.params.itemIndex].timestamp, photo);
-      //   } else {
-      //     var jsonTemp = {
-      //       ...mJson,
-      //       id: null,
-      //       processed: true,
-      //       offline: true,
-      //       timestamp: date.getTime(),
-      //     };
-      //     savedList.push(jsonTemp);
-      //     var keyName =
-      //       REQUEST_CONDITION_REPORT_PHOTO_KEY_STORAGE +
-      //       this.props.jobDetail.id +
-      //       '_' +
-      //       date.getTime();
-      //     var offlineRequest = {
-      //       url: urlRequest,
-      //       body: bodyRequest,
-      //       time: new Date().getTime(),
-      //       name: keyName,
-      //       idInventory: this.props.reportInventory,
-      //       type: this.props.conditionType,
-      //       job: this.props.jobDetail.id,
-      //       conditionType: this.props.conditionType,
-      //       reportType: this.props.reportType,
-      //       idInventory: this.props.reportInventory,
-      //       reportSubType: this.props.route.params.subType
-      //         ? this.props.route.params.subType
-      //         : null,
-      //     };
-      //     offlineRequest.body.data.photo.base64 = '';
-      //     //await saveToStorageOffline("@image" + date.getTime(), encodedImage);
-      //     await saveToStorageOffline(keyName, JSON.stringify(offlineRequest));
-      //     await saveToStorageOffline(
-      //       GALLERY_DETAIL_KEY_STORAGE +
-      //         this.props.jobDetail.id +
-      //         '_' +
-      //         date.getTime(),
-      //       photo,
-      //     );
-      //   }
-      //   savedList.forEach((element) => {
-      //     if (element.data) {
-      //       element.detail.data.photo.base64 = '';
-      //       element.thumbnail = '';
-      //     }
-      //   });
-      //   var stringListSave = JSON.stringify(savedList);
-      //   setTimeout(() => {
-      //     this.suppSaveFunction(stringListSave);
-      //   }, 400);
-      // }
     },
-    [item?.id, conditionType],
+    [item?.id, conditionType, reportIdImage],
   );
 
   const suppSaveFunction = useCallback(async (stringListSave: string) => {
@@ -958,9 +836,14 @@ const ZoomScreen = (props: any) => {
 
   const _updateNotePosition = useCallback(
     ({note, measure}: any) => {
+      if (skipNextUpdateNotePositionRef.current) {
+        skipNextUpdateNotePositionRef.current = false;
+        return;
+      }
+
       const notes = state.notes.reduce((acc: any[], curr: any) => {
         if (curr.id === note.id) {
-          //curr.position.scale = zoomScale;
+          curr.position.scale = zoomScaleRef.current;
           return [
             ...acc,
             {

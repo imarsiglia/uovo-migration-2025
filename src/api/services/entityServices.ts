@@ -16,7 +16,15 @@ import {
   inventoryServices,
   UpdateInventoryDetailApiProps,
 } from './inventoryServices';
-import {reportServices, SaveConditionReportApiProps} from './reportServices';
+import {
+  PhotoConditionOverviewApiProps,
+  RemovePhotoConditionApiProps,
+  reportServices,
+  SaveConditionCheckApiProps,
+  SaveConditionReportApiProps,
+  SavePhotoConditionApiProps,
+  SaveZoomScreenProps,
+} from './reportServices';
 
 type CreateFn = (payload: any) => Promise<any>;
 type UpdateFn = (payload: any) => Promise<any>;
@@ -94,13 +102,6 @@ const REGISTRY: Record<string, Service> = {
     delete: async ({id}: {id: number}) => inventoryServices.deleteItem({id}),
   },
 
-  condition_report: {
-    create: async ({body}: {body: SaveConditionReportApiProps}) =>
-      reportServices.saveConditionReport({...body, id: null}),
-    update: async ({body}: {body: SaveConditionReportApiProps}) =>
-      reportServices.saveConditionReport({...body}),
-  },
-
   // task pictures
   image: {
     list: async ({idJob}: {idJob: number}) => taskServices.getImages({idJob}),
@@ -109,6 +110,36 @@ const REGISTRY: Record<string, Service> = {
     update: async ({body}: {body: UpdateImageApiProps}) =>
       taskServices.updateImage({...body}),
     delete: async ({id}: {id: number}) => taskServices.deleteImage({id}),
+  },
+
+  // condition report & condition check
+  condition_report: {
+    create: async ({body}: {body: SaveConditionReportApiProps}) =>
+      reportServices.saveConditionReport({...body, id: null}),
+    update: async ({body}: {body: SaveConditionReportApiProps}) =>
+      reportServices.saveConditionReport({...body}),
+  },
+  condition_check: {
+    create: async ({body}: {body: SaveConditionCheckApiProps}) =>
+      reportServices.saveConditionCheck({...body, id: null}),
+    update: async ({body}: {body: SaveConditionCheckApiProps}) =>
+      reportServices.saveConditionCheck({...body}),
+  },
+  condition_photo: {
+    create: async ({body}: {body: SavePhotoConditionApiProps}) =>
+      reportServices.savePhotoCondition({...body, id: null}),
+    update: async ({body}: {body: SavePhotoConditionApiProps}) =>
+      reportServices.savePhotoCondition({...body}),
+    delete: async ({body}: {body: RemovePhotoConditionApiProps}) =>
+      reportServices.removePhotoCondition(body),
+  },
+  condition_zoom_photo: {
+    create: async ({body}: {body: SaveZoomScreenProps}) =>
+      reportServices.saveZoomScreen({...body}),
+    update: async ({body}: {body: SaveZoomScreenProps}) =>
+      reportServices.saveZoomScreen({...body}),
+    delete: async ({body}: {body: RemovePhotoConditionApiProps}) =>
+      reportServices.removePhotoCondition(body),
   },
 };
 
@@ -137,6 +168,18 @@ export function getEntityQueryKey(
 
   if (entity === ENTITY_TYPES.IMAGE)
     return [[QUERY_KEYS.IMAGES, {idJob: params?.idJob}]];
+
+  if (entity === ENTITY_TYPES.CONDITION_REPORT)
+    return [QUERY_KEYS.CONDITION_REPORT_BY_INVENTORY];
+
+  if (entity === ENTITY_TYPES.CONDITION_CHECK)
+    return [QUERY_KEYS.CONDITION_CHECK_BY_INVENTORY];
+
+  if (entity === ENTITY_TYPES.CONDITION_PHOTO)
+    return [QUERY_KEYS.PHOTOS_CONDITION];
+
+  if (entity === ENTITY_TYPES.CONDITION_ZOOM_PHOTO)
+    return [QUERY_KEYS.PHOTO_CONDITION_OVERVIEW];
 
   return [entity, params ?? {}];
 }
