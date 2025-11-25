@@ -13,6 +13,8 @@ export type GenericPayload = {
   clientCreatedAt?: number;
   clientUpdatedAt?: number;
   meta?: Record<string, any>;
+  parentClientId?: string;
+  parentEntity?: string;
 };
 
 export type OutboxItem = {

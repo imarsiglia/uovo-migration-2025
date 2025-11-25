@@ -8,36 +8,29 @@ export type ConditionCheckOfflineProps = {
   clientId?: string;
 } & SaveConditionCheckApiProps;
 
-export async function offlineCreateConditionCheck(
-  payload: ConditionCheckOfflineProps,
-) {
-  const {clientId, ...rest} = payload;
-  if (!clientId) {
+export async function offlineCreateConditionCheck({
+  clientId,
+  ...rest
+}: ConditionCheckOfflineProps) {
+  if (!clientId)
     throw new Error('offlineCreateConditionCheck requires clientId');
-  }
-
   return enqueueCoalesced('create', {
     entity: ENTITY_TYPES.CONDITION_CHECK,
     idJob: rest.idJob,
     clientId,
-    body: {
-      ...rest,
-    },
+    body: {...rest},
   });
 }
 
-export async function offlineUpdateConditionCheck(
-  payload: ConditionCheckOfflineProps,
-) {
-  const {id, clientId, ...rest} = payload;
-
-  if (!id && !clientId) {
+export async function offlineUpdateConditionCheck({
+  clientId,
+  ...rest
+}: ConditionCheckOfflineProps) {
+  if (!rest.id && !clientId)
     throw new Error('offlineUpdateConditionCheck requires id or clientId');
-  }
-
   return enqueueCoalesced('update', {
     entity: ENTITY_TYPES.CONDITION_CHECK,
-    id: id!,
+    id: rest.id!,
     clientId,
     idJob: rest.idJob,
     body: {

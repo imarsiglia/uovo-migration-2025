@@ -17,10 +17,15 @@ import {
 import {useGetJobInventory} from '@api/hooks/HooksInventoryServices';
 import {
   useGetConditionReportbyInventory,
+  useGetResumeConditionReport,
   useGetTotalPhotosConditionReport,
   useSaveConditionReport,
 } from '@api/hooks/HooksReportServices';
-import {ConditionReportType, JobInventoryType} from '@api/types/Inventory';
+import {
+  ConditionReportType,
+  JobInventoryType,
+  ReportResumeType,
+} from '@api/types/Inventory';
 import {CustomAutocomplete} from '@components/commons/autocomplete/CustomAutocomplete';
 import {BackButton} from '@components/commons/buttons/BackButton';
 import {AutocompleteContext} from '@components/commons/form/AutocompleteContext';
@@ -46,7 +51,7 @@ import {loadingWrapperPromise} from '@store/actions';
 import {useAuth} from '@store/auth';
 import useTopSheetStore from '@store/topsheet';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {generateUUID, moveOtherToEnd} from '@utils/functions';
+import {generateUUID, getFormattedDate, moveOtherToEnd} from '@utils/functions';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import {useFormContext, useWatch} from 'react-hook-form';
 import {AutocompleteDropdownItem} from 'react-native-autocomplete-dropdown';
@@ -66,15 +71,14 @@ import {
   CONDITION_TYPES,
   ConditionPhotoSideType,
 } from '@api/types/Condition';
-import {
-  useUpsertArrayCache,
-  useUpsertObjectCache,
-} from '@hooks/useToolsReactQueryCache';
+import {useUpsertObjectCache} from '@hooks/useToolsReactQueryCache';
 import {Paginated} from '@api/types/Response';
+import {ConditionReportByInventory} from '@api/services/reportServices';
+import {PreSubmitButton} from './ConditionCheckScreen';
 // import OfflineValidation from '../components/offline/OfflineValidation';
 
 let autosaveInitial = false;
-const delay = 3000;
+const delay = 1500;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ConditionReport'>;
 
@@ -112,6 +116,10 @@ export const ConditionReportScreen = (props: Props) => {
     idJob: jobDetail?.id!,
   });
 
+  const {data: conditionReportList} = useGetResumeConditionReport({
+    idJob: jobDetail!.id,
+  });
+
   const {data: artists} = useGetArtists({
     filter: filterArtist,
   });
@@ -120,6 +128,10 @@ export const ConditionReportScreen = (props: Props) => {
     filter: filterTypes,
   });
 
+  const currentInventoryItem = useMemo(() => {
+    return receivedItem?.id ? receivedItem : selectedItem;
+  }, [selectedItem, receivedItem]);
+
   const {
     data: conditionReportJson,
     isLoading: isLoadingConditionReport,
@@ -127,7 +139,7 @@ export const ConditionReportScreen = (props: Props) => {
     isFetched,
   } = useGetConditionReportbyInventory({
     idJobInventory:
-      receivedReport?.id_job_inventory ?? receivedItem?.id ?? selectedItem?.id!,
+      receivedReport?.id_job_inventory ?? currentInventoryItem?.id!,
   });
 
   const {online} = useOnline();
@@ -163,8 +175,8 @@ export const ConditionReportScreen = (props: Props) => {
     },
   ];
 
-  const upsertReport =
-    useUpsertObjectCache<Paginated<ConditionReportType[]>>(queryKey);
+  const upsertConditionReportReport =
+    useUpsertObjectCache<ConditionReportByInventory>(queryKey);
 
   //Autocompletes inputs
   const autocompleteRefs = [
@@ -185,39 +197,46 @@ export const ConditionReportScreen = (props: Props) => {
     setInventoryId,
     setConditionPhotoSubtype,
     setConditionClientId,
+    setReportIdImage,
   } = useConditionStore();
 
   useEffect(() => {
     setConditionType(CONDITION_TYPES.ConditionReport);
+    return () => {
+      setConditionType(undefined);
+      setConditionId(undefined);
+      setConditionClientId(undefined);
+      setConditionPhotoType(undefined);
+      setInventoryId(undefined);
+      setConditionPhotoSubtype(undefined);
+      setReportIdImage(undefined);
+    };
   }, []);
 
-  const currentInventoryItem = useMemo(() => {
-    return receivedItem ?? selectedItem;
-  }, [selectedItem, receivedItem]);
-
   const currentItem = useMemo(() => {
-    if (selectedItem || receivedReport || receivedItem) {
+    if (receivedReport || currentInventoryItem) {
       return {
-        id:
-          receivedReport?.id_job_inventory ??
-          receivedItem?.id ??
-          selectedItem?.id,
+        id: receivedReport?.id_job_inventory ?? currentInventoryItem?.id,
         clientRef:
-          receivedReport?.client_ref ??
-          receivedItem?.clientref ??
-          selectedItem?.clientref,
+          receivedReport?.client_ref ?? currentInventoryItem?.clientref,
         clientInv:
-          receivedReport?.id_inventory ??
-          receivedItem?.clientinv ??
-          selectedItem?.clientinv,
+          receivedReport?.id_inventory ?? currentInventoryItem?.clientinv,
       };
     } else {
       return null;
     }
-  }, [selectedItem, receivedReport, receivedItem]);
+  }, [receivedReport, currentInventoryItem]);
+
+  const queryKeyReport = [
+    QUERY_KEYS.RESUME_CONDITION_REPORT,
+    {idJob: jobDetail?.id},
+  ];
+
+  const upsertReport =
+    useUpsertObjectCache<Paginated<ReportResumeType[]>>(queryKeyReport);
 
   const {refetchAll} = useRefreshIndicator([
-    [QUERY_KEYS.RESUME_CONDITION_REPORT, {idJob: jobDetail?.id}],
+    queryKeyReport,
     [QUERY_KEYS.TASK_COUNT, {idJob: jobDetail?.id}],
     [QUERY_KEYS.INVENTORY_ITEM_DETAIL, {id: currentItem?.id!}],
   ]);
@@ -421,7 +440,119 @@ export const ConditionReportScreen = (props: Props) => {
 
   const saveReportOffline = useCallback(
     (form: ConditionReportSchemaType, partial?: string) => {
+      if (
+        !initialConditionReport?.id_job_inventory &&
+        !currentInventoryItem?.id
+      ) {
+        return Promise.resolve('');
+      }
       const clientId = initialConditionReport?.clientId ?? generateUUID();
+      setConditionClientId(clientId);
+
+      const data = conditionReportJson?.data ?? [];
+      const mData = data?.slice(0, -1) ?? [];
+
+      upsertConditionReportReport({
+        data: [
+          ...mData,
+          {
+            condition_report_frame_fixture_list:
+              form.frameFixture?.map((x) => ({
+                condition_report_frame_fixture_pk: {
+                  id_condition_report: Number(x.id),
+                  text_value: x.title,
+                },
+              })) ?? [],
+            condition_report_hanging_system_list:
+              form.hangingSystem?.map((x) => ({
+                condition_report_hanging_system_pk: {
+                  id_condition_report: Number(x.id),
+                  text_value: x.title,
+                },
+              })) ?? [],
+            condition_report_packing_detail_list:
+              form.packingDetail?.map((x) => ({
+                condition_report_packing_detail_pk: {
+                  id_condition_report: Number(x.id),
+                  text_value: x.title,
+                },
+              })) ?? [],
+            date_report: getFormattedDate(new Date()),
+            edition: form.edition!,
+            frame_height: form.frame_height!,
+            frame_length: form.frame_length!,
+            frame_width: form.frame_width!,
+            id: initialConditionReport?.id!,
+            id_job: jobDetail?.id!,
+            id_job_inventory:
+              initialConditionReport?.id_job_inventory ??
+              currentInventoryItem?.id!,
+            id_user: 0,
+            labeled: form.labeled!,
+            medium_name: form.mediumName!,
+            other_text: form.packing_details_other!,
+            packed_height: form.packed_height!,
+            packed_length: form.packed_length!,
+            packed_width: form.packed_width!,
+            partial: partial!,
+            place_of_exam: form.placeOfExam!,
+            signature: form.signature!,
+            title: form.title!,
+            un_packed_height: form.un_packed_height!,
+            un_packed_length: form.un_packed_length!,
+            un_packed_width: form.un_packed_width!,
+            unmanaged_name: '',
+            unpacked_weight: form.unpacked_weight!,
+            weight: form.weight!,
+            year: form.year!,
+            art_type_name: form.artTypeName?.title,
+            artist_name: form.artistName?.title,
+            condition_artwork: form.conditionArtWork,
+            clientId,
+          },
+        ],
+        total: conditionReportJson?.total,
+        obj_data: conditionReportJson?.obj_data,
+      });
+
+      // 🔹 Lista actual completa
+      const list = conditionReportList?.data ?? [];
+
+      // 🔹 Posición del item (si ya existe)
+      const existingIndex = list.findIndex(
+        (x) => x.id_job_inventory == currentItem?.id,
+      );
+      const existingItem = existingIndex >= 0 ? list[existingIndex] : undefined;
+
+      // 🔹 Nuevo item (lo que quieres insertar / actualizar)
+      const newItem = {
+        client_ref: currentItem?.clientRef!,
+        id_inventory:
+          existingItem?.id_inventory ?? Number(currentInventoryItem?.clientinv),
+        id_job_inventory: existingItem?.id_job_inventory ?? currentItem?.id!,
+        name: existingItem?.name ?? currentInventoryItem?.clientinv_display!,
+        report_count: existingItem?.report_count ?? 1,
+        partial: partial === 'true',
+        unmanaged: false,
+        unmanaged_name: '',
+      };
+
+      // 🔹 Construir la nueva lista:
+      //    - si ya existe → reemplazar en la misma posición
+      //    - si no existe → agregar al final
+      const newData =
+        existingIndex >= 0
+          ? list.map((it, idx) => (idx === existingIndex ? newItem : it))
+          : [...list, newItem];
+
+      const newTotal =
+        (conditionReportList?.total ?? 0) + (existingIndex >= 0 ? 0 : 1);
+
+      upsertReport({
+        data: newData,
+        total: newTotal,
+      });
+
       return offlineUpdateConditionReport({
         id: initialConditionReport?.id ?? null,
         clientId,
@@ -458,7 +589,21 @@ export const ConditionReportScreen = (props: Props) => {
         packingDetail: form.packingDetail?.map((x) => x.title),
       });
     },
-    [partial, currentItem?.id, jobDetail?.id, initialConditionReport?.id],
+    [
+      partial,
+      currentItem?.id,
+      currentItem?.clientInv,
+      currentItem?.clientRef,
+      jobDetail?.id,
+      initialConditionReport?.id,
+      initialConditionReport?.clientId,
+      initialConditionReport?.id_job_inventory,
+      conditionReportJson,
+      conditionReportList,
+      currentInventoryItem?.id,
+      currentInventoryItem?.clientinv,
+      currentInventoryItem?.clientinv_display,
+    ],
   );
 
   const confirmSave = useCallback(() => {
@@ -482,7 +627,11 @@ export const ConditionReportScreen = (props: Props) => {
             }),
         );
       } else {
-        saveReportOffline(temporalForm, partial);
+        loadingWrapperPromise(saveReportOffline(temporalForm, partial)).then(
+          () => {
+            goBack();
+          },
+        );
       }
     } else {
       showToastMessage('Please, select a valid option');
@@ -641,7 +790,7 @@ export const ConditionReportScreen = (props: Props) => {
           },
           styles.lateralPadding,
         ]}>
-        {!receivedReport?.id_job_inventory && !receivedItem?.id && (
+        {!receivedReport?.id_job_inventory && (
           <CustomAutocomplete
             key={'item'}
             onOpenSuggestionsList={(isOpen) => isOpen && closeAll(0)}
@@ -659,10 +808,10 @@ export const ConditionReportScreen = (props: Props) => {
             }}
             onSelectItem={(item) => onSelectItem(item)}
             initialValue={
-              selectedItem?.id
+              currentInventoryItem?.id
                 ? {
-                    id: selectedItem.id.toString(),
-                    title: selectedItem.clientinv,
+                    id: currentInventoryItem.id.toString(),
+                    title: currentInventoryItem.clientinv,
                   }
                 : undefined
             }
@@ -780,6 +929,7 @@ export const ConditionReportScreen = (props: Props) => {
             un_packed_height: initialConditionReport?.un_packed_height,
             un_packed_length: initialConditionReport?.un_packed_length,
             un_packed_width: initialConditionReport?.un_packed_width,
+            unpacked_weight: initialConditionReport?.unpacked_weight,
 
             frame_height: initialConditionReport?.frame_height,
             frame_length: initialConditionReport?.frame_length,
@@ -1170,31 +1320,32 @@ export const ConditionReportScreen = (props: Props) => {
                     marginBottom: 10,
                   },
                 ]}>
-                <ButtonPhotosCount
+                <PreSubmitButton
                   title="Front"
                   total={totalPhotos.front}
-                  onPress={() => goToGallery(CONDITION_PHOTO_SIDE_TYPE.Front)}
+                  onSubmit={() => goToGallery(CONDITION_PHOTO_SIDE_TYPE.Front)}
                 />
-
-                <ButtonPhotosCount
+                <PreSubmitButton
                   title="Back"
                   total={totalPhotos.back}
-                  onPress={() => goToGallery(CONDITION_PHOTO_SIDE_TYPE.Back)}
+                  onSubmit={() => goToGallery(CONDITION_PHOTO_SIDE_TYPE.Back)}
                 />
               </Wrapper>
 
               <Wrapper
                 style={[GLOBAL_STYLES.row, {justifyContent: 'space-between'}]}>
-                <ButtonPhotosCount
+                <PreSubmitButton
                   title="Sides"
                   total={totalPhotos.sides}
-                  onPress={goToSides}
+                  onSubmit={goToSides}
                 />
 
-                <ButtonPhotosCount
+                <PreSubmitButton
                   title="Details"
                   total={totalPhotos.details}
-                  onPress={() => goToGallery(CONDITION_PHOTO_SIDE_TYPE.Details)}
+                  onSubmit={() =>
+                    goToGallery(CONDITION_PHOTO_SIDE_TYPE.Details)
+                  }
                 />
               </Wrapper>
 

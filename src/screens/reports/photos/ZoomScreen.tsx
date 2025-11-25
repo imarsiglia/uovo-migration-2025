@@ -18,6 +18,7 @@ import {
   RBSheetRef,
 } from '@components/commons/bottomsheets/ImageOptionSheet';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
+import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 import {Label} from '@components/commons/text/Label';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {NOTE_AREA} from '@components/condition/notes/helpers';
@@ -163,6 +164,7 @@ const ZoomScreen = (props: any) => {
     setInventoryId,
     setReportIdImage,
     conditionPhotoSubtype,
+    conditionClientId,
   } = useConditionStore();
 
   const {navigate, goBack} = useCustomNavigation();
@@ -180,14 +182,21 @@ const ZoomScreen = (props: any) => {
     [conditionType, item?.id, item?.clientId, reportIdImage],
   );
 
-  const queryKey = [
-    QUERY_KEYS.PHOTOS_CONDITION,
-    {
-      conditionType: conditionType!,
-      sideType: conditionPhotoType!,
-      reportId: conditionId!,
-    },
-  ];
+  const queryKeyPayload = {
+    conditionType: conditionType!,
+    sideType: conditionPhotoType!,
+    ...(conditionId
+      ? {
+          reportId: conditionId,
+        }
+      : conditionClientId
+      ? {
+          parentClientId: conditionClientId,
+        }
+      : {}),
+  };
+
+  const queryKey = [QUERY_KEYS.PHOTOS_CONDITION, queryKeyPayload];
 
   const {
     data: conditionOverview,
@@ -755,12 +764,14 @@ const ZoomScreen = (props: any) => {
             ...bodyRequest,
             clientId,
             id: item?.id ?? reportIdImage,
+            parentClientId: conditionClientId!,
           });
         } else {
           offlineCreateZoomScreen({
             ...bodyRequest,
             clientId,
             id: item?.id ?? reportIdImage,
+            parentClientId: conditionClientId!,
           });
         }
         upsertPhoto({
@@ -800,7 +811,7 @@ const ZoomScreen = (props: any) => {
         goBack();
       }
     },
-    [item?.id, conditionType, reportIdImage],
+    [item?.id, conditionType, conditionClientId, reportIdImage],
   );
 
   const suppSaveFunction = useCallback(async (stringListSave: string) => {
@@ -1097,11 +1108,7 @@ const ZoomScreen = (props: any) => {
 
   return (
     <Wrapper style={styles.container}>
-      {/* {state.loading && (
-        <Wrapper style={GLOBAL_STYLES.backgroundLoading}>
-          <ActivityIndicator size="large" color={'#487EFD'} />
-        </Wrapper>
-      )} */}
+      {isLoading && <GeneralLoading />}
       {/* @ts-ignore */}
       <ImageZoom
         ref={zoomRef}

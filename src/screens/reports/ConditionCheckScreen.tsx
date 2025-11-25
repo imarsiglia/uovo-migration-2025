@@ -1,53 +1,29 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Platform, ScrollView, StyleSheet} from 'react-native';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
+import { Platform, ScrollView, StyleSheet } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 // import {useFocusEffect} from '@react-navigation/native';
-import {QUERY_KEYS} from '@api/contants/constants';
+import { QUERY_KEYS } from '@api/contants/constants';
 import {
   DEFAULT_PERSISTENCE_CONFIG,
   useGetArtists,
   useGetArtTypes,
   useGetPlacesConditionReport,
 } from '@api/hooks/HooksGeneralServices';
-import {useGetJobInventory} from '@api/hooks/HooksInventoryServices';
+import { useGetJobInventory } from '@api/hooks/HooksInventoryServices';
 import {
   useGetConditionCheckbyInventory,
+  useGetResumeConditionCheck,
   useGetTotalPhotosConditionCheck,
   useSaveConditionCheck,
 } from '@api/hooks/HooksReportServices';
-import {JobInventoryType} from '@api/types/Inventory';
-import {CustomAutocomplete} from '@components/commons/autocomplete/CustomAutocomplete';
-import {BackButton} from '@components/commons/buttons/BackButton';
-import {AutocompleteContext} from '@components/commons/form/AutocompleteContext';
-import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
-import {BottomSheetSelectInputContext} from '@components/commons/form/BottomSheetSelectInputContext';
-import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
-import {InputTextContext} from '@components/commons/form/InputTextContext';
-import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
-import MinRoundedView from '@components/commons/view/MinRoundedView';
-import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {
-  ConditionCheckSchema,
-  ConditionCheckSchemaType,
-} from '@generalTypes/schemas';
-import {RootStackParamList, RoutesNavigation} from '@navigation/types';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {loadingWrapperPromise} from '@store/actions';
-import {useAuth} from '@store/auth';
-import useTopSheetStore from '@store/topsheet';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {showErrorToastMessage, showToastMessage} from '@utils/toast';
-import {useFormContext, useWatch} from 'react-hook-form';
-import {AutocompleteDropdownItem} from 'react-native-autocomplete-dropdown';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
-import {Label} from '@components/commons/text/Label';
-import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
-import {COLORS} from '@styles/colors';
-import useInventoryStore from '@store/inventory';
-import isEqual from 'lodash.isequal';
-import {
-  GetPhotosConditionApiProps,
+  ConditionReportByInventory,
   reportServices,
 } from '@api/services/reportServices';
 import {
@@ -56,24 +32,64 @@ import {
   ConditionPhotoSideType,
   ConditionPhotoType,
 } from '@api/types/Condition';
-import useConditionStore from '@store/condition';
-import {ButtonPhotosCount} from '@components/commons/buttons/ButtonPhotosCount';
+import {
+  ConditionReportType,
+  JobInventoryType,
+  ReportResumeType,
+} from '@api/types/Inventory';
+import { Paginated } from '@api/types/Response';
+import { CustomAutocomplete } from '@components/commons/autocomplete/CustomAutocomplete';
 import {
   ImageOptionSheet,
   RBSheetRef,
 } from '@components/commons/bottomsheets/ImageOptionSheet';
-import type {Image as ImageType} from 'react-native-image-crop-picker';
-import {onSelectImage} from '@utils/image';
-import {offlineUpdateConditionCheck} from '@features/conditionCheck/offline';
-import {generateUUID} from '@utils/functions';
-import {useOnline} from '@hooks/useOnline';
-import {useQueryClient} from '@tanstack/react-query';
+import { BackButton } from '@components/commons/buttons/BackButton';
+import { ButtonPhotosCount } from '@components/commons/buttons/ButtonPhotosCount';
+import { RoundedButtonProps } from '@components/commons/buttons/RoundedButton';
+import { AutocompleteContext } from '@components/commons/form/AutocompleteContext';
+import { BasicFormProvider } from '@components/commons/form/BasicFormProvider';
+import { BottomSheetSelectInputContext } from '@components/commons/form/BottomSheetSelectInputContext';
+import {
+  ButtonSubmit,
+  findFirstError,
+} from '@components/commons/form/ButtonSubmit';
+import { InputTextContext } from '@components/commons/form/InputTextContext';
+import { GeneralLoading } from '@components/commons/loading/GeneralLoading';
+import { Label } from '@components/commons/text/Label';
+import MinRoundedView from '@components/commons/view/MinRoundedView';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
+import { offlineUpdateConditionCheck } from '@features/conditionCheck/offline';
+import {
+  ConditionCheckSchema,
+  ConditionCheckSchemaType,
+} from '@generalTypes/schemas';
+import { useCustomNavigation } from '@hooks/useCustomNavigation';
+import { useOnline } from '@hooks/useOnline';
+import { useRefreshIndicator } from '@hooks/useRefreshIndicator';
+import { useUpsertObjectCache } from '@hooks/useToolsReactQueryCache';
+import { RootStackParamList, RoutesNavigation } from '@navigation/types';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { loadingWrapperPromise } from '@store/actions';
+import { useAuth } from '@store/auth';
+import useConditionStore from '@store/condition';
+import useInventoryStore from '@store/inventory';
+import useTopSheetStore from '@store/topsheet';
+import { COLORS } from '@styles/colors';
+import { GLOBAL_STYLES } from '@styles/globalStyles';
+import { useQueryClient } from '@tanstack/react-query';
+import { generateUUID, getFormattedDate } from '@utils/functions';
+import { onSelectImage } from '@utils/image';
+import { showErrorToastMessage, showToastMessage } from '@utils/toast';
+import isEqual from 'lodash.isequal';
+import { useFormContext, useWatch } from 'react-hook-form';
+import { AutocompleteDropdownItem } from 'react-native-autocomplete-dropdown';
+import type { Image as ImageType } from 'react-native-image-crop-picker';
 // import OfflineValidation from '../components/offline/OfflineValidation';
 
 var offlineInventory = {};
 
 let autosaveInitial = false;
-const delay = 3000;
+const delay = 1500;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ConditionCheck'>;
 
@@ -100,6 +116,8 @@ export const ConditionCheckScreen = (props: Props) => {
     setReportIdImage,
     setConditionPhotoSubtype,
     setConditionPhotoType,
+    setConditionClientId,
+    conditionClientId,
   } = useConditionStore();
 
   const {topSheetFilter, inventoryFilter, orderFilter, orderType} =
@@ -113,11 +131,19 @@ export const ConditionCheckScreen = (props: Props) => {
   const receivedReport = props.route.params.report;
   const receivedItem = props.route.params.item;
 
+  const currentInventoryItem = useMemo(() => {
+    return receivedItem?.id ? receivedItem : selectedItem;
+  }, [selectedItem, receivedItem]);
+
   const {mutateAsync: saveConditionAsync} = useSaveConditionCheck();
 
   const {data: placeOfExamList} = useGetPlacesConditionReport();
   const {data: items} = useGetJobInventory({
     idJob: jobDetail?.id!,
+  });
+
+  const {data: conditionCheckList} = useGetResumeConditionCheck({
+    idJob: jobDetail!.id,
   });
 
   const {data: artists} = useGetArtists({
@@ -134,7 +160,7 @@ export const ConditionCheckScreen = (props: Props) => {
     refetch,
   } = useGetConditionCheckbyInventory({
     idJobInventory:
-      receivedReport?.id_job_inventory ?? receivedItem?.id ?? selectedItem?.id!,
+      receivedReport?.id_job_inventory ?? currentInventoryItem?.id!,
   });
 
   const {online} = useOnline();
@@ -160,6 +186,17 @@ export const ConditionCheckScreen = (props: Props) => {
     ],
   ]);
 
+  const queryKey = [
+    QUERY_KEYS.CONDITION_CHECK_BY_INVENTORY,
+    {
+      idJobInventory:
+        receivedReport?.id_job_inventory ?? currentInventoryItem?.id,
+    },
+  ];
+
+  const upsertConditionReportReport =
+    useUpsertObjectCache<ConditionReportByInventory>(queryKey);
+
   //Autocompletes inputs
   const autocompleteRefs = [
     useRef<any>(null),
@@ -172,13 +209,16 @@ export const ConditionCheckScreen = (props: Props) => {
 
   useEffect(() => {
     setConditionType(CONDITION_TYPES.ConditionCheck);
-    initAll();
-  }, []);
-
-  useEffect(() => {
-    // return () => {
-    //   props.dispatch(ActionsConditionReport.clearAllReport());
-    // };
+    // initAll();
+    return () => {
+      setConditionType(undefined);
+      setConditionId(undefined);
+      setConditionClientId(undefined);
+      setConditionPhotoType(undefined);
+      setInventoryId(undefined);
+      setConditionPhotoSubtype(undefined);
+      setReportIdImage(undefined);
+    };
   }, []);
 
   const initAll = async () => {
@@ -186,32 +226,33 @@ export const ConditionCheckScreen = (props: Props) => {
   };
 
   const currentItem = useMemo(() => {
-    if (selectedItem || receivedReport || receivedItem) {
+    if (receivedReport || currentInventoryItem) {
       return {
-        id:
-          receivedReport?.id_job_inventory ??
-          receivedItem?.id ??
-          selectedItem?.id,
+        id: receivedReport?.id_job_inventory ?? currentInventoryItem?.id,
         clientRef:
-          receivedReport?.client_ref ??
-          receivedItem?.clientref ??
-          selectedItem?.clientref,
+          receivedReport?.client_ref ?? currentInventoryItem?.clientref,
         clientInv:
-          receivedReport?.id_inventory ??
-          receivedItem?.clientinv ??
-          selectedItem?.clientinv,
+          receivedReport?.id_inventory ?? currentInventoryItem?.clientinv,
       };
     } else {
       return null;
     }
-  }, [selectedItem, receivedReport, receivedItem]);
+  }, [receivedReport, currentInventoryItem]);
 
   useEffect(() => {
     setInventoryId(currentItem?.id);
   }, [currentItem?.id, setInventoryId]);
 
+  const queryKeyReport = [
+    QUERY_KEYS.RESUME_CONDITION_CHECK,
+    {idJob: jobDetail?.id},
+  ];
+
+  const upsertReport =
+    useUpsertObjectCache<Paginated<ReportResumeType[]>>(queryKeyReport);
+
   const {refetchAll} = useRefreshIndicator([
-    [QUERY_KEYS.RESUME_CONDITION_CHECK, {idJob: jobDetail?.id}],
+    queryKeyReport,
     [QUERY_KEYS.TASK_COUNT, {idJob: jobDetail?.id}],
     [QUERY_KEYS.INVENTORY_ITEM_DETAIL, {id: currentItem?.id!}],
   ]);
@@ -244,41 +285,6 @@ export const ConditionCheckScreen = (props: Props) => {
       // }
     },
     [setFilterTypes],
-  );
-
-  const goToGallery = useCallback(
-    async (type: ConditionPhotoSideType) => {
-      setConditionPhotoSubtype(undefined);
-      setConditionPhotoType(type);
-      if (conditionId) {
-        setIsLoading(true);
-
-        const props: GetPhotosConditionApiProps = {
-          conditionType: CONDITION_TYPES.ConditionCheck,
-          sideType: type,
-          reportId: conditionId!,
-        };
-
-        const res = await queryClient.fetchQuery({
-          queryKey: [QUERY_KEYS.PHOTOS_CONDITION, props],
-          queryFn: () => reportServices.getPhotosCondition(props),
-          ...DEFAULT_PERSISTENCE_CONFIG,
-        });
-
-        // const res = await reportServices.getPhotosCondition({
-        //   conditionType: CONDITION_TYPES.ConditionCheck,
-        //   sideType: type,
-        //   reportId: conditionId!,
-        // });
-        setIsLoading(false);
-        if (res?.length > 0) {
-          checkOverview(res[res.length - 1]);
-        } else {
-          takeNewPhoto();
-        }
-      }
-    },
-    [conditionId],
   );
 
   const checkOverview = useCallback((item: ConditionPhotoType) => {
@@ -320,13 +326,34 @@ export const ConditionCheckScreen = (props: Props) => {
     [items, setSelectedItem],
   );
 
-  const initialConditionReport = useMemo(() => {
+  const initialConditionReport: ConditionReportType | null = useMemo(() => {
     if (conditionReportJson?.data?.length! > 0) {
       return conditionReportJson!.data[conditionReportJson!.data.length - 1];
     } else {
-      return null;
+      if (currentInventoryItem?.id) {
+        return {
+          id_job_inventory: currentInventoryItem?.id,
+          medium_name: currentInventoryItem.medium,
+          artist_name: currentInventoryItem.artist,
+          title: currentInventoryItem.clientinv_display,
+          year: currentInventoryItem.year,
+          edition: currentInventoryItem.edition,
+          packed_height: currentInventoryItem.packed_height,
+          packed_length: currentInventoryItem.packed_length,
+          packed_width: currentInventoryItem.packed_width,
+          un_packed_height: currentInventoryItem.unpacked_height,
+          un_packed_length: currentInventoryItem.unpacked_length,
+          un_packed_width: currentInventoryItem.unpacked_width,
+        } as ConditionReportType;
+      } else {
+        return null;
+      }
     }
-  }, [conditionReportJson]);
+  }, [conditionReportJson, currentInventoryItem]);
+
+  useEffect(() => {
+    setConditionClientId(initialConditionReport?.clientId);
+  }, [initialConditionReport?.clientId]);
 
   const {data: photosTotal} = useGetTotalPhotosConditionCheck({
     id: initialConditionReport?.id!,
@@ -364,13 +391,103 @@ export const ConditionCheckScreen = (props: Props) => {
     if (initialConditionReport?.id) {
       setConditionId(initialConditionReport.id);
     }
-  }, [initialConditionReport?.id, setConditionId]);
+  }, [initialConditionReport?.id]);
 
   const saveReportOffline = useCallback(
     (form: ConditionCheckSchemaType) => {
+      if (
+        !initialConditionReport?.id_job_inventory &&
+        !currentInventoryItem?.id
+      ) {
+        return Promise.resolve('');
+      }
       const clientId = initialConditionReport?.clientId ?? generateUUID();
+      setConditionClientId(clientId);
+
+      const data = conditionReportJson?.data ?? [];
+      const mData = data?.slice(0, -1) ?? [];
+
+      upsertConditionReportReport({
+        data: [
+          ...mData,
+          {
+            date_report: getFormattedDate(new Date()),
+            edition: form.edition!,
+            id: initialConditionReport?.id!,
+            id_job: jobDetail?.id!,
+            id_job_inventory:
+              initialConditionReport?.id_job_inventory ??
+              currentInventoryItem?.id!,
+            id_user: 0,
+            labeled: form.labeled!,
+            medium_name: form.mediumName!,
+            other_text: form.packing_details_other!,
+            packed_height: form.packed_height!,
+            packed_length: form.packed_length!,
+            packed_width: form.packed_width!,
+            partial: '',
+            place_of_exam: form.placeOfExam!,
+            signature: form.signature!,
+            title: form.title!,
+            un_packed_height: form.un_packed_height!,
+            un_packed_length: form.un_packed_length!,
+            un_packed_width: form.un_packed_width!,
+            unpacked_weight: '0',
+            // TODO
+            unmanaged_name: '',
+            year: form.year!,
+            art_type_name: form.artTypeName?.title,
+            artist_name: form.artistName?.title,
+            condition_artwork: form.overalConditionArtwork,
+            clientId: clientId,
+          },
+        ],
+        total: conditionReportJson?.total,
+        obj_data: conditionReportJson?.obj_data,
+      });
+
+      // 🔹 Lista actual de ConditionCheck
+      const list = conditionCheckList?.data ?? [];
+
+      // 🔹 Posición del item (si ya existe) según el id_job_inventory actual
+      const existingIndex = list.findIndex(
+        (x) => x.id_job_inventory == currentItem?.id,
+      );
+      const existingItem = existingIndex >= 0 ? list[existingIndex] : undefined;
+
+      // 🔹 Nuevo item para el upsert
+      const newItem = {
+        client_ref: currentItem?.clientRef!,
+        id_inventory:
+          existingItem?.id_inventory ?? Number(currentInventoryItem?.clientinv),
+        id_job_inventory: existingItem?.id_job_inventory ?? currentItem?.id!,
+        name: existingItem?.name ?? currentInventoryItem?.clientinv_display!,
+        report_count: existingItem?.report_count ?? 1,
+        partial: null,
+        // TODO
+        unmanaged: false,
+        unmanaged_name: '',
+      };
+
+      // 🔹 Construir nueva lista:
+      //    - si ya existe → reemplazar en la misma posición
+      //    - si no existe → agregar al final
+      const newData =
+        existingIndex >= 0
+          ? list.map((it, idx) => (idx === existingIndex ? newItem : it))
+          : [...list, newItem];
+
+      const newTotal =
+        (conditionCheckList?.total ?? 0) + (existingIndex >= 0 ? 0 : 1);
+
+      upsertReport({
+        data: newData,
+        total: newTotal,
+      });
+
       return offlineUpdateConditionCheck({
         id: initialConditionReport?.id ?? null,
+        clientId,
         idJob: jobDetail?.id!,
         idInventory: currentItem?.id!,
         artistName: form.artistName?.title,
@@ -393,7 +510,20 @@ export const ConditionCheckScreen = (props: Props) => {
         un_packed_width: form.un_packed_width,
       });
     },
-    [currentItem?.id, jobDetail?.id, initialConditionReport?.id],
+    [
+      currentItem?.id,
+      currentItem?.clientInv,
+      currentItem?.clientRef,
+      jobDetail?.id,
+      initialConditionReport?.id,
+      initialConditionReport?.clientId,
+      initialConditionReport?.id_job_inventory,
+      conditionReportJson,
+      conditionCheckList,
+      currentInventoryItem?.id,
+      currentInventoryItem?.clientinv,
+      currentInventoryItem?.clientinv_display,
+    ],
   );
 
   const saveAsync = useCallback(
@@ -452,7 +582,9 @@ export const ConditionCheckScreen = (props: Props) => {
               }),
           );
         } else {
-          saveReportOffline(props);
+          loadingWrapperPromise(saveReportOffline(props)).then(() => {
+            goBack();
+          });
         }
       } else {
         showToastMessage('Please, select a valid option');
@@ -605,6 +737,89 @@ export const ConditionCheckScreen = (props: Props) => {
     }
   }, []);
 
+  const goToGallery = useCallback(
+    async (type: ConditionPhotoSideType) => {
+      setConditionPhotoSubtype(undefined);
+      setConditionPhotoType(type);
+
+      if (
+        !initialConditionReport?.id_job_inventory &&
+        !currentInventoryItem?.id
+      ) {
+        console.log('return');
+        return;
+      }
+
+      setIsLoading(true);
+
+      const queryKeyPayload = {
+        conditionType: CONDITION_TYPES.ConditionCheck!,
+        sideType: type!,
+        ...(conditionId
+          ? {reportId: conditionId}
+          : conditionClientId
+          ? {parentClientId: conditionClientId}
+          : {}),
+      };
+
+      const queryKey = [QUERY_KEYS.PHOTOS_CONDITION, queryKeyPayload];
+
+      try {
+        let res: ConditionPhotoType[] | undefined;
+
+        // 1. Si NO hay internet → solo leer caché
+        if (!online) {
+          res = queryClient.getQueryData<ConditionPhotoType[]>(queryKey) ?? [];
+        } else {
+          // 2. Si hay internet → usar fetchQuery (leer server + actualizar caché)
+          res = await queryClient.fetchQuery<ConditionPhotoType[]>({
+            queryKey,
+            queryFn: () => reportServices.getPhotosCondition(queryKeyPayload),
+            ...DEFAULT_PERSISTENCE_CONFIG,
+          });
+        }
+
+        setIsLoading(false);
+
+        if (res && res.length > 0) {
+          // Última foto (la más reciente)
+          checkOverview(res[res.length - 1]);
+        } else {
+          // No hay nada en caché ni en server → tomar nueva foto
+          takeNewPhoto();
+        }
+      } catch (e) {
+        console.log('goToGallery error:', e);
+        setIsLoading(false);
+
+        // 3. Fallback: si falló el fetch, intento leer caché igual
+        const cached =
+          queryClient.getQueryData<ConditionPhotoType[]>([
+            QUERY_KEYS.PHOTOS_CONDITION,
+            queryKeyPayload,
+          ]) ?? [];
+
+        if (cached.length > 0) {
+          checkOverview(cached[cached.length - 1]);
+        } else {
+          takeNewPhoto();
+        }
+      }
+    },
+    [
+      initialConditionReport?.id_job_inventory,
+      conditionId,
+      conditionClientId,
+      online,
+      queryClient,
+      setConditionPhotoSubtype,
+      setConditionPhotoType,
+      checkOverview,
+      takeNewPhoto,
+      currentInventoryItem?.id,
+    ],
+  );
+
   return (
     <Wrapper style={[styles.container]}>
       {(isLoadingConditionReport || isLoading) && <GeneralLoading />}
@@ -635,7 +850,7 @@ export const ConditionCheckScreen = (props: Props) => {
           },
           styles.lateralPadding,
         ]}>
-        {!receivedReport?.id_job_inventory && !receivedItem?.id && (
+        {!receivedReport?.id_job_inventory && (
           <CustomAutocomplete
             key={'item'}
             onOpenSuggestionsList={(isOpen) => isOpen && closeAll(0)}
@@ -654,10 +869,10 @@ export const ConditionCheckScreen = (props: Props) => {
             onChangeText={checkItem}
             onSelectItem={(item) => onSelectItem(item)}
             initialValue={
-              selectedItem?.id
+              currentInventoryItem?.id
                 ? {
-                    id: selectedItem.id.toString(),
-                    title: selectedItem.clientinv,
+                    id: currentInventoryItem.id.toString(),
+                    title: currentInventoryItem.clientinv,
                   }
                 : undefined
             }
@@ -753,7 +968,7 @@ export const ConditionCheckScreen = (props: Props) => {
         </Wrapper>
 
         <BasicFormProvider
-          key={`condition_check_${conditionReportJson?.obj_data?.id}`}
+          key={`condition_check_${initialConditionReport?.title}`}
           // resetDefaultValue
           schema={ConditionCheckSchema}
           defaultValue={{
@@ -1062,24 +1277,24 @@ export const ConditionCheckScreen = (props: Props) => {
                     marginBottom: 10,
                   },
                 ]}>
-                <ButtonPhotosCount
+                <PreSubmitButton
                   title="Front"
                   total={totalPhotos.front}
-                  onPress={() => goToGallery('front')}
+                  onSubmit={() => goToGallery('front')}
                 />
-                <ButtonPhotosCount
+                <PreSubmitButton
                   title="Back"
                   total={totalPhotos.back}
-                  onPress={() => goToGallery('back')}
+                  onSubmit={() => goToGallery('back')}
                 />
               </Wrapper>
 
               <Wrapper
                 style={[GLOBAL_STYLES.row, {justifyContent: 'space-between'}]}>
-                <ButtonPhotosCount
+                <PreSubmitButton
                   title="Details"
                   total={totalPhotos.details}
-                  onPress={goToDetails}
+                  onSubmit={goToDetails}
                 />
               </Wrapper>
 
@@ -1281,91 +1496,40 @@ const styles = StyleSheet.create({
   },
 });
 
-type DependantContextProps = {
-  name: string;
+type PreSubmitButtonProps = RoundedButtonProps & {
+  onSubmit: (data: any) => void;
+  onInvalid?: () => void;
+  /** Si es true, muestra el primer error del formulario en un toast */
+  showValidationError?: boolean;
+  title: string;
+  total: number;
 };
-const FramedContext = ({name}: DependantContextProps) => {
-  const value = useWatch({name});
-  const {setValue} = useFormContext();
-
-  const isVisible = useMemo(() => {
-    return value?.some(
-      (x: {id: string; title: string}) => x.id.toUpperCase() === 'FRAMED',
-    );
-  }, [value]);
-
-  useEffect(() => {
-    if (!isVisible) {
-      setValue('frame_height', undefined);
-      setValue('frame_length', undefined);
-      setValue('frame_width', undefined);
-    }
-  }, [isVisible]);
+export const PreSubmitButton = ({
+  onSubmit,
+  onInvalid,
+  showValidationError = true,
+  ...restProps
+}: PreSubmitButtonProps) => {
+  const {handleSubmit} = useFormContext();
 
   return (
-    isVisible && (
-      <Wrapper style={[GLOBAL_STYLES.row, {justifyContent: 'space-between'}]}>
-        <Wrapper style={[styles.minPaddingLeft, styles.containerMeasure]}>
-          <Label style={[styles.subtitleFramed]}>H</Label>
-          <InputTextContext
-            currentId="frame_height"
-            maxLength={10}
-            keyboardType="numeric"
-            placeholder="N/A"
-            placeholderTextColor="#d0d0d0"
-            style={styles.inputDimensions}
-          />
-        </Wrapper>
-        <Wrapper style={[styles.minPaddingLeft, styles.containerMeasure]}>
-          <Label style={[styles.subtitleFramed]}>L</Label>
-          <InputTextContext
-            currentId="frame_length"
-            maxLength={10}
-            keyboardType="numeric"
-            placeholder="N/A"
-            placeholderTextColor="#d0d0d0"
-            style={styles.inputDimensions}
-          />
-        </Wrapper>
-        <Wrapper style={[styles.minPaddingLeft, styles.containerMeasure]}>
-          <Label style={[styles.subtitleFramed]}>W</Label>
-          <InputTextContext
-            currentId="frame_width"
-            maxLength={10}
-            keyboardType="numeric"
-            placeholder="N/A"
-            placeholderTextColor="#d0d0d0"
-            style={styles.inputDimensions}
-          />
-        </Wrapper>
-      </Wrapper>
-    )
-  );
-};
+    <ButtonPhotosCount
+      {...restProps}
+      onPress={handleSubmit(onSubmit, (errors) => {
+        // Ejecuta callback personalizado si existe
+        if (onInvalid) {
+          onInvalid();
+        }
 
-const OtherPackingDetailContext = ({name}: DependantContextProps) => {
-  const value = useWatch({name});
-  const {setValue} = useFormContext();
+        if (showValidationError) {
+          const first = findFirstError(errors);
+          const msg = first?.message ?? 'Please, complete required fields';
 
-  const isVisible = useMemo(() => {
-    return value?.some(
-      (x: {id: string; title: string}) => x.title.toUpperCase() === 'OTHER',
-    );
-  }, [value]);
-
-  useEffect(() => {
-    if (!isVisible) {
-      setValue('packing_details_other', undefined);
-    }
-  }, [isVisible]);
-
-  return (
-    isVisible && (
-      <InputTextContext
-        currentId="packing_details_other"
-        style={styles.inputTextAreaOtherText}
-        multiline={true}
-      />
-    )
+          showErrorToastMessage(msg);
+        } else if (!onInvalid) {
+          showErrorToastMessage('Please, complete required fields');
+        }
+      })}
+    />
   );
 };

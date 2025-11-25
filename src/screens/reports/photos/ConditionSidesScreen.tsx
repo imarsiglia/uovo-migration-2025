@@ -1,4 +1,17 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useGetPhotosCondition} from '@api/hooks/HooksReportServices';
+import {
+  CONDITION_PHOTO_SIDE_LABELS,
+  CONDITION_PHOTO_SIDE_SUBTYPE,
+  ConditionPhotoSideSubtype,
+} from '@api/types/Condition';
+import {ImageOptionSheet} from '@components/commons/bottomsheets/ImageOptionSheet';
+import MinRoundedView from '@components/commons/view/MinRoundedView';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {RoutesNavigation} from '@navigation/types';
+import useConditionStore from '@store/condition';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {onSelectImage} from '@utils/image';
+import {useCallback, useMemo, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   ImageBackground,
@@ -12,42 +25,6 @@ import {
 } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 import type {Image as ImageType} from 'react-native-image-crop-picker';
-
-// import {
-//   DELETE_CONDITION_IMAGE_OVERVIEW_OFFLINE_VALIDATION,
-//   DELETE_CREPORT_IMAGE_DETAIL_OFFLINE_VALIDATION,
-//   REPORT_CONDITION_IMAGE_DETAIL_OFFLINE_VALIDATION,
-//   REPORT_CONDITION_IMAGE_OFFLINE_VALIDATION,
-// } from '../../utils/storage';
-
-import MinRoundedView from '@components/commons/view/MinRoundedView';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {ImageOptionSheet} from '@components/commons/bottomsheets/ImageOptionSheet';
-import {useGetPhotosCondition} from '@api/hooks/HooksReportServices';
-import useConditionStore from '@store/condition';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {RoutesNavigation} from '@navigation/types';
-import {
-  CONDITION_PHOTO_SIDE_LABELS,
-  CONDITION_PHOTO_SIDE_SUBTYPE,
-  ConditionPhotoSideSubtype,
-} from '@api/types/Condition';
-import {onSelectImage} from '@utils/image';
-
-type ConditionSidesProps = {
-  navigation: any;
-  jobDetail: {id: number | string};
-  reportId: number | string | null;
-  reportType: string;
-  reportInventory?: string | number | null;
-  conditionType: string;
-  idInventory?: string | number | null;
-  /**
-   * Callback opcional para resetear el id de imagen en tu store (zustand).
-   * Ejemplo: () => useConditionStore.getState().setReportIdImage(undefined)
-   */
-  onResetReportImageId?: () => void;
-};
 
 const groupImagesBySide = (images: any[]) => {
   const base = {top: [], bottom: [], left: [], right: [] as any[]};
@@ -90,26 +67,30 @@ export const ConditionSides = () => {
     setConditionPhotoSubtype,
     conditionId,
     setReportIdImage,
+    conditionClientId,
   } = useConditionStore();
   const {goBack, navigate, isFocused} = useCustomNavigation();
 
-  const resetReportImageId = useCallback(() => {
-    // if (props.onResetReportImageId) {
-    //   props.onResetReportImageId();
-    // }
-    //   }, [props.onResetReportImageId]);
-  }, []);
+  const queryKeyPayload = {
+    conditionType: conditionType!,
+    sideType: conditionPhotoType!,
+    ...(conditionId
+      ? {
+          reportId: conditionId,
+        }
+      : conditionClientId
+      ? {
+          parentClientId: conditionClientId,
+        }
+      : {}),
+  };
 
   const {
     data: images = [],
     isLoading: queryLoading,
     isFetching,
     refetch,
-  } = useGetPhotosCondition({
-    conditionType: conditionType!,
-    reportId: conditionId!,
-    sideType: conditionPhotoType!,
-  });
+  } = useGetPhotosCondition(queryKeyPayload);
 
   const groupedImages = useMemo(() => groupImagesBySide(images), [images]);
 
@@ -154,25 +135,16 @@ export const ConditionSides = () => {
   // ---------- Navegar a Galería ----------
   const goToGallery = useCallback(
     (type: ConditionPhotoSideSubtype) => {
-      resetReportImageId();
       setConditionPhotoSubtype(type);
       navigate(RoutesNavigation.GalleryCondition, {
         type,
       });
-      //   {
-      //   type,
-      //   subType: type,
-      //   images, // por si la pantalla todavía los usa
-      //   refreshGallery: handleRefreshGallery,
-      // });
     },
-    [resetReportImageId, navigate, images, handleRefreshGallery],
+    [navigate, images, handleRefreshGallery],
   );
 
   // ---------- Tomar foto ----------
   const initCamera = useCallback(() => {
-    resetReportImageId();
-
     if (!selectedType) {
       return;
     }
@@ -208,14 +180,7 @@ export const ConditionSides = () => {
     //   .catch(() => {
     //     Toast.show('Picture not capture', Toast.LONG, ['UIAlertController']);
     //   });
-  }, [
-    resetReportImageId,
-    selectedType,
-    images,
-    closeImageSheet,
-    navigate,
-    handleRefreshGallery,
-  ]);
+  }, [selectedType, images, closeImageSheet, navigate, handleRefreshGallery]);
 
   const generateImagePathIOS = useCallback(
     (photo?: ImageType) => {

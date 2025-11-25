@@ -60,7 +60,7 @@ export type ReportResumeType = {
   id_inventory: number;
   id_job_inventory: number;
   name: string;
-  partial?: boolean;
+  partial?: boolean | null;
   report_count: number;
   unmanaged?: boolean;
   unmanaged_name?: string | null;
@@ -87,14 +87,14 @@ export type ConditionReportType = {
   art_type_name?: string | null;
   artist_name?: string | null;
   condition_artwork?: string | null;
-  condition_report_frame_fixture_list: ConditionReportFrameFixturePk[];
-  condition_report_hanging_system_list: ConditionReportHangingSystemPk[];
-  condition_report_packing_detail_list: ConditionReportPackingDetailPk[];
+  condition_report_frame_fixture_list?: ConditionReportFrameFixturePk[];
+  condition_report_hanging_system_list?: ConditionReportHangingSystemPk[];
+  condition_report_packing_detail_list?: ConditionReportPackingDetailPk[];
   date_report: string;
   edition: string;
-  frame_height: string;
-  frame_length: string;
-  frame_width: string;
+  frame_height?: string;
+  frame_length?: string;
+  frame_width?: string;
   id: number;
   id_job: number;
   id_job_inventory: number;
@@ -114,7 +114,7 @@ export type ConditionReportType = {
   un_packed_width: string;
   unmanaged_name: string;
   unpacked_weight: string;
-  weight: string;
+  weight?: string;
   year: string;
 
   // offline

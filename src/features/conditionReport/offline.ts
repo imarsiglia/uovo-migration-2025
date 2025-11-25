@@ -6,6 +6,7 @@ import {
   SavePhotoConditionApiProps,
   SaveZoomScreenProps,
 } from '@api/services/reportServices';
+import { CONDITION_TYPES } from '@api/types/Condition';
 import {enqueueCoalesced} from '@offline/outbox';
 import {OutboxOpKind} from '@offline/types';
 
@@ -64,10 +65,12 @@ export async function offlineDeleteConditionReport(params: {
 export type SavePhotoConditionOfflineProps = {
   // offline
   clientId?: string;
+  parentClientId?: string;
 } & SavePhotoConditionApiProps;
 
 export async function offlineCreateConditionPhoto({
   clientId,
+  parentClientId,
   ...rest
 }: SavePhotoConditionOfflineProps) {
   const op = rest.id ? 'update' : 'create';
@@ -76,11 +79,19 @@ export async function offlineCreateConditionPhoto({
     throw new Error('offlineSaveConditionPhoto requires clientId on create');
   }
 
+  // Padre según el conditionType de la foto
+  const parentEntity =
+    rest.conditionType === CONDITION_TYPES.ConditionCheck
+      ? ENTITY_TYPES.CONDITION_CHECK
+      : ENTITY_TYPES.CONDITION_REPORT;
+
   return enqueueCoalesced(op, {
     entity: ENTITY_TYPES.CONDITION_PHOTO,
     idJob: rest.idJob,
     id: rest.id ?? undefined,
-    clientId: clientId,
+    clientId,
+    parentClientId,
+    parentEntity,
     body: {
       ...rest,
     },
@@ -89,6 +100,7 @@ export async function offlineCreateConditionPhoto({
 
 export async function offlineUpdateConditionPhoto({
   clientId,
+  parentClientId,
   ...rest
 }: SavePhotoConditionOfflineProps) {
   const op = 'update';
@@ -97,11 +109,19 @@ export async function offlineUpdateConditionPhoto({
     throw new Error('offlineUpdateConditionPhoto requires clientId on update');
   }
 
+  // Padre según el conditionType de la foto
+  const parentEntity =
+    rest.conditionType === CONDITION_TYPES.ConditionCheck
+      ? ENTITY_TYPES.CONDITION_CHECK
+      : ENTITY_TYPES.CONDITION_REPORT;
+
   return enqueueCoalesced(op, {
     entity: ENTITY_TYPES.CONDITION_PHOTO,
     idJob: rest.idJob,
     id: rest.id ?? undefined,
-    clientId: clientId,
+    clientId,
+    parentClientId,
+    parentEntity,
     body: {
       ...rest,
     },
@@ -137,11 +157,13 @@ export async function offlineDeleteConditionPhoto({
 export type SaveZoomScreenOfflineProps = {
   clientId?: string;
   id?: number;
+  parentClientId?: string;
 } & SaveZoomScreenProps;
 
 export async function offlineCreateZoomScreen({
   id,
   clientId,
+  parentClientId,
   ...rest
 }: SaveZoomScreenOfflineProps) {
   const op = id ? 'update' : 'create';
@@ -161,6 +183,7 @@ export async function offlineCreateZoomScreen({
 export async function offlineUpdateZoomScreen({
   id,
   clientId,
+  parentClientId,
   ...rest
 }: SaveZoomScreenOfflineProps) {
   if (!clientId) {

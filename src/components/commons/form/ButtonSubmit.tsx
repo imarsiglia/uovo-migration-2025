@@ -11,7 +11,7 @@ type Props = RoundedButtonProps & {
   showValidationError?: boolean;
 };
 
-function findFirstError(
+export function findFirstError(
   errors: FieldErrors<any>,
   parentPath = '',
 ): {path: string; message?: string} | null {

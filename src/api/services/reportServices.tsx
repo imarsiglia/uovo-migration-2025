@@ -4,6 +4,7 @@ import {
   API_GET_PHOTO_CONDITION_DETAIL,
   API_GET_PHOTO_CONDITION_OVERVIEW,
   API_GET_PHOTOS_CONDITION,
+  API_GET_RESUME_CONDITION_CHECK,
   API_GET_RESUME_CONDITION_REPORT,
   API_GET_TOTAL_PHOTOS_CONDITION_CHECK,
   API_GET_TOTAL_PHOTOS_CONDITION_REPORT,
@@ -48,21 +49,21 @@ const getResumeConditionCheck = async ({
   idJob,
 }: TaskBaseApiProps): Promise<Paginated<ReportResumeType[]>> => {
   const response = await getRequest<Paginated<ReportResumeType[]>>(
-    `${API_GET_RESUME_CONDITION_REPORT}?idJob=${idJob}`,
+    `${API_GET_RESUME_CONDITION_CHECK}?idJob=${idJob}`,
   );
   return response.body;
+};
+
+export type ConditionReportByInventory = Paginated<ConditionReportType[]> & {
+  obj_data: JobInventoryType;
 };
 
 const getConditionReportbyInventory = async ({
   idJobInventory,
 }: {
   idJobInventory: number;
-}): Promise<
-  Paginated<ConditionReportType[]> & {obj_data: JobInventoryType}
-> => {
-  const response = await getRequest<
-    Paginated<ConditionReportType[]> & {obj_data: JobInventoryType}
-  >(
+}): Promise<ConditionReportByInventory> => {
+  const response = await getRequest<ConditionReportByInventory>(
     `${API_GET_CONDITION_REPORT_BY_INVENTORY}?idJobInventory=${idJobInventory}`,
   );
   return response.body;
@@ -72,12 +73,10 @@ const getConditionCheckbyInventory = async ({
   idJobInventory,
 }: {
   idJobInventory: number;
-}): Promise<
-  Paginated<ConditionReportType[]> & {obj_data: JobInventoryType}
-> => {
-  const response = await getRequest<
-    Paginated<ConditionReportType[]> & {obj_data: JobInventoryType}
-  >(`${API_GET_CONDITION_CHECK_BY_INVENTORY}?idJobInventory=${idJobInventory}`);
+}): Promise<ConditionReportByInventory> => {
+  const response = await getRequest<ConditionReportByInventory>(
+    `${API_GET_CONDITION_CHECK_BY_INVENTORY}?idJobInventory=${idJobInventory}`,
+  );
   return response.body;
 };
 
@@ -154,9 +153,12 @@ export type SaveConditionCheckApiProps = {
 
 const saveConditionCheck = async (
   props: SaveConditionCheckApiProps,
-): Promise<boolean> => {
-  const response = await postRequest(API_SAVE_CONDITION_CHECK, props);
-  return response.message === SUCCESS_MESSAGES.SUCCESS;
+): Promise<number> => {
+  const response = await postRequest<{reportId: number}>(
+    API_SAVE_CONDITION_CHECK,
+    props,
+  );
+  return response.body?.reportId;
 };
 
 const getTotalPhotosConditionReport = async ({
@@ -184,7 +186,8 @@ const getTotalPhotosConditionCheck = async ({
 export type GetPhotosConditionApiProps = {
   conditionType: ConditionType;
   sideType: ConditionPhotoSideType;
-  reportId: number;
+  reportId?: number;
+  parentClientId?: string;
 };
 const getPhotosCondition = async ({
   conditionType,

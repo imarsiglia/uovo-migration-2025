@@ -46,19 +46,32 @@ export const GalleryCondition = (props: Props) => {
   const {online} = useOnline();
   const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
 
-  const {conditionType, conditionPhotoType, conditionId, setReportIdImage} =
-    useConditionStore();
+  const {
+    conditionType,
+    conditionPhotoType,
+    conditionId,
+    setReportIdImage,
+    conditionClientId,
+  } = useConditionStore();
   const showDialog = useModalDialogStore((d) => d.showVisible);
   const {mutateAsync: deleteAsync} = useRemovePhotoCondition();
 
-  const queryKey = [
-    QUERY_KEYS.PHOTOS_CONDITION,
-    {
-      conditionType: conditionType!,
-      sideType: conditionPhotoType!,
-      reportId: conditionId!,
-    },
-  ];
+  const queryKeyPayload = {
+    conditionType: conditionType!,
+    sideType: conditionPhotoType!,
+    ...(conditionId
+      ? {
+          reportId: conditionId,
+        }
+      : conditionClientId
+      ? {
+          parentClientId: conditionClientId,
+        }
+      : {}),
+  };
+
+  const queryKey = [QUERY_KEYS.PHOTOS_CONDITION, queryKeyPayload];
+
   const removePhotoFromCache =
     useRemoveFromArrayCache<ConditionPhotoType>(queryKey);
 
@@ -70,11 +83,7 @@ export const GalleryCondition = (props: Props) => {
     isSuccess,
     isFetching,
     refetch,
-  } = useGetPhotosCondition({
-    conditionType: conditionType!,
-    sideType: conditionPhotoType!,
-    reportId: conditionId!,
-  });
+  } = useGetPhotosCondition(queryKeyPayload);
 
   const {refetchAll} = useRefreshIndicator([
     [QUERY_KEYS.TOTAL_PHOTOS_CONDITION_REPORT, {id: conditionId}],
@@ -232,7 +241,6 @@ export const GalleryCondition = (props: Props) => {
                 id: item?.id,
                 clientId: item.clientId,
                 idJob,
-                
               });
             } else {
               offlineDeleteConditionPhoto({

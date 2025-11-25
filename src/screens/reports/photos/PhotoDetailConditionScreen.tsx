@@ -1,62 +1,62 @@
-import { QUERY_KEYS } from '@api/contants/constants';
+import {QUERY_KEYS} from '@api/contants/constants';
 import {
   useGetPhotoConditionDetail,
   useSavePhotoCondition,
 } from '@api/hooks/HooksReportServices';
-import { PhotoConditionDetailApiProps } from '@api/services/reportServices';
+import {PhotoConditionDetailApiProps} from '@api/services/reportServices';
 import {
   CONDITION_PHOTO_SIDE_LABELS,
   CONDITION_PHOTO_SIDE_TYPE,
   CONDITION_TYPES,
   ConditionPhotoType,
 } from '@api/types/Condition';
-import { Icons } from '@assets/icons/icons';
+import {Icons} from '@assets/icons/icons';
 import {
   ImageOptionSheet,
   RBSheetRef,
 } from '@components/commons/bottomsheets/ImageOptionSheet';
-import { BackButton } from '@components/commons/buttons/BackButton';
-import { PressableOpacity } from '@components/commons/buttons/PressableOpacity';
-import { RoundedButton } from '@components/commons/buttons/RoundedButton';
-import { BasicFormProvider } from '@components/commons/form/BasicFormProvider';
-import { ButtonSubmit } from '@components/commons/form/ButtonSubmit';
-import { InputTextContext } from '@components/commons/form/InputTextContext';
+import {BackButton} from '@components/commons/buttons/BackButton';
+import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
+import {RoundedButton} from '@components/commons/buttons/RoundedButton';
+import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
+import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
+import {InputTextContext} from '@components/commons/form/InputTextContext';
 import {
   SpeechFormContext,
   SpeechFormInputRef,
 } from '@components/commons/form/SpeechFormContext';
-import { Label } from '@components/commons/text/Label';
+import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import { Wrapper } from '@components/commons/wrappers/Wrapper';
-import { CustomImage } from '@components/images/CustomImage';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {CustomImage} from '@components/images/CustomImage';
 import {
   offlineCreateConditionPhoto,
   offlineUpdateConditionPhoto,
 } from '@features/conditionReport/offline';
-import { upsertIntoObjectCache } from '@features/helpers/offlineHelpers';
+import {upsertIntoObjectCache} from '@features/helpers/offlineHelpers';
 import {
   SaveTaskImageSchema,
   SaveTaskImageSchemaType,
 } from '@generalTypes/schemas';
-import { useCustomNavigation } from '@hooks/useCustomNavigation';
-import { useOnline } from '@hooks/useOnline';
-import { useRefreshIndicator } from '@hooks/useRefreshIndicator';
-import { useUpsertArrayCache } from '@hooks/useToolsReactQueryCache';
-import { RootStackParamList, RoutesNavigation } from '@navigation/types';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { loadingWrapperPromise } from '@store/actions';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {useOnline} from '@hooks/useOnline';
+import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {useUpsertArrayCache} from '@hooks/useToolsReactQueryCache';
+import {RootStackParamList, RoutesNavigation} from '@navigation/types';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {loadingWrapperPromise} from '@store/actions';
 import useConditionStore from '@store/condition';
 import useTopSheetStore from '@store/topsheet';
-import { COLORS } from '@styles/colors';
-import { GLOBAL_STYLES } from '@styles/globalStyles';
-import { useQueryClient } from '@tanstack/react-query';
-import { generateUUID } from '@utils/functions';
-import { onSelectImage } from '@utils/image';
-import { showErrorToastMessage, showToastMessage } from '@utils/toast';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Keyboard, Platform, StyleSheet } from 'react-native';
-import { Image as ImageType } from 'react-native-image-crop-picker';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import {COLORS} from '@styles/colors';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {useQueryClient} from '@tanstack/react-query';
+import {generateUUID} from '@utils/functions';
+import {onSelectImage} from '@utils/image';
+import {showErrorToastMessage, showToastMessage} from '@utils/toast';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {Keyboard, Platform, StyleSheet} from 'react-native';
+import {Image as ImageType} from 'react-native-image-crop-picker';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-controller';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PhotoDetailCondition'>;
 export const PhotoDetailCondition = (props: Props) => {
@@ -72,6 +72,7 @@ export const PhotoDetailCondition = (props: Props) => {
     copyNote: note,
     setCopyNote,
     conditionPhotoSubtype,
+    conditionClientId,
   } = useConditionStore();
   const queryClient = useQueryClient();
 
@@ -99,14 +100,21 @@ export const PhotoDetailCondition = (props: Props) => {
   const refCallSheet = useRef<RBSheetRef>(null);
   const refVoice = useRef<SpeechFormInputRef>(null);
 
-  const queryKey = [
-    QUERY_KEYS.PHOTOS_CONDITION,
-    {
-      conditionType: conditionType!,
-      sideType: conditionPhotoType!,
-      reportId: conditionId!,
-    },
-  ];
+  const queryKeyPayload = {
+    conditionType: conditionType!,
+    sideType: conditionPhotoType!,
+    ...(conditionId
+      ? {
+          reportId: conditionId,
+        }
+      : conditionClientId
+      ? {
+          parentClientId: conditionClientId,
+        }
+      : {}),
+  };
+
+  const queryKey = [QUERY_KEYS.PHOTOS_CONDITION, queryKeyPayload];
 
   const {refetchAll} = useRefreshIndicator([
     queryKey,
@@ -223,11 +231,13 @@ export const PhotoDetailCondition = (props: Props) => {
           offlineUpdateConditionPhoto({
             ...jsonRequest,
             clientId: clientId,
+            parentClientId: conditionClientId!,
           });
         } else {
           offlineCreateConditionPhoto({
             ...jsonRequest,
             clientId: clientId,
+            parentClientId: conditionClientId!,
           });
         }
         upsertPhoto({
@@ -283,6 +293,7 @@ export const PhotoDetailCondition = (props: Props) => {
       online,
       idJob,
       note,
+      conditionClientId,
     ],
   );
 

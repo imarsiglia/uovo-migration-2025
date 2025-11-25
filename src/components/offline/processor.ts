@@ -13,13 +13,16 @@ import {
   writeProcessingSession,
   STUCK_THRESHOLD_MS,
 } from '@offline/outbox';
-import type {ProcessingSession} from '@offline/types';
+import type {OutboxItem, ProcessingSession} from '@offline/types';
 
 import {pingApiHead} from '@features/helpers/offlineHelpers';
 import {taskServices} from '@api/services/taskServices';
 import {coalesceMaterialsPlanFromQueue} from '@features/materials/offline';
 import {ENTITY_TYPES, QUERY_KEYS} from '@api/contants/constants';
 import {runItemThroughEntityServices} from '@api/services/entityServices';
+import {getServerId, registerServerId} from '@offline/idMap';
+import {reportServices} from '@api/services/reportServices';
+import {CONDITION_TYPES} from '@api/types/Condition';
 
 type ProcessOnceOpts = {
   processFailedItems?: boolean;
@@ -178,22 +181,109 @@ async function processCore(
       }
 
       // --- procesamiento genérico de otras entidades
-      // Marcamos el item como in_progress, ejecutamos lo que toque y luego succeeded/failed.
+      // // Marcamos el item como in_progress, ejecutamos lo que toque y luego succeeded/failed.
+      // q = await readQueue();
+
+      // const idx = q.findIndex((it: any) => it.uid === next.uid);
+      // if (idx < 0) continue;
+
+      // const it = q[idx];
+      // // in_progress
+      // q[idx] = {...it, status: 'in_progress', updatedAt: Date.now()};
+      // await replaceQueue(q);
+
+      // try {
+      //   // Aquí despacha tus otros servicios según payload.entity/op si aplica.
+      //   await runItemThroughEntityServices(qc, it);
+
+      //   // En esta base, lo marcamos como éxito directo.
+      //   q = await readQueue();
+      //   const idx2 = q.findIndex((x: any) => x.uid === it.uid);
+      //   if (idx2 >= 0) {
+      //     q[idx2] = {...q[idx2], status: 'succeeded', updatedAt: Date.now()};
+      //     await replaceQueue(q);
+      //   }
+      // } catch (e: any) {
+      //   q = await readQueue();
+      //   const idx2 = q.findIndex((x: any) => x.uid === it.uid);
+      //   if (idx2 >= 0) {
+      //     const attempts = q[idx2].attempts ?? 0;
+      //     q[idx2] = {
+      //       ...q[idx2],
+      //       status: 'failed',
+      //       attempts,
+      //       lastError: String(e?.message ?? e),
+      //       updatedAt: Date.now(),
+      //     };
+      //     await replaceQueue(q);
+      //   }
+      // }
+
+      // --- procesamiento de otras entidades (genérico + casos especiales CR/PHOTO)
       q = await readQueue();
-      
+
       const idx = q.findIndex((it: any) => it.uid === next.uid);
       if (idx < 0) continue;
 
       const it = q[idx];
-      // in_progress
+
+      // Marcar como in_progress
       q[idx] = {...it, status: 'in_progress', updatedAt: Date.now()};
       await replaceQueue(q);
 
       try {
-        // Aquí despacha tus otros servicios según payload.entity/op si aplica.
-        await runItemThroughEntityServices(qc, it);
+        let result: 'ok' | 'skip' | void;
+        const entity = it.payload?.entity;
+        const op = it.op;
 
-        // En esta base, lo marcamos como éxito directo.
+        if (entity === ENTITY_TYPES.CONDITION_REPORT) {
+          if (op === 'delete') {
+            await runItemThroughEntityServices(qc, it);
+            result = 'ok';
+          } else {
+            result = await processConditionReportItem(it);
+          }
+        } else if (entity === ENTITY_TYPES.CONDITION_CHECK) {
+          if (op === 'delete') {
+            await runItemThroughEntityServices(qc, it);
+            result = 'ok';
+          } else {
+            // create / update con lógica especial e idMap
+            result = await processConditionCheckItem(it);
+          }
+        } else if (entity === ENTITY_TYPES.CONDITION_PHOTO) {
+          if (op === 'delete') {
+            await runItemThroughEntityServices(qc, it);
+            result = 'ok';
+          } else {
+            result = await processConditionPhotoItem(it);
+          }
+        } else {
+          // Resto de entidades → flujo genérico
+          await runItemThroughEntityServices(qc, it);
+          result = 'ok';
+        }
+
+        // Si el procesador de fotos nos dice "skip", significa que
+        // todavía no existe el padre en el backend.
+        if (result === 'skip') {
+          q = await readQueue();
+          const idx2 = q.findIndex((x: any) => x.uid === it.uid);
+          if (idx2 >= 0) {
+            const skipped = q[idx2];
+            q.splice(idx2, 1); // lo sacamos de su posición actual
+            q.push({
+              ...skipped,
+              status: 'pending',
+              updatedAt: Date.now(),
+            });
+            await replaceQueue(q);
+          }
+          // En lugar de romper el while, seguimos con el siguiente item
+          continue;
+        }
+
+        // Éxito normal (ConditionReport / Photo / genérico)
         q = await readQueue();
         const idx2 = q.findIndex((x: any) => x.uid === it.uid);
         if (idx2 >= 0) {
@@ -252,4 +342,83 @@ export async function processQueueOnce(
     pingBefore: async () => true,
   };
   await processCore(qc, forcedOpts, {useLock: false});
+}
+
+async function processConditionReportItem(item: OutboxItem): Promise<'ok'> {
+  const {payload} = item;
+  const {clientId, body} = payload as any;
+
+  // body: SaveConditionReportApiProps
+  const reportId = await reportServices.saveConditionReport(body);
+
+  // Si este reporte se creó offline (tiene clientId),
+  // guardamos el mapping clientId → reportId real del backend.
+  if (clientId && typeof reportId === 'number') {
+    registerServerId(ENTITY_TYPES.CONDITION_REPORT, clientId, reportId);
+  }
+
+  return 'ok';
+}
+
+async function processConditionCheckItem(item: OutboxItem): Promise<'ok'> {
+  const {payload} = item;
+  const {clientId, body} = payload as any;
+
+  // ⚠️ Ajusta este servicio/nombre de campo según tu API real
+  const conditionId = await reportServices.saveConditionCheck(body);
+
+  if (clientId && typeof conditionId === 'number') {
+    registerServerId(ENTITY_TYPES.CONDITION_CHECK, clientId, conditionId);
+  }
+
+  return 'ok';
+}
+
+async function processConditionPhotoItem(
+  item: OutboxItem,
+): Promise<'ok' | 'skip'> {
+  const {payload} = item;
+  const {parentClientId, parentEntity, body} = payload as any;
+
+  let {reportId} = body as {reportId?: number};
+
+  // Si no tenemos reportId pero sí parentClientId, intentamos resolverlo
+  if (!reportId && parentClientId) {
+    // 1) Usar parentEntity que viene del payload (preferido)
+    let effectiveParentEntity: string | undefined = parentEntity;
+
+    // 2) Fallback por si hay items viejos en cola (sin parentEntity)
+    if (!effectiveParentEntity && body.conditionType) {
+      if (body.conditionType === CONDITION_TYPES.ConditionCheck) {
+        effectiveParentEntity = ENTITY_TYPES.CONDITION_CHECK;
+      } else {
+        effectiveParentEntity = ENTITY_TYPES.CONDITION_REPORT;
+      }
+    }
+
+    // 3) Fallback final: asumir ConditionReport (compatibilidad hacia atrás)
+    if (!effectiveParentEntity) {
+      effectiveParentEntity = ENTITY_TYPES.CONDITION_REPORT;
+    }
+
+    const resolved = getServerId(effectiveParentEntity as any, parentClientId);
+
+    if (!resolved) {
+      // El padre aún no se ha sincronizado (REPORT o CHECK)
+      return 'skip';
+    }
+
+    reportId = resolved;
+    body.reportId = resolved;
+  }
+
+  // Sin reportId no podemos crear la foto
+  if (!reportId) {
+    return 'skip';
+  }
+
+  // Ya sabemos el id real del padre en el backend
+  await reportServices.savePhotoCondition(body);
+
+  return 'ok';
 }
