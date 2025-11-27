@@ -4,33 +4,21 @@ import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {RootStackParamList} from '@navigation/types';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {memo, useCallback, useMemo, useRef, useState} from 'react';
-import {
-  FlatList,
-  Image,
-  StyleSheet,
-  useWindowDimensions,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  Platform,
-} from 'react-native';
+import {memo, useMemo, useState, useCallback} from 'react';
+import {StyleSheet, useWindowDimensions} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import ImageViewing from 'react-native-image-viewing';
+import { COLORS } from '@styles/colors';
 
 export type ImageType = 'jpeg' | 'png' | 'webp' | 'gif';
 
 export type Base64ImageCarouselProps = {
-  /** Arreglo de cadenas base64 o data URIs (e.g. "data:image/jpeg;base64,...") */
   images: string[];
-  /** Tipo de imagen para prefijo data URI cuando la entrada es base64 "pura" */
   type?: ImageType;
-  /** Alto del carrusel; por defecto usa 9:16 del ancho de pantalla */
   height?: number;
-  /** Índice inicial a mostrar */
   initialIndex?: number;
-  /** cover|contain (cómo ajustar la imagen dentro del contenedor) */
   contentFit?: 'cover' | 'contain';
-  /** Callback cuando cambia la página visible */
   onIndexChange?: (index: number) => void;
-  /** Muestra indicadores de página (puntos) */
   showIndicators?: boolean;
 };
 
@@ -56,147 +44,98 @@ const BaseImageScreen = (props: Props) => {
   const {
     images,
     type = 'jpeg',
-    height,
     initialIndex = 0,
-    contentFit = 'contain',
     onIndexChange,
     showIndicators = true,
   } = props.route.params;
 
   const {goBack} = useCustomNavigation();
-
-  const listRef = useRef<FlatList<string>>(null);
   const {width} = useWindowDimensions();
-  const [index, setIndex] = useState(
+  const insets = useSafeAreaInsets();
+
+  const [currentIndex, setCurrentIndex] = useState(
     Math.min(Math.max(initialIndex, 0), Math.max(images.length - 1, 0)),
   );
 
-  const dataUris = useMemo(
-    () => images.map((s) => ensureDataUri(s, type)),
+  const imageUris = useMemo(
+    () =>
+      images.map((s) => ({
+        uri: ensureDataUri(s, type),
+      })),
     [images, type],
   );
 
-  //   const itemHeight = height ?? Math.round((width * 9) / 16);
-
-  const getItemLayout = useCallback(
-    (_: unknown, i: number) => ({
-      length: width,
-      offset: width * i,
-      index: i,
-    }),
-    [width],
-  );
-
-  const keyExtractor = useCallback((_: string, i: number) => i.toString(), []);
-
-  const onMomentumEnd = useCallback(
-    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const offX = e.nativeEvent.contentOffset.x;
-      const newIndex = Math.round(offX / width);
-      if (newIndex !== index) {
-        setIndex(newIndex);
-        onIndexChange?.(newIndex);
-      }
+  const handleIndexChange = useCallback(
+    (index: number) => {
+      setCurrentIndex(index);
+      onIndexChange?.(index);
     },
-    [index, onIndexChange, width],
+    [onIndexChange],
   );
 
-  const renderItem = useCallback(
-    ({item}: {item: string}) => (
-      <Wrapper
-        style={[styles.slide, {width}]}
-        // Estas dos props suelen ayudar en listas de imágenes pesadas:
-        renderToHardwareTextureAndroid
-        // @ts-ignore (prop iOS; no afecta en Android)
-        shouldRasterizeIOS>
-        <Image
-          source={{uri: item}}
-          resizeMode={contentFit}
-          style={styles.image}
-          // En Android quita el fade para hacer más ágil la transición
-          {...(Platform.OS === 'android' ? ({fadeDuration: 0} as any) : {})}
-        />
+  const HeaderComponent = useCallback(
+    () => (
+      <Wrapper style={[styles.headerContainer, {paddingTop: insets.top}]}>
+        <BackButton onPress={goBack} />
       </Wrapper>
     ),
-    [contentFit, width],
+    [goBack, insets.top],
   );
 
-  // Evita crash de initialScrollIndex en listas grandes
-  const onRefReady = useCallback(
-    (ref: FlatList<string> | null) => {
-      if (ref) {
-        listRef.current = ref;
-        if (initialIndex > 0 && initialIndex < dataUris.length) {
-          // scrollToIndex sin animación para posicionar rápido
-          setTimeout(() => {
-            try {
-              ref.scrollToIndex({index: initialIndex, animated: false});
-            } catch {}
-          }, 0);
-        }
-      }
+  const FooterComponent = useCallback(
+    ({imageIndex}: {imageIndex: number}) => {
+      if (!showIndicators || imageUris.length <= 1) return null;
+
+      return (
+        <Wrapper
+          style={[styles.footerContainer, {paddingBottom: insets.bottom + 20}]}>
+          <Wrapper style={styles.counterPill}>
+            <Label style={styles.counterText}>
+              {imageIndex + 1} / {imageUris.length}
+            </Label>
+          </Wrapper>
+          <Indicator count={imageUris.length} active={imageIndex} />
+        </Wrapper>
+      );
     },
-    [initialIndex, dataUris.length],
+    [imageUris.length, showIndicators, insets.bottom],
   );
 
   return (
-    <Wrapper style={[styles.container, {width}]}>
-      <Wrapper style={styles.containerHeader}>
-        <BackButton onPress={goBack} />
-      </Wrapper>
-      <FlatList
-        ref={onRefReady}
-        data={dataUris}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        decelerationRate="fast"
-        // Virtualización y performance
-        initialNumToRender={2}
-        maxToRenderPerBatch={2}
-        updateCellsBatchingPeriod={16}
-        windowSize={3}
-        removeClippedSubviews
-        getItemLayout={getItemLayout}
-        onMomentumScrollEnd={onMomentumEnd}
+    <Wrapper style={[styles.container, {width}]}> 
+      <ImageViewing
+        images={imageUris}
+        imageIndex={currentIndex}
+        visible={true}
+        onRequestClose={goBack}
+        onImageIndexChange={handleIndexChange}
+        HeaderComponent={HeaderComponent}
+        FooterComponent={FooterComponent}
+        backgroundColor={COLORS.placeholderInput}
+        swipeToCloseEnabled={false}
+        doubleTapToZoomEnabled={true}
+        presentationStyle="fullScreen"
+        animationType="none"
       />
-
-      {showIndicators && dataUris.length > 1 && (
-        <Wrapper style={styles.overlayIndicators}>
-          <Indicator count={dataUris.length} active={index} />
-          <Wrapper style={styles.counterPill}>
-            <Label style={styles.counterText}>
-              {index + 1}/{dataUris.length}
-            </Label>
-          </Wrapper>
-        </Wrapper>
-      )}
     </Wrapper>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    overflow: 'hidden',
     flex: 1,
+    backgroundColor: '#f5f5f5',
   },
-  slide: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  image: {
+  headerContainer: {
+    backgroundColor: 'white',
+    flexDirection: 'row',
     width: '100%',
-    height: '100%',
+    borderBottomEndRadius: 5,
+    borderBottomStartRadius: 5,
   },
-  overlayIndicators: {
-    position: 'absolute',
-    bottom: 10,
-    left: 0,
-    right: 0,
+  footerContainer: {
     alignItems: 'center',
-    gap: 8,
+    gap: 12,
   },
   indicatorContainer: {
     flexDirection: 'row',
@@ -218,24 +157,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   counterPill: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    backgroundColor: 'rgba(0,0,0,0.6)',
   },
   counterText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600',
   },
-  containerHeader: {
-    backgroundColor: 'white',
-    flexDirection: 'row',
+  headerContainerFixed: {
     position: 'absolute',
-    width: '100%',
-    zIndex: 11,
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    zIndex: 999,
     borderBottomEndRadius: 5,
-    borderBottomStartRadius: 5
+    borderBottomStartRadius: 5,
   },
 });
 

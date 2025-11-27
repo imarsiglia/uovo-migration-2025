@@ -10,7 +10,7 @@ import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {RoutesNavigation} from '@navigation/types';
 import useConditionStore from '@store/condition';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {onSelectImage} from '@utils/image';
+import {onLaunchCamera, onSelectImage} from '@utils/image';
 import {useCallback, useMemo, useRef, useState} from 'react';
 import {
   ActivityIndicator,
@@ -140,52 +140,11 @@ export const ConditionSides = () => {
         type,
       });
     },
-    [navigate, images, handleRefreshGallery],
+    [navigate, images],
   );
-
-  // ---------- Tomar foto ----------
-  const initCamera = useCallback(() => {
-    if (!selectedType) {
-      return;
-    }
-
-    if (Platform.OS === 'ios') {
-      closeImageSheet();
-
-      const hasOverview = images.some(
-        (x: any) => x.subtype === selectedType && x.is_overview,
-      );
-
-      if (hasOverview) {
-        // navigate('PhotoCaptureZoom', {
-        //   note: null,
-        //   refresh: true,
-        //   refreshGallery: handleRefreshGallery,
-        //   subType: selectedType,
-        // });
-      } else {
-        // navigate('PhotoCapture', {
-        //   subType: selectedType,
-        //   refreshGallery: handleRefreshGallery,
-        // });
-      }
-
-      return;
-    }
-
-    // ImagePicker.openCamera(CAMERA_OPTION_COMPRESS)
-    //   .then((image) => {
-    //     manageImage(image);
-    //   })
-    //   .catch(() => {
-    //     Toast.show('Picture not capture', Toast.LONG, ['UIAlertController']);
-    //   });
-  }, [selectedType, images, closeImageSheet, navigate, handleRefreshGallery]);
 
   const generateImagePathIOS = useCallback(
     (photo?: ImageType) => {
-      setReportIdImage(undefined);
-      setConditionPhotoSubtype(selectedType!);
       if (groupedImages[selectedType!]?.some((x: any) => x.is_overview)) {
         navigate(RoutesNavigation.PhotoDetailCondition, {
           photo: photo?.data!,
@@ -196,19 +155,32 @@ export const ConditionSides = () => {
         const image = {uri: photo?.path, base64: photo?.data, data: ''};
         navigate(RoutesNavigation.ZoomScreen, {
           photo: image,
-          // refreshGallery: (() => {}).bind(this),
         });
-        // navigate('ZoomScreen', {
-        //   photo,
-        //   refreshGallery: getImages.bind(this),
-        //   subType: props.route.params.subType
-        //     ? props.route.params.subType
-        //     : null,
-        // });
       }
     },
     [selectedType, groupedImages, conditionPhotoType, navigate],
   );
+
+  // ---------- Tomar foto ----------
+  const initCamera = useCallback(() => {
+    if (!selectedType) {
+      return;
+    }
+    if (Platform.OS === 'ios') {
+      closeImageSheet();
+      const hasOverview = images.some(
+        (x: any) => x.subtype === selectedType && x.is_overview,
+      );
+      if (hasOverview) {
+        navigate(RoutesNavigation.PhotoCaptureZoom);
+      } else {
+        navigate(RoutesNavigation.PhotoCapture);
+      }
+    } else {
+      // @ts-ignore
+      onLaunchCamera(closeSheet, generateImagePathIOS);
+    }
+  }, [selectedType, images, generateImagePathIOS]);
 
   const closeSheet = useCallback(() => {
     if (refCallSheet.current) {
@@ -223,13 +195,12 @@ export const ConditionSides = () => {
   }, [generateImagePathIOS]);
 
   // ---------- Abrir sheet para nuevo tipo ----------
-  const takeNewPhoto = useCallback(
-    (type: ConditionPhotoSideSubtype) => {
-      setSelectedType(type);
-      openImageSheet();
-    },
-    [openImageSheet],
-  );
+  const takeNewPhoto = useCallback((type: ConditionPhotoSideSubtype) => {
+    setReportIdImage(undefined);
+    setConditionPhotoSubtype(type);
+    setSelectedType(type);
+    openImageSheet();
+  }, []);
 
   const getImageSide = useCallback(
     (subtype: ConditionPhotoSideSubtype) => {

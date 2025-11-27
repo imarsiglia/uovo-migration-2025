@@ -6,6 +6,7 @@ import {ImageType} from '@generalTypes/general';
 import {Skia, ImageFormat as SkiaImageFormat} from '@shopify/react-native-skia';
 import RNFS from 'react-native-fs';
 import {Platform} from 'react-native';
+import {PhotoFile} from 'react-native-vision-camera';
 
 const PHOTO_DIR = `${RNFS.CachesDirectoryPath}/photos`;
 
@@ -230,4 +231,27 @@ export async function uriToBase64(
     return b64;
   } finally {
   }
+}
+
+type UriBase64 = {uri: string; base64: string};
+
+export async function photoFileToUriBase64(
+  photo: PhotoFile,
+): Promise<UriBase64> {
+  if (!photo.path) {
+    throw new Error('PhotoFile no tiene path');
+  }
+
+  // VisionCamera guarda algo tipo: /data/user/0/tu.app/cache/mrousavy123.jpg
+  // Para <Image /> casi siempre necesitas el prefijo file://
+  const filePath = photo.path.startsWith('file://')
+    ? photo.path.replace('file://', '')
+    : photo.path;
+
+  const uri = `file://${filePath}`;
+
+  // RNFS.readFile espera la ruta sin file://
+  const base64 = await RNFS.readFile(filePath, 'base64');
+
+  return {uri, base64};
 }

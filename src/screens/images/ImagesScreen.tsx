@@ -195,9 +195,10 @@ export const ImagesScreen = () => {
 
   const visualizePhotos = useCallback(
     (item: TaskImageType) => {
-      navigate(RoutesNavigation.TaskPhotoCarouselScreen, {
+      navigate(RoutesNavigation.TaskPhotoViewerScreen, {
         photos: item.photos,
         groupRev: item.update_time,
+        initialIndex: 0,
       });
     },
     [navigate],

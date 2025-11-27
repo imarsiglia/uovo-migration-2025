@@ -110,12 +110,14 @@ export const SpeechFormContext = forwardRef<SpeechFormInputRef, Props>(
 
     const handlePress = async () => {
       const hasPermission = await requestMicrophonePermission();
-      if (!hasPermission) return;
+      if (!hasPermission) {
+        return;
+      }
 
       try {
         if (!listening) {
-          await setRecognitionLanguage(locale);
-          await startListening();
+          // await setRecognitionLanguage(locale);
+          startListening();
           // setListening(true) lo hará el evento START
         } else {
           manuallyStoppedRef.current = true;

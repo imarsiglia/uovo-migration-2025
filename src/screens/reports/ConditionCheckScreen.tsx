@@ -1,21 +1,14 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react';
-import { Platform, ScrollView, StyleSheet } from 'react-native';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {Keyboard, Platform, ScrollView, StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
-// import {useFocusEffect} from '@react-navigation/native';
-import { QUERY_KEYS } from '@api/contants/constants';
+import {QUERY_KEYS} from '@api/contants/constants';
 import {
   DEFAULT_PERSISTENCE_CONFIG,
   useGetArtists,
   useGetArtTypes,
   useGetPlacesConditionReport,
 } from '@api/hooks/HooksGeneralServices';
-import { useGetJobInventory } from '@api/hooks/HooksInventoryServices';
+import {useGetJobInventory} from '@api/hooks/HooksInventoryServices';
 import {
   useGetConditionCheckbyInventory,
   useGetResumeConditionCheck,
@@ -37,53 +30,54 @@ import {
   JobInventoryType,
   ReportResumeType,
 } from '@api/types/Inventory';
-import { Paginated } from '@api/types/Response';
-import { CustomAutocomplete } from '@components/commons/autocomplete/CustomAutocomplete';
+import {Paginated} from '@api/types/Response';
+import {CustomAutocomplete} from '@components/commons/autocomplete/CustomAutocomplete';
 import {
   ImageOptionSheet,
   RBSheetRef,
 } from '@components/commons/bottomsheets/ImageOptionSheet';
-import { BackButton } from '@components/commons/buttons/BackButton';
-import { ButtonPhotosCount } from '@components/commons/buttons/ButtonPhotosCount';
-import { RoundedButtonProps } from '@components/commons/buttons/RoundedButton';
-import { AutocompleteContext } from '@components/commons/form/AutocompleteContext';
-import { BasicFormProvider } from '@components/commons/form/BasicFormProvider';
-import { BottomSheetSelectInputContext } from '@components/commons/form/BottomSheetSelectInputContext';
+import {BackButton} from '@components/commons/buttons/BackButton';
+import {ButtonPhotosCount} from '@components/commons/buttons/ButtonPhotosCount';
+import {RoundedButtonProps} from '@components/commons/buttons/RoundedButton';
+import {AutocompleteContext} from '@components/commons/form/AutocompleteContext';
+import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
+import {BottomSheetSelectInputContext} from '@components/commons/form/BottomSheetSelectInputContext';
 import {
   ButtonSubmit,
   findFirstError,
 } from '@components/commons/form/ButtonSubmit';
-import { InputTextContext } from '@components/commons/form/InputTextContext';
-import { GeneralLoading } from '@components/commons/loading/GeneralLoading';
-import { Label } from '@components/commons/text/Label';
+import {InputTextContext} from '@components/commons/form/InputTextContext';
+import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
+import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import { Wrapper } from '@components/commons/wrappers/Wrapper';
-import { offlineUpdateConditionCheck } from '@features/conditionCheck/offline';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {offlineUpdateConditionCheck} from '@features/conditionCheck/offline';
 import {
   ConditionCheckSchema,
   ConditionCheckSchemaType,
 } from '@generalTypes/schemas';
-import { useCustomNavigation } from '@hooks/useCustomNavigation';
-import { useOnline } from '@hooks/useOnline';
-import { useRefreshIndicator } from '@hooks/useRefreshIndicator';
-import { useUpsertObjectCache } from '@hooks/useToolsReactQueryCache';
-import { RootStackParamList, RoutesNavigation } from '@navigation/types';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { loadingWrapperPromise } from '@store/actions';
-import { useAuth } from '@store/auth';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {useOnline} from '@hooks/useOnline';
+import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {useUpsertObjectCache} from '@hooks/useToolsReactQueryCache';
+import {RootStackParamList, RoutesNavigation} from '@navigation/types';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {loadingWrapperPromise} from '@store/actions';
+import {useAuth} from '@store/auth';
 import useConditionStore from '@store/condition';
 import useInventoryStore from '@store/inventory';
 import useTopSheetStore from '@store/topsheet';
-import { COLORS } from '@styles/colors';
-import { GLOBAL_STYLES } from '@styles/globalStyles';
-import { useQueryClient } from '@tanstack/react-query';
-import { generateUUID, getFormattedDate } from '@utils/functions';
-import { onSelectImage } from '@utils/image';
-import { showErrorToastMessage, showToastMessage } from '@utils/toast';
+import {COLORS} from '@styles/colors';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {useQueryClient} from '@tanstack/react-query';
+import {generateUUID, getFormattedDate} from '@utils/functions';
+import {onLaunchCamera, onSelectImage} from '@utils/image';
+import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import isEqual from 'lodash.isequal';
-import { useFormContext, useWatch } from 'react-hook-form';
-import { AutocompleteDropdownItem } from 'react-native-autocomplete-dropdown';
-import type { Image as ImageType } from 'react-native-image-crop-picker';
+import {useFormContext, useWatch} from 'react-hook-form';
+import {AutocompleteDropdownItem} from 'react-native-autocomplete-dropdown';
+import type {Image as ImageType} from 'react-native-image-crop-picker';
+import {SpeechFormContext} from '@components/commons/form/SpeechFormContext';
 // import OfflineValidation from '../components/offline/OfflineValidation';
 
 var offlineInventory = {};
@@ -221,9 +215,9 @@ export const ConditionCheckScreen = (props: Props) => {
     };
   }, []);
 
-  const initAll = async () => {
-    // await initOfflineInventory();
-  };
+  // const initAll = async () => {
+  //   await initOfflineInventory();
+  // };
 
   const currentItem = useMemo(() => {
     if (receivedReport || currentInventoryItem) {
@@ -295,17 +289,10 @@ export const ConditionCheckScreen = (props: Props) => {
   }, []);
 
   const goToDetails = () => {
+    Keyboard.dismiss();
     setConditionPhotoType(CONDITION_PHOTO_SIDE_TYPE.Details);
     setConditionPhotoSubtype(undefined);
     navigate(RoutesNavigation.GalleryCondition);
-    // Keyboard.dismiss();
-    // if (item.id) {
-    //   props.dispatch(ActionsConditionReport.copyReportType('sides'));
-    //   props.dispatch(ActionsConditionReport.copyReportInventory(item.id));
-    //   navigate('ConditionSides', { type: 'sides', idInventory: item.id });
-    // } else {
-    //   Alert.alert('You must select an item');
-    // }
   };
 
   const closeAll = (exceptIndex: number) => {
@@ -446,16 +433,11 @@ export const ConditionCheckScreen = (props: Props) => {
         obj_data: conditionReportJson?.obj_data,
       });
 
-      // 🔹 Lista actual de ConditionCheck
       const list = conditionCheckList?.data ?? [];
-
-      // 🔹 Posición del item (si ya existe) según el id_job_inventory actual
       const existingIndex = list.findIndex(
         (x) => x.id_job_inventory == currentItem?.id,
       );
       const existingItem = existingIndex >= 0 ? list[existingIndex] : undefined;
-
-      // 🔹 Nuevo item para el upsert
       const newItem = {
         client_ref: currentItem?.clientRef!,
         id_inventory:
@@ -468,10 +450,6 @@ export const ConditionCheckScreen = (props: Props) => {
         unmanaged: false,
         unmanaged_name: '',
       };
-
-      // 🔹 Construir nueva lista:
-      //    - si ya existe → reemplazar en la misma posición
-      //    - si no existe → agregar al final
       const newData =
         existingIndex >= 0
           ? list.map((it, idx) => (idx === existingIndex ? newItem : it))
@@ -562,6 +540,7 @@ export const ConditionCheckScreen = (props: Props) => {
 
   const onSubmit = useCallback(
     (props: ConditionCheckSchemaType) => {
+      Keyboard.dismiss();
       if (props) {
         if (online) {
           loadingWrapperPromise(
@@ -602,7 +581,8 @@ export const ConditionCheckScreen = (props: Props) => {
   );
 
   const AutoSaveConditionCheck = () => {
-    const formData = useWatch<ConditionCheckSchemaType>(); // valores del formulario
+    const formData = useWatch<ConditionCheckSchemaType>();
+    const {formState} = useFormContext<ConditionCheckSchemaType>();
     // @ts-ignore
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const firstRun = useRef(true);
@@ -610,41 +590,57 @@ export const ConditionCheckScreen = (props: Props) => {
     const [saving, setSaving] = useState(false);
     const isMountedRef = useRef(true);
 
+    // 👇 nuevo: el autosave solo se activa después de unos segundos
+    const [autosaveReady, setAutosaveReady] = useState(false);
+
     useEffect(() => {
+      const readyTimeout = setTimeout(() => {
+        if (isMountedRef.current) {
+          setAutosaveReady(true);
+        }
+      }, 4000); // Esperamos 4s después de entrar a la pantalla
+
       return () => {
         isMountedRef.current = false;
-        if (timerRef.current) clearTimeout(timerRef.current);
+        if (timerRef.current) {
+          clearTimeout(timerRef.current);
+        }
+        clearTimeout(readyTimeout);
       };
     }, []);
 
     useEffect(() => {
-      // evito ejecutar al montar (cuando useWatch dispara por default con los valores iniciales)
-      if (firstRun.current) {
-        firstRun.current = false;
-        // opcional: actualizar lastSavedRef con los datos iniciales si quieres evitar guardarlos inmediatamente
-        // lastSavedRef.current = formData ? { ...formData } : null;
+      // 💡 Si aún no está habilitado el autosave, no hacemos nada
+      if (!autosaveReady) {
         return;
       }
 
-      // no autosave si no hay item seleccionado
+      // Primera pasada después de estar listo -> no autosavear todavía
+      if (firstRun.current) {
+        firstRun.current = false;
+        return;
+      }
+
       if (!currentItem?.id) return;
 
-      // si no hay cambios respecto al último guardado, no programo nada
+      // 💡 Solo si el usuario realmente tocó algo del formulario
+      if (!formState.isDirty) {
+        return;
+      }
+
+      // Si lo que hay es igual a lo último guardado, no hacemos nada
       if (lastSavedRef.current && isEqual(lastSavedRef.current, formData)) {
         return;
       }
 
-      // limpio timeout anterior
       if (timerRef.current) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
       }
 
-      // programo el autosave
-      timerRef.current = setTimeout(async () => {
-        // otra comprobación por seguridad
+      timerRef.current = setTimeout(() => {
         if (!isMountedRef.current) return;
-        // otra vez: si no hay cambios, no guardamos
+
         if (lastSavedRef.current && isEqual(lastSavedRef.current, formData)) {
           return;
         }
@@ -652,22 +648,20 @@ export const ConditionCheckScreen = (props: Props) => {
         try {
           setSaving(true);
           if (online) {
-            // Esperamos la promesa y guardamos. saveAsync viene de tu scope superior.
-            const res = await saveAsync(formData as ConditionCheckSchemaType);
-            if (res) {
-              if (autosaveInitial) {
-                // sólo actualizamos lastSavedRef si save fue exitoso
-                lastSavedRef.current = formData
-                  ? JSON.parse(JSON.stringify(formData))
-                  : null;
-                // refrescamos datos y otros efectos
-                refetchAll();
-                hardRefreshMany();
-                refetch();
-              } else {
-                autosaveInitial = true;
+            saveAsync(formData as ConditionCheckSchemaType).then((res) => {
+              if (res) {
+                if (autosaveInitial) {
+                  lastSavedRef.current = formData
+                    ? JSON.parse(JSON.stringify(formData))
+                    : null;
+                  refetchAll();
+                  hardRefreshMany();
+                  refetch();
+                } else {
+                  autosaveInitial = true;
+                }
               }
-            }
+            });
           } else {
             saveReportOffline(formData as ConditionCheckSchemaType);
           }
@@ -678,7 +672,6 @@ export const ConditionCheckScreen = (props: Props) => {
       }, delay);
 
       return () => {
-        // limpieza cada vez que formData cambia antes del timeout
         if (timerRef.current) {
           clearTimeout(timerRef.current);
           timerRef.current = null;
@@ -686,6 +679,8 @@ export const ConditionCheckScreen = (props: Props) => {
       };
     }, [
       formData,
+      formState.isDirty,
+      autosaveReady,
       currentItem?.id,
       saveAsync,
       refetchAll,
@@ -697,7 +692,6 @@ export const ConditionCheckScreen = (props: Props) => {
     return null;
   };
 
-  // cada vez que selecciona un item nuevo se detiene el autosave
   useEffect(() => {
     autosaveInitial = false;
     setRenderForm(false);
@@ -709,11 +703,8 @@ export const ConditionCheckScreen = (props: Props) => {
   }, [currentItem?.id]);
 
   const generateImagePathIOS = useCallback((photo?: ImageType) => {
-    setReportIdImage(undefined);
     navigate(RoutesNavigation.PhotoDetailCondition, {
       photo: photo?.data!,
-      refresh: true,
-      updateRefreshGallery: false,
     });
   }, []);
 
@@ -723,9 +714,18 @@ export const ConditionCheckScreen = (props: Props) => {
     onSelectImage(closeSheet, generateImagePathIOS);
   }, [generateImagePathIOS]);
 
-  const initCamera = useCallback(() => {}, []);
+  const initCamera = useCallback(() => {
+    if (Platform.OS == 'ios') {
+      closeSheet();
+      navigate(RoutesNavigation.PhotoCaptureZoom);
+    } else {
+      // @ts-ignore
+      onLaunchCamera(closeSheet, generateImagePathIOS);
+    }
+  }, [generateImagePathIOS]);
 
   const takeNewPhoto = useCallback(() => {
+    setReportIdImage(undefined);
     if (refCallSheet.current) {
       refCallSheet.current.open();
     }
@@ -741,12 +741,11 @@ export const ConditionCheckScreen = (props: Props) => {
     async (type: ConditionPhotoSideType) => {
       setConditionPhotoSubtype(undefined);
       setConditionPhotoType(type);
-
+      Keyboard.dismiss();
       if (
         !initialConditionReport?.id_job_inventory &&
         !currentInventoryItem?.id
       ) {
-        console.log('return');
         return;
       }
 
@@ -766,33 +765,23 @@ export const ConditionCheckScreen = (props: Props) => {
 
       try {
         let res: ConditionPhotoType[] | undefined;
-
-        // 1. Si NO hay internet → solo leer caché
         if (!online) {
           res = queryClient.getQueryData<ConditionPhotoType[]>(queryKey) ?? [];
         } else {
-          // 2. Si hay internet → usar fetchQuery (leer server + actualizar caché)
-          res = await queryClient.fetchQuery<ConditionPhotoType[]>({
-            queryKey,
-            queryFn: () => reportServices.getPhotosCondition(queryKeyPayload),
-            ...DEFAULT_PERSISTENCE_CONFIG,
-          });
+          res = await reportServices.getPhotosCondition(queryKeyPayload);
+          queryClient.setQueryData(queryKey, res);
         }
 
         setIsLoading(false);
 
         if (res && res.length > 0) {
-          // Última foto (la más reciente)
           checkOverview(res[res.length - 1]);
         } else {
-          // No hay nada en caché ni en server → tomar nueva foto
           takeNewPhoto();
         }
       } catch (e) {
         console.log('goToGallery error:', e);
         setIsLoading(false);
-
-        // 3. Fallback: si falló el fetch, intento leer caché igual
         const cached =
           queryClient.getQueryData<ConditionPhotoType[]>([
             QUERY_KEYS.PHOTOS_CONDITION,
@@ -843,14 +832,14 @@ export const ConditionCheckScreen = (props: Props) => {
         style={{flex: 1}}
         keyboardDismissMode="on-drag"
         nestedScrollEnabled={true}
-        keyboardShouldPersistTaps="handled"
+        keyboardShouldPersistTaps="always"
         contentContainerStyle={[
           {
             paddingTop: 20,
           },
           styles.lateralPadding,
         ]}>
-        {!receivedReport?.id_job_inventory && (
+        {!receivedReport?.id_job_inventory && !receivedItem?.id && (
           <CustomAutocomplete
             key={'item'}
             onOpenSuggestionsList={(isOpen) => isOpen && closeAll(0)}
@@ -995,7 +984,8 @@ export const ConditionCheckScreen = (props: Props) => {
             frame_length: initialConditionReport?.frame_length,
             frame_width: initialConditionReport?.frame_width,
 
-            conditionArtWork: initialConditionReport?.condition_artwork,
+            overalConditionArtwork:
+              initialConditionReport?.overal_condition_artwork,
           }}>
           {renderForm && (
             <>
@@ -1246,7 +1236,7 @@ export const ConditionCheckScreen = (props: Props) => {
               <Wrapper style={styles.blankSpace}></Wrapper>
               <Label style={[styles.title]}>Overall condition of artwork</Label>
               <InputTextContext
-                currentId="conditionArtWork"
+                currentId="overalConditionArtwork"
                 style={styles.inputTextArea}
                 multiline={true}
                 maxLength={50000}
@@ -1255,16 +1245,11 @@ export const ConditionCheckScreen = (props: Props) => {
                 style={[GLOBAL_STYLES.row, styles.containerOptionsCondition]}>
                 {
                   <Wrapper>
-                    {/* <VoiceRecorder
+                    <SpeechFormContext
                       ref={refVoiceCondArt}
-                      onSpeechResults={e => setConditionOfArtwork(e)}
-                    /> */}
+                      name="overalConditionArtwork"
+                    />
                   </Wrapper>
-                }
-
-                {
-                  //Grammar check
-                  <Wrapper></Wrapper>
                 }
               </Wrapper>
 
@@ -1389,7 +1374,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: '#959595',
     color: '#3C424A',
-    opacity: 0.7,
+    // opacity: 0.7,
     paddingLeft: 10,
     paddingRight: 10,
     height: 120,

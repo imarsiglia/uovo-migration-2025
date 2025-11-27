@@ -1,25 +1,32 @@
 import React, {useCallback} from 'react';
 import {View} from 'react-native';
 import CameraScreenVC from '@components/condition/Camera';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {RoutesNavigation} from '@navigation/types';
+import {uriToBase64} from '@utils/image';
+import {PhotoFile} from 'react-native-vision-camera';
 
-const PhotoCaptureZoomEdit = React.memo(function PhotoCapture({
-  navigation: {navigate, goBack},
-  route: {params},
-}: any) {
-  const onCapture = useCallback(
-    async ({photo}: any) => {
-      // const base64Compressed = await compressImageDefault(photo.base64);
-      params.updatePhoto(photo.base64);
-      goBack();
-    },
-    [navigate],
-  );
+const PhotoCaptureZoomEdit = () => {
+  const {navigate, replaceScreen, goBackAndUpdate, goBackToIndex} =
+    useCustomNavigation();
+
+  const onCapture = useCallback(async ({photo}: {photo: PhotoFile}) => {
+    const base64 = await uriToBase64(photo.path);
+    navigate(
+      RoutesNavigation.PhotoDetailCondition,
+      {editedImage: base64},
+      {
+        merge: true,
+        pop: true,
+      },
+    );
+  }, []);
 
   return (
     <View style={{flex: 1}}>
       <CameraScreenVC onCapture={onCapture} />
     </View>
   );
-});
+};
 
 export default PhotoCaptureZoomEdit;

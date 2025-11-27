@@ -1,4 +1,4 @@
-import React, {useMemo, useRef, useCallback} from 'react';
+import React, {useMemo, useRef, useCallback, useEffect} from 'react';
 import {
   Animated,
   StyleSheet,
@@ -8,7 +8,6 @@ import {
   type ViewStyle,
 } from 'react-native';
 import {
-  Gesture,
   PanGestureHandler,
   State,
   type PanGestureHandlerGestureEvent,
@@ -20,12 +19,8 @@ import {getFakeAreaStyles, NOTE_AREA} from './helpers';
 import useConditionStore from '@store/condition';
 import {StickyNoteTranslation, StickyNoteType} from '@api/types/Condition';
 
-// ⛔️ Redux removido. Si necesitas estado global, inyecta callbacks de zustand por props.
-
 export type StickyNoteProps = {
   note: StickyNoteType;
-
-  // Callbacks del padre
   onStickyNoteDragged?: (args: {
     note: StickyNoteType;
     translation: StickyNoteTranslation;
@@ -34,9 +29,7 @@ export type StickyNoteProps = {
   onZoomButtonPress?: (n: StickyNoteType) => void;
   onEditPosition?: (n: StickyNoteType) => void;
   onDeleteNote?: (n: StickyNoteType) => void;
-  // Estilo extra opcional
   containerStyle?: StyleProp<ViewStyle>;
-
   onCancel?: (idNote: number) => void;
   onFinishAreaEdit?: ({
     note,
@@ -48,7 +41,6 @@ export type StickyNoteProps = {
   onExpand?: (photo?: any) => void;
   onRetake?: () => void;
   onEdit?: (note: StickyNoteType) => void;
-
   headerHeight?: number;
 };
 
@@ -67,7 +59,7 @@ const StickyNote: React.FC<StickyNoteProps> = ({
   );
   const copyNote = useConditionStore((d) => d.setCopyNote);
 
-  // Animated values iniciales desde el estado persistido (si existe)
+  // Inicializar Animated.Values en 0 (como en el ClassComponent)
   const translateX = useRef(
     new Animated.Value(note?.stickyNoteTranslation?.translationX ?? 0),
   ).current;
@@ -76,76 +68,120 @@ const StickyNote: React.FC<StickyNoteProps> = ({
   ).current;
 
   const lastOffset = useRef({x: 0, y: 0});
+  const lastNativeEventRef =
+    useRef<PanGestureHandlerGestureEvent['nativeEvent']>();
+
+  // Ref para tracking de la posición actual durante el gesto
   const translationRef = useRef<StickyNoteTranslation>({
-    translationX: note?.stickyNoteTranslation?.translationX ?? 0,
-    translationY: note?.stickyNoteTranslation?.translationY ?? 0,
+    translationX: 0,
+    translationY: 0,
     absoluteX: note?.stickyNoteTranslation?.absoluteX ?? 0,
     absoluteY: note?.stickyNoteTranslation?.absoluteY ?? 0,
   });
 
+  // Configurar offset inicial solo una vez al montar
+  useEffect(() => {
+    const initialX = note?.stickyNoteTranslation?.translationX ?? 0;
+    const initialY = note?.stickyNoteTranslation?.translationY ?? 0;
+
+    translateX.setOffset(initialX);
+    translateY.setOffset(initialY);
+    lastOffset.current = {x: initialX, y: initialY};
+
+    translationRef.current = {
+      translationX: initialX,
+      translationY: initialY,
+      absoluteX: note?.stickyNoteTranslation?.absoluteX ?? 0,
+      absoluteY: note?.stickyNoteTranslation?.absoluteY ?? 0,
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // const onGestureEvent = useRef(
+  //   Animated.event<PanGestureHandlerGestureEvent['nativeEvent']>(
+  //     [
+  //       {
+  //         nativeEvent: {
+  //           translationX: translateX,
+  //           translationY: translateY,
+  //         },
+  //       },
+  //     ],
+  //     {
+  //       useNativeDriver: true,
+  //       listener: (e: PanGestureHandlerGestureEvent) => {
+  //         // Calcular posición total: offset acumulado + delta del gesto actual
+  //         translationRef.current = {
+  //           ...translationRef.current,
+  //           translationX: lastOffset.current.x + e.nativeEvent.translationX,
+  //           translationY: lastOffset.current.y + e.nativeEvent.translationY,
+  //         };
+  //       },
+  //     },
+  //   ),
+  // ).current;
+
   const onGestureEvent = useRef(
-    Animated.event<PanGestureHandlerGestureEvent['nativeEvent']>(
-      [
-        {
-          nativeEvent: {
-            translationX: translateX,
-            translationY: translateY,
-          },
-        },
-      ],
+  Animated.event(
+    [
       {
-        useNativeDriver: true,
-        listener: (e: PanGestureHandlerGestureEvent) => {
-          translationRef.current = {
-            ...translationRef.current,
-            translationX:
-              // @ts-ignore
-              e.nativeEvent.translationX +
-                (translateX as any).__getOffset?.() ?? 0,
-            translationY:
-              // @ts-ignore
-              e.nativeEvent.translationY +
-                (translateY as any).__getOffset?.() ?? 0,
-          };
+        nativeEvent: {
+          translationX: translateX,
+          translationY: translateY,
         },
       },
-    ),
-  ).current;
+    ],
+    {
+      useNativeDriver: true,
+      listener: ({nativeEvent}) => {
+        // Igual que this._translation = nativeEvent
+        lastNativeEventRef.current = nativeEvent;
+      },
+    },
+  ),
+).current;
 
   const onHandlerStateChange = useCallback(
-    (event: PanGestureHandlerStateChangeEvent) => {
-      const {nativeEvent} = event;
-      if (nativeEvent.oldState === State.ACTIVE) {
-        lastOffset.current.x += nativeEvent.translationX;
-        lastOffset.current.y += nativeEvent.translationY;
+  (event: PanGestureHandlerStateChangeEvent) => {
+    const {nativeEvent} = event;
+    if (nativeEvent.oldState === State.ACTIVE) {
+      lastOffset.current.x += nativeEvent.translationX;
+      lastOffset.current.y += nativeEvent.translationY;
 
-        translateX.setOffset(lastOffset.current.x);
-        translateX.setValue(0);
-        translateY.setOffset(lastOffset.current.y);
-        translateY.setValue(0);
+      translateX.setOffset(lastOffset.current.x);
+      translateX.setValue(0);
+      translateY.setOffset(lastOffset.current.y);
+      translateY.setValue(0);
 
-        if (onStickyNoteDragged) {
-          onStickyNoteDragged({note, translation: translationRef.current});
-        }
+      if (onStickyNoteDragged && lastNativeEventRef.current) {
+        const {translationX, translationY, absoluteX, absoluteY} =
+          lastNativeEventRef.current;
+
+        onStickyNoteDragged({
+          note,
+          translation: {
+            translationX,
+            translationY,
+            absoluteX,
+            absoluteY,
+          },
+        });
       }
-    },
-    [note, onStickyNoteDragged, translateX, translateY],
-  );
+    }
+  },
+  [note, onStickyNoteDragged, translateX, translateY],
+);
 
-  // Abrir modal de edición (antes usaba withModal + redux; ahora useModal + props opcionales para zustand)
   const onEdit = useCallback(() => {
     const editModalFunction = () => {
       openModal('EditModal', {
         onSave,
         onZoomButtonPress,
         note,
-        // Estos dos eran acciones redux; ahora déjalos conectados a tu store de zustand si los pasas por props:
         copyEditModalFunction,
         copyNote,
       });
     };
 
-    // Simular comportamiento previo: guardar nota/función en store global si llega por props
     copyNote(note);
     copyEditModalFunction(editModalFunction);
     editModalFunction();
@@ -162,10 +198,7 @@ const StickyNote: React.FC<StickyNoteProps> = ({
     openModal('EditDeleteModal', {onEditPosition, onDeleteNote, note});
   }, [note, onDeleteNote, onEditPosition, openModal]);
 
-  // Estilos calculados (área visual de la nota)
   const calculatedStyles = useMemo(() => getFakeAreaStyles(note), [note]);
-  const width = note?.width ?? NOTE_AREA;
-  const stickyNotePosition = width / 2 - 10; // (no se usa, lo conservo por si fuera necesario)
 
   return (
     <View style={[styles.fakeArea, calculatedStyles, containerStyle]}>

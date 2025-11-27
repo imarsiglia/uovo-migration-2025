@@ -15,6 +15,10 @@ import {BooleanNumberType} from '@generalTypes/general';
 import {ImageType} from '@generalTypes/images';
 import {Base64ImageCarouselProps} from '@screens/commons/BaseImageScreen';
 import {TaskPhotoCarouselType} from '@screens/commons/TaskPhotoCarouselScreen';
+import type {
+  CropRect,
+  Image as ImageTypePicker,
+} from 'react-native-image-crop-picker';
 
 // 👉 Constantes reutilizables (sin strings mágicos)
 export const RoutesNavigation = {
@@ -41,6 +45,7 @@ export const RoutesNavigation = {
   WoAttachment: 'WoAttachment',
   BaseImageScreen: 'BaseImageScreen',
   TaskPhotoCarouselScreen: 'TaskPhotoCarouselScreen',
+  TaskPhotoViewerScreen: 'TaskPhotoViewerScreen',
   EditPieceCount: 'EditPieceCount',
   LaborReport: 'LaborReport',
   AddLaborReport: 'AddLaborReport',
@@ -57,6 +62,8 @@ export const RoutesNavigation = {
   GalleryCondition: 'GalleryCondition',
   PhotoDetailCondition: 'PhotoDetailCondition',
   PhotoCaptureZoomEdit: 'PhotoCaptureZoomEdit',
+  PhotoCaptureZoom: 'PhotoCaptureZoom',
+  PhotoCapture: 'PhotoCapture',
   ZoomScreen: 'ZoomScreen',
   ConditionSides: 'ConditionSides',
 } as const;
@@ -127,6 +134,7 @@ export type RootStackParamList = {
     | undefined;
   [RoutesNavigation.BaseImageScreen]: Base64ImageCarouselProps;
   [RoutesNavigation.TaskPhotoCarouselScreen]: TaskPhotoCarouselType;
+  [RoutesNavigation.TaskPhotoViewerScreen]: TaskPhotoCarouselType;
   [RoutesNavigation.WoAttachment]: undefined;
   [RoutesNavigation.EditPieceCount]: undefined;
   [RoutesNavigation.LaborReport]: undefined;
@@ -180,11 +188,29 @@ export type RootStackParamList = {
     updateRefreshGallery?: boolean;
     subType?: string;
     item?: ConditionPhotoType;
+    editedImage?: string;
   };
   [RoutesNavigation.PhotoCaptureZoomEdit]: undefined;
+  [RoutesNavigation.PhotoCaptureZoom]: undefined;
+  [RoutesNavigation.PhotoCapture]: undefined;
+
   [RoutesNavigation.ZoomScreen]: {
     photo?: {
-      uri?: string;
+      uri?: string | undefined;
+      base64?: string | null | undefined;
+      data?: string;
+      cropRect?: CropRect | null | undefined;
+      path?: string | undefined;
+      size?: number | undefined;
+      width?: number | undefined;
+      height?: number | undefined;
+      mime?: string | undefined;
+      exif?: any;
+      localIdentifier?: string;
+      sourceURL?: string;
+      filename?: string;
+      creationDate?: string;
+      modificationDate?: string;
     };
     subType?: string | null;
     item?: ConditionPhotoType;

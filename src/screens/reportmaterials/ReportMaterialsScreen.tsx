@@ -166,13 +166,13 @@ export const ReportMaterialsScreen = () => {
             </Wrapper>
           </PressableOpacity>
 
-          <Wrapper style={{flexDirection: 'row'}}>
+          {/* <Wrapper style={{flexDirection: 'row'}}>
             <PressableOpacity
               onPress={() => navigate(RoutesNavigation.SaveReportMaterials)}
               style={styles.btnOptTopSend}>
               <Label style={{color: 'white'}}>Send</Label>
             </PressableOpacity>
-          </Wrapper>
+          </Wrapper> */}
         </Wrapper>
 
         <Wrapper

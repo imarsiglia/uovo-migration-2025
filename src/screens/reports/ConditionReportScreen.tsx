@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Platform, ScrollView, StyleSheet} from 'react-native';
+import {Keyboard, Platform, ScrollView, StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 // import {useFocusEffect} from '@react-navigation/native';
 import {
@@ -75,6 +75,7 @@ import {useUpsertObjectCache} from '@hooks/useToolsReactQueryCache';
 import {Paginated} from '@api/types/Response';
 import {ConditionReportByInventory} from '@api/services/reportServices';
 import {PreSubmitButton} from './ConditionCheckScreen';
+import {SpeechFormContext} from '@components/commons/form/SpeechFormContext';
 // import OfflineValidation from '../components/offline/OfflineValidation';
 
 let autosaveInitial = false;
@@ -285,16 +286,9 @@ export const ConditionReportScreen = (props: Props) => {
   );
 
   const goToSides = () => {
+    Keyboard.dismiss();
     setConditionPhotoType('sides');
     navigate(RoutesNavigation.ConditionSides);
-    // Keyboard.dismiss();
-    // if (item.id) {
-    //   props.dispatch(ActionsConditionReport.copyReportType('sides'));
-    //   props.dispatch(ActionsConditionReport.copyReportInventory(item.id));
-    //   navigate('ConditionSides', { type: 'sides', idInventory: item.id });
-    // } else {
-    //   Alert.alert('You must select an item');
-    // }
   };
 
   const closeAll = (exceptIndex: number) => {
@@ -514,17 +508,11 @@ export const ConditionReportScreen = (props: Props) => {
         total: conditionReportJson?.total,
         obj_data: conditionReportJson?.obj_data,
       });
-
-      // 🔹 Lista actual completa
       const list = conditionReportList?.data ?? [];
-
-      // 🔹 Posición del item (si ya existe)
       const existingIndex = list.findIndex(
         (x) => x.id_job_inventory == currentItem?.id,
       );
       const existingItem = existingIndex >= 0 ? list[existingIndex] : undefined;
-
-      // 🔹 Nuevo item (lo que quieres insertar / actualizar)
       const newItem = {
         client_ref: currentItem?.clientRef!,
         id_inventory:
@@ -536,10 +524,6 @@ export const ConditionReportScreen = (props: Props) => {
         unmanaged: false,
         unmanaged_name: '',
       };
-
-      // 🔹 Construir la nueva lista:
-      //    - si ya existe → reemplazar en la misma posición
-      //    - si no existe → agregar al final
       const newData =
         existingIndex >= 0
           ? list.map((it, idx) => (idx === existingIndex ? newItem : it))
@@ -667,31 +651,19 @@ export const ConditionReportScreen = (props: Props) => {
     }, []);
 
     useEffect(() => {
-      // evito ejecutar al montar (cuando useWatch dispara por default con los valores iniciales)
       if (firstRun.current) {
         firstRun.current = false;
-        // opcional: actualizar lastSavedRef con los datos iniciales si quieres evitar guardarlos inmediatamente
-        // lastSavedRef.current = formData ? { ...formData } : null;
         return;
       }
-
-      // no autosave si no hay item seleccionado
       if (!currentItem?.id) return;
-
-      // si no hay cambios respecto al último guardado, no programo nada
       if (lastSavedRef.current && isEqual(lastSavedRef.current, formData)) {
         return;
       }
-
-      // limpio timeout anterior
       if (timerRef.current) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
       }
-
-      // programo el autosave
-      timerRef.current = setTimeout(async () => {
-        // otra comprobación por seguridad
+      timerRef.current = setTimeout(() => {
         if (!isMountedRef.current) return;
         // otra vez: si no hay cambios, no guardamos
         if (lastSavedRef.current && isEqual(lastSavedRef.current, formData)) {
@@ -702,24 +674,22 @@ export const ConditionReportScreen = (props: Props) => {
           setSaving(true);
           if (online) {
             // Esperamos la promesa y guardamos. saveAsync viene de tu scope superior.
-            const res = await saveAsync(
-              formData as ConditionReportSchemaType,
-              'true',
+            saveAsync(formData as ConditionReportSchemaType, 'true').then(
+              (res) => {
+                if (res) {
+                  if (autosaveInitial) {
+                    lastSavedRef.current = formData
+                      ? JSON.parse(JSON.stringify(formData))
+                      : null;
+                    refetchAll();
+                    hardRefreshMany();
+                    refetch();
+                  } else {
+                    autosaveInitial = true;
+                  }
+                }
+              },
             );
-            if (res) {
-              if (autosaveInitial) {
-                // sólo actualizamos lastSavedRef si save fue exitoso
-                lastSavedRef.current = formData
-                  ? JSON.parse(JSON.stringify(formData))
-                  : null;
-                // refrescamos datos y otros efectos
-                refetchAll();
-                hardRefreshMany();
-                refetch();
-              } else {
-                autosaveInitial = true;
-              }
-            }
           } else {
             saveReportOffline(formData as ConditionReportSchemaType, 'true');
           }
@@ -730,7 +700,6 @@ export const ConditionReportScreen = (props: Props) => {
       }, delay);
 
       return () => {
-        // limpieza cada vez que formData cambia antes del timeout
         if (timerRef.current) {
           clearTimeout(timerRef.current);
           timerRef.current = null;
@@ -749,7 +718,6 @@ export const ConditionReportScreen = (props: Props) => {
     return null;
   };
 
-  // cada vez que selecciona un item nuevo se detiene el autosave
   useEffect(() => {
     autosaveInitial = false;
     setRenderForm(false);
@@ -790,7 +758,7 @@ export const ConditionReportScreen = (props: Props) => {
           },
           styles.lateralPadding,
         ]}>
-        {!receivedReport?.id_job_inventory && (
+        {!receivedReport?.id_job_inventory && !receivedItem?.id && (
           <CustomAutocomplete
             key={'item'}
             onOpenSuggestionsList={(isOpen) => isOpen && closeAll(0)}
@@ -1298,10 +1266,10 @@ export const ConditionReportScreen = (props: Props) => {
                 style={[GLOBAL_STYLES.row, styles.containerOptionsCondition]}>
                 {
                   <Wrapper>
-                    {/* <VoiceRecorder
+                    <SpeechFormContext
                       ref={refVoiceCondArt}
-                      onSpeechResults={e => setConditionOfArtwork(e)}
-                    /> */}
+                      name="conditionArtWork"
+                    />
                   </Wrapper>
                 }
 
@@ -1486,7 +1454,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: '#959595',
     color: '#3C424A',
-    opacity: 0.7,
+    // opacity: 0.7,
     paddingLeft: 10,
     paddingRight: 10,
     height: 120,
@@ -1681,46 +1649,3 @@ const OtherPackingDetailContext = ({name}: DependantContextProps) => {
     )
   );
 };
-
-type ButtonPhotosCountProps = {
-  title: string;
-  total: number;
-  onPress: () => void;
-};
-
-const ButtonPhotosCount = ({title, onPress, total}: ButtonPhotosCountProps) => (
-  <PressableOpacity
-    style={[GLOBAL_STYLES.row, styles.btnTakePhoto]}
-    onPress={onPress}>
-    <Wrapper
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 5,
-      }}>
-      <Label style={styles.textTakePhoto}>{title}</Label>
-      {/* <OfflineValidation
-                      idJob={jobDetail.id}
-                      offline={[
-                        DELETE_CREPORT_IMAGE_DETAIL_OFFLINE_VALIDATION,
-                        REPORT_CONDITION_IMAGE_DETAIL_OFFLINE_VALIDATION[
-                        'conditionreport'
-                        ],
-                      ]}
-                      idInventory={item?.id}
-                      reportType={'details'}
-                      conditionType={'conditionreport'}
-                    /> */}
-    </Wrapper>
-    <Wrapper style={[GLOBAL_STYLES.row, styles.containerCountCamera]}>
-      <Wrapper style={styles.countTakePhoto}>
-        <Label style={styles.numberCount} allowFontScaling={false}>
-          {total}
-        </Label>
-      </Wrapper>
-      <Wrapper style={styles.viewCamera}>
-        <Icon name="camera" type="solid" color="white" size={25} />
-      </Wrapper>
-    </Wrapper>
-  </PressableOpacity>
-);

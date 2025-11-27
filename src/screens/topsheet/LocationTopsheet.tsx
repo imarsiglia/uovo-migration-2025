@@ -38,7 +38,11 @@ import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {formatAddress, openInMaps} from '@utils/functions';
 import {requestAccessFineLocationAndroid} from '@utils/permissions';
 import {showToastMessage} from '@utils/toast';
-import { ReportLocationProblem } from '@components/topheet/ReportLocationProblem';
+import {ReportLocationProblem} from '@components/topheet/ReportLocationProblem';
+import {
+  MapAppBottomSheet,
+  MapAppBottomSheetRef,
+} from '@components/commons/bottomsheets/MapAppBottomSheet';
 
 const INITIAL_DELTAS = {
   latitudeDelta: 0.015,
@@ -46,6 +50,8 @@ const INITIAL_DELTAS = {
 };
 
 export const LocationTopsheet = () => {
+  const mapAppBottomSheetRef = useRef<MapAppBottomSheetRef>(null);
+
   const [currentPosition, setCurrentPosition] = useState<
     {latitude: number; longitude: number} | undefined
   >();
@@ -175,12 +181,35 @@ export const LocationTopsheet = () => {
       showToastMessage('Selected address is not valid');
       return;
     }
-    openDirectionsChooser(
-      {lat: coordinate.latitude, lng: coordinate.longitude},
-      formattedAddress,
-      CANDIDATES_IOS,
-    );
-  }, [hasValidAddress, coordinate, typeAddress, formattedAddress]);
+
+    if (Platform.OS === 'ios') {
+      // iOS: Bottom sheet custom
+      mapAppBottomSheetRef.current?.open({
+        lat: coordinate.latitude,
+        lng: coordinate.longitude,
+        label: formattedAddress,
+      });
+    } else {
+      // Android: Chooser nativo (tu código actual)
+      openDirectionsChooser(
+        {lat: coordinate.latitude, lng: coordinate.longitude},
+        formattedAddress,
+        CANDIDATES_IOS,
+      );
+    }
+  }, [hasValidAddress, coordinate, formattedAddress]);
+
+  // const showNavigationApps = useCallback(() => {
+  //   if (!hasValidAddress || !coordinate) {
+  //     showToastMessage('Selected address is not valid');
+  //     return;
+  //   }
+  //   openDirectionsChooser(
+  //     {lat: coordinate.latitude, lng: coordinate.longitude},
+  //     formattedAddress,
+  //     CANDIDATES_IOS,
+  //   );
+  // }, [hasValidAddress, coordinate, typeAddress, formattedAddress]);
 
   const openNavigation = useCallback(() => {
     if (!estimatedTime || !jobDetail) {
@@ -535,6 +564,15 @@ export const LocationTopsheet = () => {
           </Wrapper>
         </Wrapper>
       </Animated.View>
+
+      {Platform.OS === 'ios' && (
+        <MapAppBottomSheet
+          ref={mapAppBottomSheetRef}
+          title="Open location with"
+          // message="Select the app you want to use"
+          height={240}
+        />
+      )}
     </ScrollView>
   );
 };

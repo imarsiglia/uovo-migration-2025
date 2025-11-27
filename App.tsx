@@ -9,7 +9,7 @@ import {AppNavigation} from './src/navigation/AppNavigation';
 import AppProviders from '@providers/AppProviders';
 import {ModalDialog} from '@components/commons/modals/ModalDialog';
 import {ModalLoading} from '@components/commons/modals/ModalLoading';
-import {PortalHost} from '@gorhom/portal';
+// import {PortalHost} from '@gorhom/portal';
 
 // import EditDeleteModal from './src/components/conditionReport/EditDeleteModal';
 // import EditModal from './src/components/conditionReport/EditModal';

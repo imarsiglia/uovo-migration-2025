@@ -27,10 +27,10 @@ import useConditionStore from '@store/condition';
 import {useModalDialogStore} from '@store/modals';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {onSelectImage} from '@utils/image';
+import {onLaunchCamera, onSelectImage} from '@utils/image';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import {useCallback, useEffect, useMemo, useRef} from 'react';
-import {FlatList, ImageBackground, StyleSheet} from 'react-native';
+import {FlatList, ImageBackground, Platform, StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 import type {Image as ImageType} from 'react-native-image-crop-picker';
 import {offlineDeleteConditionPhoto} from '@features/conditionReport/offline';
@@ -109,6 +109,7 @@ export const GalleryCondition = (props: Props) => {
   }, [isSuccess, photos]);
 
   const takeNewPhoto = useCallback(() => {
+    setReportIdImage(undefined);
     if (refCallSheet.current) {
       refCallSheet.current.open();
     }
@@ -133,7 +134,6 @@ export const GalleryCondition = (props: Props) => {
 
   const generateImagePathIOS = useCallback(
     (photo?: ImageType) => {
-      setReportIdImage(undefined);
       if (
         photos?.some((x) => x.is_overview) ||
         conditionPhotoType == CONDITION_PHOTO_SIDE_TYPE.Details
@@ -144,7 +144,12 @@ export const GalleryCondition = (props: Props) => {
           updateRefreshGallery: false,
         });
       } else {
-        const image = {uri: photo?.path, base64: photo?.data, data: ''};
+        const image = {
+          ...photo,
+          uri: photo?.path,
+          base64: photo?.data,
+          data: '',
+        };
         navigate(RoutesNavigation.ZoomScreen, {
           photo: image,
           // refreshGallery: (() => {}).bind(this),
@@ -167,7 +172,36 @@ export const GalleryCondition = (props: Props) => {
     }
   }, []);
 
-  const initCamera = useCallback(() => {}, []);
+  const initCamera = useCallback(() => {
+    if (Platform.OS == 'ios') {
+      closeSheet();
+      if (
+        photos.some((x) => x.is_overview) ||
+        conditionPhotoType == 'details'
+      ) {
+        navigate(
+          RoutesNavigation.PhotoCaptureZoom,
+          //  {
+          // note: null,
+          // refresh: true,
+          // refreshGallery: getImages.bind(this),
+          // subType: props.route.params.type,
+          // }
+        );
+      } else {
+        navigate(
+          RoutesNavigation.PhotoCapture,
+          //  {
+          // subType: props.route.params.subType,
+          // refreshGallery: getImages.bind(this),
+          // }
+        );
+      }
+    } else {
+      // @ts-ignore
+      onLaunchCamera(closeSheet, generateImagePathIOS);
+    }
+  }, [generateImagePathIOS]);
 
   const initGallery = useCallback(() => {
     // @ts-ignore

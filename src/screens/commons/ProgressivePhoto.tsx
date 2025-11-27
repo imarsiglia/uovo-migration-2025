@@ -1,5 +1,5 @@
 // components/ProgressivePhoto.tsx
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Animated as RNAnimated,
   Image,
@@ -125,6 +125,27 @@ export const ProgressivePhoto: React.FC<Props> = ({
   // Pan solo cuando hay zoom (estado JS para habilitar Pan gesture)
   const [panEnabled, setPanEnabled] = useState(false);
 
+  // Centraliza cuándo hay zoom activo y sincroniza pan + callback al padre
+  const updateZoomActive = useCallback(
+    (active: boolean) => {
+      setPanEnabled(active);
+      onZoomActiveChange?.(active);
+    },
+    [onZoomActiveChange],
+  );
+
+  // Mantiene en JS el estado de zoom activo y sincroniza panEnabled + callback al padre
+  const zoomCallbackRef = useRef(onZoomActiveChange);
+
+  useEffect(() => {
+    zoomCallbackRef.current = onZoomActiveChange;
+  }, [onZoomActiveChange]);
+
+  const setZoomActiveFromUI = useCallback((active: boolean) => {
+    setPanEnabled(active);
+    zoomCallbackRef.current?.(active);
+  }, []);
+
   // Reset de transformaciones cuando cambia la imagen/versión
   const depKey = useMemo(
     () =>
@@ -142,8 +163,8 @@ export const ProgressivePhoto: React.FC<Props> = ({
     scale.value = 1;
     translateX.value = 0;
     translateY.value = 0;
-    setPanEnabled(false);
-    onZoomActiveChange?.(false);
+    // y marcamos que NO hay zoom activo
+    updateZoomActive(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [depKey]);
 
@@ -156,25 +177,21 @@ export const ProgressivePhoto: React.FC<Props> = ({
     'worklet';
     // Aproximación: imagen ocupa el contenedor en "contain";
     // este bound es seguro y evita arrastrar fuera de la pantalla.
-    const maxX = Math.max(0, ((containerW.value * s) - containerW.value) / 2);
-    const maxY = Math.max(0, ((containerH.value * s) - containerH.value) / 2);
+    const maxX = Math.max(0, (containerW.value * s - containerW.value) / 2);
+    const maxY = Math.max(0, (containerH.value * s - containerH.value) / 2);
     return {maxX, maxY};
   };
-
-  // Notifica si hay zoom activo y conmuta panEnabled
-  useDerivedValue(() => {
-    const active = scale.value > 1.01;
-    if (onZoomActiveChange) runOnJS(onZoomActiveChange)(active);
-    runOnJS(setPanEnabled)(active);
-  }, [scale]);
 
   // Pinch
   const pinch = Gesture.Pinch()
     .enabled(zoomEnabled)
     .onStart(() => {
+      'worklet';
       savedScale.value = scale.value;
       savedTX.value = translateX.value;
       savedTY.value = translateY.value;
+      // En cuanto empieza un pinch, asumimos que hay zoom activo
+      runOnJS(updateZoomActive)(true);
     })
     .onUpdate((e) => {
       'worklet';
@@ -196,14 +213,18 @@ export const ProgressivePhoto: React.FC<Props> = ({
     })
     .onEnd(() => {
       'worklet';
-      // Snap a 1 si quedó casi en 1 → ayuda a reactivar swipe del carrusel
-      if (scale.value < 1.02) {
+      // Decidimos estado final del zoom
+      const currentScale = scale.value;
+
+      if (currentScale < 1.02) {
+        // Consideramos “sin zoom” y reseteamos
         scale.value = withTiming(1, {duration: 120});
         translateX.value = withTiming(0, {duration: 120});
         translateY.value = withTiming(0, {duration: 120});
+        runOnJS(updateZoomActive)(false);
       } else {
-        // Asegurar que no quede fuera de límites
-        const b = bounds(scale.value);
+        // Sigue habiendo zoom
+        const b = bounds(currentScale);
         translateX.value = withTiming(
           clamp(translateX.value, -b.maxX, b.maxX),
           {duration: 120},
@@ -212,6 +233,7 @@ export const ProgressivePhoto: React.FC<Props> = ({
           clamp(translateY.value, -b.maxY, b.maxY),
           {duration: 120},
         );
+        runOnJS(updateZoomActive)(true);
       }
     });
 
@@ -258,6 +280,8 @@ export const ProgressivePhoto: React.FC<Props> = ({
         scale.value = withTiming(1, {duration: 160});
         translateX.value = withTiming(0, {duration: 160});
         translateY.value = withTiming(0, {duration: 160});
+        // Aquí marcamos explícitamente “sin zoom”
+        runOnJS(updateZoomActive)(false);
         return;
       }
 
@@ -279,7 +303,9 @@ export const ProgressivePhoto: React.FC<Props> = ({
       translateY.value = withTiming(clamp(nextTY, -b.maxY, b.maxY), {
         duration: 160,
       });
-      // panEnabled se actualiza vía useDerivedValue
+
+      // Aquí marcamos explícitamente “zoom activo”
+      runOnJS(updateZoomActive)(true);
     });
 
   if (externalScrollRef) {

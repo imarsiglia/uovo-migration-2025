@@ -96,6 +96,11 @@ const TaskPhotoCarouselScreen = (props: Props) => {
     prefetch(photos[index - 1]);
   }, [index, photos, groupRev, qc]);
 
+  const handleZoomActiveChange = useCallback(
+    (active: boolean) => setScrollEnabled(!active),
+    [],
+  );
+
   const renderItem = useCallback(
     ({item, index: i}: {item: TaskPhotoType; index: number}) => (
       <Wrapper
@@ -107,8 +112,8 @@ const TaskPhotoCarouselScreen = (props: Props) => {
           visible={i === index}
           contentFit={contentFit}
           groupRev={groupRev}
-          externalScrollRef={listRef}            // 👈 permite simultaneidad de gestos
-          onZoomActiveChange={(active) => setScrollEnabled(!active)} // 👈
+          externalScrollRef={listRef}
+          onZoomActiveChange={handleZoomActiveChange}
         />
       </Wrapper>
     ),

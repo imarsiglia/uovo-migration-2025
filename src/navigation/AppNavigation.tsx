@@ -110,6 +110,9 @@ import {COLORS} from '@styles/colors';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {BackButton} from '@components/commons/buttons/BackButton';
 import {ConditionSides} from '@screens/reports/photos/ConditionSidesScreen';
+import PhotoCapture from '@screens/reports/photos/PhotoCapture';
+import PhotoCaptureZoom from '@screens/reports/photos/PhotoCaptureZoom';
+import TaskPhotoViewerScreen from '@screens/commons/TaskPhotoViewerScreen';
 
 // LogBox.ignoreLogs([
 //   'Non-serializable values were found in the navigation state',
@@ -357,6 +360,16 @@ export const AppNavigation = () => {
               options={{headerShown: true}}
             />
             <Stack.Screen
+              name={RoutesNavigation.PhotoCaptureZoom}
+              component={PhotoCaptureZoom}
+              options={{headerShown: true}}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.PhotoCapture}
+              component={PhotoCapture}
+              options={{headerShown: true}}
+            />
+            <Stack.Screen
               name={RoutesNavigation.ConditionSides}
               component={ConditionSides}
             />
@@ -369,6 +382,10 @@ export const AppNavigation = () => {
             <Stack.Screen
               name={RoutesNavigation.TaskPhotoCarouselScreen}
               component={TaskPhotoCarouselScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.TaskPhotoViewerScreen}
+              component={TaskPhotoViewerScreen}
             />
           </Stack.Navigator>
           <ModalDialog />

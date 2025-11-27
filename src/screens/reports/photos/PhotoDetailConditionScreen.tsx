@@ -51,7 +51,7 @@ import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {useQueryClient} from '@tanstack/react-query';
 import {generateUUID} from '@utils/functions';
-import {onSelectImage} from '@utils/image';
+import {onLaunchCamera, onSelectImage} from '@utils/image';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Keyboard, Platform, StyleSheet} from 'react-native';
@@ -142,6 +142,12 @@ export const PhotoDetailCondition = (props: Props) => {
     };
   }, [editModalFunction, note]);
 
+  useEffect(() => {
+    if (props.route.params?.editedImage) {
+      setImage(props.route.params.editedImage);
+    }
+  }, [props.route.params?.editedImage]);
+
   const closeSheet = useCallback(() => {
     if (refCallSheet.current) {
       refCallSheet.current.close();
@@ -157,11 +163,10 @@ export const PhotoDetailCondition = (props: Props) => {
 
   const initCamera = useCallback(() => {
     if (Platform.OS == 'ios') {
-      // @ts-ignore
-      navigate(RoutesNavigation.PhotoCaptureZoomEdit, {
-        edit: true,
-        updatePhoto: setImage.bind(this),
-      });
+      closeSheet();
+      navigate(RoutesNavigation.PhotoCaptureZoomEdit);
+    } else {
+      onLaunchCamera(closeSheet, (img) => manageImage(img as ImageType));
     }
   }, [navigate, setImage]);
 

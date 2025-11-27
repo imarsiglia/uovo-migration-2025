@@ -2,17 +2,22 @@ import CameraScreenVC from '@components/condition/Camera';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {RoutesNavigation} from '@navigation/types';
 import {uriToBase64} from '@utils/image';
-import {useCallback, useEffect} from 'react';
+import {useCallback} from 'react';
 import {View} from 'react-native';
 import {PhotoFile} from 'react-native-vision-camera';
 
-const PhotoCaptureZoom = () => {
+const PhotoCapture = () => {
   const {replaceScreen} = useCustomNavigation();
 
   const onCapture = useCallback(async ({photo}: {photo: PhotoFile}) => {
     const base64 = await uriToBase64(photo.path);
-    replaceScreen(RoutesNavigation.PhotoDetailCondition, {
-      photo: base64,
+    replaceScreen(RoutesNavigation.ZoomScreen, {
+      photo: {
+        ...photo,
+        uri: photo.path,
+        base64: base64.replace(/\s+/g, ''),
+        data: '',
+      },
     });
   }, []);
 
@@ -22,4 +27,5 @@ const PhotoCaptureZoom = () => {
     </View>
   );
 };
-export default PhotoCaptureZoom;
+
+export default PhotoCapture;

@@ -2749,7 +2749,7 @@ PODS:
     - RNFBApp
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.28.0):
+  - RNGestureHandler (2.29.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -3260,6 +3260,12 @@ PODS:
   - SocketRocket (0.7.1)
   - Toast (4.1.1)
   - TOCropViewController (2.7.4)
+  - VisionCamera (4.7.2):
+    - VisionCamera/Core (= 4.7.2)
+    - VisionCamera/React (= 4.7.2)
+  - VisionCamera/Core (4.7.2)
+  - VisionCamera/React (4.7.2):
+    - React-Core
   - VoiceToText (0.3.2):
     - boost
     - DoubleConversion
@@ -3396,6 +3402,7 @@ DEPENDENCIES:
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - SocketRocket (~> 0.7.1)
+  - VisionCamera (from `../node_modules/react-native-vision-camera`)
   - "VoiceToText (from `../node_modules/@ascendtis/react-native-voice-to-text`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -3626,6 +3633,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-svg"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
+  VisionCamera:
+    :path: "../node_modules/react-native-vision-camera"
   VoiceToText:
     :path: "../node_modules/@ascendtis/react-native-voice-to-text"
   Yoga:
@@ -3740,7 +3749,7 @@ SPEC CHECKSUMS:
   RNFBApp: 8579526ddddaa6f93669d7393a7e9d090990c259
   RNFBAuth: 1069d86051f9396a81f91124819d461c1ac2fc1c
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
-  RNGestureHandler: a52292df4f8fc7daab354ad2c37be401d4c3bed8
+  RNGestureHandler: d02f35d6340a788d67d859598c37cb580126d42d
   RNGoogleSignin: 0f9deae0357018403a3c34b367456dee09c95b2c
   RNImageCropPicker: 7fae017f7f9e7a002ccd82f67175e6eaf31cbe31
   RNLocalize: 7a74b29785cd0bc55514c1faba75cf59351838e1
@@ -3753,6 +3762,7 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Toast: 1f5ea13423a1e6674c4abdac5be53587ae481c4e
   TOCropViewController: 80b8985ad794298fb69d3341de183f33d1853654
+  VisionCamera: 30b358b807324c692064f78385e9a732ce1bebfe
   VoiceToText: a6969eb1b4f4ba0395eb501bf9795c51287f2a67
   Yoga: ce248fb32065c9b00451491b06607f1c25b2f1ed
 

@@ -116,6 +116,7 @@ export type ConditionReportType = {
   unpacked_weight: string;
   weight?: string;
   year: string;
+  overal_condition_artwork?: string;
 
   // offline
   clientId?: string;

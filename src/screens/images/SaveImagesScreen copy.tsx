@@ -586,7 +586,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: '#959595',
     color: '#3C424A',
-    opacity: 0.7,
+    // opacity: 0.7,
     paddingLeft: 10,
     paddingRight: 10,
     height: 80,

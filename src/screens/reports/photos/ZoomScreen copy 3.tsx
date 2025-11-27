@@ -33,9 +33,8 @@ import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {useOnline} from '@hooks/useOnline';
 import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
 import {useUpsertArrayCache} from '@hooks/useToolsReactQueryCache';
-import {RootStackParamList, RoutesNavigation} from '@navigation/types';
+import {RoutesNavigation} from '@navigation/types';
 import {CommonActions} from '@react-navigation/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {SpeedDial} from '@rneui/themed';
 import {loadingWrapperPromise} from '@store/actions';
 import useConditionStore from '@store/condition';
@@ -135,8 +134,8 @@ const height_ratioRef = {current: 0.0};
 const ratioRef = {current: 0.0};
 const newHeightRef = {current: 0.0};
 
-type Props = NativeStackScreenProps<RootStackParamList, 'ZoomScreen'>;
-const ZoomScreen = (props: Props) => {
+// ======= Functional de ZoomScreenClass =======
+const ZoomScreen = (props: any) => {
   const zoomRef = useRef<any>(null);
   const refCallSheet = useRef<RBSheetRef>(null);
   const mainImageTransformsRef = useRef<any>(null);
@@ -265,10 +264,6 @@ const ZoomScreen = (props: Props) => {
   );
 
   const [state, setState] = useState<any>(() => getInitialState(props));
-  const stateRef = useRef(state);
-  useEffect(() => {
-    stateRef.current = state;
-  }, [state]);
 
   useEffect(() => {
     if (conditionOverview?.idJob) {
@@ -331,6 +326,7 @@ const ZoomScreen = (props: Props) => {
       originalImageWidthRef.current = params.photo.width;
       originalImageHeightRef.current = params.photo.height;
     }
+
     // reset zoom
     zoomRef.current?.reset?.();
     zoomRef.current?.panResponderReleaseResolve?.();
@@ -339,9 +335,9 @@ const ZoomScreen = (props: Props) => {
     return () => {
       zoomRef.current?.reset?.();
       zoomRef.current?.panResponderReleaseResolve?.();
-      // if (refreshGalleryRef.current && params?.refreshGallery) {
-      //   params.refreshGallery();
-      // }
+      if (refreshGalleryRef.current && params?.refreshGallery) {
+        params.refreshGallery();
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
@@ -405,7 +401,6 @@ const ZoomScreen = (props: Props) => {
     var newNotes: any[] = [];
 
     conditionOverview?.data?.notes?.map((element: any) => {
-      // CÓDIGO ORIGINAL: transformar notas de otros dispositivos
       var elWidth = element.width;
       var elHeight = element.height;
 
@@ -482,10 +477,9 @@ const ZoomScreen = (props: Props) => {
           Keyboard.dismiss();
         }, 500);
       } else {
-        initNewHeight();
-        // if (!(params && params.edit)) {
-        //   initNewHeight();
-        // }
+        if (!(params && params.edit)) {
+          initNewHeight();
+        }
       }
     }
   }, [
@@ -499,6 +493,8 @@ const ZoomScreen = (props: Props) => {
     initNewHeight,
   ]);
 
+  console.log("state.notes")
+  console.log(state.notes);
   // ======= handlers =======
   const _onPhotoPress = useCallback(
     (event: any) => {
@@ -636,89 +632,13 @@ const ZoomScreen = (props: Props) => {
     return photo;
   }, [conditionOverview, params]);
 
-  const getOriginalImageDimensions = useCallback(async () => {
-    // Si ya están inicializadas, retornarlas
-    if (
-      originalImageWidthRef.current > 0 &&
-      originalImageHeightRef.current > 0
-    ) {
-      return {
-        width: originalImageWidthRef.current,
-        height: originalImageHeightRef.current,
-      };
-    }
-
-    // Si vienen de params
-    if (params?.photo?.width && params?.photo?.height) {
-      originalImageWidthRef.current = params.photo.width;
-      originalImageHeightRef.current = params.photo.height;
-      return {
-        width: params.photo.width,
-        height: params.photo.height,
-      };
-    }
-
-    // Si hay que obtenerlas de la imagen
-    const photo = state.photoSource;
-    if (photo?.uri) {
-      return new Promise((resolve) => {
-        Image.getSize(
-          photo.uri,
-          (width, height) => {
-            originalImageWidthRef.current = width;
-            originalImageHeightRef.current = height;
-            resolve({width, height});
-          },
-          (error) => {
-            console.error('Error getting image size:', error);
-            // Fallback a dimensiones de pantalla
-            resolve({width: dimensionsWidth, height: dimensionsHeight});
-          },
-        );
-      });
-    }
-
-    // Fallback
-    return {width: dimensionsWidth, height: dimensionsHeight};
-  }, [params, state.photoSource]);
-
   const _handleFAB = useCallback(
     async (buttonName: string) => {
-      // setM({fabOpen: false});
+      setM({fabOpen: false});
       const {notes: stateNotes, activeNoteId} = state;
 
       if (buttonName === 'save') {
         refreshGalleryRef.current = false;
-
-        // NUEVO: Simular un pequeño zoom para forzar el cálculo de dimensiones
-        const currentScale = zoomScaleRef.current;
-        if (currentScale === 1) {
-          // Si no hay zoom, hacer un micro-zoom y regresar
-          const microZoomLocation = {
-            x: dimensionsWidth / 2,
-            y: dimensionsHeight / 2,
-            scale: 1.01, // Zoom casi imperceptible
-            duration: 0,
-          };
-          zoomRef.current?.centerOn?.(microZoomLocation);
-
-          // Esperar que se procese el zoom
-          await new Promise((resolve) => setTimeout(resolve, 50));
-
-          // Regresar a escala 1
-          const resetLocation = {
-            x: dimensionsWidth / 2,
-            y: dimensionsHeight / 2,
-            scale: 1,
-            duration: 0,
-          };
-          zoomRef.current?.centerOn?.(resetLocation);
-
-          // Esperar que se procese el reset
-          await new Promise((resolve) => setTimeout(resolve, 50));
-        }
-
-        // Ahora sí hacer reset normal
         zoomRef.current?.reset?.();
 
         setTimeout(() => {
@@ -726,13 +646,9 @@ const ZoomScreen = (props: Props) => {
         }, 100);
 
         setTimeout(async () => {
-          // Usar SIEMPRE el último estado
-          const latestState = stateRef.current;
-
           setM({loading: true});
           const photo = _getPhoto();
-          const {notes} = latestState;
-
+          const {notes} = state;
           const body: SaveZoomScreenProps = {
             conditionType: conditionType!,
             data: {
@@ -741,7 +657,7 @@ const ZoomScreen = (props: Props) => {
               mainImageTransforms: mainImageTransformsRef.current,
               screen: {
                 width: dimensionsWidth,
-                height: latestState.height,
+                height: state.height,
               },
             },
             idJob: idJob,
@@ -751,7 +667,6 @@ const ZoomScreen = (props: Props) => {
             reportType: conditionPhotoType ?? null,
             reportSubType: conditionPhotoSubtype ?? null,
           };
-
           functSave(online, body);
           return;
         }, 400);
@@ -766,8 +681,14 @@ const ZoomScreen = (props: Props) => {
       } else if (buttonName === 'set') {
         const notes = stateNotes?.reduce((acc: any[], curr: any) => {
           if (activeNoteId === curr.id) {
+            console.log('active note id');
+            console.log(activeNoteId);
             curr.position.scale = zoomScaleRef.current;
             curr.updating = false;
+
+
+            console.log("curr")
+            console.log(curr)
             return [...acc, {...curr, areaSet: true}];
           }
           return [...acc, curr];
@@ -917,22 +838,8 @@ const ZoomScreen = (props: Props) => {
               originalHeight: measure.height,
               screenWidth: dimensionsWidth,
               screenHeight: state.height,
-              // NUEVO: Marcar que esta nota ya está en coordenadas del dispositivo actual
-              isCurrentDevice: true, // <-- AGREGAR ESTO
-              // Guardar dimensiones originales de la imagen para referencia
-              originalScreenWidth: originalImageWidthRef.current,
-              originalScreenHeight: originalImageHeightRef.current,
               areaSet: true,
               updating: false,
-              stickyNoteTranslation: {
-                ...(note.stickyNoteTranslation ?? {}),
-                absoluteX: measure.translation.left,
-                absoluteY: measure.translation.top,
-                x: 0,
-                y: 0,
-                translationX: 0,
-                translationY: 0,
-              },
             },
           ];
         }
