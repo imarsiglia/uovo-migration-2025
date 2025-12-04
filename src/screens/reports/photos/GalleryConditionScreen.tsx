@@ -1,4 +1,4 @@
-import {QUERY_KEYS} from '@api/contants/constants';
+import { QUERY_KEYS } from '@api/contants/constants';
 import {
   useGetPhotosCondition,
   useRemovePhotoCondition,
@@ -12,32 +12,33 @@ import {
   ImageOptionSheet,
   RBSheetRef,
 } from '@components/commons/bottomsheets/ImageOptionSheet';
-import {BackButton} from '@components/commons/buttons/BackButton';
-import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
-import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
-import {Label} from '@components/commons/text/Label';
+import { BackButton } from '@components/commons/buttons/BackButton';
+import { PressableOpacity } from '@components/commons/buttons/PressableOpacity';
+import { GeneralLoading } from '@components/commons/loading/GeneralLoading';
+import { Label } from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import {Wrapper} from '@components/commons/wrappers/Wrapper';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
-import {RootStackParamList, RoutesNavigation} from '@navigation/types';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {loadingWrapperPromise} from '@store/actions';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
+import OfflineValidation from '@components/offline/OfflineValidation';
+import { offlineDeleteConditionPhoto } from '@features/conditionReport/offline';
+import { useCustomNavigation } from '@hooks/useCustomNavigation';
+import { useOnline } from '@hooks/useOnline';
+import { usePhotoSyncIndicator } from '@hooks/usePhotoSyncIndicator';
+import { useRefreshIndicator } from '@hooks/useRefreshIndicator';
+import { useRemoveFromArrayCache } from '@hooks/useToolsReactQueryCache';
+import { RootStackParamList, RoutesNavigation } from '@navigation/types';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { loadingWrapperPromise } from '@store/actions';
 import useConditionStore from '@store/condition';
-import {useModalDialogStore} from '@store/modals';
-import {COLORS} from '@styles/colors';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {onLaunchCamera, onSelectImage} from '@utils/image';
-import {showErrorToastMessage, showToastMessage} from '@utils/toast';
-import {useCallback, useEffect, useMemo, useRef} from 'react';
-import {FlatList, ImageBackground, Platform, StyleSheet} from 'react-native';
-import Icon from 'react-native-fontawesome-pro';
-import type {Image as ImageType} from 'react-native-image-crop-picker';
-import {offlineDeleteConditionPhoto} from '@features/conditionReport/offline';
-import {useOnline} from '@hooks/useOnline';
+import { useModalDialogStore } from '@store/modals';
 import useTopSheetStore from '@store/topsheet';
-import {generateUUID} from '@utils/functions';
-import {useRemoveFromArrayCache} from '@hooks/useToolsReactQueryCache';
+import { COLORS } from '@styles/colors';
+import { GLOBAL_STYLES } from '@styles/globalStyles';
+import { onLaunchCamera, onSelectImage } from '@utils/image';
+import { showErrorToastMessage, showToastMessage } from '@utils/toast';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { FlatList, ImageBackground, Platform, StyleSheet } from 'react-native';
+import Icon from 'react-native-fontawesome-pro';
+import type { Image as ImageType } from 'react-native-image-crop-picker';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'GalleryCondition'>;
 export const GalleryCondition = (props: Props) => {
@@ -52,7 +53,16 @@ export const GalleryCondition = (props: Props) => {
     conditionId,
     setReportIdImage,
     conditionClientId,
+    inventoryId,
   } = useConditionStore();
+
+  const {hasPending: hasOffline} = usePhotoSyncIndicator({
+    idJob,
+    conditionType,
+    idJobInventory: inventoryId,
+    type: conditionPhotoType,
+  });
+
   const showDialog = useModalDialogStore((d) => d.showVisible);
   const {mutateAsync: deleteAsync} = useRemovePhotoCondition();
 
@@ -337,6 +347,7 @@ export const GalleryCondition = (props: Props) => {
             allowFontScaling={false}>
             {CONDITION_PHOTO_SIDE_LABELS[subtype ?? conditionPhotoType!]}
           </Label>
+          <OfflineValidation offline={hasOffline} />
         </Wrapper>
       </Wrapper>
 

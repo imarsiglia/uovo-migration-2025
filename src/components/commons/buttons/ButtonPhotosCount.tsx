@@ -5,14 +5,21 @@ import {Label} from '../text/Label';
 import Icon from 'react-native-fontawesome-pro';
 import {StyleSheet} from 'react-native';
 import {COLORS} from '@styles/colors';
+import OfflineValidation from '@components/offline/OfflineValidation';
 
 type ButtonPhotosCountProps = {
   title: string;
   total: number;
   onPress: () => void;
+  offline?: boolean;
 };
 
-export const ButtonPhotosCount = ({title, total, onPress}: ButtonPhotosCountProps) => {
+export const ButtonPhotosCount = ({
+  title,
+  total,
+  onPress,
+  offline
+}: ButtonPhotosCountProps) => {
   return (
     <PressableOpacity
       style={[
@@ -30,6 +37,7 @@ export const ButtonPhotosCount = ({title, total, onPress}: ButtonPhotosCountProp
           gap: 5,
         }}>
         <Label style={styles.textTakePhoto}>{title}</Label>
+        <OfflineValidation offline={offline} />
         {/* Aquí podrías reactivar validaciones offline específicas
             para ConditionCheck si las necesitas en el futuro */}
       </Wrapper>

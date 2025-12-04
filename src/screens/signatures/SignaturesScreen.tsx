@@ -1,4 +1,4 @@
-import {QUERY_KEYS, SIGNER_TYPES} from '@api/contants/constants';
+import {ENTITY_TYPES, QUERY_KEYS, SIGNER_TYPES} from '@api/contants/constants';
 import {
   useDeleteSignature,
   useGetSignatures,
@@ -17,9 +17,11 @@ import {PendingIcon} from '@components/commons/icons/PendingIcon';
 import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import OfflineValidation from '@components/offline/OfflineValidation';
 import {offlineDeleteSignature} from '@features/signatures/offline';
 import {useOnline} from '@hooks/useOnline';
 import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {useHasPendingSync} from '@hooks/useSyncIndicator';
 import {useRemoveFromArrayCache} from '@hooks/useToolsReactQueryCache';
 import {RoutesNavigation} from '@navigation/types';
 import {useRoute} from '@react-navigation/native';
@@ -57,6 +59,10 @@ export const SignaturesScreen = () => {
 
   const signatureForce = useTopSheetStore((d) => d.signatureForce);
   const setSignatureForce = useTopSheetStore((d) => d.setSignatureForce);
+
+  const hasOffline = useHasPendingSync(ENTITY_TYPES.SIGNATURE, idJob);
+
+  console.log({hasOffline})
 
   const formRef = useRef<BasicFormHandle<PreSaveSignatureSchemaType>>(null);
 
@@ -199,7 +205,7 @@ export const SignaturesScreen = () => {
                 </Label>
                 <Label style={styles.subtitleNotification}>{item.type}</Label>
               </Wrapper>
-              {item._pending && <PendingIcon />}
+              {/* {item._pending && <PendingIcon />} */}
             </PressableOpacity>
             <Wrapper style={GLOBAL_STYLES.row}>
               <PressableOpacity
@@ -256,6 +262,7 @@ export const SignaturesScreen = () => {
               ]}>
               Signature
             </Label>
+            <OfflineValidation offline={hasOffline} />
           </Wrapper>
         </Wrapper>
 

@@ -237,7 +237,7 @@ export const MapAppBottomSheet = forwardRef<
           width: 100,
         },
       }}>
-      <View style={{flex: 1, paddingHorizontal: 20}}>
+      <View style={{flex: 1, paddingHorizontal: 0}}>
         <View style={{marginBottom: 5, marginTop: 10}}>
           <Text style={{fontWeight: 'bold', fontSize: 14}}>{title}</Text>
           {/* {message ? (
@@ -258,7 +258,7 @@ export const MapAppBottomSheet = forwardRef<
               </View>
             ) : (
               availableApps.map((app, i) => (
-                <PressableOpacity
+               <PressableOpacity
                   key={app.id}
                   style={styles.appItem}
                   onPress={() => openMapApp(app)}
@@ -306,14 +306,13 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   row: {
-    // flexDirection: 'row',
-    // alignItems: 'center',
+    flexDirection: 'row',
+    alignItems: "flex-start"
   },
   appItem: {
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 20,
-    // width: 70,
   },
   iconContainer: {
     width: 52,
@@ -327,7 +326,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'contain',
-    // borderRadius: 10
+    borderRadius: 12
   },
   appName: {
     fontSize: 11,

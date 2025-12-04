@@ -1,4 +1,4 @@
-import {QUERY_KEYS} from '@api/contants/constants';
+import {ENTITY_TYPES, QUERY_KEYS} from '@api/contants/constants';
 import {useGetBOLCount, useSaveBOLCount} from '@api/hooks/HooksTaskServices';
 import {BolCountType} from '@api/types/Task';
 import {Icons} from '@assets/icons/icons';
@@ -11,8 +11,10 @@ import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import OfflineValidation from '@components/offline/OfflineValidation';
 import {offlineUpdateBOLCount} from '@features/bolCount/offline';
 import {useOnline} from '@hooks/useOnline';
+import {useHasPendingSync} from '@hooks/useSyncIndicator';
 import {useUpsertObjectCache} from '@hooks/useToolsReactQueryCache';
 import {loadingWrapperPromise} from '@store/actions';
 import useTopSheetStore from '@store/topsheet';
@@ -31,15 +33,16 @@ import {PieceCountSchema, PieceCountSchemaType} from 'src/types/schemas';
 
 export const EditPieceCountScreen = () => {
   const {goBack} = useCustomNavigation();
-  // @ts-ignore
-  const {id: idJob} = useTopSheetStore((d) => d.jobDetail);
+  const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
 
   const {mutateAsync} = useSaveBOLCount();
   const {data, isLoading, refetch} = useGetBOLCount({
     idJob,
   });
-
   const {online} = useOnline();
+
+  const hasOffline = useHasPendingSync(ENTITY_TYPES.BOL_COUNT, idJob);
+
   const upsertPieceCount = useUpsertObjectCache<BolCountType>([
     QUERY_KEYS.BOL_COUNT,
     {idJob},
@@ -125,6 +128,7 @@ export const EditPieceCountScreen = () => {
               ]}>
               Edit BOL
             </Label>
+            <OfflineValidation offline={hasOffline} />
           </Wrapper>
         </Wrapper>
 

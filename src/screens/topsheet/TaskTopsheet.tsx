@@ -1,4 +1,8 @@
-import {PAUSED_STATUS, STARTED_STATUS} from '@api/contants/constants';
+import {
+  ENTITY_TYPES,
+  PAUSED_STATUS,
+  STARTED_STATUS,
+} from '@api/contants/constants';
 import {useGetTaskCount} from '@api/hooks/HooksJobServices';
 import {SendBOLBottomSheet} from '@components/bottomSheets/SendBOLBottomSheet';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
@@ -9,6 +13,7 @@ import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import TaskNoAdd from '@components/topheet/TaskNoAdd';
 import TaskOption from '@components/topheet/TaskOption';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {useHasPendingSync} from '@hooks/useSyncIndicator';
 import {RoutesNavigation} from '@navigation/types';
 import {useRoute} from '@react-navigation/native';
 import useTopSheetStore from '@store/topsheet';
@@ -19,7 +24,6 @@ import Icon from 'react-native-fontawesome-pro';
 
 export const TaskTopsheet = () => {
   const {navigate} = useCustomNavigation();
-  const route = useRoute<any>();
   const jobDetail = useTopSheetStore((d) => d.jobDetail);
   const setToClockout = useTopSheetStore((d) => d.setToClockout);
   const {data: taskCount, isLoading} = useGetTaskCount({idJob: jobDetail?.id!});
@@ -36,19 +40,34 @@ export const TaskTopsheet = () => {
     );
   }, [jobDetail?.current_clock_in]);
 
+  const hasSignaturesOrBOLCount = useHasPendingSync(
+    [ENTITY_TYPES.SIGNATURE, ENTITY_TYPES.BOL_COUNT],
+    jobDetail?.id,
+  );
+  const hasNotes = useHasPendingSync(ENTITY_TYPES.NOTE, jobDetail?.id);
+  const hasImages = useHasPendingSync(ENTITY_TYPES.IMAGE, jobDetail?.id);
+  const hasReportMaterials = useHasPendingSync(
+    [ENTITY_TYPES.REPORT_MATERIALS, ENTITY_TYPES.REPORT_MATERIAL],
+    jobDetail?.id,
+  );
+  const hasReports = useHasPendingSync(
+    [
+      ENTITY_TYPES.CONDITION_REPORT,
+      ENTITY_TYPES.CONDITION_CHECK,
+      ENTITY_TYPES.CONDITION_PHOTO,
+      ENTITY_TYPES.CONDITION_ZOOM_PHOTO,
+    ],
+    jobDetail?.id,
+  );
+
+  const hasBolCount = useHasPendingSync(ENTITY_TYPES.BOL_COUNT, jobDetail?.id);
+
   const goToLaborReport = useCallback(() => {
     if (setToClockout) {
       setToClockout(toClockOut ? 0 : 1);
     }
     navigate(RoutesNavigation.LaborReport);
   }, [setToClockout, navigate, toClockOut]);
-
-  const goToClockIn = useCallback(() => {
-    if (setToClockout) {
-      setToClockout(1);
-      navigate(RoutesNavigation.LaborReport);
-    }
-  }, [setToClockout, navigate]);
 
   if (!jobDetail) {
     return <></>;
@@ -74,7 +93,7 @@ export const TaskTopsheet = () => {
             }
             // onPressRight={() => (jobDetail?.use_bol ? showBOL() : null)}
             disabled={!jobDetail?.use_bol}
-            // offline={[SIGNATURE_OFFLINE_VALIDATION, JOB_BOL_OFFLINE_VALIDATION]}
+            offline={hasSignaturesOrBOLCount}
             idJob={jobDetail.id}
             isMenuRight
             // @ts-ignore
@@ -119,8 +138,8 @@ export const TaskTopsheet = () => {
             quantity={taskCount?.[1]?.quantity}
             onPressLeft={() => navigate(RoutesNavigation.Images)}
             onPressRight={() => navigate(RoutesNavigation.SaveImages)}
-            // offline={[IMAGES_OFFLINE_VALIDATION]}
             idJob={jobDetail?.id!}
+            offline={hasImages}
           />
           <TaskOption
             name={taskCount?.[2]?.description}
@@ -129,8 +148,8 @@ export const TaskTopsheet = () => {
             quantity={taskCount?.[2]?.quantity}
             onPressLeft={() => navigate(RoutesNavigation.Notes)}
             onPressRight={() => navigate(RoutesNavigation.SaveNote)}
-            // offline={[NOTES_OFFLINE_VALIDATION]}
             idJob={jobDetail.id}
+            offline={hasNotes}
           />
           <TaskOption
             name={taskCount?.[3]?.description}
@@ -139,8 +158,8 @@ export const TaskTopsheet = () => {
             quantity={taskCount?.[3]?.quantity}
             onPressLeft={() => navigate(RoutesNavigation.ReportMaterials)}
             onPressRight={() => navigate(RoutesNavigation.SaveReportMaterials)}
-            // offline={[MATERIAL_OFFLINE_VALIDATION]}
             idJob={jobDetail.id}
+            offline={hasReportMaterials}
           />
 
           <CustomDropdown
@@ -213,10 +232,7 @@ export const TaskTopsheet = () => {
             quantity={taskCount?.[4]?.quantity}
             onPress={() => navigate(RoutesNavigation.Reports)}
             idJob={jobDetail.id}
-            // offline={[
-            //   CONDITION_REPORT_OFFLINE_VALIDATION,
-            //   CONDITION_CHECK_OFFLINE_VALIDATION,
-            // ]}
+            offline={hasReports}
           />
 
           {/* {!loadingService && ( */}

@@ -17,7 +17,6 @@ import {
   ImageOptionSheet,
   RBSheetRef,
 } from '@components/commons/bottomsheets/ImageOptionSheet';
-import {BackButton} from '@components/commons/buttons/BackButton';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 import {Label} from '@components/commons/text/Label';
@@ -34,27 +33,19 @@ import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {useOnline} from '@hooks/useOnline';
 import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
 import {useUpsertArrayCache} from '@hooks/useToolsReactQueryCache';
-import {RoutesNavigation} from '@navigation/types';
+import {RootStackParamList, RoutesNavigation} from '@navigation/types';
 import {CommonActions} from '@react-navigation/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {SpeedDial} from '@rneui/themed';
 import {loadingWrapperPromise} from '@store/actions';
 import useConditionStore from '@store/condition';
 import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {useQueryClient} from '@tanstack/react-query';
 import {generateUUID} from '@utils/functions';
 import {onLaunchCamera, onSelectImage} from '@utils/image';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {
-  Alert,
-  Dimensions,
-  Image,
-  Keyboard,
-  Platform,
-  StyleSheet,
-  View,
-} from 'react-native';
+import {Dimensions, Image, Keyboard, Platform, StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 import type {Image as ImageType} from 'react-native-image-crop-picker';
 import ImageZoom from 'react-native-image-pan-zoom';
@@ -144,8 +135,8 @@ const height_ratioRef = {current: 0.0};
 const ratioRef = {current: 0.0};
 const newHeightRef = {current: 0.0};
 
-// ======= Functional de ZoomScreenClass =======
-const ZoomScreen = (props: any) => {
+type Props = NativeStackScreenProps<RootStackParamList, 'ZoomScreen'>;
+const ZoomScreen = (props: Props) => {
   const zoomRef = useRef<any>(null);
   const refCallSheet = useRef<RBSheetRef>(null);
   const mainImageTransformsRef = useRef<any>(null);
@@ -237,7 +228,6 @@ const ZoomScreen = (props: any) => {
         const base64 = conditionOverview.data.photo.base64;
         const base64Image = `data:image/jpeg;base64,${base64}`;
         return {
-          // @ts-ignore
           notes: [],
           helperVisible: true,
           notesVisible: true,
@@ -271,7 +261,7 @@ const ZoomScreen = (props: any) => {
         photoSource: {uri},
       };
     },
-    [conditionOverview, dimensionsHeight],
+    [conditionOverview, uri],
   );
 
   const [state, setState] = useState<any>(() => getInitialState(props));
@@ -314,7 +304,6 @@ const ZoomScreen = (props: any) => {
   );
 
   const initVariables = useCallback(() => {
-    // Estado base (no necesitamos mutar STATE global aquí, mantenemos el state local)
     globalPositionXRef.current = 0;
     globalPositionYRef.current = 0;
     zoomScaleRef.current = 1;
@@ -337,6 +326,11 @@ const ZoomScreen = (props: any) => {
   useEffect(() => {
     initVariables();
 
+    // CRÍTICO: Inicializar dimensiones originales desde params
+    if (params?.photo?.width && params?.photo?.height) {
+      originalImageWidthRef.current = params.photo.width;
+      originalImageHeightRef.current = params.photo.height;
+    }
     // reset zoom
     zoomRef.current?.reset?.();
     zoomRef.current?.panResponderReleaseResolve?.();
@@ -345,9 +339,9 @@ const ZoomScreen = (props: any) => {
     return () => {
       zoomRef.current?.reset?.();
       zoomRef.current?.panResponderReleaseResolve?.();
-      if (refreshGalleryRef.current && params?.refreshGallery) {
-        params.refreshGallery();
-      }
+      // if (refreshGalleryRef.current && params?.refreshGallery) {
+      //   params.refreshGallery();
+      // }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
@@ -380,14 +374,14 @@ const ZoomScreen = (props: any) => {
         setState((s: any) => ({...s, notes}));
       }
     }
-  }, [params, state.notes]);
+  }, [params, state.notes, navigation]);
 
   // ======= initNewHeight =======
   const initNewHeight = useCallback(() => {
-    ratioRef.current = dimensionsWidth / params?.photo?.width;
+    ratioRef.current = dimensionsWidth / (params?.photo?.width || 1);
     newHeightRef.current = dimensionsHeight;
     setM({height: dimensionsHeight});
-  }, [params]);
+  }, [params, setM]);
 
   // ======= postConstruct =======
   const postConstruct = useCallback(() => {
@@ -411,6 +405,7 @@ const ZoomScreen = (props: any) => {
     var newNotes: any[] = [];
 
     conditionOverview?.data?.notes?.map((element: any) => {
+      // CÓDIGO ORIGINAL: transformar notas de otros dispositivos
       var elWidth = element.width;
       var elHeight = element.height;
 
@@ -434,8 +429,6 @@ const ZoomScreen = (props: any) => {
       var nOrigwidth = elOrigWidth * width_ratioRef.current;
       var nOrigheight = elOrigHeight * height_ratioRef.current;
 
-      //element.position.scale = element.position.scale + ((nwidth - elWidth) / elWidth);
-
       element.width = nwidth;
       element.height = nheight;
       element.originalWidth = nOrigwidth;
@@ -458,14 +451,14 @@ const ZoomScreen = (props: any) => {
     });
 
     setM({notes: newNotes, height: newHeightRef.current});
-  }, [conditionOverview]);
+  }, [conditionOverview, setM]);
 
   useEffect(() => {
     if (!isLoading) {
       if (conditionOverview?.idJob) {
         setState(getInitialState(props));
 
-        // tamaños originales
+        // CRÍTICO: Establecer tamaños originales PRIMERO
         originalImageWidthRef.current = conditionOverview.data.screen.width;
         originalImageHeightRef.current = conditionOverview.data.screen.height;
 
@@ -475,11 +468,8 @@ const ZoomScreen = (props: any) => {
             conditionOverview.data.mainImageTransforms;
           mainImageTransformsRef.current = mainImageTransforms;
           const location = {
-            // @ts-ignore
             x: mainImageTransforms?.positionX || 0,
-            // @ts-ignore
             y: mainImageTransforms?.positionY || 0,
-            // @ts-ignore
             scale: mainImageTransforms?.scale || 1,
             duration: 0,
           };
@@ -488,17 +478,26 @@ const ZoomScreen = (props: any) => {
 
         postConstruct();
 
-        // esconder teclado
         setTimeout(() => {
           Keyboard.dismiss();
         }, 500);
       } else {
-        if (!(params && params.edit)) {
-          initNewHeight();
-        }
+        initNewHeight();
+        // if (!(params && params.edit)) {
+        //   initNewHeight();
+        // }
       }
     }
-  }, [props, params, conditionOverview?.idJob, isLoading, isFetching]);
+  }, [
+    props,
+    params,
+    conditionOverview?.idJob,
+    isLoading,
+    isFetching,
+    getInitialState,
+    postConstruct,
+    initNewHeight,
+  ]);
 
   // ======= handlers =======
   const _onPhotoPress = useCallback(
@@ -507,7 +506,6 @@ const ZoomScreen = (props: any) => {
       if (setModeActive && !areaDraggable) {
         const active = state?.notes?.find((n: any) => n.editing);
         if (!active) {
-          //initial click position used to calculate the area
           const position = {
             top: event?.locationY,
             left: event?.locationX,
@@ -571,7 +569,6 @@ const ZoomScreen = (props: any) => {
 
   const _onCancel = useCallback(
     (noteId: number) => {
-      skipNextUpdateNotePositionRef.current = true;
       const notes = state.notes.filter((n: any) => n.id !== noteId);
       setM({notes});
     },
@@ -638,6 +635,52 @@ const ZoomScreen = (props: any) => {
     const photo = params?.photo;
     return photo;
   }, [conditionOverview, params]);
+
+  const getOriginalImageDimensions = useCallback(async () => {
+    // Si ya están inicializadas, retornarlas
+    if (
+      originalImageWidthRef.current > 0 &&
+      originalImageHeightRef.current > 0
+    ) {
+      return {
+        width: originalImageWidthRef.current,
+        height: originalImageHeightRef.current,
+      };
+    }
+
+    // Si vienen de params
+    if (params?.photo?.width && params?.photo?.height) {
+      originalImageWidthRef.current = params.photo.width;
+      originalImageHeightRef.current = params.photo.height;
+      return {
+        width: params.photo.width,
+        height: params.photo.height,
+      };
+    }
+
+    // Si hay que obtenerlas de la imagen
+    const photo = state.photoSource;
+    if (photo?.uri) {
+      return new Promise((resolve) => {
+        Image.getSize(
+          photo.uri,
+          (width, height) => {
+            originalImageWidthRef.current = width;
+            originalImageHeightRef.current = height;
+            resolve({width, height});
+          },
+          (error) => {
+            console.error('Error getting image size:', error);
+            // Fallback a dimensiones de pantalla
+            resolve({width: dimensionsWidth, height: dimensionsHeight});
+          },
+        );
+      });
+    }
+
+    // Fallback
+    return {width: dimensionsWidth, height: dimensionsHeight};
+  }, [params, state.photoSource]);
 
   const _handleFAB = useCallback(
     async (buttonName: string) => {
@@ -809,7 +852,6 @@ const ZoomScreen = (props: any) => {
           id_sticky_note: null,
         });
 
-        // Guardamos en cache
         const detailKey: [string, PhotoConditionOverviewApiProps] = [
           QUERY_KEYS.PHOTO_CONDITION_OVERVIEW,
           item?.id
@@ -835,7 +877,22 @@ const ZoomScreen = (props: any) => {
         goBack();
       }
     },
-    [item?.id, conditionType, conditionClientId, reportIdImage],
+    [
+      item?.id,
+      conditionType,
+      conditionClientId,
+      reportIdImage,
+      saveZoomScreen,
+      refetchAll,
+      refetch,
+      setReportIdImage,
+      goBack,
+      upsertPhoto,
+      conditionPhotoType,
+      item?.subtype,
+      conditionPhotoSubtype,
+      queryClient,
+    ],
   );
 
   const _updateNotePosition = useCallback(
@@ -847,6 +904,7 @@ const ZoomScreen = (props: any) => {
 
       const notes = state.notes.reduce((acc: any[], curr: any) => {
         if (curr.id === note.id) {
+          // CRÍTICO: Guardar el scale actual
           curr.position.scale = zoomScaleRef.current;
           return [
             ...acc,
@@ -859,8 +917,22 @@ const ZoomScreen = (props: any) => {
               originalHeight: measure.height,
               screenWidth: dimensionsWidth,
               screenHeight: state.height,
+              // NUEVO: Marcar que esta nota ya está en coordenadas del dispositivo actual
+              isCurrentDevice: true, // <-- AGREGAR ESTO
+              // Guardar dimensiones originales de la imagen para referencia
+              originalScreenWidth: originalImageWidthRef.current,
+              originalScreenHeight: originalImageHeightRef.current,
               areaSet: true,
               updating: false,
+              stickyNoteTranslation: {
+                ...(note.stickyNoteTranslation ?? {}),
+                absoluteX: measure.translation.left,
+                absoluteY: measure.translation.top,
+                x: 0,
+                y: 0,
+                translationX: 0,
+                translationY: 0,
+              },
             },
           ];
         }
@@ -921,7 +993,7 @@ const ZoomScreen = (props: any) => {
         photo: image.data!,
       });
     },
-    [conditionPhotoType],
+    [navigate],
   );
 
   const initCamera = useCallback(() => {
@@ -942,23 +1014,25 @@ const ZoomScreen = (props: any) => {
   // ======= onMove (igual lógica que class) =======
   const _updateMainImageTransform = useCallback(
     (position: any) => {
-      // Guardamos el scale actual del zoom
       zoomScaleRef.current = position.scale;
 
-      // --- 1. Calcular el tamaño "fitted" de la imagen (como en el class) ---
-      const cropWidth = zoomRef.current?.props?.cropWidth ?? dimensionsWidth;
-      const cropHeight = zoomRef.current?.props?.cropHeight ?? dimensionsHeight;
+      const offset = {
+        x: 0,
+        y: 0,
+      };
+
+      var cropWidth = zoomRef.current?.props?.cropWidth;
+      var cropHeight = zoomRef.current?.props?.cropHeight;
 
       const fittedSize = {width: 0, height: 0};
-
       if (originalImageWidthRef.current > originalImageHeightRef.current) {
-        const ratio = dimensionsWidth / (originalImageWidthRef.current || 1);
+        const ratio = dimensionsWidth / originalImageWidthRef.current;
         fittedSize.width = dimensionsWidth;
         fittedSize.height = originalImageHeightRef.current * ratio;
       } else if (
         originalImageWidthRef.current < originalImageHeightRef.current
       ) {
-        const ratio = dimensionsWidth / (originalImageWidthRef.current || 1);
+        const ratio = dimensionsWidth / originalImageWidthRef.current;
         fittedSize.width = dimensionsWidth;
         fittedSize.height = originalImageHeightRef.current * ratio;
       } else if (
@@ -968,7 +1042,6 @@ const ZoomScreen = (props: any) => {
         fittedSize.height = dimensionsWidth;
       }
 
-      // --- 2. Cuánta parte de la imagen está "escondida" por el zoom ---
       const scaledCropWidth = cropWidth / position.scale;
       const scaledCropHeight = cropHeight / position.scale;
 
@@ -979,138 +1052,97 @@ const ZoomScreen = (props: any) => {
       const percentRestW = 100 - percentCropperAreaW;
       const hiddenAreaW = getPercentFromNumber(percentRestW, fittedSize.width);
 
+      const x = hiddenAreaW / 2 - position.positionX;
+      offset.x = x <= 0 ? 0 : x;
+
       const percentCropperAreaH = getPercentDiffNumberFromNumber(
         scaledCropHeight,
         fittedSize.height,
       );
+
       const percentRestH = 100 - percentCropperAreaH;
       const hiddenAreaH = getPercentFromNumber(percentRestH, fittedSize.height);
 
-      // Centrado vertical cuando la imagen no llena la altura
-      const diffPositionY = (dimensionsHeight - fittedSize.height) / 2;
-
-      // --- 3. Offset actual de la ventana sobre la imagen (en coords de fittedSize) ---
-      const x = hiddenAreaW / 2 - position.positionX;
+      var diffPositionY = (dimensionsHeight - fittedSize.height) / 2;
       const y = hiddenAreaH / 2 - position.positionY + diffPositionY;
 
-      const offsetX = x <= 0 ? 0 : x;
-      const offsetY = y <= 0 ? 0 : y;
+      offset.y = y <= 0 ? 0 : y;
+      globalPositionXRef.current = offset.x;
+      globalPositionYRef.current = offset.y;
 
-      // --- 4. Calcular deltas contra la posición global anterior ---
-      const prevGlobalX = globalPositionXRef.current;
-      const prevGlobalY = globalPositionYRef.current;
-
-      const diffGlobalX = offsetX - prevGlobalX;
-      const diffGlobalY = offsetY - prevGlobalY;
-
-      // Actualizamos inmediatamente los refs de posición global
-      globalPositionXRef.current = offsetX;
-      globalPositionYRef.current = offsetY;
-
-      // --- 5. Actualizar notas SIEMPRE a partir del estado previo coherente ---
-      setState((prev) => {
-        if (!prev.notes || !prev.notes.length) {
-          return prev;
-        }
-
-        const notes = prev.notes.map((note: any) => {
-          const scaleAtCreation = note?.position?.scale;
-          if (!scaleAtCreation) {
-            // Nota aún sin scale base válido => no la tocamos en transform
-            return {
-              ...note,
-              position: {...note.position},
-            };
-          }
-
-          // Diferencia de "recorrido" de la ventana sobre la imagen
-          const deltaX = diffGlobalX * scaleAtCreation;
-          const deltaY = diffGlobalY * scaleAtCreation;
-
-          const newPositionTop = note.position.top - deltaY;
-          const newPositionLeft = note.position.left - deltaX;
-
-          // La traducción base (antes de re-escalar)
-          let finalTop = newPositionTop - note.diffTop;
-          let finalLeft = newPositionLeft - note.diffLeft;
-
-          // Ajustar por cambio de scale entre el momento de creación y el actual
-          const factor = position.scale / scaleAtCreation;
-          finalTop = finalTop * factor;
-          finalLeft = finalLeft * factor;
-
-          const finalWidth =
-            (note.originalWidth / scaleAtCreation) * position.scale;
-          const finalHeight =
-            (note.originalHeight / scaleAtCreation) * position.scale;
-
-          return {
-            ...note,
-            position: {
-              ...note.position,
-              top: newPositionTop,
-              left: newPositionLeft,
-            },
-            width: finalWidth,
-            height: finalHeight,
-            translation: {
-              ...note.translation,
-              top: finalTop,
-              left: finalLeft,
-            },
-            stickyNoteTranslation: {
-              ...note.stickyNoteTranslation,
-              absoluteX: finalLeft,
-              absoluteY: finalTop,
-              x: 0,
-              y: 0,
-              translationX: 0,
-              translationY: 0,
-            },
-          };
-        });
-
-        return {
-          ...prev,
-          notes,
-        };
-      });
-
-      // --- 6. Actualizar los refs "last" UNA sola vez por frame ---
-      lastGlobalPositionXRef.current = offsetX;
-      lastGlobalPositionYRef.current = offsetY;
-
-      // (opcional) por si usas esto para guardar el zoom actual
       mainImageTransformsRef.current = {
         positionX: position.positionX,
         positionY: position.positionY,
         scale: position.scale,
       };
+
+      const notes = state?.notes?.map((note: any) => {
+        var deltaX =
+          (globalPositionXRef.current - lastGlobalPositionXRef.current) *
+          note?.position?.scale;
+        var deltaY =
+          (globalPositionYRef.current - lastGlobalPositionYRef.current) *
+          note?.position?.scale;
+
+        if (!note?.position?.scale) {
+          return {
+            ...note,
+            position: {
+              ...note.position,
+            },
+          };
+        }
+
+        var newPositionTop = note?.position?.top - deltaY;
+        var newPositionLeft = note?.position?.left - deltaX;
+
+        var finalTop = newPositionTop - note?.diffTop;
+        var finalLeft = newPositionLeft - note?.diffLeft;
+
+        finalTop = finalTop * (position.scale / note?.position?.scale);
+        finalLeft = finalLeft * (position.scale / note?.position?.scale);
+
+        var finalWidth =
+          (note?.originalWidth / note?.position?.scale) * position.scale;
+        var finalHeight =
+          (note?.originalHeight / note?.position?.scale) * position.scale;
+
+        return {
+          ...note,
+          position: {
+            ...note.position,
+            top: newPositionTop,
+            left: newPositionLeft,
+          },
+          width: finalWidth,
+          height: finalHeight,
+          translation: {
+            ...note.translation,
+            top: finalTop,
+            left: finalLeft,
+          },
+          stickyNoteTranslation: {
+            ...note.stickyNoteTranslation,
+            absoluteX: finalLeft,
+            absoluteY: finalTop,
+            x: 0,
+            y: 0,
+            translationX: 0,
+            translationY: 0,
+          },
+        };
+      });
+
+      lastGlobalPositionXRef.current = globalPositionXRef.current;
+      lastGlobalPositionYRef.current = globalPositionYRef.current;
+      setM({notes});
     },
-    [
-      dimensionsWidth,
-      dimensionsHeight,
-      getPercentDiffNumberFromNumber,
-      getPercentFromNumber,
-    ],
+    [getPercentDiffNumberFromNumber, getPercentFromNumber, state?.notes],
   );
 
   return (
     <Wrapper style={styles.container}>
-      <Wrapper
-        style={[GLOBAL_STYLES.containerBtnOptTop, {backgroundColor: 'white', zIndex: 999999}]}>
-        <BackButton onPress={goBack} title="Back" />
-
-        <Wrapper style={[GLOBAL_STYLES.lateralPadding]}>
-          <Label style={[GLOBAL_STYLES.subtitle, GLOBAL_STYLES.bold]}>
-            Zoom Screen
-          </Label>
-        </Wrapper>
-        <Wrapper style={{width: 50}}></Wrapper>
-      </Wrapper>
-      {/* <View style={[GLOBAL_STYLES.row, {paddingHorizontal: 10}]}>
-        <BackButton title="Zoom Screen" onPress={goBack} />
-      </View> */}
+      {isLoading && <GeneralLoading />}
       {/* @ts-ignore */}
       <ImageZoom
         ref={zoomRef}
@@ -1143,9 +1175,6 @@ const ZoomScreen = (props: any) => {
           }}
         />
       </ImageZoom>
-
-      {isLoading && <GeneralLoading />}
-
       {state.notes.map((note: any) => (
         <NoteIssueSelector
           note={note}
@@ -1162,53 +1191,6 @@ const ZoomScreen = (props: any) => {
           onDeleteNote={_onDeleteNote}
         />
       ))}
-      {/* <ImageZoom
-        ref={zoomRef}
-        cropWidth={dimensionsWidth}
-        cropHeight={dimensionsHeight}
-        imageWidth={dimensionsWidth}
-        imageHeight={dimensionsHeight}
-        minScale={1}
-        maxScale={5}
-        useNativeDriver={true}
-        enableDoubleClickZoom={false}
-        onClick={_onPhotoPress}
-        onMove={_updateMainImageTransform}
-        style={{
-          width: dimensionsWidth,
-          height: state.height,
-          position: 'absolute',
-          top: 0,
-          left: 0,
-        }}>
-        <Image
-          resizeMode="contain"
-          source={state.photoSource}
-          style={{
-            width: dimensionsWidth,
-            height: state.height,
-            position: 'absolute',
-            top: 0,
-            left: 0,
-          }}
-        />
-      </ImageZoom> */}
-      {/* {state.notes.map((note: any) => (
-        <NoteIssueSelector
-          note={note}
-          key={note.id}
-          onCancel={_onCancel}
-          onFinishAreaEdit={_updateNotePosition}
-          onStickyNoteDragged={_onDragEnd}
-          onSave={_onSave}
-          onExpand={_onExpand}
-          onRetake={_captureZoom}
-          onEdit={_onEdit}
-          onZoomButtonPress={_captureZoom}
-          onEditPosition={_onEditPosition}
-          onDeleteNote={_onDeleteNote}
-        />
-      ))} */}
       {state.helperVisible && (
         <PressableOpacity
           style={styles.helper}

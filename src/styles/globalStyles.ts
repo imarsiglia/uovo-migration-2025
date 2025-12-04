@@ -34,6 +34,9 @@ export const GLOBAL_STYLES = StyleSheet.create({
   title: {
     fontSize: 30,
   },
+  subtitle: {
+    fontSize: 20,
+  },
   bold: {
     fontWeight: 'bold',
   },

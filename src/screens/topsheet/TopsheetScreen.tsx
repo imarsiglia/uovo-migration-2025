@@ -288,6 +288,8 @@ export const TopsheetScreen = ({route}: Props) => {
                     opacity,
                     height: animatedHeight,
                     overflow: 'hidden',
+                    flexDirection: "row",
+                    alignItems: "flex-start"
                   }}>
                   <TeamAvatars
                     crew={jobDetail!.crew}

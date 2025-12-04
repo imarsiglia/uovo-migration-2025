@@ -19,6 +19,9 @@ import Icon from 'react-native-fontawesome-pro';
 import {ReportsConditionCheck} from './ReportsConditionCheck';
 import {ReportsConditionReport} from './ReportsConditionReport';
 import {RoutesNavigation} from '@navigation/types';
+import OfflineValidation from '@components/offline/OfflineValidation';
+import {useHasPendingSync} from '@hooks/useSyncIndicator';
+import {ENTITY_TYPES} from '@api/contants/constants';
 // import ReportsConditionCheck from './reportsConditionCheck';
 // import ReportsConditionReport from './reportsConditionReport';
 // import OfflineValidation from '../components/offline/OfflineValidation';
@@ -38,7 +41,7 @@ export const ReportsScreen = () => {
   } = useGetResumeConditionReport({
     idJob: jobDetail!.id,
   });
-  
+
   const {
     data: conditionCheck,
     isLoading: isLoadingConditionCheck,
@@ -47,6 +50,16 @@ export const ReportsScreen = () => {
   } = useGetResumeConditionCheck({
     idJob: jobDetail!.id,
   });
+
+  const hasConditionReportOffline = useHasPendingSync(
+    ENTITY_TYPES.CONDITION_REPORT,
+    jobDetail?.id,
+  );
+
+  const hasConditionCheckOffline = useHasPendingSync(
+    ENTITY_TYPES.CONDITION_CHECK,
+    jobDetail?.id,
+  );
 
   useEffect(() => {
     if (conditionReport?.data) {
@@ -155,10 +168,7 @@ export const ReportsScreen = () => {
             options={{
               tabBarLabel: ({color}) => (
                 <Wrapper style={styles.containerTab}>
-                  {/* <OfflineValidation
-                      idJob={props.jobDetail.id}
-                      offline={[REGISTER_CREPORT_OFFLINE_VALIDATION]}
-                    /> */}
+                  <OfflineValidation offline={hasConditionReportOffline} />
                   <Label allowFontScaling={false} style={{color: color}}>
                     Condition report
                   </Label>
@@ -181,10 +191,7 @@ export const ReportsScreen = () => {
             options={{
               tabBarLabel: ({color}) => (
                 <Wrapper style={styles.containerTab}>
-                  {/* <OfflineValidation
-                      idJob={props.jobDetail.id}
-                      offline={[REGISTER_CCHECK_OFFLINE_VALIDATION]}
-                    /> */}
+                  <OfflineValidation offline={hasConditionCheckOffline} />
                   <Label allowFontScaling={false} style={{color: color}}>
                     Condition check
                   </Label>

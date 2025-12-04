@@ -83,8 +83,8 @@ android {
         applicationId "com.uovo"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 2025120301
+        versionName "1.0.2025120301"
     }
     signingConfigs {
         debug {

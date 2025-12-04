@@ -419,6 +419,7 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
                 autoCapitalize="none"
                 returnKeyType="search"
                 clearButtonMode="while-editing"
+                placeholderTextColor={'gray'}
               />
             )}
           </Wrapper>
@@ -429,6 +430,8 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
             <BottomSheetFlatList
               ref={listRef}
               data={filtered}
+              // contentContainerStyle={styles.contentContainer}
+              contentContainerStyle={{paddingBottom: 70 + (insetBottom || 0)}}
               keyExtractor={keyExtractor}
               renderItem={renderItem}
               keyboardDismissMode="on-drag"
@@ -612,6 +615,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     backgroundColor: 'white',
+    paddingBottom: 70
   },
   itemContainer: {
     padding: 6,

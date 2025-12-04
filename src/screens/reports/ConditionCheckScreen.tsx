@@ -1488,6 +1488,7 @@ type PreSubmitButtonProps = RoundedButtonProps & {
   showValidationError?: boolean;
   title: string;
   total: number;
+  offline?: boolean;
 };
 export const PreSubmitButton = ({
   onSubmit,

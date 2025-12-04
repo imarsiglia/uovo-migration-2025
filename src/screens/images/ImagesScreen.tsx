@@ -1,4 +1,4 @@
-import {QUERY_KEYS} from '@api/contants/constants';
+import {ENTITY_TYPES, QUERY_KEYS} from '@api/contants/constants';
 import {
   useDeletePictureGroup,
   useGetPictures,
@@ -16,10 +16,12 @@ import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {CustomImage} from '@components/images/CustomImage';
+import OfflineValidation from '@components/offline/OfflineValidation';
 import {offlineDeleteImage} from '@features/images/offline';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {useOnline} from '@hooks/useOnline';
 import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {useHasPendingSync} from '@hooks/useSyncIndicator';
 import {useRemoveFromArrayCache} from '@hooks/useToolsReactQueryCache';
 import {RoutesNavigation} from '@navigation/types';
 import {loadingWrapperPromise} from '@store/actions';
@@ -49,11 +51,11 @@ export const ImagesScreen = () => {
   const {refetchAll} = useRefreshIndicator([[QUERY_KEYS.TASK_COUNT, {idJob}]]);
   const {online} = useOnline();
   const qc = useQueryClient();
-
   const imagesQueryKey = useMemo(() => [QUERY_KEYS.IMAGES, {idJob}], [idJob]);
-
   const removeImageFromCache =
     useRemoveFromArrayCache<TaskImageType>(imagesQueryKey);
+
+  const hasImages = useHasPendingSync(ENTITY_TYPES.IMAGE, idJob);
 
   const {
     data: list,
@@ -195,11 +197,18 @@ export const ImagesScreen = () => {
 
   const visualizePhotos = useCallback(
     (item: TaskImageType) => {
-      navigate(RoutesNavigation.TaskPhotoViewerScreen, {
+      navigate(RoutesNavigation.TaskPhotoCarouselScreen, {
         photos: item.photos,
         groupRev: item.update_time,
         initialIndex: 0,
       });
+      // navigate(RoutesNavigation.TaskPhotoViewerScreen, {
+      //   photos: item.photos,
+      //   groupRev: item.update_time,
+      //   initialIndex: 0,
+      // });
+
+      
     },
     [navigate],
   );
@@ -247,7 +256,7 @@ export const ImagesScreen = () => {
                   <Text style={[GLOBAL_STYLES.bold, styles.titleNotification]}>
                     {item.title}
                   </Text>
-                  {item._pending && <PendingIcon />}
+                  {/* {item._pending && <PendingIcon />} */}
                 </Wrapper>
 
                 <Text
@@ -302,6 +311,7 @@ export const ImagesScreen = () => {
             style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, styles.topsheet]}>
             Pictures
           </Text>
+          <OfflineValidation offline={hasImages}/>
         </View>
       </View>
 

@@ -1,4 +1,3 @@
-// screens/TaskPhotoViewerScreen.tsx
 import {
   fullPhotoQueryById,
   localPhotoQueryByClientId,

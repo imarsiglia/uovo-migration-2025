@@ -1,9 +1,12 @@
 import {useHeaderHeight} from '@react-navigation/elements';
-import StickyNote, {StickyNoteProps} from './StickyNote';
+import StickyNote from './StickyNote';
 import NoteArea from './NoteArea';
+import {StickyNoteProps} from './StickyNoteFunctional';
 
 const NoteIssueSelector = function NoteIssueSelector(props: StickyNoteProps) {
   const headerHeight = useHeaderHeight();
+  console.log("headerHeight NoteIssueSelector")
+  console.log(headerHeight)
   if (props?.note?.areaSet && !props?.note?.updating) {
     return <StickyNote {...props} headerHeight={headerHeight} />;
   }

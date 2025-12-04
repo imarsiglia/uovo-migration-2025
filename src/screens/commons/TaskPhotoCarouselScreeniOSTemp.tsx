@@ -1,3 +1,4 @@
+// screens/TaskPhotoCarouselScreen.tsx
 import {
   fullPhotoQueryById,
   localPhotoQueryByClientId,
@@ -17,9 +18,7 @@ import {
   View,
   useWindowDimensions,
   ViewToken,
-  Platform,
 } from 'react-native';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {ProgressivePhoto} from './ProgressivePhoto';
 
 export type TaskPhotoCarouselType = {
@@ -55,7 +54,6 @@ const TaskPhotoCarouselScreen = (props: Props) => {
     Math.max(0, Math.min(initialIndex, photos.length - 1)),
   );
   const [scrollEnabled, setScrollEnabled] = useState(true);
-  const scrollEnabledRef = useRef(true);
 
   // Filtrar fotos válidas
   const validPhotos = photos.filter(p => p.photo || p.id || p.clientId);
@@ -124,11 +122,7 @@ const TaskPhotoCarouselScreen = (props: Props) => {
 
   // Manejar estado de zoom
   const handleZoomChange = useCallback((isZoomed: boolean) => {
-    // Actualizar inmediatamente sin debounce para bloquear gestos horizontales
-    if (scrollEnabledRef.current !== !isZoomed) {
-      scrollEnabledRef.current = !isZoomed;
-      setScrollEnabled(!isZoomed);
-    }
+    setScrollEnabled(!isZoomed);
   }, []);
 
   const renderItem = useCallback(
@@ -169,60 +163,52 @@ const TaskPhotoCarouselScreen = (props: Props) => {
 
   if (validPhotos.length === 0) {
     return (
-      <GestureHandlerRootView style={styles.flex}>
-        <Wrapper style={styles.container}>
-          <Wrapper style={styles.header}>
-            <BackButton onPress={goBack} />
-          </Wrapper>
-          <View style={styles.emptyContainer}>
-            <Label style={styles.emptyText}>No hay fotos disponibles</Label>
-          </View>
+      <Wrapper style={styles.container}>
+        <Wrapper style={styles.header}>
+          <BackButton onPress={goBack} />
         </Wrapper>
-      </GestureHandlerRootView>
+        <View style={styles.emptyContainer}>
+          <Label style={styles.emptyText}>No hay fotos disponibles</Label>
+        </View>
+      </Wrapper>
     );
   }
 
   return (
-    <GestureHandlerRootView style={styles.flex}>
-      <Wrapper style={styles.container}>
-        <Wrapper style={styles.header}>
-          <BackButton onPress={goBack} />
-          <Wrapper style={styles.counterPill}>
-            <Label style={styles.counterText}>
-              {currentIndex + 1}/{validPhotos.length}
-            </Label>
-          </Wrapper>
+    <Wrapper style={styles.container}>
+      <Wrapper style={styles.header}>
+        <BackButton onPress={goBack} />
+        <Wrapper style={styles.counterPill}>
+          <Label style={styles.counterText}>
+            {currentIndex + 1}/{validPhotos.length}
+          </Label>
         </Wrapper>
-
-        <FlatList
-          ref={listRef}
-          data={validPhotos}
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          scrollEnabled={scrollEnabled}
-          bounces={false}
-          decelerationRate="fast"
-          getItemLayout={getItemLayout}
-          onViewableItemsChanged={onViewableItemsChanged}
-          viewabilityConfig={viewabilityConfig}
-          initialNumToRender={1}
-          maxToRenderPerBatch={2}
-          windowSize={3}
-          removeClippedSubviews={false}
-          scrollEventThrottle={16}
-        />
       </Wrapper>
-    </GestureHandlerRootView>
+
+      <FlatList
+        ref={listRef}
+        data={validPhotos}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        scrollEnabled={scrollEnabled}
+        bounces={false}
+        decelerationRate="fast"
+        getItemLayout={getItemLayout}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
+        initialNumToRender={1}
+        maxToRenderPerBatch={2}
+        windowSize={3}
+        removeClippedSubviews={false}
+      />
+    </Wrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  flex: {
-    flex: 1,
-  },
   container: {
     flex: 1,
     backgroundColor: 'black',

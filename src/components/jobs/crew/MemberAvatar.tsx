@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   avatarText: {color: 'white', fontWeight: '700'},
   leaderBadge: {
     position: 'absolute',
-    left: -2,
+    left: 0,
     bottom: 0,
     borderRadius: 7,
     backgroundColor: '#F1A43E',

@@ -9,6 +9,8 @@ import type {
 } from './types';
 import {generateUUID} from '@utils/functions';
 
+import {outboxEvents} from './outboxEvents';
+
 const STORE_ID = 'offline-outbox-v16';
 const KEY_QUEUE = 'OUTBOX_QUEUE_V16';
 const KEY_LOCK = 'OUTBOX_LOCK_V16';
@@ -38,6 +40,7 @@ export async function readQueue(): Promise<OutboxItem[]> {
 }
 export async function writeQueue(q: OutboxItem[]) {
   await w(KEY_QUEUE, JSON.stringify(q));
+  outboxEvents.notifyQueueChanged();
 }
 export async function replaceQueue(q: OutboxItem[]) {
   await writeQueue(q);
@@ -188,6 +191,10 @@ export async function enqueueCoalesced(
         };
         q[i] = {...it, payload: merged, updatedAt: Date.now()};
         await writeQueue(q);
+        outboxEvents.notifyItemUpdated(
+          payload.entity,
+          Number(payload.idJob ?? 0),
+        );
         return it.uid;
       }
     }
@@ -206,6 +213,11 @@ export async function enqueueCoalesced(
     }
     if (removed && !payload.id && payload.clientId) {
       await writeQueue(q);
+
+      outboxEvents.notifyItemUpdated(
+        payload.entity, 
+        Number(payload.idJob ?? 0)
+      );
       return generateUUID(); // net-zero (create+delete collapsed)
     }
   }
@@ -227,6 +239,12 @@ export async function enqueueCoalesced(
   };
   q.push(item);
   await writeQueue(q);
+
+  outboxEvents.notifyItemAdded(
+    payload.entity, 
+    Number(payload.idJob ?? 0)
+  );
+  
   const qqq = await readQueue();
   return item.uid;
 }

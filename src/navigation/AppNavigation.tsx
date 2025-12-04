@@ -312,24 +312,27 @@ export const AppNavigation = () => {
               component={ZoomScreen}
               // @ts-ignore
               options={({navigation}) => ({
-                headerShown: true,
-                headerStyle: {
-                  backgroundColor: COLORS.bgWhite,
-                },
-                headerTitleStyle: {
-                  color: COLORS.titleColor,
-                },
-                headerLeft: () => (
-                  <BackButton
-                    style={{marginLeft: -10}}
-                    title="Back"
-                    onPress={navigation.goBack}
-                  />
-                ),
-                headerBackTitleStyle: {
-                  color: COLORS.gray,
-                },
-                headerBackTitle: 'Sisa',
+                // headerShown: true,
+                // headerLargeStyle: {
+                //   height: 30
+                // },
+                // headerStyle: {
+                //   backgroundColor: COLORS.bgWhite,
+                //   height: 30
+                // },
+                // headerTitleStyle: {
+                //   color: COLORS.titleColor,
+                // },
+                // headerLeft: () => (
+                //   <BackButton
+                //     style={{marginLeft: -10}}
+                //     title="Back"
+                //     onPress={navigation.goBack}
+                //   />
+                // ),
+                // headerBackTitleStyle: {
+                //   color: COLORS.gray,
+                // },
               })}
 
               // options={{
@@ -392,7 +395,7 @@ export const AppNavigation = () => {
           <ModalLoading />
           <PortalHost name="root" />
           <CallPhoneSheet />
-          <OfflineBanner />
+          {/* <OfflineBanner /> */}
           <ModalOffline />
         </NavigationContainer>
         // <OfflineComponentSync />

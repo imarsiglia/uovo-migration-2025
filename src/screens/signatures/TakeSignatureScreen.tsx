@@ -12,6 +12,7 @@ import {
   CanvasControlProvider,
   CanvasControls,
 } from '@equinor/react-native-skia-draw';
+import {offlineCreateSignature} from '@features/signatures/offline';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {useOnline} from '@hooks/useOnline';
 import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
@@ -43,7 +44,7 @@ export const TakeSignatureScreen = (props: Props) => {
       canvasRef={refCanvas}
       initialToolColor={COLORS.dark}
       initialToolType="pen"
-      initialStrokeWeight={3}>
+      initialStrokeWeight={4}>
       {/* @ts-ignore */}
       <_TakeSignatureScreen {...props} refCanvas={refCanvas} />
     </CanvasControlProvider>
@@ -171,17 +172,24 @@ const _TakeSignatureScreen = ({
           // OFFLINE: enqueue + optimistic cache
           const clientId = generateUUID();
           // encola a tu outbox
-          // offlineCreateSignature({...});
-          upsertSignature({
+          offlineCreateSignature({
+            idJob,
             clientId,
-            id_job: idJob,
-            id_user: user_id,
-            print_name: name,
+            printName: name,
             type,
-            signature_data: signatureBase64,
-            signature_timestamp: new Date().toISOString().split('.')[0],
+            signature: signatureBase64,
+          }).then(() => {
+            upsertSignature({
+              clientId,
+              id_job: idJob,
+              id_user: user_id,
+              print_name: name,
+              type,
+              signature_data: signatureBase64,
+              signature_timestamp: new Date().toISOString().split('.')[0],
+            });
+            goBack();
           });
-          goBack();
         }
       })(),
     );

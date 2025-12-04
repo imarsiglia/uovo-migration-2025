@@ -6,9 +6,12 @@ import {
 } from '@api/types/Condition';
 import {ImageOptionSheet} from '@components/commons/bottomsheets/ImageOptionSheet';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
+import OfflineValidation from '@components/offline/OfflineValidation';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {usePhotoSyncIndicator} from '@hooks/usePhotoSyncIndicator';
 import {RoutesNavigation} from '@navigation/types';
 import useConditionStore from '@store/condition';
+import useTopSheetStore from '@store/topsheet';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {onLaunchCamera, onSelectImage} from '@utils/image';
 import {useCallback, useMemo, useRef, useState} from 'react';
@@ -60,6 +63,7 @@ export const ConditionSides = () => {
   const refCallSheet = useRef<any>(null);
   const [selectedType, setSelectedType] =
     useState<ConditionPhotoSideSubtype | null>(null);
+  const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
   const [localLoading, setLocalLoading] = useState(false);
   const {
     conditionType,
@@ -68,8 +72,16 @@ export const ConditionSides = () => {
     conditionId,
     setReportIdImage,
     conditionClientId,
+    inventoryId,
   } = useConditionStore();
   const {goBack, navigate, isFocused} = useCustomNavigation();
+
+  const {hasPending: hasOffline} = usePhotoSyncIndicator({
+    idJob,
+    conditionType,
+    idJobInventory: inventoryId,
+    type: conditionPhotoType,
+  });
 
   const queryKeyPayload = {
     conditionType: conditionType!,
@@ -305,22 +317,7 @@ export const ConditionSides = () => {
             style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, styles.topsheet]}>
             Sides
           </Text>
-          {/* <OfflineValidation
-              idJob={props.jobDetail.id}
-              offline={[
-                DELETE_CONDITION_IMAGE_OVERVIEW_OFFLINE_VALIDATION[
-                  props.conditionType
-                ],
-                DELETE_CREPORT_IMAGE_DETAIL_OFFLINE_VALIDATION,
-                REPORT_CONDITION_IMAGE_OFFLINE_VALIDATION[props.conditionType],
-                REPORT_CONDITION_IMAGE_DETAIL_OFFLINE_VALIDATION[
-                  props.conditionType
-                ],
-              ]}
-              reportType={'sides'}
-              conditionType={props.conditionType}
-              idInventory={props.idInventory}
-            /> */}
+          <OfflineValidation offline={hasOffline} />
         </View>
       </View>
 

@@ -6,6 +6,7 @@ import {
   CONDITION_STATES_LIST,
   FRAME_FIXTURE_LIST,
   HANGING_SYSTEM_LIST,
+  PHOTOS_REPORT_TYPES,
   QUERY_KEYS,
 } from '@api/contants/constants';
 import {
@@ -76,6 +77,7 @@ import {Paginated} from '@api/types/Response';
 import {ConditionReportByInventory} from '@api/services/reportServices';
 import {PreSubmitButton} from './ConditionCheckScreen';
 import {SpeechFormContext} from '@components/commons/form/SpeechFormContext';
+import {usePhotoSyncIndicator} from '@hooks/usePhotoSyncIndicator';
 // import OfflineValidation from '../components/offline/OfflineValidation';
 
 let autosaveInitial = false;
@@ -199,7 +201,36 @@ export const ConditionReportScreen = (props: Props) => {
     setConditionPhotoSubtype,
     setConditionClientId,
     setReportIdImage,
+    inventoryId,
   } = useConditionStore();
+
+  const {hasPending: hasPendingFront} = usePhotoSyncIndicator({
+    idJob: jobDetail?.id,
+    conditionType: CONDITION_TYPES.ConditionReport,
+    idJobInventory: inventoryId,
+    type: CONDITION_PHOTO_SIDE_TYPE.Front,
+  });
+
+  const {hasPending: hasPendingBack} = usePhotoSyncIndicator({
+    idJob: jobDetail?.id,
+    conditionType: CONDITION_TYPES.ConditionReport,
+    idJobInventory: inventoryId,
+    type: CONDITION_PHOTO_SIDE_TYPE.Back,
+  });
+
+  const {hasPending: hasPendingSides} = usePhotoSyncIndicator({
+    idJob: jobDetail?.id,
+    conditionType: CONDITION_TYPES.ConditionReport,
+    idJobInventory: inventoryId,
+    type: CONDITION_PHOTO_SIDE_TYPE.Sides,
+  });
+
+  const {hasPending: hasPendingDetails} = usePhotoSyncIndicator({
+    idJob: jobDetail?.id,
+    conditionType: CONDITION_TYPES.ConditionReport,
+    idJobInventory: inventoryId,
+    type: CONDITION_PHOTO_SIDE_TYPE.Details,
+  });
 
   useEffect(() => {
     setConditionType(CONDITION_TYPES.ConditionReport);
@@ -1292,11 +1323,13 @@ export const ConditionReportScreen = (props: Props) => {
                   title="Front"
                   total={totalPhotos.front}
                   onSubmit={() => goToGallery(CONDITION_PHOTO_SIDE_TYPE.Front)}
+                  offline={hasPendingFront}
                 />
                 <PreSubmitButton
                   title="Back"
                   total={totalPhotos.back}
                   onSubmit={() => goToGallery(CONDITION_PHOTO_SIDE_TYPE.Back)}
+                  offline={hasPendingBack}
                 />
               </Wrapper>
 
@@ -1306,6 +1339,7 @@ export const ConditionReportScreen = (props: Props) => {
                   title="Sides"
                   total={totalPhotos.sides}
                   onSubmit={goToSides}
+                  offline={hasPendingSides}
                 />
 
                 <PreSubmitButton
@@ -1314,6 +1348,7 @@ export const ConditionReportScreen = (props: Props) => {
                   onSubmit={() =>
                     goToGallery(CONDITION_PHOTO_SIDE_TYPE.Details)
                   }
+                  offline={hasPendingDetails}
                 />
               </Wrapper>
 

@@ -1,4 +1,4 @@
-import {QUERY_KEYS} from '@api/contants/constants';
+import {ENTITY_TYPES, QUERY_KEYS} from '@api/contants/constants';
 import {useDeleteNote, useGetNotes} from '@api/hooks/HooksTaskServices';
 import {NoteType} from '@api/types/Task';
 import {BackButton} from '@components/commons/buttons/BackButton';
@@ -11,10 +11,12 @@ import {
 import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import OfflineValidation from '@components/offline/OfflineValidation';
 import {offlineDeleteNote} from '@features/notes/offline';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {useOnline} from '@hooks/useOnline';
 import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {useHasPendingSync} from '@hooks/useSyncIndicator';
 import {RoutesNavigation} from '@navigation/types';
 import {loadingWrapperPromise} from '@store/actions';
 import {useModalDialogStore} from '@store/modals';
@@ -54,6 +56,8 @@ export const NotesScreen = () => {
   const {data: list, isLoading, isRefetching, refetch} = useGetNotes({idJob});
 
   const {mutateAsync: deleteNoteAsync} = useDeleteNote();
+
+  const hasNotes = useHasPendingSync(ENTITY_TYPES.NOTE, idJob);
 
   /** ---------- cache helpers (optimistic UI) ---------- */
   const removeFromCache = useCallback(
@@ -184,7 +188,7 @@ export const NotesScreen = () => {
                   <Text style={[GLOBAL_STYLES.bold, styles.titleNotification]}>
                     {item.title}
                   </Text>
-                  {item._pending && <PendingIcon />}
+                  {/* {item._pending && <PendingIcon />} */}
                 </Wrapper>
 
                 <Text
@@ -239,6 +243,7 @@ export const NotesScreen = () => {
             style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, styles.topsheet]}>
             Notes
           </Text>
+          <OfflineValidation offline={hasNotes} />
         </View>
       </View>
 

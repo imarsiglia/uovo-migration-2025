@@ -1,4 +1,4 @@
-import {QUERY_KEYS} from '@api/contants/constants';
+import {ENTITY_TYPES, QUERY_KEYS} from '@api/contants/constants';
 import {
   useGetHistoryReportMaterials,
   useGetReportMaterials,
@@ -32,6 +32,8 @@ import {
   offlineDeleteOneOfflineReportMaterial,
   offlineUpsertMaterialsList,
 } from '@features/materials/offline';
+import {useHasPendingSync} from '@hooks/useSyncIndicator';
+import OfflineValidation from '@components/offline/OfflineValidation';
 // import OfflineValidation from '../components/offline/OfflineValidation';
 
 export const ReportMaterialsScreen = () => {
@@ -60,6 +62,11 @@ export const ReportMaterialsScreen = () => {
   } = useGetReportMaterials({idJob});
 
   const {mutateAsync: removeMaterialAsync} = useRegisterReportMaterials();
+
+  const hasOffline = useHasPendingSync(
+    [ENTITY_TYPES.REPORT_MATERIALS, ENTITY_TYPES.REPORT_MATERIAL],
+    idJob,
+  );
 
   const deleteMaterial = useCallback(
     (item: ReportMaterialType) => {
@@ -187,10 +194,7 @@ export const ReportMaterialsScreen = () => {
               allowFontScaling={false}>
               Report materials
             </Label>
-            {/* <OfflineValidation
-                idJob={props.jobDetail.id}
-                offline={[MATERIAL_OFFLINE_VALIDATION]}
-              /> */}
+            <OfflineValidation offline={hasOffline} />
           </Wrapper>
 
           <Wrapper
