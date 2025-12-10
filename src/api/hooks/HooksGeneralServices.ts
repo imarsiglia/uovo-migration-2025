@@ -8,12 +8,14 @@ import {
   DEFAULT_WO_TYPE_LIST,
   QUERY_KEYS,
 } from '@api/contants/constants';
+import {DAYS_IN_MS} from './HooksTaskServices';
 
-const DEFAULT_PERSISTENCE_CONFIG = {
+export const DEFAULT_PERSISTENCE_CONFIG = {
   staleTime: 5 * 60 * 1000,
   gcTime: 7 * 24 * 60 * 60 * 1000,
   retry: 1,
   placeholderData: (prev: any) => prev,
+  refetchOnMount: 'always' as const,
 };
 
 export const useContactUsService = () => {
@@ -98,9 +100,13 @@ export const useGetQrUser = () => {
 
 export const useGetPackingDetails = () => {
   return useQuery({
-    ...DEFAULT_PERSISTENCE_CONFIG,
     queryKey: [QUERY_KEYS.PACKING_DETAILS],
     queryFn: generalServices.getPackingDetails,
+    staleTime: 7 * DAYS_IN_MS, // refresca cada 7 días
+    gcTime: 8 * DAYS_IN_MS, // un poco más largo que staleTime
+    refetchOnMount: 'always', // si está stale, refetch al abrir
+    refetchOnReconnect: true, // si vuelve internet y está stale
+    refetchInterval: false, // no necesitamos polling
   });
 };
 

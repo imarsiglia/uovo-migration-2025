@@ -65,7 +65,7 @@ import {isInternet} from '@utils/internet';
 import {LoginScreen} from '../screens/auth/LoginScreen';
 import {RootStackParamList, RoutesNavigation} from './types';
 import {AccountScreen} from '@screens/account/AccountScreen';
-import {configureFontAwesomePro} from 'react-native-fontawesome-pro';
+import Icon, {configureFontAwesomePro} from 'react-native-fontawesome-pro';
 import {TopsheetScreen} from '@screens/topsheet/TopsheetScreen';
 import {ReportIssueScreen} from '@screens/location/ReportIssueScreen';
 import {LocationNotesScreen} from '@screens/location/LocationNotesScreen';
@@ -97,8 +97,22 @@ import {EditProfileScreen} from '@screens/profile/EditProfileScreen';
 import CallPhoneSheet from '@components/bottomSheets/CallPhoneSheet';
 import {navigationRef} from '@utils/navigationService';
 import {InventoryNSScreen} from '@screens/nationalshuttle/InventoryNSScreen';
-import { OfflineBanner } from '@components/offline/OfflineBanner';
-// import InventoryNS from '../screens/nationalShuttle/InventoryNS';
+import {OfflineBanner} from '@components/offline/OfflineBanner';
+import {ModalOffline} from '@components/offline/ModalOffline';
+import {ImagesScreen} from '@screens/images/ImagesScreen';
+import TaskPhotoCarouselScreen from '@screens/commons/TaskPhotoCarouselScreen';
+import {SaveImagesScreen} from '@screens/images/SaveImagesScreen';
+import {GalleryCondition} from '@screens/reports/photos/GalleryConditionScreen';
+import {PhotoDetailCondition} from '@screens/reports/photos/PhotoDetailConditionScreen';
+import PhotoCaptureZoomEdit from '@screens/reports/photos/PhotoCaptureZoomEdit';
+import ZoomScreen from '@screens/reports/photos/ZoomScreen';
+import {COLORS} from '@styles/colors';
+import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
+import {BackButton} from '@components/commons/buttons/BackButton';
+import {ConditionSides} from '@screens/reports/photos/ConditionSidesScreen';
+import PhotoCapture from '@screens/reports/photos/PhotoCapture';
+import PhotoCaptureZoom from '@screens/reports/photos/PhotoCaptureZoom';
+import TaskPhotoViewerScreen from '@screens/commons/TaskPhotoViewerScreen';
 
 // LogBox.ignoreLogs([
 //   'Non-serializable values were found in the navigation state',
@@ -106,6 +120,7 @@ import { OfflineBanner } from '@components/offline/OfflineBanner';
 
 enableScreens(true);
 const Stack = createNativeStackNavigator<RootStackParamList>();
+// @ts-ignore
 configureFontAwesomePro();
 
 export const AppNavigation = () => {
@@ -259,6 +274,19 @@ export const AppNavigation = () => {
               component={TakeDimensionsScreen}
             />
             <Stack.Screen
+              name={RoutesNavigation.InventoryNationalShuttle}
+              component={InventoryNSScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.Images}
+              component={ImagesScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.SaveImages}
+              component={SaveImagesScreen}
+            />
+            {/* condition report / condition check */}
+            <Stack.Screen
               name={RoutesNavigation.Reports}
               component={ReportsScreen}
             />
@@ -271,8 +299,82 @@ export const AppNavigation = () => {
               component={ConditionCheckScreen}
             />
             <Stack.Screen
-              name={RoutesNavigation.InventoryNationalShuttle}
-              component={InventoryNSScreen}
+              name={RoutesNavigation.GalleryCondition}
+              component={GalleryCondition}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.PhotoDetailCondition}
+              component={PhotoDetailCondition}
+            />
+
+            <Stack.Screen
+              name={RoutesNavigation.ZoomScreen}
+              component={ZoomScreen}
+              // @ts-ignore
+              options={({navigation}) => ({
+                // headerShown: true,
+                // headerLargeStyle: {
+                //   height: 30
+                // },
+                // headerStyle: {
+                //   backgroundColor: COLORS.bgWhite,
+                //   height: 30
+                // },
+                // headerTitleStyle: {
+                //   color: COLORS.titleColor,
+                // },
+                // headerLeft: () => (
+                //   <BackButton
+                //     style={{marginLeft: -10}}
+                //     title="Back"
+                //     onPress={navigation.goBack}
+                //   />
+                // ),
+                // headerBackTitleStyle: {
+                //   color: COLORS.gray,
+                // },
+              })}
+
+              // options={{
+              //   headerShown: true,
+              //   headerStyle: {
+              //     backgroundColor: COLORS.bgWhite,
+              //   },
+              //   headerTitleStyle: {
+              //     color: COLORS.titleColor,
+              //   },
+              //   headerBackImageSource: (
+              //     <Icon
+              //       name="chevron-left"
+              //       color={COLORS.gray}
+              //       type="light"
+              //       size={15}
+              //     />
+              //   ),
+              //   headerBackTitleStyle: {
+              //     color: COLORS.gray
+              //   }
+              // }}
+            />
+
+            <Stack.Screen
+              name={RoutesNavigation.PhotoCaptureZoomEdit}
+              component={PhotoCaptureZoomEdit}
+              options={{headerShown: true}}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.PhotoCaptureZoom}
+              component={PhotoCaptureZoom}
+              options={{headerShown: true}}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.PhotoCapture}
+              component={PhotoCapture}
+              options={{headerShown: true}}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.ConditionSides}
+              component={ConditionSides}
             />
 
             {/* visualizar imagenes */}
@@ -280,12 +382,21 @@ export const AppNavigation = () => {
               name={RoutesNavigation.BaseImageScreen}
               component={BaseImageScreen}
             />
+            <Stack.Screen
+              name={RoutesNavigation.TaskPhotoCarouselScreen}
+              component={TaskPhotoCarouselScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.TaskPhotoViewerScreen}
+              component={TaskPhotoViewerScreen}
+            />
           </Stack.Navigator>
           <ModalDialog />
           <ModalLoading />
           <PortalHost name="root" />
           <CallPhoneSheet />
-          <OfflineBanner/>
+          {/* <OfflineBanner /> */}
+          <ModalOffline />
         </NavigationContainer>
         // <OfflineComponentSync />
         // <OfflineCompSecondSync />

@@ -6,11 +6,11 @@ import {Wrapper} from '@components/commons/wrappers/Wrapper';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {RoutesNavigation} from '@navigation/types';
 import {useAuth} from '@store/auth';
+import { useModalDialogStore } from '@store/modals';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {
-  closeSessionOnGoogle,
-  showAlertDialogWithOptions,
+  closeSessionOnGoogle
 } from '@utils/functions';
 import {useCallback} from 'react';
 import {Image, StyleSheet} from 'react-native';
@@ -19,13 +19,22 @@ export const AccountScreen = () => {
   const clearSession = useAuth((d) => d.clearSession);
   const user = useAuth((d) => d.user);
   const {resetTo, goBack, navigate} = useCustomNavigation();
+  const showDialog = useModalDialogStore(d => d.showVisible)
 
   const initLogout = useCallback(() => {
-    showAlertDialogWithOptions(() => {
-      clearSession();
-      // removeAllStorageOffline();
-      closeSessionOnGoogle();
-      resetTo(RoutesNavigation.Login);
+    showDialog({
+      modalVisible: true,
+      type: 'info',
+      message: 'Are you sure you want to logout?',
+      confirmBtnLabel: 'Yes, logout',
+      cancelBtnLabel: 'Cancel',
+      cancelable: true,
+      onConfirm: () => {
+        clearSession();
+        // removeAllStorageOffline();
+        closeSessionOnGoogle();
+        resetTo(RoutesNavigation.Login);
+      },
     });
   }, []);
 

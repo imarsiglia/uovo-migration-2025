@@ -1,9 +1,12 @@
 import {
+  API_DELETE_IMAGE,
   API_DELETE_NOTE,
   API_DELETE_SIGNATURE,
   API_GET_BOL_COUNT,
   API_GET_EMPLOYEES,
+  API_GET_FULL_IMAGE,
   API_GET_HISTORY_REPORT_MATERIALS,
+  API_GET_IMAGES,
   API_GET_LABOR_CODES,
   API_GET_LABOR_REPORTS,
   API_GET_NOTES,
@@ -11,11 +14,13 @@ import {
   API_GET_REPORT_MATERIALS_INVENTORY,
   API_GET_SIGNATURES,
   API_GET_WO_ATTACHMENTS,
+  API_REGISTER_IMAGES,
   API_REGISTER_LABOR_REPORT,
   API_REGISTER_ONE_REPORT_MATERIAL,
   API_REGISTER_REPORT_MATERIALS,
   API_SAVE_NOTE,
   API_SAVE_SIGNATURE,
+  API_UPDATE_IMAGES,
   SUCCESS_MESSAGES,
 } from '@api/contants/endpoints';
 import {getRequest, postRequest} from '@api/helpers/apiClientHelper';
@@ -31,8 +36,8 @@ import {
   NoteType,
   ReportMaterialType,
   SignatureType,
+  TaskImageType,
 } from '@api/types/Task';
-import {UserType} from '@api/types/User';
 import {BooleanNumberType} from '@generalTypes/general';
 
 export type TaskBaseApiProps = {
@@ -43,7 +48,7 @@ export type SignaturesApiProps = {
   forceSend?: boolean;
 } & TaskBaseApiProps;
 
-const signatures = async ({
+const getSignatures = async ({
   idJob,
   forceSend = false,
 }: SignaturesApiProps): Promise<SignatureType[]> => {
@@ -64,7 +69,7 @@ const saveSignature = async (
 ): Promise<boolean> => {
   const response = await postRequest(API_SAVE_SIGNATURE, {
     id: null,
-    signatureDatetime: new Date().toISOString().split(',')[0],
+    signatureDatetime: new Date().toISOString().split('.')[0],
     ...props,
   });
   return response.message === SUCCESS_MESSAGES.SUCCESS;
@@ -148,12 +153,24 @@ const getReportMaterialsInventory = async ({
   return response.body?.data ?? [];
 };
 
+export type ReportMaterialsInventoryAllProps = {
+  idJob: number;
+};
+const getReportMaterialsInventoryAll = async ({
+  idJob,
+}: ReportMaterialsInventoryAllProps): Promise<IdReportMaterialType[]> => {
+  const response = await getRequest<Paginated<IdReportMaterialType[]>>(
+    `${API_GET_REPORT_MATERIALS_INVENTORY}?downloadAll=1&idJob=${idJob}`,
+  );
+  return response.body?.data ?? [];
+};
+
 export type RegisterOneReportMaterialApiProps = {
   id?: number;
   idJob: number;
   idMaterial: number;
   quantity: number;
-  idUser: number;
+  idUser: number | null;
 };
 
 const registerOneReportMaterial = async (
@@ -181,7 +198,7 @@ const getBOLCount = async ({
   return response.body;
 };
 
-type SaveBOLCountApiProps = {
+export type SaveBOLCountApiProps = {
   pbs: string;
   packageCount: number;
 } & TaskBaseApiProps;
@@ -238,8 +255,47 @@ const getLaborCodes = async (): Promise<LaborCodeType[]> => {
   return response.body?.data ?? [];
 };
 
+const getImages = async ({
+  idJob,
+}: TaskBaseApiProps): Promise<TaskImageType[]> => {
+  const response = await getRequest<Paginated<TaskImageType[]>>(
+    `${API_GET_IMAGES}?idJob=${idJob}`,
+  );
+  return response.body?.data ?? [];
+};
+
+export type SaveImageApiProps = {
+  title: string;
+  description: string | null | undefined;
+  photos: string[];
+} & TaskBaseApiProps;
+const registerImage = async (props: SaveImageApiProps): Promise<boolean> => {
+  const response = await postRequest(API_REGISTER_IMAGES, props);
+  return response.message === SUCCESS_MESSAGES.SUCCESS;
+};
+
+export type UpdateImageApiProps = {
+  title: string;
+  description: string;
+  photos: {id: string; photo: string}[];
+} & TaskBaseApiProps;
+const updateImage = async (props: UpdateImageApiProps): Promise<boolean> => {
+  const response = await postRequest(API_UPDATE_IMAGES, props);
+  return response.message === SUCCESS_MESSAGES.SUCCESS;
+};
+
+const deleteImage = async ({id}: {id: number}): Promise<boolean> => {
+  const response = await postRequest(`${API_DELETE_IMAGE}/${id}`);
+  return response.message === SUCCESS_MESSAGES.SUCCESS;
+};
+
+const getFullImage = async ({id}: {id: number}): Promise<string> => {
+  const response = await getRequest<string>(`${API_GET_FULL_IMAGE}?id=${id}`);
+  return response.body ?? '';
+};
+
 export const taskServices = {
-  signatures,
+  getSignatures,
   saveSignature,
   deleteSignature,
   getNotes,
@@ -257,4 +313,10 @@ export const taskServices = {
   registerLaborReport,
   getEmployees,
   getLaborCodes,
+  getReportMaterialsInventoryAll,
+  getImages,
+  deleteImage,
+  getFullImage,
+  registerImage,
+  updateImage,
 };

@@ -1,15 +1,19 @@
 import {QUERY_KEYS} from '@api/contants/constants';
-import {reportServices} from '@api/services/reportServices';
+import {
+  GetPhotosConditionApiProps,
+  PhotoConditionDetailApiProps,
+  PhotoConditionOverviewApiProps,
+  reportServices,
+} from '@api/services/reportServices';
 import {TaskBaseApiProps} from '@api/services/taskServices';
 import {keepPreviousData, useMutation, useQuery} from '@tanstack/react-query';
 
 const DEFAULT_PERSISTENCE_CONFIG = {
   staleTime: 5 * 60 * 1000,
-  // gcTime: 7 * 24 * 60 * 60 * 1000,
-  gcTime: 0,
+  gcTime: 7 * 24 * 60 * 60 * 1000,
   retry: 1,
-  // placeholderData: keepPreviousData,
-  placeholderData: undefined,
+  placeholderData: keepPreviousData,
+  refetchOnMount: 'always' as const,
 };
 
 export const useGetResumeConditionReport = (props: TaskBaseApiProps) => {
@@ -111,5 +115,54 @@ export const useGetTotalPhotosConditionCheck = (props: {id: number}) => {
         total: 0,
       },
     ],
+  });
+};
+
+export const useGetPhotosCondition = (props: GetPhotosConditionApiProps) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.PHOTOS_CONDITION, props],
+    queryFn: () => reportServices.getPhotosCondition(props),
+    enabled: !!props?.conditionType && !!props.reportId && !!props.sideType,
+    ...DEFAULT_PERSISTENCE_CONFIG,
+  });
+};
+
+export const useRemovePhotoCondition = () => {
+  return useMutation({
+    mutationFn: reportServices.removePhotoCondition,
+  });
+};
+
+export const useSavePhotoCondition = () => {
+  return useMutation({
+    mutationFn: reportServices.savePhotoCondition,
+  });
+};
+
+export const useGetPhotoConditionOverview = (
+  props: PhotoConditionOverviewApiProps,
+) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.PHOTO_CONDITION_OVERVIEW, props],
+    queryFn: () => reportServices.getPhotoConditionOverview(props),
+    enabled: !!props?.conditionType && !!props.id,
+    ...DEFAULT_PERSISTENCE_CONFIG,
+  });
+};
+
+export const useGetPhotoConditionDetail = (
+  props: PhotoConditionDetailApiProps,
+) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.PHOTO_CONDITION_DETAIL, props],
+    queryFn: () => reportServices.getPhotoConditionDetail(props),
+    enabled: !!props?.conditionType && !!props.id,
+    ...DEFAULT_PERSISTENCE_CONFIG,
+  });
+};
+
+export const useSaveZoomScreen = () => {
+  return useMutation({
+    mutationFn: reportServices.saveZoomScreen,
   });
 };

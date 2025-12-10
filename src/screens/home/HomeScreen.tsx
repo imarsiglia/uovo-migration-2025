@@ -1,5 +1,5 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {Alert, StyleSheet, View} from 'react-native';
 // import {removeAllStorageOffline} from '../utils/functions';
 import {HomeFloatingAction} from '@components/floating/HomeFloatingAction';
@@ -24,7 +24,10 @@ import {useMinBusy} from '@hooks/useMinBusy';
 import {JobQueueView} from './JobQueueView';
 import {useJobQueueStore} from '@store/jobqueue';
 import {NationalShuttleView} from './NationalShuttleView';
-import useNationalShuttleStore from '@store/nationalShuttle';
+import {useCustomInsetBottom} from '@hooks/useCustomInsetBottom';
+import {useGetPackingDetails} from '@api/hooks/HooksGeneralServices';
+import {prefetchPackingDetailsAll} from '@features/general/offline';
+import {useQueryClient} from '@tanstack/react-query';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -34,10 +37,12 @@ export const HomeScreen = () => {
     timelinePressed,
     setTimelinePressed,
     setActiveTab,
-    activeTab,
     setSyncroNS,
   } = useGeneralStore();
+
+  const insetBottom = useCustomInsetBottom();
   const selectedDate = useGeneralStore((d) => d.selectedDate);
+
   const {
     orderBy,
     serviceLocation,
@@ -64,6 +69,13 @@ export const HomeScreen = () => {
   });
 
   const loading = useMinBusy(isRefetching, 1000);
+
+  const qc = useQueryClient();
+
+  // load general data
+  useEffect(() => {
+    prefetchPackingDetailsAll(qc);
+  }, []);
 
   // useEffect(() => {
   //   createIdsInventory();
@@ -127,11 +139,14 @@ export const HomeScreen = () => {
   //   }
   // }
 
-  const onPressTab = useCallback((state: TabNavigationState<ParamListBase>) => {
-    setTimeout(() => {
-      setActiveTab(state.index);
-    }, 100);
-  }, []);
+  const onPressTab = useCallback(
+    (state: TabNavigationState<ParamListBase>) => {
+      setTimeout(() => {
+        setActiveTab(state.index);
+      }, 100);
+    },
+    [setActiveTab],
+  );
 
   const onPressTimelineTab = useCallback(() => {
     setTimelinePressed(!timelinePressed);
@@ -139,20 +154,20 @@ export const HomeScreen = () => {
 
   const syncro = useCallback(() => {
     setIsRefetching(true);
-    let refetchPromise: Promise<unknown>;
-    switch (activeTab) {
-      case 0: // timeline
-        refetchPromise = Promise.all([refetchCalendar(), refetchTimeline()]);
-        break;
-      case 1: // jobqueue
-        refetchPromise = refetchJobQueue();
-        break;
-      default:
-        setSyncroNS(Date.now());
-        refetchPromise = Promise.resolve();
-    }
+    let refetchPromise = Promise.all([
+      refetchCalendar(),
+      refetchTimeline(),
+      refetchJobQueue(),
+    ]);
+    setSyncroNS(Date.now());
     return refetchPromise.finally(() => setIsRefetching(false));
-  }, [activeTab, refetchCalendar, refetchTimeline, refetchJobQueue]);
+  }, [
+    refetchCalendar,
+    refetchTimeline,
+    refetchJobQueue,
+    setSyncroNS,
+    setIsRefetching,
+  ]);
 
   return (
     <Wrapper style={GLOBAL_STYLES.safeAreaLight}>
@@ -222,7 +237,11 @@ export const HomeScreen = () => {
           <View
             style={[
               styles.floatingInfoFilter,
-              {flexDirection: 'row', alignItems: 'center'},
+              {
+                flexDirection: 'row',
+                alignItems: 'center',
+                bottom: insetBottom,
+              },
             ]}>
             <Icon name="exclamation" size={15} color="orange" type="solid" />
             <Label allowFontScaling={false} style={{color: '#000000'}}>

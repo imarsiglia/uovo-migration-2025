@@ -1,100 +1,155 @@
-// components/SpeechButton.tsx
-import { VOICE_EVENTS } from '@api/contants/constants';
 import {
   addEventListener,
-  destroy,
   setRecognitionLanguage,
   startListening,
   stopListening,
+  isRecognitionAvailable,
 } from '@ascendtis/react-native-voice-to-text';
-import { requestMicrophonePermission } from '@utils/permissions';
-import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Text, TouchableOpacity } from 'react-native';
+import {Icons} from '@assets/icons/icons';
+import {COLORS} from '@styles/colors';
+import {requestMicrophonePermission} from '@utils/permissions';
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
+import {StyleSheet} from 'react-native';
+import {PressableOpacity} from '../buttons/PressableOpacity';
+import {Label} from '../text/Label';
+import {VOICE_EVENTS} from '@api/contants/constants';
+
+export type SpeechFormInputRef = {
+  stop: () => Promise<void>;
+  isRecognitionAvailable: () => Promise<boolean>;
+};
 
 type Props = {
   onResult: (text: string) => void;
-  label?: string;
-  locale?: string; // por si quieres parametrizar (default es 'es-ES')
+  locale?: string; // por si quieres parametrizar el idioma (default: 'en-US')
 };
 
-export const SpeechButton = ({
-  onResult,
-  label = 'Hablar',
-  locale = 'es-ES',
-}: Props) => {
-  const [listening, setListening] = useState(false);
+export const SpeechButton = forwardRef<SpeechFormInputRef, Props>(
+  ({locale = 'en-US', onResult}, ref) => {
+    const manuallyStoppedRef = useRef(false);
+    const [listening, setListening] = useState(false);
 
-  useEffect(() => {
-    // Escucha resultados finales
-    const resultsSub = addEventListener(VOICE_EVENTS.RESULTS, (e: any) => {
-      const text = e?.value ?? e?.results?.transcriptions?.[0]?.text ?? '';
-      if (text) onResult(text);
-    });
-
-    // (Opcional) Parciales en tiempo real
-    // const partialSub = addEventListener(PARTIAL_RESULTS, (e: any) => {
-    //   if (e?.value) onResult(e.value);
-    // });
-
-    const startSub = addEventListener(VOICE_EVENTS.START, () => setListening(true));
-    const endSub = addEventListener(VOICE_EVENTS.END, () => setListening(false));
-    const errorSub = addEventListener(VOICE_EVENTS.ERROR, (e: any) => {
-      console.warn('Speech error:', e);
-      setListening(false);
-    });
-
-    return () => {
-      // Limpieza recomendada por la lib
-      destroy();
-      resultsSub.remove();
-      // partialSub?.remove();
-      startSub.remove();
-      endSub.remove();
-      errorSub.remove();
+    // Utilidad para extraer texto desde distintos formatos del evento
+    const extractText = (e: any): string => {
+      return (
+        e?.value ??
+        e?.results?.transcriptions?.[0]?.text ??
+        e?.partial ??
+        e?.text ??
+        ''
+      );
     };
-  }, [onResult]);
 
-  const start = useCallback(async () => {
-    const hasPermission = await requestMicrophonePermission();
-    if (!hasPermission) return;
+    useImperativeHandle(ref, () => ({
+      stop: async () => {
+        try {
+          manuallyStoppedRef.current = true;
+          await stopListening();
+          setListening(false);
+        } catch (err) {
+          console.warn('Error al detener reconocimiento:', err);
+        }
+      },
+      isRecognitionAvailable: async () => {
+        return isRecognitionAvailable();
+      },
+    }));
 
-    try {
-      // Configura el idioma antes de empezar (p.ej. 'es-ES')
-      await setRecognitionLanguage(locale);
-      await startListening(); // comienza a escuchar
-      // 'listening' pasará a true cuando llegue el evento START
-    } catch (e) {
-      console.error('startListening error:', e);
-      setListening(false);
-    }
-  }, [locale]);
+    useEffect(() => {
+      // Parciales (texto en vivo mientras se habla)
+      const partialSub = addEventListener(
+        VOICE_EVENTS.PARTIAL_RESULTS,
+        (e: any) => {
+          const partial = extractText(e);
+          if (partial) onResult(partial);
+        },
+      );
 
-  const stop = useCallback(async () => {
-    try {
-      await stopListening();
-      // 'listening' pasará a false con el evento END
-    } catch (e) {
-      console.error('stopListening error:', e);
-    }
-  }, []);
+      // Resultados finales
+      const resultsSub = addEventListener('onSpeechResults', (e: any) => {
+        // Si lo detuvimos manualmente, ignoramos este resultado final
+        if (manuallyStoppedRef.current) {
+          manuallyStoppedRef.current = false;
+          return;
+        }
 
-  const handlePress = async () => {
-    if (listening) {
-      await stop();
-    } else {
-      await start();
-    }
-  };
+        const finalText = extractText(e);
+        if (finalText) onResult(finalText.trim());
+      });
 
-  return (
-    <TouchableOpacity
-      onPress={handlePress}
-      style={{padding: 10, backgroundColor: '#007aff', borderRadius: 8}}>
-      {listening ? (
-        <ActivityIndicator color="#fff" />
-      ) : (
-        <Text style={{color: '#fff'}}>{label}</Text>
-      )}
-    </TouchableOpacity>
-  );
-};
+      // Estado de inicio/fin para el spinner y label
+      const startSub = addEventListener('onSpeechStart', () =>
+        setListening(true),
+      );
+      const endSub = addEventListener('onSpeechEnd', () => setListening(false));
+
+      // Errores
+      const errorSub = addEventListener('onSpeechError', (e: any) => {
+        console.warn('Speech error:', e);
+        setListening(false);
+      });
+
+      return () => {
+        // Limpieza recomendada: elimina listeners y destruye instancia nativa
+        partialSub.remove();
+        resultsSub.remove();
+        startSub.remove();
+        endSub.remove();
+        errorSub.remove();
+        // destroy();
+      };
+    }, [onResult]);
+
+    const handlePress = async () => {
+      const hasPermission = await requestMicrophonePermission();
+      if (!hasPermission) return;
+
+      try {
+        if (!listening) {
+          // await setRecognitionLanguage(locale);
+          await startListening();
+          // setListening(true) lo hará el evento START
+        } else {
+          manuallyStoppedRef.current = true;
+          await stopListening();
+          // setListening(false) lo hará el evento END
+        }
+      } catch (e) {
+        console.error('VoiceToText error:', e);
+        setListening(false);
+      }
+    };
+
+    return (
+      <PressableOpacity style={styles.dictationButton} onPress={handlePress}>
+        <Icons.Microphone fontSize={16} color={COLORS.primary} />
+        <Label style={styles.dictation}>
+          {listening ? 'Stop Dictation' : 'Take Dictation'}
+        </Label>
+      </PressableOpacity>
+    );
+  },
+);
+
+const styles = StyleSheet.create({
+  dictationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 5,
+    marginBottom: 12,
+    alignSelf: 'flex-start',
+  },
+  dictation: {
+    color: COLORS.primary,
+    fontSize: 14,
+    textDecorationLine: 'underline',
+  },
+});
+
+SpeechButton.displayName = 'SpeechButton';

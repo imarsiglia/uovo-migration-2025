@@ -22,7 +22,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 export const WoAttachmentScreen = () => {
   const {goBack} = useCustomNavigation();
-  const {id: idJob} = useTopSheetStore((d) => d.jobDetail);
+  const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
   const {data: list, isLoading} = useGetWoAttachments({
     idJob,
   });
@@ -33,9 +33,9 @@ export const WoAttachmentScreen = () => {
     return list?.filter((x) =>
       x.name.toUpperCase().includes(filter.trim().toUpperCase()),
     );
-  }, [filter]);
+  }, [list, filter]);
 
-  const openUrl = (url) => {
+  const openUrl = (url: string) => {
     Linking.openURL(url).catch((err) =>
       Alert.alert('Error', 'An error ocurrer while opening file'),
     );
@@ -61,7 +61,7 @@ export const WoAttachmentScreen = () => {
       <MinRoundedView />
 
       <View style={styles.containerSearchQueue}>
-        <SearchInput value={filter} onChange={(text) => setFilter(text)} />
+        <SearchInput placeholder='Search' value={filter} onChange={(text) => setFilter(text as string)} />
       </View>
 
       <FlatList

@@ -204,6 +204,7 @@ export const AddLaborSchema = yup
       .min(0, "Minutes can't be inferior than 0")
       .max(59, "Minutes can't be superior to 59")
       .nullable(),
+    reportDate: yup.date().required(DEFAULT_REQUIRED_MESSAGE),
   })
   // Autorrelleno: si uno es válido y el otro no, rellenar con 0
   .transform((current) => {
@@ -253,9 +254,9 @@ export const ClockInSchema = yup.object().shape({
 export type ClockInSchemaType = yup.InferType<typeof ClockInSchema>;
 
 export const TakeDimensionsSchema = yup.object().shape({
-  unpacked_height: decimalString(),
-  unpacked_length: decimalString(),
-  unpacked_width: decimalString(),
+  un_packed_height: decimalString(),
+  un_packed_length: decimalString(),
+  un_packed_width: decimalString(),
   packed_height: decimalString(),
   packed_length: decimalString(),
   packed_width: decimalString(),
@@ -354,3 +355,9 @@ export const ProfileSchema = yup.object({
 });
 
 export type ProfileSchemaType = yup.InferType<typeof ProfileSchema>;
+
+export const SaveTaskImageSchema = yup.object({
+  title: yup.string().trim().min(1, 'Please, enter a title').required('Please, enter a title'),
+  description: yup.string().optional().nullable(),
+});
+export type SaveTaskImageSchemaType = yup.InferType<typeof SaveTaskImageSchema>;

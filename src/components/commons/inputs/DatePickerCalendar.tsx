@@ -9,29 +9,36 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
-import CalendarPicker, { CustomDayHeaderStylesFunc } from 'react-native-calendar-picker';
+import CalendarPicker, {
+  CalendarPickerProps,
+  CustomDayHeaderStylesFunc,
+} from 'react-native-calendar-picker';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-fontawesome-pro';
-import { getFormattedDate } from '@utils/functions';
-import { COLORS } from '@styles/colors';
-import { Icons } from '@assets/icons/icons';
-import { PressableOpacity } from '@components/commons/buttons/PressableOpacity';
-import { Wrapper } from '@components/commons/wrappers/Wrapper';
+import {getFormattedDate} from '@utils/functions';
+import {COLORS} from '@styles/colors';
+import {Icons} from '@assets/icons/icons';
+import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {Label} from '../text/Label';
+
+type Props = {
+  selectedDate?: Date;
+  onSelectDate: (date: Date) => void;
+  containerStyles?: StyleProp<ViewStyle>;
+  inputTextStyles?: StyleProp<TextStyle>;
+} & CalendarPickerProps;
 
 export const DatePickerCalendar = ({
   selectedDate = new Date(),
   onSelectDate,
   containerStyles,
   inputTextStyles,
-}: {
-  selectedDate?: Date;
-  onSelectDate: (date: Date) => void;
-  containerStyles?: StyleProp<ViewStyle>;
-  inputTextStyles?: StyleProp<TextStyle>;
-}) => {
+  ...rest
+}: Props) => {
   const [isVisible, setIsVisible] = useState(false);
   const [temporalDate, setTemporalDate] = useState<Date>(
-    new Date(selectedDate.getTime()),
+    new Date(selectedDate?.getTime()),
   );
 
   const isToday = useMemo(() => {
@@ -43,7 +50,7 @@ export const DatePickerCalendar = ({
   };
 
   const openPicker = () => {
-    setTemporalDate(new Date(selectedDate.getTime()));
+    setTemporalDate(new Date(selectedDate?.getTime()));
     setIsVisible(true);
   };
 
@@ -56,7 +63,9 @@ export const DatePickerCalendar = ({
     closePicker();
   };
 
-  const customDayHeaderStylesCallback:CustomDayHeaderStylesFunc | undefined = ({dayOfWeek, month, year}) => {
+  const customDayHeaderStylesCallback:
+    | CustomDayHeaderStylesFunc
+    | undefined = ({dayOfWeek, month, year}) => {
     return {
       textStyle: {
         fontSize: 14,
@@ -72,7 +81,7 @@ export const DatePickerCalendar = ({
       style: {width: 40, height: 40},
       textStyle: {
         fontSize: 16,
-        color: "#3E3E3E"
+        color: '#3E3E3E',
       },
     };
   };
@@ -90,11 +99,13 @@ export const DatePickerCalendar = ({
           },
         ]}
         onPress={openPicker}>
-        <Text style={[styles.inputTextLabel, inputTextStyles]}>
+        <Label numberOfLines={1} style={[styles.inputTextLabel, inputTextStyles]}>
           {getFormattedDate(selectedDate, 'MM/DD/YYYY')}
           {isToday ? ' (Today)' : ''}
-        </Text>
-        <Icons.CalendarIcon color={'#4F46E5'} />
+        </Label>
+        <Wrapper style={{width: 20}}>
+          <Icons.CalendarIcon color={'#4F46E5'} />
+        </Wrapper>
       </PressableOpacity>
       <Modal isVisible={isVisible} backdropOpacity={0.5}>
         <View
@@ -107,6 +118,7 @@ export const DatePickerCalendar = ({
             width: '100%',
           }}>
           <View style={{height: 310}}>
+            {/* @ts-ignore */}
             <CalendarPicker
               monthTitleStyle={{fontSize: 18}}
               yearTitleStyle={{fontSize: 18}}
@@ -138,6 +150,7 @@ export const DatePickerCalendar = ({
                   <Icon name="angle-right" size={28} color="#3E3E3E" />
                 </View>
               }
+              {...rest}
             />
           </View>
           <View
@@ -145,7 +158,7 @@ export const DatePickerCalendar = ({
               display: 'flex',
               flexDirection: 'row',
               justifyContent: 'space-around',
-              marginTop: 10,
+              marginTop: 30,
             }}>
             <TouchableOpacity
               style={[
@@ -175,12 +188,14 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderColor: COLORS.borderInputColor,
     paddingHorizontal: 8,
-    height: 40,
+    minHeight: 40,
     verticalAlign: 'middle',
     justifyContent: 'center',
   },
   inputTextLabel: {
     color: '#8B8C8E',
+    flex: 1,
+    flexWrap: "nowrap"
   },
   buttonAction: {
     flex: 1,

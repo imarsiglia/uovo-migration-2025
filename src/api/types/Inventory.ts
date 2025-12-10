@@ -1,7 +1,7 @@
 import {BooleanStringType} from '@generalTypes/general';
 
 export type JobInventoryType = {
-  additional_info: string;
+  additional_info?: string | null;
   art_type: string;
   art_type_id: string;
   artist: string;
@@ -22,12 +22,12 @@ export type JobInventoryType = {
   medium: string;
   medium_id: string;
   must_update: number;
-  netsuite_image: null;
+  netsuite_image: string | null;
   packed_cubit_foot: string;
-  packed_height: string;
-  packed_length: string;
+  packed_height?: string;
+  packed_length?: string;
   packed_square_foot: string;
-  packed_width: string;
+  packed_width?: string;
   packing_details_display: string;
   parent: string;
   parent_url: string;
@@ -35,14 +35,17 @@ export type JobInventoryType = {
   provenance: null;
   status: string | null;
   unpacked_cubit_foot: string;
-  unpacked_height: string;
-  unpacked_length: string;
+  unpacked_height?: string;
+  unpacked_length?: string;
   unpacked_square_foot: string;
-  unpacked_width: string;
+  unpacked_width?: string;
   url: string;
-  weight: string;
+  weight?: string;
   year: string;
   parent_id?: string;
+
+  // offline
+  clientId?: string;
 };
 
 export type MinimalInventoryType = {
@@ -57,7 +60,7 @@ export type ReportResumeType = {
   id_inventory: number;
   id_job_inventory: number;
   name: string;
-  partial?: boolean;
+  partial?: boolean | null;
   report_count: number;
   unmanaged?: boolean;
   unmanaged_name?: string | null;
@@ -84,14 +87,14 @@ export type ConditionReportType = {
   art_type_name?: string | null;
   artist_name?: string | null;
   condition_artwork?: string | null;
-  condition_report_frame_fixture_list: ConditionReportFrameFixturePk[];
-  condition_report_hanging_system_list: ConditionReportHangingSystemPk[];
-  condition_report_packing_detail_list: ConditionReportPackingDetailPk[];
+  condition_report_frame_fixture_list?: ConditionReportFrameFixturePk[];
+  condition_report_hanging_system_list?: ConditionReportHangingSystemPk[];
+  condition_report_packing_detail_list?: ConditionReportPackingDetailPk[];
   date_report: string;
   edition: string;
-  frame_height: string;
-  frame_length: string;
-  frame_width: string;
+  frame_height?: string;
+  frame_length?: string;
+  frame_width?: string;
   id: number;
   id_job: number;
   id_job_inventory: number;
@@ -111,8 +114,12 @@ export type ConditionReportType = {
   un_packed_width: string;
   unmanaged_name: string;
   unpacked_weight: string;
-  weight: string;
+  weight?: string;
   year: string;
+  overal_condition_artwork?: string;
+
+  // offline
+  clientId?: string;
 };
 
 export type TotalPhotoReportType = {

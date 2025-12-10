@@ -7,7 +7,7 @@ type Props = {
   id: number;
   name: string;
   clientRef: string;
-  partial?: boolean;
+  partial?: boolean | null;
   onEdit: () => void;
 };
 

@@ -30,6 +30,10 @@ export const ResumeTopsheet = () => {
     return getFormattedDate(jobDetail?.end_date, 'dddd DD [•] MMM YYYY');
   }, [jobDetail?.end_date]);
 
+  const isWoAttachmentsAvaibale = useMemo(() => {
+    return jobDetail?.file_counter! > 0;
+  }, [jobDetail?.file_counter]);
+
   if (!jobDetail) {
     return <></>;
   }
@@ -83,11 +87,27 @@ export const ResumeTopsheet = () => {
           width: '100%',
         }}>
         <PressableOpacity
-          style={styles.btnOptionAttachments}
+          style={[
+            styles.btnOptionAttachments,
+            !isWoAttachmentsAvaibale
+              ? {
+                  backgroundColor: 'gray',
+                  shadowColor: 'gray',
+                }
+              : undefined,
+          ]}
           onPress={() => navigate(RoutesNavigation.WoAttachment)}>
           <Label style={styles.btnOptionAttachmentsText}>WO Attachments</Label>
           <Wrapper style={styles.btnOptionAttachmentsCounter}>
-            <Label style={styles.btnOptionAttachmentsNumeric}>
+            <Label
+              style={[
+                styles.btnOptionAttachmentsNumeric,
+                !isWoAttachmentsAvaibale
+                  ? {
+                      color: 'gray',
+                    }
+                  : undefined,
+              ]}>
               {jobDetail.file_counter ? jobDetail.file_counter : '0'}
             </Label>
           </Wrapper>
@@ -132,7 +152,7 @@ const styles = StyleSheet.create({
     paddingLeft: 3,
     paddingRight: 3,
     minWidth: 25,
-    height: 25,
+    minHeight: 25,
     justifyContent: 'center',
   },
   btnOptionAttachmentsText: {
@@ -149,7 +169,7 @@ const styles = StyleSheet.create({
     paddingRight: 20,
     alignItems: 'center',
     marginRight: 2,
-    height: 40,
+    minHeight: 40,
     shadowColor: COLORS.primary,
     shadowOffset: {height: 5, width: 1},
     shadowRadius: 10,

@@ -37,12 +37,19 @@ export const API_REMOVE_TEAM_MEMBER = '/job/team/remove';
 //signatures
 export const API_GET_SIGNATURES = '/signature/query';
 export const API_SAVE_SIGNATURE = '/signature/register';
-export const API_DELETE_SIGNATURE = '/signature/remove/';
+export const API_DELETE_SIGNATURE = '/signature/remove';
 
 // notes
 export const API_GET_NOTES = '/notes/query';
 export const API_SAVE_NOTE = '/notes/register';
 export const API_DELETE_NOTE = '/notes/remove';
+
+// task images
+export const API_GET_IMAGES = '/jobimage/query';
+export const API_REGISTER_IMAGES = '/jobimage/register';
+export const API_UPDATE_IMAGES = '/jobimage/update';
+export const API_DELETE_IMAGE = '/jobimage/remove';
+export const API_GET_FULL_IMAGE = '/jobimage/loadimgfull';
 
 // report materials
 export const API_GET_REPORT_MATERIALS = '/material/register/query';
@@ -107,6 +114,25 @@ export const API_GET_CONDITION_CHECK_BY_INVENTORY = '/conditioncheck/list';
 
 export const API_GET_TOTAL_PHOTOS_CONDITION_REPORT = '/conditionreport/totalPhotos';
 export const API_GET_TOTAL_PHOTOS_CONDITION_CHECK = '/conditioncheck/totalPhotos';
+
+export const API_GET_PHOTOS_CONDITION = '/loadImages';
+export const API_SAVE_PHOTO_CONDITION = '/reportImageDetail';
+export const API_GET_PHOTO_CONDITION_DETAIL = '/loadDetail';
+export const API_GET_PHOTO_CONDITION_OVERVIEW = '/loadOverview';
+
+// Photo zoom
+export const API_SAVE_ZOOM_SCREEN = '/reportImage';
+
+// export const API_GET_TOTAL_PHOTOS_CONDITION_CHECK = '/conditioncheck/totalPhotos';
+
+// const response = await fetchData.Get(
+//         'resources/' +
+//           props.conditionType +
+//           '/loadImages?reportType=' +
+//           props.reportType +
+//           '&reportId=' +
+//           (reportId ? reportId : props.reportId),
+//       );
 
 // GENERAL
 export const API_GET_PACKING_DETAILS = '/conditionreport/load/packingdetail';

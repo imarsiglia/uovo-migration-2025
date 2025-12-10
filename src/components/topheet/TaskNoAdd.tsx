@@ -1,8 +1,7 @@
+import OfflineValidation from '@components/offline/OfflineValidation';
 import { GLOBAL_STYLES } from '@styles/globalStyles';
-import React from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
-// import OfflineValidation from './offline/OfflineValidation';
 
 type Props = {
   onPress: () => void;
@@ -31,7 +30,7 @@ const TaskNoAdd = ({onPress, description, quantity, offline, idJob}: Props) => {
             {flexDirection: 'row', alignItems: 'center', gap: 5},
           ]}>
           <Text style={[GLOBAL_STYLES.bold, styles.labelTask]}>{description}</Text>
-          {/* <OfflineValidation idJob={idJob} offline={offline} /> */}
+          <OfflineValidation offline={offline} />
         </View>
       </View>
 

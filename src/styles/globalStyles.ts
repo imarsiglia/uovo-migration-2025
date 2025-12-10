@@ -34,6 +34,9 @@ export const GLOBAL_STYLES = StyleSheet.create({
   title: {
     fontSize: 30,
   },
+  subtitle: {
+    fontSize: 20,
+  },
   bold: {
     fontWeight: 'bold',
   },
@@ -100,8 +103,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
   },
   bodyModalClockOut: {
     padding: 14,
-    paddingLeft: 40,
-    paddingRight: 40,
+    paddingHorizontal: 40,
     justifyContent: 'center',
     alignItems: 'center',
   },

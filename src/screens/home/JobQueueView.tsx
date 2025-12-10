@@ -49,7 +49,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 let timezone = new Date().getTimezoneOffset() / 60;
 
 export const JobQueueViewCmp = () => {
-  const {activeTab, isFilterActive} = useGeneralStore();
+  const {isFilterActive} = useGeneralStore();
   const {online} = useOnline();
   const sessionUser = useAuth((d) => d.user);
   const {
@@ -192,6 +192,7 @@ export const JobQueueViewCmp = () => {
           jobQueue={true}
           isFilterActive={isFilterActive}
           isOnline={online}
+          userStatus={item.user_status}
         />
       ),
     [handleItemPress, isFilterActive, online],

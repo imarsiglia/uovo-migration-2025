@@ -57,19 +57,19 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Overlay con opacidad
+    backgroundColor: 'rgba(0, 0, 0, 0.2)', // Overlay con opacidad
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1001,
   },
   modal: {
-    width: '80%',
-    height: '30%',
-    backgroundColor: 'white', // Fondo blanco del modal
+    width: 100,
+    height: 100,
+    backgroundColor: 'white',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 5, // Sombra en Android
+    elevation: 5, 
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,

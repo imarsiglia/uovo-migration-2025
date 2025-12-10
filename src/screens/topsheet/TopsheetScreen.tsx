@@ -19,8 +19,8 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {deriveVisualState} from '@utils/functions';
-import {useCallback, useEffect, useMemo, useRef} from 'react';
+import {deriveVisualGroupState, deriveVisualUserState} from '@utils/functions';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Alert, Animated, StyleSheet, View} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 import {LocationTopsheet} from './LocationTopsheet';
@@ -29,6 +29,17 @@ import {TaskTopsheet} from './TaskTopsheet';
 import {TeamTopsheet} from './TeamTopsheet';
 import {ClockinButton} from '@components/clockin/ClockinButton';
 import {InventoryTopsheet} from './InventoryTopsheet';
+import {
+  GLOBAL_FONT_SIZE_MULTIPLIER_MD,
+  QUERY_KEYS,
+} from '@api/contants/constants';
+import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import useInventoryStore from '@store/inventory';
+import {useCustomInsetBottom} from '@hooks/useCustomInsetBottom';
+import {useQueryClient} from '@tanstack/react-query';
+import {useGetReportMaterialsInventoryAll} from '@api/hooks/HooksTaskServices';
+import {useGetJobInventory} from '@api/hooks/HooksInventoryServices';
+import {useGetJobData} from '@api/hooks/HooksByJob';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -40,6 +51,9 @@ export const TopsheetScreen = ({route}: Props) => {
   const {setJobDetail, setActiveTab, activeTab, setIsJobQueue} =
     useTopSheetStore();
 
+  const insetBottom = useCustomInsetBottom();
+  const [isRefetching, setIsRefetching] = useState(false);
+
   const {
     params: {id, queue, nsItemId},
   } = route;
@@ -48,12 +62,24 @@ export const TopsheetScreen = ({route}: Props) => {
     data: jobDetail,
     isLoading,
     refetch,
-    isRefetching,
   } = useGetTopsheet({
     id,
     queue,
     enabled: true,
   });
+
+  // para hacer el syncro
+  const {orderFilter, orderType, topSheetFilter} = useInventoryStore();
+  const {refetchAll} = useRefreshIndicator([
+    [QUERY_KEYS.TASK_COUNT, {idJob: jobDetail?.id}],
+    [
+      QUERY_KEYS.JOB_INVENTORY,
+      {idJob: jobDetail?.id!, filter: topSheetFilter, orderFilter, orderType},
+    ],
+  ]);
+
+  // prefetch general data from job
+  useGetJobData(jobDetail?.id);
 
   const heightAnim = useRef(new Animated.Value(36)).current;
   const translateY = useRef(new Animated.Value(0)).current; // empieza fuera de pantalla
@@ -126,31 +152,26 @@ export const TopsheetScreen = ({route}: Props) => {
   // const loading = useMinBusy(isRefetching, 1000);
 
   const syncro = useCallback(() => {
-    refetch();
-    // setIsRefetching(true);
-    // let refetchPromise: Promise<unknown>;
-    // switch (activeTab) {
-    //   case 0: // timeline
-    //     refetchPromise = Promise.all([refetchCalendar(), refetchTimeline()]);
-    //     break;
-    //   case 1: // jobqueue
-    //     refetchPromise = refetchJobQueue();
-    //     break;
-    //   default:
-    //     refetchPromise = Promise.resolve(); // evita que sea undefined
-    // }
-    // return refetchPromise.finally(() => setIsRefetching(false));
-    // }, [activeTab, refetchCalendar, refetchTimeline, refetchJobQueue]);
-  }, []);
+    setIsRefetching(true);
+    let refetchPromise = Promise.all([refetch(), refetchAll()]);
+    return refetchPromise.finally(() => setIsRefetching(false));
+  }, [refetch, refetchAll]);
 
-  const {visual, label} = useMemo(
+  const {visual: visualGroupStatus, label: labelGroupStatus} = useMemo(
     () =>
-      deriveVisualState({
+      deriveVisualGroupState({
         offline: !online,
-        currentClockInStatus: jobDetail?.current_clock_in?.status,
         woStatus: jobDetail?.wo_status,
       }),
-    [online, jobDetail?.current_clock_in?.status, jobDetail?.wo_status],
+    [online, jobDetail?.wo_status],
+  );
+
+  const {visual: visualUserStatus, label: labelUserStatus} = useMemo(
+    () =>
+      deriveVisualUserState({
+        currentClockInStatus: jobDetail?.current_clock_in?.status,
+      }),
+    [jobDetail?.current_clock_in?.status],
   );
 
   const goToTeamMember = useCallback(() => {
@@ -215,15 +236,50 @@ export const TopsheetScreen = ({route}: Props) => {
                     GLOBAL_STYLES.title,
                     GLOBAL_STYLES.bold,
                     styles.topsheet,
-                  ]}>
+                  ]}
+                  maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_MD}>
                   {jobDetail?.netsuite_order}
                 </Label>
-                <Wrapper
-                  style={[styles.containerState, containerByVisual[visual]]}>
-                  <Label style={[{fontSize: 12}, textByVisual[visual]]}>
-                    {label}
+                <Wrapper style={styles.containerWoStatus}>
+                  <Label
+                    style={styles.textStatus}
+                    maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_MD}>
+                    Group status
                   </Label>
+                  <Wrapper
+                    style={[
+                      styles.containerState,
+                      containerByVisual[visualGroupStatus],
+                    ]}>
+                    <Label
+                      style={[{fontSize: 12}, textByVisual[visualGroupStatus]]}>
+                      {labelGroupStatus}
+                    </Label>
+                  </Wrapper>
                 </Wrapper>
+
+                {visualUserStatus && (
+                  <Wrapper style={styles.containerWoStatus}>
+                    <Label
+                      style={styles.textStatus}
+                      maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_MD}>
+                      User status
+                    </Label>
+                    <Wrapper
+                      style={[
+                        styles.containerState,
+                        containerByVisual[visualUserStatus],
+                      ]}>
+                      <Label
+                        style={[
+                          {fontSize: 12},
+                          textByVisual[visualUserStatus],
+                        ]}>
+                        {labelUserStatus}
+                      </Label>
+                    </Wrapper>
+                  </Wrapper>
+                )}
               </Wrapper>
               {jobDetail?.crew?.length! > 0 && (
                 <Animated.View
@@ -232,6 +288,8 @@ export const TopsheetScreen = ({route}: Props) => {
                     opacity,
                     height: animatedHeight,
                     overflow: 'hidden',
+                    flexDirection: "row",
+                    alignItems: "flex-start"
                   }}>
                   <TeamAvatars
                     crew={jobDetail!.crew}
@@ -302,11 +360,11 @@ export const TopsheetScreen = ({route}: Props) => {
             <Wrapper
               style={{
                 position: 'absolute',
-                bottom: 0,
+                bottom: insetBottom,
                 width: '100%',
-                paddingVertical: 5,
                 backgroundColor: 'white',
                 paddingHorizontal: 10,
+                paddingBottom: 5,
               }}>
               <ClockinButton />
             </Wrapper>
@@ -395,6 +453,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 3,
+  },
+  textStatus: {
+    fontSize: 10,
+    marginTop: 2,
+    color: '#2f2f2f',
+  },
+  containerWoStatus: {
+    alignItems: 'center',
+    gap: 5,
   },
 });
 

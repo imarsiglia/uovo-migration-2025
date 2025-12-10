@@ -87,6 +87,7 @@ export function AutocompleteContext<T extends FieldValues>({
         return (
           <>
             <CustomAutocomplete
+              useFilter={false}
               {...rest}
               controller={(c) => {
                 ddCtrlRef.current = c;
@@ -103,7 +104,6 @@ export function AutocompleteContext<T extends FieldValues>({
                 inputContainerStyle,
                 fieldState.error && {borderColor: COLORS.error, borderWidth: 1},
               ]}
-              useFilter={false}
             />
           </>
         );

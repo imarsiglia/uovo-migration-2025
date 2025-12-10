@@ -24,6 +24,7 @@ const DEFAULT_PERSISTENCE_CONFIG = {
   staleTime: 5 * 60 * 1000,
   gcTime: 7 * 24 * 60 * 60 * 1000,
   retry: 1,
+  refetchOnMount: 'always' as const,
   placeholderData: keepPreviousData,
 };
 
@@ -34,10 +35,7 @@ export const useGetCalendar = (date = new Date()) => {
   return useQuery({
     queryKey: [QUERY_KEYS.CALENDAR, year, month],
     queryFn: () => jobServices.calendar(month, year),
-    // staleTime: 0,
-    // gcTime: 7 * 24 * 60 * 60 * 1000,
-    retry: 1,
-    placeholderData: keepPreviousData,
+    ...DEFAULT_PERSISTENCE_CONFIG,
   });
 };
 
@@ -86,7 +84,7 @@ export const useGetJobQueue = ({
         start,
         limit,
       }),
-    retry: 1,
+    ...DEFAULT_PERSISTENCE_CONFIG,
   });
 };
 
@@ -98,12 +96,13 @@ export const useGetTopsheet = ({
     queryKey: [QUERY_KEYS.TOPSHEET, props],
     queryFn: () => jobServices.topsheet(props),
     // staleTime: 0,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 0,
+    // staleTime: 5 * 60 * 1000,
+    // gcTime: 0,
     // gcTime: 7 * 24 * 60 * 60 * 1000,
     enabled: props.id != null && props.queue != null && enabled,
-    retry: 1,
-    placeholderData: undefined,
+    // retry: 1,
+    // placeholderData: undefined,
+    ...DEFAULT_PERSISTENCE_CONFIG,
   });
 };
 
@@ -122,18 +121,12 @@ export const useReportIssue = () => {
   });
 };
 
-export const useGetLocationNotes = (
-  props: LocationNotesApiProps,
-  options?: UseQueryOptions<any | undefined, Error> | undefined,
-) => {
+export const useGetLocationNotes = (props: LocationNotesApiProps) => {
   return useQuery({
     queryKey: [QUERY_KEYS.LOCATION_NOTES, props],
     queryFn: () => jobServices.locationNotes(props),
-    // staleTime: 0,
-    // gcTime: 7 * 24 * 60 * 60 * 1000,
     enabled: !!props?.idJob && !!props?.type,
     ...DEFAULT_PERSISTENCE_CONFIG,
-    ...options,
   });
 };
 

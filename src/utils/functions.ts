@@ -1,5 +1,6 @@
+import 'react-native-get-random-values';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {Alert, Linking, Platform} from 'react-native';
+import {Dimensions, Easing, Linking, Platform} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import * as RNLocalize from 'react-native-localize';
 import moment from 'moment';
@@ -13,13 +14,16 @@ import {
   PAUSED_COLOR_CREW,
   PAUSED_STATUS,
   PAUSED_STATUS_CREW,
+  REPREPPED_STATUS,
   STARTED_COLOR_CREW,
   STARTED_STATUS,
   STARTED_STATUS_CREW,
   STATUS_NATIONAL_SHUTTLE,
   StatusNationalShuttleTye,
+  WO_CONFIRMED_STATUS,
 } from '@api/contants/constants';
 import Orientation from 'react-native-orientation-locker';
+import {v4 as uuid} from 'uuid';
 
 export function getFormattedDate(date?: string | Date | null, format?: string) {
   if (!date) {
@@ -109,22 +113,6 @@ export async function closeSessionOnGoogle() {
   } catch (e) {}
 }
 
-export function showAlertDialogWithOptions(onConfirm: () => void) {
-  Alert.alert(
-    'Logout',
-    'Sure want to logout?',
-    [
-      {
-        text: 'Cancel',
-        onPress: () => console.log('Cancel Pressed'),
-        style: 'cancel',
-      },
-      {text: 'Yes', onPress: onConfirm},
-    ],
-    {cancelable: false},
-  );
-}
-
 export function adaptAgendaItemsToArray(itemsObj: AgendaSchedule) {
   return Object.keys(itemsObj)
     .sort() // ordena por fecha
@@ -183,22 +171,31 @@ export function getItemColorStatus(loadStatus: StatusNationalShuttleTye) {
   );
 }
 
-export function deriveVisualState({
+export function deriveVisualGroupState({
   offline,
-  currentClockInStatus,
   woStatus,
 }: {
   offline: boolean;
-  currentClockInStatus?: string | null;
   woStatus?: string | null;
 }) {
   if (offline) return {visual: 'offline' as const, label: 'Offline'};
-
-  // Prioriza current_clock_in.status si existe
-  const status = currentClockInStatus ?? woStatus ?? null;
-
+  const status = woStatus ?? null;
   if (!status) return {visual: 'inProgress' as const, label: 'WO Confirmed'};
+  return getDerivedState(status);
+}
 
+export function deriveVisualUserState({
+  currentClockInStatus,
+}: {
+  currentClockInStatus?: string | null;
+}) {
+  if (!currentClockInStatus) {
+    return {visual: null, label: null};
+  }
+  return getDerivedState(currentClockInStatus);
+}
+
+function getDerivedState(status: string) {
   switch (status) {
     case STARTED_STATUS:
       return {visual: 'inProgress' as const, label: status};
@@ -210,6 +207,44 @@ export function deriveVisualState({
       return {visual: 'inProgress' as const, label: status};
   }
 }
+
+export const getGroupStatusType = (
+  isOnline?: boolean,
+  status?: string | null,
+) => {
+  if (!isOnline) return 'offline';
+  if (
+    status === WO_CONFIRMED_STATUS ||
+    status === 'Scheduled' ||
+    status?.includes(STARTED_STATUS)
+  ) {
+    return 'scheduled';
+  }
+  if (status?.includes(PAUSED_STATUS)) {
+    return 'paused';
+  }
+  if (status?.includes(REPREPPED_STATUS)) {
+    return 'reprepped';
+  }
+  return 'canceled';
+};
+
+export const getUserStatusType = (status?: string | null) => {
+  if (
+    status === WO_CONFIRMED_STATUS ||
+    status === 'Scheduled' ||
+    status?.includes(STARTED_STATUS)
+  ) {
+    return 'scheduled';
+  }
+  if (status?.includes(PAUSED_STATUS)) {
+    return 'paused';
+  }
+  if (status?.includes(REPREPPED_STATUS)) {
+    return 'reprepped';
+  }
+  return 'canceled';
+};
 
 export function cleanAddress(address: string) {
   if (!address) {
@@ -309,28 +344,87 @@ export function sortList<T>(
   field: keyof T,
   ascending: boolean = true,
 ): T[] {
-  return list?.sort((a, b) => {
-    const fieldA = a[field];
-    const fieldB = b[field];
+  return (
+    list?.sort((a, b) => {
+      const fieldA = a[field];
+      const fieldB = b[field];
 
-    if (fieldA === null && fieldB === null) {
-      return 0;
-    }
-    if (fieldA === null) {
-      return 1;
-    }
-    if (fieldB === null) {
-      return -1;
-    }
+      if (fieldA === null && fieldB === null) {
+        return 0;
+      }
+      if (fieldA === null) {
+        return 1;
+      }
+      if (fieldB === null) {
+        return -1;
+      }
 
-    if (typeof fieldA === 'string' && typeof fieldB === 'string') {
-      return ascending
-        ? fieldA.localeCompare(fieldB)
-        : fieldB.localeCompare(fieldA);
-    } else if (typeof fieldA === 'number' && typeof fieldB === 'number') {
-      return ascending ? fieldA - fieldB : fieldB - fieldA;
-    } else {
-      return 0;
-    }
-  }) ?? [];
+      if (typeof fieldA === 'string' && typeof fieldB === 'string') {
+        return ascending
+          ? fieldA.localeCompare(fieldB)
+          : fieldB.localeCompare(fieldA);
+      } else if (typeof fieldA === 'number' && typeof fieldB === 'number') {
+        return ascending ? fieldA - fieldB : fieldB - fieldA;
+      } else {
+        return 0;
+      }
+    }) ?? []
+  );
 }
+
+export const sleep = (ms: number) =>
+  new Promise<void>((res) => setTimeout(res, ms));
+
+export function generateUUID() {
+  return uuid();
+}
+
+export async function promisePool<T>(
+  tasks: Array<() => Promise<T>>,
+  concurrency = 4,
+): Promise<void> {
+  if (!tasks.length) return;
+  const queue = tasks.slice(); // copia
+  const worker = async () => {
+    while (queue.length) {
+      const job = queue.shift();
+      if (!job) break;
+      await job();
+    }
+  };
+  const workers = Array.from(
+    {length: Math.min(concurrency, tasks.length)},
+    worker,
+  );
+  await Promise.allSettled(workers);
+}
+
+const {height} = Dimensions.get('screen');
+
+export const DEFAULT_OPTIONS_MODALFY = {
+  backdropOpacity: 0.5,
+  animateInConfig: {
+    easing: Easing.bezier(0.42, -0.03, 0.27, 0.95),
+    duration: 450,
+  },
+  animateOutConfig: {
+    easing: Easing.bezier(0.42, -0.03, 0.27, 0.95),
+    duration: 450,
+  },
+  transitionOptions: (animatedValue: any) => ({
+    opacity: animatedValue.interpolate({
+      inputRange: [0, 1, 2],
+      outputRange: [0, 1, 0.9],
+    }),
+    transform: [
+      {perspective: 2000},
+      {
+        translateY: animatedValue.interpolate({
+          inputRange: [0, 1, 2],
+          outputRange: [height / 1.5, 0, -height / 1.5],
+          extrapolate: 'clamp',
+        }),
+      },
+    ],
+  }),
+};

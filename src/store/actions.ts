@@ -4,11 +4,23 @@ import {
   ModalDialogContentType,
 } from './modals';
 
-export async function loadingWrapperPromise<T>(promise: Promise<T>) {
+export async function loadingWrapperPromise<T>(
+  fnOrPromise: Promise<T> | (() => Promise<T>),
+  opts?: {onError?: (e: any) => void},
+) {
   modalLoadingSetter({loadingVisible: true});
-  const res = await promise;
-  modalLoadingSetter({loadingVisible: false});
-  return res;
+  try {
+    const res =
+      typeof fnOrPromise === 'function'
+        ? await (fnOrPromise as () => Promise<T>)()
+        : await fnOrPromise;
+    return res;
+  } catch (e) {
+    opts?.onError?.(e);
+    throw e;
+  } finally {
+    modalLoadingSetter({loadingVisible: false});
+  }
 }
 
 export function openGeneralDialog(props: ModalDialogContentType) {

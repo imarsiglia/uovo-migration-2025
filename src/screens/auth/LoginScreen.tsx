@@ -16,7 +16,6 @@ import { COLORS } from '@styles/colors';
 import { closeSessionOnGoogle, getDeviceInfo } from '@utils/functions';
 import { useCallback, useEffect } from 'react';
 import { Alert, Image, Platform, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCustomNavigation } from 'src/hooks/useCustomNavigation';
 
 const logotipo = require('../../assets/logotipo/logotipo.png');
@@ -27,7 +26,6 @@ export const LoginScreen = () => {
   const setSession = useAuth((d) => d.setSession);
   const {mutateAsync: loginAsync, isPending} = useLogin();
   const {resetTo, navigate} = useCustomNavigation();
-  const {top} = useSafeAreaInsets();
 
   useEffect(() => {
     // Orientation.lockToPortrait();

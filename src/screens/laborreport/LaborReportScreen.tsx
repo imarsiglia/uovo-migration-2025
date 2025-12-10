@@ -115,6 +115,7 @@ export const LaborReportScreen = () => {
                     addedManually: item.added_manually,
                     workedHours: item.worked_hour,
                     userName: item.user_name,
+                    customDateReport: item.custom_date_report
                   })) ?? [],
             })
               .then((d) => {

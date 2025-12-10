@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     width: '100%',
     borderWidth: 0.5,
-    borderRadius: 10,
+    borderRadius: 100,
     borderColor: COLORS.gray,
     color: COLORS.inputTextColor,
     height: 40,
@@ -102,6 +102,7 @@ const styles = StyleSheet.create({
     height: '100%',
     fontSize: 16,
     flex: 1,
+    color: COLORS.inputTextColor
   },
   disabled: {
     backgroundColor: COLORS.disabled,

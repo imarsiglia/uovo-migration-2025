@@ -1,5 +1,5 @@
-import { OfflineItemType } from "@generalTypes/general";
-import { LaborCodeType } from "./Jobs";
+import {OfflineItemType} from '@generalTypes/general';
+import {LaborCodeType} from './Jobs';
 
 export type SignatureType = {
   id: number;
@@ -9,6 +9,9 @@ export type SignatureType = {
   type: string;
   signature_data: string;
   signature_timestamp: string;
+  // for offline
+  clientId?: string; 
+  _pending?: boolean;
 };
 
 export type NoteType = {
@@ -47,6 +50,9 @@ export type ReportMaterialType = {
   updated_date?: string;
   user_info?: UserInfoReportMaterialType;
   idUser?: number | null;
+  // offline
+  clientId?: string;
+  _pending?: boolean;
 };
 
 export type HistoryReportMaterialType = {
@@ -68,6 +74,8 @@ export type AttachmentType = {
 export type BolCountType = {
   pbs: string;
   packageCount: number;
+  // offline
+  clientId?: string;
 };
 
 export type LaborReportType = {
@@ -88,4 +96,32 @@ export type LaborReportType = {
 export type EmployeeType = {
   id: string;
   name: string;
+};
+
+export type TaskPhotoType = {
+  id?: number;
+  path?: string;
+  photo?: string; // base64 image data
+  // for offline
+  _fileUri?: string;
+  _dirty?: boolean;
+  clientId?: string; 
+  _pending?: boolean;
+  _deleted?: boolean;
+  _updated_at?: number;
+};
+
+export type TaskImageType = {
+  id_job: number;
+  id_user: number;
+  title: string;
+  description: string | undefined;
+  update_time: string;
+  photos: TaskPhotoType[];
+  // for offline
+  clientId?: string; 
+  _pending?: boolean;
+  _deleted?: boolean;
+  clientIdEdit?: string; 
+  clientIdDelete?: string; 
 };

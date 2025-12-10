@@ -14,7 +14,10 @@ import Icon from 'react-native-fontawesome-pro';
 import {getItemColorStatus} from '../../utils/functions';
 import useNationalShuttleStore from '@store/nationalShuttle';
 import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
-import {STATUS_NATIONAL_SHUTTLE} from '@api/contants/constants';
+import {
+  GLOBAL_FONT_SIZE_MULTIPLIER_XS,
+  STATUS_NATIONAL_SHUTTLE,
+} from '@api/contants/constants';
 import {EmptyCard} from '@components/commons/cards/EmptyCard';
 import {CustomPressable} from '@components/commons/pressable/CustomPressable';
 import {COLORS} from '@styles/colors';
@@ -384,7 +387,7 @@ export const RowNS = ({
             onPress={onDelete}>
             <Text
               style={[NSInventoryStyles.columnText, {color: 'white'}]}
-              allowFontScaling={false}>
+              maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_XS}>
               Remove
             </Text>
             <Icon name="trash" color="white" size={15} type="solid" />
@@ -501,7 +504,9 @@ const ColorLabel = ({color, label}: {color: string; label: string}) => (
         backgroundColor: color,
       }}
     />
-    <Text style={{fontSize: 10, color: '#404040'}} allowFontScaling={false}>
+    <Text
+      style={{fontSize: 10, color: '#404040'}}
+      maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_XS}>
       {label}
     </Text>
   </View>

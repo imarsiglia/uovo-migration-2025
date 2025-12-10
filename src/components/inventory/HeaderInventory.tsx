@@ -1,4 +1,4 @@
-import {COLUMNS_WIDTH} from '@api/contants/constants';
+import {COLUMNS_WIDTH, GLOBAL_FONT_SIZE_MULTIPLIER_MD} from '@api/contants/constants';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {InputCheck} from '@components/commons/inputs/InputCheck';
 import {Label} from '@components/commons/text/Label';
@@ -31,6 +31,9 @@ type Props = {
   onCheckAll: () => void;
   showSecondaryId?: boolean;
   deleteBtn?: string;
+  hasImage: string;
+  isAltIdVisible?: boolean;
+  isClientRefVisible?: boolean;
 };
 
 const HeaderInventory = ({
@@ -49,6 +52,9 @@ const HeaderInventory = ({
   onCheckAll,
   showSecondaryId,
   deleteBtn,
+  hasImage,
+  isAltIdVisible,
+  isClientRefVisible,
 }: Props) => {
   const {orderFilter, orderType, setOrderFilter, setOrderType} =
     useInventoryStore();
@@ -71,7 +77,7 @@ const HeaderInventory = ({
         onPress={() => sort({filterType})}>
         <Label
           style={[styles.column, marked ? {color: '#00D3ED'} : {}]}
-          allowFontScaling={false}>
+          maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_MD}>
           {columnName}
         </Label>
 
@@ -170,7 +176,7 @@ const HeaderInventory = ({
         }}
       />
 
-      {showSecondaryId == true && (
+      {showSecondaryId == true && isAltIdVisible && (
         <ColumnSort
           filterType="clientinv2"
           columnName="ALT ID"
@@ -182,15 +188,17 @@ const HeaderInventory = ({
         />
       )}
 
-      <ColumnSort
-        filterType="clientref"
-        columnName={clientRef}
-        propStyles={{
-          width: COLUMNS_WIDTH.CLIENT_REF,
-          maxWidth: COLUMNS_WIDTH.CLIENT_REF,
-          minWidth: COLUMNS_WIDTH.CLIENT_REF,
-        }}
-      />
+      {isClientRefVisible && (
+        <ColumnSort
+          filterType="clientref"
+          columnName={clientRef}
+          propStyles={{
+            width: COLUMNS_WIDTH.CLIENT_REF,
+            maxWidth: COLUMNS_WIDTH.CLIENT_REF,
+            minWidth: COLUMNS_WIDTH.CLIENT_REF,
+          }}
+        />
+      )}
 
       <ColumnSort
         filterType="fromlocationDisplay"
@@ -259,6 +267,16 @@ const HeaderInventory = ({
           width: COLUMNS_WIDTH.CONDITION,
           maxWidth: COLUMNS_WIDTH.CONDITION,
           minWidth: COLUMNS_WIDTH.CONDITION,
+        }}
+      />
+
+      <ColumnSort
+        filterType="netsuiteImage"
+        columnName={hasImage}
+        propStyles={{
+          width: COLUMNS_WIDTH.HAS_IMAGE,
+          maxWidth: COLUMNS_WIDTH.HAS_IMAGE,
+          minWidth: COLUMNS_WIDTH.HAS_IMAGE,
         }}
       />
 

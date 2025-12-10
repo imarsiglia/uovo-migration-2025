@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Platform, ScrollView, StyleSheet} from 'react-native';
+import {Keyboard, Platform, ScrollView, StyleSheet} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 // import {useFocusEffect} from '@react-navigation/native';
 import {
@@ -18,10 +18,15 @@ import {
 import {useGetJobInventory} from '@api/hooks/HooksInventoryServices';
 import {
   useGetConditionReportbyInventory,
+  useGetResumeConditionReport,
   useGetTotalPhotosConditionReport,
   useSaveConditionReport,
 } from '@api/hooks/HooksReportServices';
-import {JobInventoryType} from '@api/types/Inventory';
+import {
+  ConditionReportType,
+  JobInventoryType,
+  ReportResumeType,
+} from '@api/types/Inventory';
 import {CustomAutocomplete} from '@components/commons/autocomplete/CustomAutocomplete';
 import {BackButton} from '@components/commons/buttons/BackButton';
 import {AutocompleteContext} from '@components/commons/form/AutocompleteContext';
@@ -41,13 +46,13 @@ import {
   ConditionReportSchema,
   ConditionReportSchemaType,
 } from '@generalTypes/schemas';
-import {RootStackParamList} from '@navigation/types';
+import {RootStackParamList, RoutesNavigation} from '@navigation/types';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {loadingWrapperPromise} from '@store/actions';
 import {useAuth} from '@store/auth';
 import useTopSheetStore from '@store/topsheet';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {moveOtherToEnd} from '@utils/functions';
+import {generateUUID, getFormattedDate, moveOtherToEnd} from '@utils/functions';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import {useFormContext, useWatch} from 'react-hook-form';
 import {AutocompleteDropdownItem} from 'react-native-autocomplete-dropdown';
@@ -59,12 +64,24 @@ import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {COLORS} from '@styles/colors';
 import useInventoryStore from '@store/inventory';
 import isEqual from 'lodash.isequal';
+import {offlineUpdateConditionReport} from '@features/conditionReport/offline';
+import {useOnline} from '@hooks/useOnline';
+import useConditionStore from '@store/condition';
+import {
+  CONDITION_PHOTO_SIDE_TYPE,
+  CONDITION_TYPES,
+  ConditionPhotoSideType,
+} from '@api/types/Condition';
+import {useUpsertObjectCache} from '@hooks/useToolsReactQueryCache';
+import {Paginated} from '@api/types/Response';
+import {ConditionReportByInventory} from '@api/services/reportServices';
+import {PreSubmitButton} from './ConditionCheckScreen';
+import {SpeechFormContext} from '@components/commons/form/SpeechFormContext';
+import {usePhotoSyncIndicator} from '@hooks/usePhotoSyncIndicator';
 // import OfflineValidation from '../components/offline/OfflineValidation';
 
-var offlineInventory = {};
-
 let autosaveInitial = false;
-const delay = 3000;
+const delay = 1500;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ConditionReport'>;
 
@@ -74,7 +91,7 @@ export const ConditionReportScreen = (props: Props) => {
   const [renderForm, setRenderForm] = useState(false);
 
   // filters and select
-  const [filterItem, setFilterItem] = useState('');
+  // const [filterItem, setFilterItem] = useState('');
   const [filterArtist, setFilterArtist] = useState('');
   const [filterTypes, setFilterTypes] = useState('');
   const [selectedItem, setSelectedItem] = useState<JobInventoryType | null>(
@@ -88,7 +105,7 @@ export const ConditionReportScreen = (props: Props) => {
     useInventoryStore();
   const jobDetail = useTopSheetStore((d) => d.jobDetail);
   const sessionUser = useAuth((d) => d.user);
-  const {goBack} = useCustomNavigation();
+  const {goBack, navigate} = useCustomNavigation();
 
   // received params
   const fromReports = props.route.params.fromReports;
@@ -98,18 +115,13 @@ export const ConditionReportScreen = (props: Props) => {
   const {mutateAsync: saveConditionAsync} = useSaveConditionReport();
   const {data: packingDetailList} = useGetPackingDetails();
   const {data: placeOfExamList} = useGetPlacesConditionReport();
-  const {data: items} = useGetJobInventory(
-    {
-      idJob: jobDetail?.id!,
-      filter: filterItem,
-      limit: 10,
-      start: 0,
-    },
-    // @ts-ignore
-    {
-      enabled: !!jobDetail?.id && filterItem.trim().length > 0,
-    },
-  );
+  const {data: items} = useGetJobInventory({
+    idJob: jobDetail?.id!,
+  });
+
+  const {data: conditionReportList} = useGetResumeConditionReport({
+    idJob: jobDetail!.id,
+  });
 
   const {data: artists} = useGetArtists({
     filter: filterArtist,
@@ -119,14 +131,21 @@ export const ConditionReportScreen = (props: Props) => {
     filter: filterTypes,
   });
 
+  const currentInventoryItem = useMemo(() => {
+    return receivedItem?.id ? receivedItem : selectedItem;
+  }, [selectedItem, receivedItem]);
+
   const {
     data: conditionReportJson,
     isLoading: isLoadingConditionReport,
     refetch,
+    isFetched,
   } = useGetConditionReportbyInventory({
     idJobInventory:
-      receivedReport?.id_job_inventory ?? receivedItem?.id ?? selectedItem?.id!,
+      receivedReport?.id_job_inventory ?? currentInventoryItem?.id!,
   });
+
+  const {online} = useOnline();
 
   const {hardRefreshMany} = useRefreshIndicator([
     [
@@ -149,6 +168,19 @@ export const ConditionReportScreen = (props: Props) => {
     ],
   ]);
 
+  const queryKey = [
+    QUERY_KEYS.CONDITION_REPORT_BY_INVENTORY,
+    {
+      idJobInventory:
+        receivedReport?.id_job_inventory ??
+        receivedItem?.id ??
+        selectedItem?.id!,
+    },
+  ];
+
+  const upsertConditionReportReport =
+    useUpsertObjectCache<ConditionReportByInventory>(queryKey);
+
   //Autocompletes inputs
   const autocompleteRefs = [
     useRef<any>(null),
@@ -159,105 +191,101 @@ export const ConditionReportScreen = (props: Props) => {
   //Take dictation
   const refVoiceCondArt = useRef(null);
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     if (props.reportId) {
-  //       getTotalPhotos();
-  //     }
-  //   }, [props.reportId]),
-  // );
+  useEffect(() => {}, [isFetched]);
+
+  const {
+    setConditionPhotoType,
+    setConditionType,
+    setConditionId,
+    setInventoryId,
+    setConditionPhotoSubtype,
+    setConditionClientId,
+    setReportIdImage,
+    inventoryId,
+  } = useConditionStore();
+
+  const {hasPending: hasPendingFront} = usePhotoSyncIndicator({
+    idJob: jobDetail?.id,
+    conditionType: CONDITION_TYPES.ConditionReport,
+    idJobInventory: inventoryId,
+    type: CONDITION_PHOTO_SIDE_TYPE.Front,
+  });
+
+  const {hasPending: hasPendingBack} = usePhotoSyncIndicator({
+    idJob: jobDetail?.id,
+    conditionType: CONDITION_TYPES.ConditionReport,
+    idJobInventory: inventoryId,
+    type: CONDITION_PHOTO_SIDE_TYPE.Back,
+  });
+
+  const {hasPending: hasPendingSides} = usePhotoSyncIndicator({
+    idJob: jobDetail?.id,
+    conditionType: CONDITION_TYPES.ConditionReport,
+    idJobInventory: inventoryId,
+    type: CONDITION_PHOTO_SIDE_TYPE.Sides,
+  });
+
+  const {hasPending: hasPendingDetails} = usePhotoSyncIndicator({
+    idJob: jobDetail?.id,
+    conditionType: CONDITION_TYPES.ConditionReport,
+    idJobInventory: inventoryId,
+    type: CONDITION_PHOTO_SIDE_TYPE.Details,
+  });
 
   useEffect(() => {
-    // props.dispatch(ActionsConditionReport.copyConditionType('conditionreport'));
-    initAll();
+    setConditionType(CONDITION_TYPES.ConditionReport);
+    return () => {
+      setConditionType(undefined);
+      setConditionId(undefined);
+      setConditionClientId(undefined);
+      setConditionPhotoType(undefined);
+      setInventoryId(undefined);
+      setConditionPhotoSubtype(undefined);
+      setReportIdImage(undefined);
+    };
   }, []);
-
-  useEffect(() => {
-    // return () => {
-    //   props.dispatch(ActionsConditionReport.clearAllReport());
-    // };
-  }, []);
-
-  const initAll = async () => {
-    // await initOfflineInventory();
-  };
-
-  const getTotalPhotos = async (id: string) => {
-    // if (id || (props.reportId != null && props.reportId != '')) {
-    //   const isConnected = await isInternet();
-    //   if (isConnected) {
-    //     const response = await fetchData.Get(
-    //       'resources/conditionreport/totalPhotos?id=' +
-    //       (id ? id : props.reportId),
-    //     );
-    //     if (response.ok) {
-    //       if (response.data.message == 'SUCCESS') {
-    //         setTotalPhotos(response.data.body);
-    //       }
-    //     } else {
-    //       Toast.show('Error while retreiving total photos', Toast.LONG, [
-    //         'UIAlertController',
-    //       ]);
-    //     }
-    //   } else {
-    //     setTotalPhotos([
-    //       {
-    //         type: 'back',
-    //         total: 0,
-    //       },
-    //       {
-    //         type: 'front',
-    //         total: 0,
-    //       },
-    //       {
-    //         type: 'sides',
-    //         total: 0,
-    //       },
-    //       {
-    //         type: 'details',
-    //         total: 0,
-    //       },
-    //     ]);
-    //   }
-    // }
-  };
 
   const currentItem = useMemo(() => {
-    if (selectedItem || receivedReport || receivedItem) {
+    if (receivedReport || currentInventoryItem) {
       return {
-        id:
-          receivedReport?.id_job_inventory ??
-          receivedItem?.id ??
-          selectedItem?.id,
+        id: receivedReport?.id_job_inventory ?? currentInventoryItem?.id,
         clientRef:
-          receivedReport?.client_ref ??
-          receivedItem?.clientref ??
-          selectedItem?.clientref,
+          receivedReport?.client_ref ?? currentInventoryItem?.clientref,
         clientInv:
-          receivedReport?.id_inventory ??
-          receivedItem?.clientinv ??
-          selectedItem?.clientinv,
+          receivedReport?.id_inventory ?? currentInventoryItem?.clientinv,
       };
     } else {
       return null;
     }
-  }, [selectedItem, receivedReport, receivedItem]);
+  }, [receivedReport, currentInventoryItem]);
+
+  const queryKeyReport = [
+    QUERY_KEYS.RESUME_CONDITION_REPORT,
+    {idJob: jobDetail?.id},
+  ];
+
+  const upsertReport =
+    useUpsertObjectCache<Paginated<ReportResumeType[]>>(queryKeyReport);
 
   const {refetchAll} = useRefreshIndicator([
-    [QUERY_KEYS.RESUME_CONDITION_REPORT, {idJob: jobDetail?.id}],
+    queryKeyReport,
     [QUERY_KEYS.TASK_COUNT, {idJob: jobDetail?.id}],
     [QUERY_KEYS.INVENTORY_ITEM_DETAIL, {id: currentItem?.id!}],
   ]);
 
-  const checkItem = useCallback(
-    (value: string) => {
-      setFilterItem(value.trim());
-      if (autocompleteRefs[0].current) {
-        autocompleteRefs[0].current.open();
-      }
-    },
-    [setFilterItem],
-  );
+  // const checkItem = useCallback(
+  //   (value: string) => {
+  //     setFilterItem(value.trim());
+  //     if (autocompleteRefs[0].current) {
+  //       autocompleteRefs[0].current.open();
+  //     }
+  //   },
+  //   [setFilterItem],
+  // );
+
+  useEffect(() => {
+    setInventoryId(currentItem?.id);
+  }, [currentItem?.id]);
 
   const checkArtist = useCallback(
     (value: string) => {
@@ -279,46 +307,20 @@ export const ConditionReportScreen = (props: Props) => {
     [setFilterTypes],
   );
 
-  const goToGallery = (type: string) => {
-    // Keyboard.dismiss();
-    // if (item.id) {
-    //   props.dispatch(ActionsConditionReport.copyReportType(type));
-    //   props.dispatch(ActionsConditionReport.copyReportInventory(item.id));
-    //   // navigate("Gallery", { type, type, idInventory: item.id })
-    //   navigate('Gallery', { type: type, idInventory: item.id });
-    // } else {
-    //   Alert.alert('You must select an item');
-    // }
-  };
+  const goToGallery = useCallback(
+    (type: ConditionPhotoSideType) => {
+      setConditionPhotoSubtype(undefined);
+      setConditionPhotoType(type);
+      navigate(RoutesNavigation.GalleryCondition);
+    },
+    [setConditionPhotoType, navigate],
+  );
 
   const goToSides = () => {
-    // Keyboard.dismiss();
-    // if (item.id) {
-    //   props.dispatch(ActionsConditionReport.copyReportType('sides'));
-    //   props.dispatch(ActionsConditionReport.copyReportInventory(item.id));
-    //   navigate('ConditionSides', { type: 'sides', idInventory: item.id });
-    // } else {
-    //   Alert.alert('You must select an item');
-    // }
+    Keyboard.dismiss();
+    setConditionPhotoType('sides');
+    navigate(RoutesNavigation.ConditionSides);
   };
-
-  useEffect(() => {
-    // if (!initial) {
-    //   clearTimeout(idTimeOut);
-    //   idTimeOut = setTimeout(
-    //     () => {
-    //       onPartialSave();
-    //     },
-    //     props.route.params.condition == null &&
-    //       (props.reportId == null || props.reportId == '')
-    //       ? 500
-    //       : 3000,
-    //   );
-    // }
-    // return () => {
-    //   clearTimeout(idTimeOut);
-    // };
-  }, []);
 
   const closeAll = (exceptIndex: number) => {
     autocompleteRefs.forEach((r, i) => {
@@ -349,23 +351,47 @@ export const ConditionReportScreen = (props: Props) => {
     [items, setSelectedItem],
   );
 
-  const initialConditionReport = useMemo(() => {
+  const initialConditionReport: ConditionReportType | null = useMemo(() => {
     if (conditionReportJson?.data?.length! > 0) {
       return conditionReportJson!.data[conditionReportJson!.data.length - 1];
     } else {
-      return null;
+      if (currentInventoryItem?.id) {
+        return {
+          medium_name: currentInventoryItem.medium,
+          artist_name: currentInventoryItem.artist,
+          title: currentInventoryItem.clientinv_display,
+          year: currentInventoryItem.year,
+          edition: currentInventoryItem.edition,
+          packed_height: currentInventoryItem.packed_height,
+          packed_length: currentInventoryItem.packed_length,
+          packed_width: currentInventoryItem.packed_width,
+          un_packed_height: currentInventoryItem.unpacked_height,
+          un_packed_length: currentInventoryItem.unpacked_length,
+          un_packed_width: currentInventoryItem.unpacked_width,
+        } as ConditionReportType;
+      } else {
+        return null;
+      }
     }
-  }, [conditionReportJson]);
+  }, [conditionReportJson, currentInventoryItem]);
 
   const {data: photosTotal} = useGetTotalPhotosConditionReport({
     id: initialConditionReport?.id!,
   });
 
+  useEffect(() => {
+    setConditionId(initialConditionReport?.id!);
+  }, [initialConditionReport?.id!]);
+
+  useEffect(() => {
+    setConditionClientId(initialConditionReport?.clientId);
+  }, [initialConditionReport?.clientId]);
+
   const totalPhotos = useMemo(() => {
     const init = {
       front: 0,
       back: 0,
-      detail: 0,
+      details: 0,
       sides: 0,
     };
 
@@ -373,16 +399,16 @@ export const ConditionReportScreen = (props: Props) => {
 
     return photosTotal.reduce((acc, cur) => {
       switch (cur.type) {
-        case PHOTOS_REPORT_TYPES.FRONT:
+        case CONDITION_PHOTO_SIDE_TYPE.Front:
           acc.front = cur.total ?? 0;
           break;
-        case PHOTOS_REPORT_TYPES.BACK:
+        case CONDITION_PHOTO_SIDE_TYPE.Back:
           acc.back = cur.total ?? 0;
           break;
-        case PHOTOS_REPORT_TYPES.DETAIL:
-          acc.detail = cur.total ?? 0;
+        case CONDITION_PHOTO_SIDE_TYPE.Details:
+          acc.details = cur.total ?? 0;
           break;
-        case PHOTOS_REPORT_TYPES.SIDES:
+        case CONDITION_PHOTO_SIDE_TYPE.Sides:
           acc.sides = cur.total ?? 0;
           break;
         default:
@@ -431,36 +457,201 @@ export const ConditionReportScreen = (props: Props) => {
     },
     [
       saveConditionAsync,
-      partial,
       currentItem?.id,
       jobDetail?.id,
       initialConditionReport?.id,
     ],
   );
 
+  const saveReportOffline = useCallback(
+    (form: ConditionReportSchemaType, partial?: string) => {
+      if (
+        !initialConditionReport?.id_job_inventory &&
+        !currentInventoryItem?.id
+      ) {
+        return Promise.resolve('');
+      }
+      const clientId = initialConditionReport?.clientId ?? generateUUID();
+      setConditionClientId(clientId);
+
+      const data = conditionReportJson?.data ?? [];
+      const mData = data?.slice(0, -1) ?? [];
+
+      upsertConditionReportReport({
+        data: [
+          ...mData,
+          {
+            condition_report_frame_fixture_list:
+              form.frameFixture?.map((x) => ({
+                condition_report_frame_fixture_pk: {
+                  id_condition_report: Number(x.id),
+                  text_value: x.title,
+                },
+              })) ?? [],
+            condition_report_hanging_system_list:
+              form.hangingSystem?.map((x) => ({
+                condition_report_hanging_system_pk: {
+                  id_condition_report: Number(x.id),
+                  text_value: x.title,
+                },
+              })) ?? [],
+            condition_report_packing_detail_list:
+              form.packingDetail?.map((x) => ({
+                condition_report_packing_detail_pk: {
+                  id_condition_report: Number(x.id),
+                  text_value: x.title,
+                },
+              })) ?? [],
+            date_report: getFormattedDate(new Date()),
+            edition: form.edition!,
+            frame_height: form.frame_height!,
+            frame_length: form.frame_length!,
+            frame_width: form.frame_width!,
+            id: initialConditionReport?.id!,
+            id_job: jobDetail?.id!,
+            id_job_inventory:
+              initialConditionReport?.id_job_inventory ??
+              currentInventoryItem?.id!,
+            id_user: 0,
+            labeled: form.labeled!,
+            medium_name: form.mediumName!,
+            other_text: form.packing_details_other!,
+            packed_height: form.packed_height!,
+            packed_length: form.packed_length!,
+            packed_width: form.packed_width!,
+            partial: partial!,
+            place_of_exam: form.placeOfExam!,
+            signature: form.signature!,
+            title: form.title!,
+            un_packed_height: form.un_packed_height!,
+            un_packed_length: form.un_packed_length!,
+            un_packed_width: form.un_packed_width!,
+            unmanaged_name: '',
+            unpacked_weight: form.unpacked_weight!,
+            weight: form.weight!,
+            year: form.year!,
+            art_type_name: form.artTypeName?.title,
+            artist_name: form.artistName?.title,
+            condition_artwork: form.conditionArtWork,
+            clientId,
+          },
+        ],
+        total: conditionReportJson?.total,
+        obj_data: conditionReportJson?.obj_data,
+      });
+      const list = conditionReportList?.data ?? [];
+      const existingIndex = list.findIndex(
+        (x) => x.id_job_inventory == currentItem?.id,
+      );
+      const existingItem = existingIndex >= 0 ? list[existingIndex] : undefined;
+      const newItem = {
+        client_ref: currentItem?.clientRef!,
+        id_inventory:
+          existingItem?.id_inventory ?? Number(currentInventoryItem?.clientinv),
+        id_job_inventory: existingItem?.id_job_inventory ?? currentItem?.id!,
+        name: existingItem?.name ?? currentInventoryItem?.clientinv_display!,
+        report_count: existingItem?.report_count ?? 1,
+        partial: partial === 'true',
+        unmanaged: false,
+        unmanaged_name: '',
+      };
+      const newData =
+        existingIndex >= 0
+          ? list.map((it, idx) => (idx === existingIndex ? newItem : it))
+          : [...list, newItem];
+
+      const newTotal =
+        (conditionReportList?.total ?? 0) + (existingIndex >= 0 ? 0 : 1);
+
+      upsertReport({
+        data: newData,
+        total: newTotal,
+      });
+
+      return offlineUpdateConditionReport({
+        id: initialConditionReport?.id ?? null,
+        clientId,
+        idJob: jobDetail?.id!,
+        idInventory: currentItem?.id!,
+        partial: partial === 'true',
+        artistName: form.artistName?.title,
+        artTypeName: form.artTypeName?.title,
+
+        placeOfExam: form.placeOfExam,
+        conditionArtWork: form.conditionArtWork,
+        edition: form.edition,
+        frame_height: form.frame_height,
+        frame_length: form.frame_length,
+        frame_width: form.frame_width,
+        labeled: form.labeled,
+        mediumName: form.mediumName,
+        otherText: form.packing_details_other,
+        signature: form.signature,
+        title: form.title,
+        year: form.year,
+
+        packed_height: form.packed_height,
+        packed_length: form.packed_length,
+        packed_width: form.packed_width,
+        un_packed_height: form.un_packed_height,
+        un_packed_length: form.un_packed_length,
+        un_packed_width: form.un_packed_width,
+        unpacked_weight: form.unpacked_weight,
+        weight: form.weight,
+
+        frameFixture: form.frameFixture?.map((x) => x.title),
+        hangingSystem: form.hangingSystem?.map((x) => x.title),
+        packingDetail: form.packingDetail?.map((x) => x.title),
+      });
+    },
+    [
+      partial,
+      currentItem?.id,
+      currentItem?.clientInv,
+      currentItem?.clientRef,
+      jobDetail?.id,
+      initialConditionReport?.id,
+      initialConditionReport?.clientId,
+      initialConditionReport?.id_job_inventory,
+      conditionReportJson,
+      conditionReportList,
+      currentInventoryItem?.id,
+      currentInventoryItem?.clientinv,
+      currentInventoryItem?.clientinv_display,
+    ],
+  );
+
   const confirmSave = useCallback(() => {
     if (partial && temporalForm) {
-      loadingWrapperPromise(
-        saveAsync(temporalForm, partial)
-          .then((d) => {
-            if (d) {
-              showToastMessage('Condition report saved successfully');
-              refetchAll();
-              refetch();
-              hardRefreshMany();
-              goBack();
-            } else {
+      if (online) {
+        loadingWrapperPromise(
+          saveAsync(temporalForm, partial)
+            .then((d) => {
+              if (d) {
+                showToastMessage('Condition report saved successfully');
+                refetchAll();
+                refetch();
+                hardRefreshMany();
+                goBack();
+              } else {
+                showErrorToastMessage('Error while saving condition report');
+              }
+            })
+            .catch(() => {
               showErrorToastMessage('Error while saving condition report');
-            }
-          })
-          .catch(() => {
-            showErrorToastMessage('Error while saving condition report');
-          }),
-      );
+            }),
+        );
+      } else {
+        loadingWrapperPromise(saveReportOffline(temporalForm, partial)).then(
+          () => {
+            goBack();
+          },
+        );
+      }
     } else {
       showToastMessage('Please, select a valid option');
     }
-  }, [temporalForm, partial, saveAsync]);
+  }, [temporalForm, partial, saveAsync, online, saveReportOffline]);
 
   const onInitSubmit = useCallback(
     (props: ConditionReportSchemaType) => {
@@ -491,31 +682,19 @@ export const ConditionReportScreen = (props: Props) => {
     }, []);
 
     useEffect(() => {
-      // evito ejecutar al montar (cuando useWatch dispara por default con los valores iniciales)
       if (firstRun.current) {
         firstRun.current = false;
-        // opcional: actualizar lastSavedRef con los datos iniciales si quieres evitar guardarlos inmediatamente
-        // lastSavedRef.current = formData ? { ...formData } : null;
         return;
       }
-
-      // no autosave si no hay item seleccionado
       if (!currentItem?.id) return;
-
-      // si no hay cambios respecto al último guardado, no programo nada
       if (lastSavedRef.current && isEqual(lastSavedRef.current, formData)) {
         return;
       }
-
-      // limpio timeout anterior
       if (timerRef.current) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
       }
-
-      // programo el autosave
-      timerRef.current = setTimeout(async () => {
-        // otra comprobación por seguridad
+      timerRef.current = setTimeout(() => {
         if (!isMountedRef.current) return;
         // otra vez: si no hay cambios, no guardamos
         if (lastSavedRef.current && isEqual(lastSavedRef.current, formData)) {
@@ -524,24 +703,26 @@ export const ConditionReportScreen = (props: Props) => {
 
         try {
           setSaving(true);
-          // Esperamos la promesa y guardamos. saveAsync viene de tu scope superior.
-          const res = await saveAsync(
-            formData as ConditionReportSchemaType,
-            'true',
-          );
-          if (res) {
-            if (autosaveInitial) {
-              // sólo actualizamos lastSavedRef si save fue exitoso
-              lastSavedRef.current = formData
-                ? JSON.parse(JSON.stringify(formData))
-                : null;
-              // refrescamos datos y otros efectos
-              refetchAll();
-              hardRefreshMany();
-              refetch();
-            } else {
-              autosaveInitial = true;
-            }
+          if (online) {
+            // Esperamos la promesa y guardamos. saveAsync viene de tu scope superior.
+            saveAsync(formData as ConditionReportSchemaType, 'true').then(
+              (res) => {
+                if (res) {
+                  if (autosaveInitial) {
+                    lastSavedRef.current = formData
+                      ? JSON.parse(JSON.stringify(formData))
+                      : null;
+                    refetchAll();
+                    hardRefreshMany();
+                    refetch();
+                  } else {
+                    autosaveInitial = true;
+                  }
+                }
+              },
+            );
+          } else {
+            saveReportOffline(formData as ConditionReportSchemaType, 'true');
           }
         } catch (err) {
         } finally {
@@ -550,18 +731,24 @@ export const ConditionReportScreen = (props: Props) => {
       }, delay);
 
       return () => {
-        // limpieza cada vez que formData cambia antes del timeout
         if (timerRef.current) {
           clearTimeout(timerRef.current);
           timerRef.current = null;
         }
       };
-    }, [formData, currentItem?.id, saveAsync, refetchAll, hardRefreshMany]);
+    }, [
+      formData,
+      currentItem?.id,
+      saveAsync,
+      refetchAll,
+      hardRefreshMany,
+      online,
+      saveReportOffline,
+    ]);
 
     return null;
   };
 
-  // cada vez que selecciona un item nuevo se detiene el autosave
   useEffect(() => {
     autosaveInitial = false;
     setRenderForm(false);
@@ -581,7 +768,8 @@ export const ConditionReportScreen = (props: Props) => {
 
         <Wrapper style={[styles.lateralPadding, styles.row]}>
           <Label
-            style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, styles.topsheet]}>
+            style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, styles.topsheet]}
+            allowFontScaling={false}>
             Condition Report
           </Label>
         </Wrapper>
@@ -617,13 +805,12 @@ export const ConditionReportScreen = (props: Props) => {
             controller={(controller) => {
               autocompleteRefs[0].current = controller;
             }}
-            onChangeText={checkItem}
             onSelectItem={(item) => onSelectItem(item)}
             initialValue={
-              selectedItem?.id
+              currentInventoryItem?.id
                 ? {
-                    id: selectedItem.id.toString(),
-                    title: selectedItem.clientinv,
+                    id: currentInventoryItem.id.toString(),
+                    title: currentInventoryItem.clientinv,
                   }
                 : undefined
             }
@@ -636,7 +823,7 @@ export const ConditionReportScreen = (props: Props) => {
               Platform.select({ios: {zIndex: 999 + 0}, android: {}}),
             ]}
             showClear={false}
-            useFilter={false}
+            useFilter={true}
           />
         )}
 
@@ -719,7 +906,7 @@ export const ConditionReportScreen = (props: Props) => {
         </Wrapper>
 
         <BasicFormProvider
-          key={`condition_report_${conditionReportJson?.obj_data?.id}`}
+          key={`condition_report_${initialConditionReport?.title}`}
           // resetDefaultValue
           schema={ConditionReportSchema}
           defaultValue={{
@@ -741,6 +928,7 @@ export const ConditionReportScreen = (props: Props) => {
             un_packed_height: initialConditionReport?.un_packed_height,
             un_packed_length: initialConditionReport?.un_packed_length,
             un_packed_width: initialConditionReport?.un_packed_width,
+            unpacked_weight: initialConditionReport?.unpacked_weight,
 
             frame_height: initialConditionReport?.frame_height,
             frame_length: initialConditionReport?.frame_length,
@@ -1109,10 +1297,10 @@ export const ConditionReportScreen = (props: Props) => {
                 style={[GLOBAL_STYLES.row, styles.containerOptionsCondition]}>
                 {
                   <Wrapper>
-                    {/* <VoiceRecorder
+                    <SpeechFormContext
                       ref={refVoiceCondArt}
-                      onSpeechResults={e => setConditionOfArtwork(e)}
-                    /> */}
+                      name="conditionArtWork"
+                    />
                   </Wrapper>
                 }
 
@@ -1131,31 +1319,36 @@ export const ConditionReportScreen = (props: Props) => {
                     marginBottom: 10,
                   },
                 ]}>
-                <ButtonPhotosCount
+                <PreSubmitButton
                   title="Front"
                   total={totalPhotos.front}
-                  onPress={() => goToGallery(PHOTOS_REPORT_TYPES.FRONT)}
+                  onSubmit={() => goToGallery(CONDITION_PHOTO_SIDE_TYPE.Front)}
+                  offline={hasPendingFront}
                 />
-
-                <ButtonPhotosCount
+                <PreSubmitButton
                   title="Back"
                   total={totalPhotos.back}
-                  onPress={() => goToGallery(PHOTOS_REPORT_TYPES.BACK)}
+                  onSubmit={() => goToGallery(CONDITION_PHOTO_SIDE_TYPE.Back)}
+                  offline={hasPendingBack}
                 />
               </Wrapper>
 
               <Wrapper
                 style={[GLOBAL_STYLES.row, {justifyContent: 'space-between'}]}>
-                <ButtonPhotosCount
+                <PreSubmitButton
                   title="Sides"
                   total={totalPhotos.sides}
-                  onPress={goToSides}
+                  onSubmit={goToSides}
+                  offline={hasPendingSides}
                 />
 
-                <ButtonPhotosCount
-                  title="Sides"
-                  total={totalPhotos.sides}
-                  onPress={() => goToGallery(PHOTOS_REPORT_TYPES.DETAIL)}
+                <PreSubmitButton
+                  title="Details"
+                  total={totalPhotos.details}
+                  onSubmit={() =>
+                    goToGallery(CONDITION_PHOTO_SIDE_TYPE.Details)
+                  }
+                  offline={hasPendingDetails}
                 />
               </Wrapper>
 
@@ -1296,7 +1489,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: '#959595',
     color: '#3C424A',
-    opacity: 0.7,
+    // opacity: 0.7,
     paddingLeft: 10,
     paddingRight: 10,
     height: 120,
@@ -1491,46 +1684,3 @@ const OtherPackingDetailContext = ({name}: DependantContextProps) => {
     )
   );
 };
-
-type ButtonPhotosCountProps = {
-  title: string;
-  total: number;
-  onPress: () => void;
-};
-
-const ButtonPhotosCount = ({title, onPress, total}: ButtonPhotosCountProps) => (
-  <PressableOpacity
-    style={[GLOBAL_STYLES.row, styles.btnTakePhoto]}
-    onPress={onPress}>
-    <Wrapper
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 5,
-      }}>
-      <Label style={styles.textTakePhoto}>{title}</Label>
-      {/* <OfflineValidation
-                      idJob={jobDetail.id}
-                      offline={[
-                        DELETE_CREPORT_IMAGE_DETAIL_OFFLINE_VALIDATION,
-                        REPORT_CONDITION_IMAGE_DETAIL_OFFLINE_VALIDATION[
-                        'conditionreport'
-                        ],
-                      ]}
-                      idInventory={item?.id}
-                      reportType={'details'}
-                      conditionType={'conditionreport'}
-                    /> */}
-    </Wrapper>
-    <Wrapper style={[GLOBAL_STYLES.row, styles.containerCountCamera]}>
-      <Wrapper style={styles.countTakePhoto}>
-        <Label style={styles.numberCount} allowFontScaling={false}>
-          {total}
-        </Label>
-      </Wrapper>
-      <Wrapper style={styles.viewCamera}>
-        <Icon name="camera" type="solid" color="white" size={25} />
-      </Wrapper>
-    </Wrapper>
-  </PressableOpacity>
-);

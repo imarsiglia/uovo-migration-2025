@@ -123,6 +123,8 @@ export const LoginEmailScreen = () => {
                 maxLength={50}
                 style={styles.input}
                 onSubmitEditing={onFocusPassword}
+                autoComplete="email"
+                textContentType="emailAddress"
               />
               <InputPasswordContext
                 ref={passwordInputRef}
@@ -135,6 +137,8 @@ export const LoginEmailScreen = () => {
                   style: styles.input,
                 }}
                 onSubmitEditing={onPressSubmit}
+                autoComplete="password"
+                textContentType="password"
               />
             </Wrapper>
 
@@ -144,7 +148,7 @@ export const LoginEmailScreen = () => {
                 label="Sign in"
                 onSubmit={onLogin}
                 onInvalid={() =>
-                  showToastMessage('Please, enter your credentials')
+                  showToastMessage('Please, enter valid credentials')
                 }
                 disabled={isPending}
                 style={styles.button}

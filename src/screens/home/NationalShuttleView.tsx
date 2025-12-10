@@ -41,6 +41,7 @@ import {CustomInputText} from '@components/commons/inputs/CustomInputText';
 import useNationalShuttleStore from '@store/nationalShuttle';
 import {
   FILTER_TYPES_ACTIVITY,
+  GLOBAL_FONT_SIZE_MULTIPLIER_SM,
   NATIONAL_SHUTTLE_TYPE,
   NationalShuttleType,
 } from '@api/contants/constants';
@@ -78,7 +79,6 @@ const NationalShuttleViewCmp = () => {
   //send BOL
   const [isVisibleSendBOL, setIsVisibleSendBOL] = useState(false);
   const [jobDetail, setJobDetail] = useState<NSJobType | null>(null);
-  const [canFetchJobQueue, setCanFetchJobQueue] = useState(false);
 
   const updateJobDetail = useTopSheetStore((d) => d.setJobDetail);
 
@@ -203,26 +203,6 @@ const NationalShuttleViewCmp = () => {
   };
 
   useEffect(() => {
-    if (activeTab == 2 && canFetchJobQueue) {
-      filterJobs();
-    }
-  }, [
-    filter.date,
-    filterWoNumber,
-    filter.type,
-    filter.serviceLocation,
-    isInventoryMode,
-  ]);
-
-  useEffect(() => {
-    if (!canFetchJobQueue && activeTab == 2) {
-      filterJobs().then(() => {
-        setCanFetchJobQueue(true);
-      });
-    }
-  }, [activeTab]);
-
-  useEffect(() => {
     if (syncroNS) {
       syncro();
     }
@@ -315,6 +295,13 @@ const NationalShuttleViewCmp = () => {
     getInventoryUniqueRoutePickup,
     getInventoryUniqueRouteDropoff,
   ]);
+
+  // useEffect(() => {
+  //   if (activeTab == 2) {
+  //     console.log('use effect active tab = 2');
+  //     filterJobs();
+  //   }
+  // }, [activeTab, filterJobs]);
 
   const syncro = useCallback(() => {
     filterJobs();
@@ -430,9 +417,9 @@ const NationalShuttleViewCmp = () => {
             <CustomInputText
               placeholder="Search WO number..."
               textAlignVertical="center"
-              maxFontSizeMultiplier={1.4}
+              maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_SM}
               style={{
-                height: 34,
+                minHeight: 34,
                 fontSize: 12,
                 paddingHorizontal: 8,
                 paddingVertical: 0,
@@ -519,7 +506,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     paddingHorizontal: 8,
     backgroundColor: 'white',
-    height: 27,
+    minHeight: 27,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

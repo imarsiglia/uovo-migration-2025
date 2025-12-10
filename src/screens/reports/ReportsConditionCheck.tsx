@@ -10,30 +10,6 @@ export const ReportsConditionCheck = () => {
   const {navigate} = useCustomNavigation();
   const list = useReportStore((d) => d.conditionCheckList);
 
-  useEffect(() => {
-    // setList(props.list);
-    // setfullList(props.list);
-    // setLoading(false);
-    // const mmsubscribe = props.navigation.addListener('state', (e) => {
-    //   if (e != undefined) {
-    //     if (
-    //       e.data.state.index &&
-    //       e.data.state.routes &&
-    //       e.data.state.routes.length > 2 &&
-    //       e.data.state.routes[2].state
-    //     ) {
-    //       props.changeIndex(e.data.state.routes[2].state.index);
-    //     }
-    //   }
-    // });
-  }, []);
-
-  //   useEffect(() => {
-  //     return () => {
-  //       props.navigation.removeListener('state');
-  //     };
-  //   }, []);
-
   const initEdit = useCallback(
     (item: ReportResumeType) => {
       navigate(RoutesNavigation.ConditionCheck, {

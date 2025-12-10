@@ -40,6 +40,7 @@ export type JobType = {
   wo_status: string;
   wo_title: string;
   headcount: number;
+  user_status?: string;
 };
 
 export type NSJobType = {

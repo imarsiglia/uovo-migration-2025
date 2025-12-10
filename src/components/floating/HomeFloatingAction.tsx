@@ -1,19 +1,15 @@
-import { Icons } from '@assets/icons/icons';
-import { useCustomNavigation } from '@hooks/useCustomNavigation';
-import { RoutesNavigation } from '@navigation/types';
-import { IconNode } from '@rneui/base';
-import { SpeedDial } from '@rneui/themed';
-import { useAuth } from '@store/auth';
+import {Icons} from '@assets/icons/icons';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {RoutesNavigation} from '@navigation/types';
+import {IconNode} from '@rneui/base';
+import {SpeedDial} from '@rneui/themed';
+import {useAuth} from '@store/auth';
 import useGeneralStore from '@store/general';
-import { useModalDialogStore } from '@store/modals';
-import { COLORS } from '@styles/colors';
-import {
-  closeSessionOnGoogle,
-  getDeviceInfo,
-  showAlertDialogWithOptions,
-} from '@utils/functions';
-import { useCallback, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import {useModalDialogStore} from '@store/modals';
+import {COLORS} from '@styles/colors';
+import {closeSessionOnGoogle, getDeviceInfo} from '@utils/functions';
+import {useCallback, useState} from 'react';
+import {StyleSheet} from 'react-native';
 
 export const HomeFloatingAction = () => {
   const [open, setOpen] = useState(false);
@@ -31,18 +27,27 @@ export const HomeFloatingAction = () => {
       modalVisible: true,
       type: 'info',
       message: `ABOUT\n\nUOVO APP\nVerion ${getDeviceInfo().buildNumber}`,
-      confirmBtnLabel: "OK"
+      confirmBtnLabel: 'OK',
+      cancelable: false,
     });
     onCloseFab();
   }, []);
 
   const logout = useCallback(() => {
-    showAlertDialogWithOptions(() => {
-      clearSession();
-      closeSessionOnGoogle();
-      resetTo(RoutesNavigation.Login);
-    });
     onCloseFab();
+    showDialog({
+      modalVisible: true,
+      type: 'info',
+      message: 'Are you sure you want to logout?',
+      confirmBtnLabel: 'Yes, logout',
+      cancelBtnLabel: 'Cancel',
+      cancelable: true,
+      onConfirm: () => {
+        clearSession();
+        closeSessionOnGoogle();
+        resetTo(RoutesNavigation.Login);
+      },
+    });
   }, []);
 
   const goToHelpDesk = useCallback(() => {
@@ -68,7 +73,10 @@ export const HomeFloatingAction = () => {
       onOpen={() => setOpen(!open)}
       onClose={() => setOpen(!open)}
       color={isFilterActive ? 'green' : COLORS.tertearyDark}
-      overlayColor="#00000040">
+      overlayColor="#00000040"
+      style={{
+        paddingBottom: 15,
+      }}>
       <CustomSpeedDialoAction
         title="Show active jobs"
         icon={<Icons.Filter fontSize={20} color={COLORS.white} />}
@@ -101,52 +109,6 @@ export const HomeFloatingAction = () => {
         onPress={logout}
       />
     </SpeedDial>
-    //    <FloatingAction
-    //              onClose={() => setFloating(false)}
-    //              onOpen={() => setFloating(!floating)}
-    //              animated
-    //              color={activeFilter ? 'green' : COLORS.terceary}
-    //              actionsPaddingTopBottom={0}
-    //              dismissKeyboardOnPress
-    //              overlayColor="#FFFFFF70"
-    //              shadow={{
-    //                shadowOpacity: 0.1,
-    //                shadowRadius: 0,
-    //                shadowOffset: {height: 2, width: 0},
-    //              }}
-    //              floatingIcon={
-    //                !floating ? (
-    //                  <Icon color="white" size={26} name="th" type="solid" />
-    //                ) : (
-    //                  <Icon color="white" size={26} name="times" type="solid" />
-    //                )
-    //              }
-    //              actions={[
-    //                {
-    //                  name: 'active_jobs',
-    //                  text: activeFilter ? 'Show all jobs' : 'Show active jobs',
-    //                  color: COLORS.terceary,
-    //                  icon: <Icon name="filter" size={15} color="white" type="solid" />,
-    //                  animated: true,
-    //                  tintColor: 'red',
-    //                },
-    //                {
-    //                  name: 'account',
-    //                  text: 'Account',
-    //                  color: COLORS.terceary,
-    //                  icon: <Icon name="user" size={15} color="white" type="solid" />,
-    //                },
-    //                {
-    //                  name: 'help_desk',
-    //                  text: 'Help Desk',
-    //                  color: COLORS.terceary,
-    //                  icon: (
-    //                    <Icon name="question" size={15} color="white" type="solid" />
-    //                  ),
-    //                },
-    //              ]}
-    //              onPressItem={onPressMenuAction}
-    //            />
   );
 };
 
@@ -169,7 +131,7 @@ type CustomSpeedDialoActionProps = {
   onPress: () => void;
 };
 
-const CustomSpeedDialoAction = ({
+export const CustomSpeedDialoAction = ({
   title,
   icon,
   onPress,

@@ -29,6 +29,7 @@ export const QUERY_KEYS = {
   REPORT_MATERIALS: 'report_materials',
   HISTORY_REPORT_MATERIALS: 'history_report_materials',
   REPORT_MATERIALS_INVENTORY: 'report_materials_inventory',
+  ALL_REPORT_MATERIALS_INVENTORY: 'all_report_materials_inventory',
   WO_ATTACHMENTS: 'wo_attachments',
   BOL_COUNT: 'bol_count',
   LABOR_REPORTS: 'labor_reports',
@@ -43,12 +44,18 @@ export const QUERY_KEYS = {
   RESUME_CONDITION_CHECK: 'resume_condition_check',
   PLACES_CONDITION_REPORT: 'places_condition_report',
   ARTISTS: 'artists',
+  ALL_ARTIST: 'all_artist',
   ART_TYPES: 'art_types',
   CONDITION_REPORT_BY_INVENTORY: 'condition_report_by_inventory',
   CONDITION_CHECK_BY_INVENTORY: 'condition_check_by_inventory',
   TOTAL_PHOTOS_CONDITION_REPORT: 'total_photos_condition_report',
   TOTAL_PHOTOS_CONDITION_CHECK: 'total_photos_condition_check',
+  PHOTOS_CONDITION: 'photos_condition',
+  PHOTO_CONDITION_OVERVIEW: 'photo_condition_overview',
+  PHOTO_CONDITION_DETAIL: 'photo_condition_detail',
   GET_BOL_PDF: 'get_bol_pdf',
+  IMAGES: 'images',
+  LOAD_FULL_IMAGE: 'load_full_image',
 };
 
 export const WO_DEFAULT_NAME = 'WO Confirmed';
@@ -136,7 +143,7 @@ export const NATIONAL_SHUTTLE_TYPE = {
   UNIQUE_ROUTE_DROPOFF: 'unique_route_dropoff',
 } as const;
 
-export type NationalShuttleType = typeof NATIONAL_SHUTTLE_TYPE
+export type NationalShuttleType = typeof NATIONAL_SHUTTLE_TYPE;
 
 export const STATUS_NATIONAL_SHUTTLE = {
   UNLOADED: {
@@ -294,6 +301,7 @@ export const COLUMNS_WIDTH = {
   STATUS: 100,
   CONDITION: 90,
   DELETE: 120,
+  HAS_IMAGE: 90,
 };
 
 export const ROW_COLUMNS_WIDTH = {
@@ -310,6 +318,7 @@ export const ROW_COLUMNS_WIDTH = {
   STATUS: COLUMNS_WIDTH.STATUS,
   CONDITION: COLUMNS_WIDTH.CONDITION,
   DELETE: COLUMNS_WIDTH.DELETE,
+  HAS_IMAGE: COLUMNS_WIDTH.CONDITION,
 };
 
 export const VOICE_EVENTS = {
@@ -370,4 +379,23 @@ export const PHOTOS_REPORT_TYPES = {
   BACK: 'back',
   SIDES: 'sides',
   DETAIL: 'detail',
+};
+
+export const GLOBAL_FONT_SIZE_MULTIPLIER_XS = 1.2;
+export const GLOBAL_FONT_SIZE_MULTIPLIER_SM = 1.4;
+export const GLOBAL_FONT_SIZE_MULTIPLIER_MD = 1.7;
+
+export const ENTITY_TYPES = {
+  NOTE: 'note',
+  SIGNATURE: 'signature',
+  REPORT_MATERIAL: 'report_material',
+  REPORT_MATERIALS: 'report_materials',
+  BOL_COUNT: 'bol_count',
+  ITEM_INVENTORY_DETAIL: 'item_inventory_detail',
+  IMAGE: 'image',
+  // CR & CC
+  CONDITION_REPORT: 'condition_report',
+  CONDITION_CHECK: 'condition_check',
+  CONDITION_PHOTO: 'condition_photo',
+  CONDITION_ZOOM_PHOTO: 'condition_zoom_photo',
 };

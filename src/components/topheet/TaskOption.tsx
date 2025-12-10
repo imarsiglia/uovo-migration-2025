@@ -1,7 +1,7 @@
 import CustomDropdown from '@components/commons/menu/CustomDropdown';
 import OfflineValidation from '@components/offline/OfflineValidation';
-import { GLOBAL_STYLES } from '@styles/globalStyles';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
 type Props = {
@@ -17,7 +17,7 @@ type Props = {
   hideQuantity?: boolean;
   disabled?: boolean;
   idJob: number;
-  offline?: string[];
+  offline?: boolean;
   isMenuRight?: boolean;
   menuRight?: React.ReactNode;
 };
@@ -67,7 +67,8 @@ const TaskOption = ({
             <Text style={[GLOBAL_STYLES.bold, styles.name]} numberOfLines={1}>
               {name}
             </Text>
-            <OfflineValidation offline={offline} idJob={idJob} />
+
+            <OfflineValidation offline={offline} />
           </View>
         </View>
 
@@ -98,7 +99,7 @@ const TaskOption = ({
 
         {isMenuRight ? (
           <CustomDropdown
-            position='auto'
+            // position="auto"
             button={
               <View
                 style={[

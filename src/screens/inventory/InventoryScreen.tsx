@@ -1,5 +1,6 @@
 import {
   FINALIZED_STATUS,
+  GLOBAL_FONT_SIZE_MULTIPLIER_XS,
   INVENTORY_STATUS_TYPES,
   PAUSED_STATUS,
   QUERY_KEYS,
@@ -360,6 +361,18 @@ export const InventoryScreen = () => {
     };
   }, [online, status]);
 
+  const isAltIdVisible = useMemo(() => {
+    return inventory?.some(
+      (x) => !!x.clientinv2 && x.clientinv2.trim().length > 0,
+    );
+  }, [inventory]);
+
+  const isClientRefVisible = useMemo(() => {
+    return inventory?.some(
+      (x) => !!x.clientref && x.clientref.trim().length > 0,
+    );
+  }, [inventory]);
+
   return (
     <Wrapper style={styles.container}>
       <Wrapper
@@ -379,6 +392,9 @@ export const InventoryScreen = () => {
               label="Add"
               style={{minHeight: 27}}
               icon={<Icon name="plus" color={COLORS.white} size={14} />}
+              labelProps={{
+                maxFontSizeMultiplier: GLOBAL_FONT_SIZE_MULTIPLIER_XS,
+              }}
             />
           )}
         </Wrapper>
@@ -395,6 +411,7 @@ export const InventoryScreen = () => {
               onSubmitEditing={search}
               selectTextOnFocus={true}
               maxLength={40}
+              allowFontScaling={false}
             />
             <PressableOpacity
               onPress={() => search()}
@@ -416,11 +433,16 @@ export const InventoryScreen = () => {
                 GLOBAL_STYLES.bold,
                 styles.topsheet,
                 {fontSize: 27},
-              ]}>
+              ]}
+              allowFontScaling={false}>
               Inventory
             </Label>
             <Wrapper style={pillStyle}>
-              <Label style={textStyle}>{label}</Label>
+              <Label
+                style={textStyle}
+                maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_XS}>
+                {label}
+              </Label>
             </Wrapper>
           </Wrapper>
         )}
@@ -433,7 +455,9 @@ export const InventoryScreen = () => {
                 disabled={isDisabled}
                 style={[styles.btnPlay, {opacity: isDisabled ? 0.3 : 1}]}>
                 <Icon name="check" type="solid" color="white" size={14} />
-                <Label style={styles.textPlay} maxFontSizeMultiplier={1.2}>
+                <Label
+                  style={styles.textPlay}
+                  maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_XS}>
                   Prepped
                 </Label>
               </PressableOpacity>
@@ -462,11 +486,13 @@ export const InventoryScreen = () => {
 
       {searched && (
         <Wrapper style={[GLOBAL_STYLES.row, {padding: 10}]}>
-          <Label>Filter: </Label>
+          <Label allowFontScaling={false}>Filter: </Label>
           <PressableOpacity
             style={[GLOBAL_STYLES.row, styles.tagFilter]}
             onPress={clearFilter}>
-            <Label style={styles.textFilter}>"{inventoryFilter?.trim()}"</Label>
+            <Label style={styles.textFilter} allowFontScaling={false}>
+              "{inventoryFilter?.trim()}"
+            </Label>
             <Icon name="times-circle" type="solid" color="white" size={12} />
           </PressableOpacity>
         </Wrapper>
@@ -494,6 +520,9 @@ export const InventoryScreen = () => {
             checked={allChecked}
             onCheckAll={onCheckAll}
             deleteBtn="Delete"
+            hasImage="Has image"
+            isAltIdVisible={isAltIdVisible}
+            isClientRefVisible={isClientRefVisible}
           />
 
           {inventory && (
@@ -539,6 +568,9 @@ export const InventoryScreen = () => {
                   hasConditionCheck={item.has_condition_check}
                   user={sessionUser}
                   deleteBtn={() => onDeleteItem(item)}
+                  hasImage={!!item.netsuite_image}
+                  isAltIdVisible={isAltIdVisible}
+                  isClientRefVisible={isClientRefVisible}
                 />
               )}
               keyExtractor={(item) => item.id.toString()}

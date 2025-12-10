@@ -106,58 +106,57 @@ export const TeamTopsheet = () => {
   }, [jobDetail?.crew, filter]);
 
   return (
-    <>
+    <Wrapper
+      style={[
+        styles.containerTabScreen,
+        {
+          paddingTop: 15,
+          flex: 1,
+        },
+      ]}>
       <Wrapper
-        style={[
-          styles.containerTabScreen,
-          {
-            paddingTop: 15,
-            flex: 1,
-          },
-        ]}>
-        <Wrapper
-          style={{
-            paddingHorizontal: 20,
-          }}>
-          <SearchInput
-            value={filter}
-            onChange={(d) => setFilter(d as string)}
-          />
-        </Wrapper>
-
-        <SwipeableListProvider>
-          <ScrollView
-            bounces={false}
-            style={{
-              flex: 1,
-              paddingLeft: 20,
-              paddingRight: 20,
-              paddingTop: 10,
-              marginBottom: 65,
-              height: '100%',
-            }}>
-            {filteredCrew?.map((item, index) => {
-              return (
-                <Wrapper key={index}>
-                  <CrewMember
-                    item={item}
-                    currentUser={userSession?.user_id}
-                    onPressProfile={() =>
-                      navigate(RoutesNavigation.DigitalId, {
-                        member: true,
-                        person: item,
-                      })
-                    }
-                    onPressCall={() => doCall(item.phone)}
-                    onRemoveUser={() => initRemoveUser(item)}
-                  />
-                </Wrapper>
-              );
-            })}
-          </ScrollView>
-        </SwipeableListProvider>
+        style={{
+          paddingHorizontal: 20,
+        }}>
+        <SearchInput
+          value={filter}
+          onChange={(d) => setFilter(d as string)}
+          placeholder="Search team member"
+        />
       </Wrapper>
-    </>
+
+      <SwipeableListProvider>
+        <ScrollView
+          bounces={false}
+          style={{
+            flex: 1,
+            paddingLeft: 20,
+            paddingRight: 20,
+            paddingTop: 10,
+            marginBottom: 65,
+            height: '100%',
+          }}>
+          {filteredCrew?.map((item, index) => {
+            return (
+              <Wrapper key={index}>
+                <CrewMember
+                  item={item}
+                  currentUser={userSession?.user_id}
+                  onPressProfile={() =>
+                    navigate(RoutesNavigation.DigitalId, {
+                      member: true,
+                      person: item,
+                    })
+                  }
+                  onPressCall={() => doCall(item.phone)}
+                  onRemoveUser={() => initRemoveUser(item)}
+                />
+              </Wrapper>
+            );
+          })}
+        </ScrollView>
+      </SwipeableListProvider>
+    </Wrapper>
   );
 };
 
