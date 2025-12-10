@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>uovo</string>
+	<string>UOVO&#x2002;App&#x2002;Sandbox</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -71,13 +71,15 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>App requiere access to your location to allow locate and and estimate the time for your request</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Description of why you require the use of the microphone</string>
+	<string>Uovo needs access to your microphone to enable voice-to-text input in forms and text fields</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>App requiere access to your photo library to allow to add a photo id to process your request</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>App requiere access to your photo library to allow to add a photo to process your request</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Description of why you require the use of the speech recognition</string>
+	<string>Uovo needs speech recognition to enable voice-to-text input in forms and text fields</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>This app does not access Apple Music. This permission is required by an integrated third-party SDK</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

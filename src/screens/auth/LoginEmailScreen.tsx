@@ -123,6 +123,8 @@ export const LoginEmailScreen = () => {
                 maxLength={50}
                 style={styles.input}
                 onSubmitEditing={onFocusPassword}
+                autoComplete="email"
+                textContentType="emailAddress"
               />
               <InputPasswordContext
                 ref={passwordInputRef}
@@ -135,6 +137,8 @@ export const LoginEmailScreen = () => {
                   style: styles.input,
                 }}
                 onSubmitEditing={onPressSubmit}
+                autoComplete="password"
+                textContentType="password"
               />
             </Wrapper>
 
