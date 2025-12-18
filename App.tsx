@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // import {createAsyncStoragePersister} from '@tanstack/query-async-storage-persister';
 import {QueryClient} from '@tanstack/react-query';
-import * as React from 'react';
 import {Dimensions, Easing, LogBox, Platform} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {ModalProvider, createModalStack} from 'react-native-modalfy';
@@ -9,6 +8,8 @@ import {AppNavigation} from './src/navigation/AppNavigation';
 import AppProviders from '@providers/AppProviders';
 import {ModalDialog} from '@components/commons/modals/ModalDialog';
 import {ModalLoading} from '@components/commons/modals/ModalLoading';
+import {initImageCacheCleanup} from '@utils/imageCacheManager';
+import {useEffect} from 'react';
 // import {PortalHost} from '@gorhom/portal';
 
 // import EditDeleteModal from './src/components/conditionReport/EditDeleteModal';
@@ -86,6 +87,9 @@ const defaultOptions = {
 // const modalStack = createModalStack(modalConfig, defaultOptions);
 
 const App = () => {
+  useEffect(() => {
+    initImageCacheCleanup().catch(console.error);
+  }, []);
   // React.useEffect(() => {
   //   if (Text.defaultProps == null) Text.defaultProps = {};
   //     Text.defaultProps.allowFontScaling = false;

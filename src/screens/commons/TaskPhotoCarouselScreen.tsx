@@ -58,7 +58,7 @@ const TaskPhotoCarouselScreen = (props: Props) => {
   const scrollEnabledRef = useRef(true);
 
   // Filtrar fotos válidas
-  const validPhotos = photos.filter(p => p.photo || p.id || p.clientId);
+  const validPhotos = photos.filter((p) => p.photo || p.id || p.clientId);
 
   const keyExtractor = useCallback(
     (item: TaskPhotoType, index: number) =>
@@ -84,10 +84,14 @@ const TaskPhotoCarouselScreen = (props: Props) => {
 
       try {
         const query = photo.id
-          ? fullPhotoQueryById({id: photo.id})
+          ? fullPhotoQueryById({
+              id: photo.id,
+              groupRev: props.route.params.groupRev,
+            })
           : localPhotoQueryByClientId({
               clientId: photo.clientId!,
               base64: photo.photo!,
+              groupRev: props.route.params.groupRev,
             });
 
         await qc.prefetchQuery({
@@ -153,19 +157,32 @@ const TaskPhotoCarouselScreen = (props: Props) => {
 
   // Scroll inicial
   useEffect(() => {
-    if (initialIndex > 0 && validPhotos.length > 0 && listRef.current) {
-      setTimeout(() => {
-        try {
-          listRef.current?.scrollToIndex({
-            index: Math.min(initialIndex, validPhotos.length - 1),
-            animated: false,
-          });
-        } catch (error) {
-          console.log('Scroll to index error:', error);
-        }
-      }, 100);
-    }
-  }, []);
+    if (validPhotos.length === 0) return;
+
+    const safe = Math.max(
+      0,
+      Math.min(initialIndex ?? 0, validPhotos.length - 1),
+    );
+    setCurrentIndex(safe);
+
+    requestAnimationFrame(() => {
+      listRef.current?.scrollToIndex({index: safe, animated: false});
+    });
+  }, [groupRev, initialIndex, validPhotos.length, width]);
+  // useEffect(() => {
+  //   if (initialIndex > 0 && validPhotos.length > 0 && listRef.current) {
+  //     setTimeout(() => {
+  //       try {
+  //         listRef.current?.scrollToIndex({
+  //           index: Math.min(initialIndex, validPhotos.length - 1),
+  //           animated: false,
+  //         });
+  //       } catch (error) {
+  //         console.log('Scroll to index error:', error);
+  //       }
+  //     }, 100);
+  //   }
+  // }, []);
 
   if (validPhotos.length === 0) {
     return (
@@ -195,6 +212,7 @@ const TaskPhotoCarouselScreen = (props: Props) => {
         </Wrapper>
 
         <FlatList
+          key={groupRev}
           ref={listRef}
           data={validPhotos}
           keyExtractor={keyExtractor}

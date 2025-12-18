@@ -5,52 +5,32 @@ import {RootStackParamList} from '@navigation/types';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {SketchCanvas} from '@sourcetoad/react-native-sketch-canvas';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {writeToFileSystem} from '@utils/filesystem';
 import {nextFrame} from '@utils/functions';
-import {getFileExtension} from '@utils/image';
 import {useEffect, useRef, useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 import RNFS from 'react-native-fs';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditImage'>;
-export const EditImageScreen = (props: Props) => {
+export const EditImageURIScreen = (props: Props) => {
   const refCanvas = useRef<SketchCanvas | undefined>(null);
   const {navigate, getState} = useCustomNavigation();
 
   const [initLoading, setInitLoading] = useState(true);
-  const [photo, setPhoto] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("props.route.params.photo")
-    console.log(props.route.params.photo)
-    if (props.route.params.photo.path && props.route.params.photo.data) {
-      const filepath = `${
-        RNFS.TemporaryDirectoryPath
-      }/sketch_canvas${getFileExtension(props.route.params.photo.path)}`;
-      writeToFileSystem({
-        filepath,
-        contents: props.route.params.photo.data,
-        encodingOrOptions: 'base64',
-      }).then(() => setPhoto(filepath)).catch((error) => {
-        console.error(error)
-      });
-    }
-  }, [props.route.params.photo]);
-
-  // useEffect(() => {
-  //   return () => {
-  //     if (props.route.params.photo.path) {
-  //       RNFS.unlink(props.route.params.photo.path)
-  //         .then(() => {
-  //           // console.log('FILE DELETED EF');
-  //         })
-  //         .catch((err) => {
-  //           // console.log(err.message);
-  //         });
-  //     }
-  //   };
-  // }, []);
+    return () => {
+      if (props.route.params.photo.path) {
+        RNFS.unlink(props.route.params.photo.path)
+          .then(() => {
+            // console.log('FILE DELETED EF');
+          })
+          .catch((err) => {
+            // console.log(err.message);
+          });
+      }
+    };
+  }, []);
 
   const saveImage = async () => {
     await nextFrame();
@@ -61,16 +41,17 @@ export const EditImageScreen = (props: Props) => {
     refCanvas.current?.getBase64('jpg', false, true, false, true);
   };
 
-  const updateImage = (base64: string) => {
+  const updateImage = async (base64: string) => {
+    const fileName = `edited_${Date.now()}.jpg`;
+    const filePath = `${RNFS.CachesDirectoryPath}/${fileName}`;
+    await nextFrame();
+    await RNFS.writeFile(filePath, base64, 'base64');
+    await nextFrame();
     navigate(
       getState().routes[getState().index - 1]?.name as any,
       {
-        editedImage: {
-          ...props.route.params.photo,
-          data: base64,
-          compress: false,
-        },
-        photos: props.route.params?.photos,
+        editedUri: `file://${filePath}`,
+        editedBase64: base64,
       },
       {merge: true, pop: true},
     );
@@ -115,7 +96,7 @@ export const EditImageScreen = (props: Props) => {
 
         <MinRoundedView />
 
-        {photo != null && (
+        {props.route.params.photo != null && (
           <View style={{flex: 1, flexDirection: 'row'}}>
             <View
               style={{
@@ -156,7 +137,7 @@ export const EditImageScreen = (props: Props) => {
               strokeColor={'red'}
               strokeWidth={3}
               localSourceImage={{
-                filename: photo.replace('file://', ''),
+                filename: props.route.params.photo.path,
                 mode: 'AspectFit',
               }}
               onGenerateBase64={({base64}) => {
@@ -168,6 +149,14 @@ export const EditImageScreen = (props: Props) => {
                 setInitLoading(false);
               }}
               style={{flex: 1}}
+              // savePreference={() => {
+              //   return {
+              //     folder: 'RNSketchCanvas',
+              //     filename: String(Math.ceil(Math.random() * 100000000)),
+              //     transparent: false,
+              //     imageType: 'png',
+              //   };
+              // }}
             />
           </View>
         )}

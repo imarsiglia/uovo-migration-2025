@@ -61,10 +61,18 @@ export const ProgressivePhoto: React.FC<Props> = ({
     [photo.photo, type],
   );
 
+  const photoKey = useMemo(
+    () =>
+      `${photo.id ?? photo.clientId ?? 'unknown'}-${groupRev}-${
+        photo.photo?.length ?? 0
+      }`,
+    [photo.id, photo.clientId, groupRev, photo.photo],
+  );
+
   // URI de alta calidad
   const {data: hiUri} = useFullPhotoUri(
     photo,
-    {update_time: groupRev},
+    {update_time: photoKey},
     visible,
   );
 
@@ -75,10 +83,10 @@ export const ProgressivePhoto: React.FC<Props> = ({
   const [isPanEnabled, setIsPanEnabled] = useState(false);
 
   // Key única para forzar re-render cuando cambia la foto
-  const photoKey = useMemo(
-    () => `${photo.id ?? photo.clientId ?? 'unknown'}-${groupRev}`,
-    [photo.id, photo.clientId, groupRev],
-  );
+  // const photoKey = useMemo(
+  //   () => `${photo.id ?? photo.clientId ?? 'unknown'}-${groupRev}`,
+  //   [photo.id, photo.clientId, groupRev],
+  // );
 
   // Zoom/Pan con Reanimated
   const scale = useSharedValue(1);
@@ -115,7 +123,9 @@ export const ProgressivePhoto: React.FC<Props> = ({
   // URI completa de alta calidad
   const highResUri = useMemo(() => {
     if (!hiUri) return null;
-    return hiUri.startsWith('data:') ? hiUri : `data:image/jpeg;base64,${hiUri}`;
+    return hiUri.startsWith('data:')
+      ? hiUri
+      : `data:image/jpeg;base64,${hiUri}`;
   }, [hiUri]);
 
   // Notificar cambio de zoom
@@ -143,7 +153,7 @@ export const ProgressivePhoto: React.FC<Props> = ({
     .onStart(() => {
       savedScale.value = scale.value;
     })
-    .onUpdate(e => {
+    .onUpdate((e) => {
       const newScale = savedScale.value * e.scale;
       scale.value = clamp(newScale, 1, 4);
     })
@@ -176,7 +186,7 @@ export const ProgressivePhoto: React.FC<Props> = ({
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
     })
-    .onUpdate(e => {
+    .onUpdate((e) => {
       const bounds = getBounds(scale.value);
       translateX.value = clamp(
         savedTranslateX.value + e.translationX,
@@ -205,11 +215,11 @@ export const ProgressivePhoto: React.FC<Props> = ({
       } else {
         // Zoom in al punto tocado
         const targetScale = 2.5;
-        
+
         // Calcular offset para centrar en el punto tocado
         const tapX = e.x - screenWidth / 2;
         const tapY = e.y - screenHeight / 2;
-        
+
         const bounds = getBounds(targetScale);
         const newTranslateX = clamp(
           -tapX * (targetScale - 1),
@@ -225,7 +235,7 @@ export const ProgressivePhoto: React.FC<Props> = ({
         scale.value = withTiming(targetScale, {duration: 250});
         translateX.value = withTiming(newTranslateX, {duration: 250});
         translateY.value = withTiming(newTranslateY, {duration: 250});
-        
+
         runOnJS(notifyZoomChange)(true);
       }
     });
@@ -253,10 +263,7 @@ export const ProgressivePhoto: React.FC<Props> = ({
             <Image
               key={`${photoKey}-low`}
               source={{uri: lowResUri}}
-              style={[
-                styles.image,
-                {width: screenWidth, height: screenHeight},
-              ]}
+              style={[styles.image, {width: screenWidth, height: screenHeight}]}
               resizeMode={contentFit}
               blurRadius={blurPreview}
             />

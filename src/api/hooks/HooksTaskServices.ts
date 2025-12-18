@@ -258,7 +258,7 @@ export function useFullPhotoUri(
   const groupRev = group?.update_time ?? 'nogrev';
 
   const q = photo.id
-    ? fullPhotoQueryById({id: photo.id!})
+    ? fullPhotoQueryById({id: photo.id!, groupRev: groupRev})
     : localPhotoQueryByClientId({
         clientId: photo.clientId!,
         base64: photo.photo!,

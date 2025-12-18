@@ -101,7 +101,7 @@ export function getInputIdFormContext(
 }
 
 export function isAndroid() {
-  return Platform.OS == 'ios';
+  return Platform.OS === 'android';
 }
 
 export async function closeSessionOnGoogle() {
@@ -428,3 +428,6 @@ export const DEFAULT_OPTIONS_MODALFY = {
     ],
   }),
 };
+
+export const nextFrame = () =>
+  new Promise<void>((r) => requestAnimationFrame(() => r()));

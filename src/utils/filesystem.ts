@@ -15,7 +15,7 @@ export async function writeToFileSystem({
   contents,
   encodingOrOptions,
 }: WriteFileProps) {
-  return RNFS.write(filepath, contents, encodingOrOptions);
+  return RNFS.writeFile(filepath, contents, encodingOrOptions);
 }
 
 type WriteFileTemporaryDirProps = {

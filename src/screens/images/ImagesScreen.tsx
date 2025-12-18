@@ -30,9 +30,9 @@ import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {useQueryClient} from '@tanstack/react-query';
-import {getFormattedDateWithTimezone} from '@utils/functions';
+import {getFormattedDateWithTimezone, nextFrame} from '@utils/functions';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
-import {useCallback, useEffect, useMemo} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {
   FlatList,
   InteractionManager,
@@ -187,30 +187,54 @@ export const ImagesScreen = () => {
     });
   }
 
-  const initEdit = (item: TaskImageType, index: number) => {
-    navigate(RoutesNavigation.SaveImages, {item, index: index});
-  };
+  const initEdit = useCallback(
+    (item: TaskImageType, index: number) => {
+      // const selectedItem = list?.[index];
+      if (!item) return;
+      navigate(RoutesNavigation.SaveImages, {item});
+    },
+    [list],
+  );
 
   const initCreate = useCallback(() => {
     navigate(RoutesNavigation.SaveImages);
   }, [navigate]);
 
   const visualizePhotos = useCallback(
-    (item: TaskImageType) => {
+    (item: TaskImageType, index: number) => {
+      // const selectedItem = list?.[index];
+      if (!item) return;
       navigate(RoutesNavigation.TaskPhotoCarouselScreen, {
         photos: item.photos,
         groupRev: item.update_time,
         initialIndex: 0,
       });
-      // navigate(RoutesNavigation.TaskPhotoViewerScreen, {
-      //   photos: item.photos,
-      //   groupRev: item.update_time,
-      //   initialIndex: 0,
-      // });
-
-      
     },
-    [navigate],
+    [list, navigate],
+  );
+
+  const prefetchAndNavigateToCarousel = useCallback(
+    async (item: TaskImageType, index: number) => {
+      loadingWrapperPromise(async () => {
+        await nextFrame();
+        refetch();
+        await nextFrame();
+        visualizePhotos(item, index);
+      });
+    },
+    [list, visualizePhotos],
+  );
+
+  const prefetchAndNavigateToEdit = useCallback(
+    async (item: TaskImageType, index: number) => {
+      loadingWrapperPromise(async () => {
+        await nextFrame();
+        refetch();
+        await nextFrame();
+        initEdit(item, index);
+      });
+    },
+    [list, initEdit],
   );
 
   const renderItem = useCallback(
@@ -225,7 +249,7 @@ export const ImagesScreen = () => {
                   style={styles.rightActionsEdit}
                   onPress={() => {
                     close();
-                    initEdit(item, index);
+                    prefetchAndNavigateToEdit(item, index);
                   }}>
                   <Icon name="pen" size={25} color="white" type="solid" />
                 </TouchableOpacity>
@@ -240,7 +264,7 @@ export const ImagesScreen = () => {
               </>
             )}>
             <PressableOpacity
-              onPress={() => visualizePhotos(item)}
+              onPress={() => prefetchAndNavigateToCarousel(item, index)}
               style={styles.viewNotification}>
               <View style={[styles.circleNotification]}>
                 <CustomImage
@@ -311,7 +335,7 @@ export const ImagesScreen = () => {
             style={[GLOBAL_STYLES.title, GLOBAL_STYLES.bold, styles.topsheet]}>
             Pictures
           </Text>
-          <OfflineValidation offline={hasImages}/>
+          <OfflineValidation offline={hasImages} />
         </View>
       </View>
 

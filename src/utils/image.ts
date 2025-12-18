@@ -18,29 +18,30 @@ export const onLaunchCamera = async (
   let granted = true;
   if (isAndroid()) {
     granted = await requestWriteExternalStorage();
+    if (!granted) {
+      throw new Error('Write external storage permission not granted');
+    }
     if (granted) {
       granted = await requestCameraPermission();
+      throw new Error('Camera permission not granted');
     }
   }
-  if (granted) {
-    ImageCropPicker.openCamera({
-      compressImageQuality: 0.5,
-      includeBase64: true,
-      writeTempFile: false,
-      mediaType: 'photo',
-      forceJpg: true,
-      ...options,
+  return ImageCropPicker.openCamera({
+    compressImageQuality: 0.5,
+    includeBase64: true,
+    writeTempFile: false,
+    mediaType: 'photo',
+    forceJpg: true,
+    ...options,
+  })
+    .then((image) => {
+      closeModal?.();
+      manageImage(image as any, callback);
+      return image as ImageType | ImageType[];
     })
-      .then((image) => {
-        if (closeModal) {
-          closeModal();
-        }
-        manageImage(image as ResponseImagePickerProps, callback);
-      })
-      .catch((error) =>
-        showToastMessage(error?.message ?? 'Picture not captured'),
-      );
-  }
+    .catch((error) =>
+      showToastMessage(error?.message ?? 'Picture not captured'),
+    );
 };
 
 export const onSelectImage = async (
@@ -52,27 +53,28 @@ export const onSelectImage = async (
   if (isAndroid()) {
     granted = await requestReadMediaPermission();
   }
-  try {
-    ImageCropPicker.openPicker({
-      mediaType: 'photo',
-      includeBase64: true,
-      writeTempFile: false,
-      compressImageQuality: 0.5,
-      forceJpg: true,
-      ...options,
+  if (!granted) throw new Error('Read media permission not granted');
+
+  console.log("granted")
+  console.log(granted)
+
+  return ImageCropPicker.openPicker({
+    mediaType: 'photo',
+    includeBase64: true,
+    writeTempFile: false,
+    compressImageQuality: 0.5,
+    forceJpg: true,
+    waitAnimationEnd: false,
+    ...options,
+  })
+    .then((image) => {
+      closeModal?.();
+      manageImage(image as any, callback);
+      return image as ImageType | ImageType[];
     })
-      .then((image) => {
-        closeModal();
-        setTimeout(() => {
-          manageImage(image as ResponseImagePickerProps, callback);
-        }, 300);
-      })
-      .catch((error) =>
-        showToastMessage(error?.message ?? 'Pictures not selected'),
-      );
-  } catch (e: any) {
-    showToastMessage(e?.message ?? 'You must accept Read Media Permissions');
-  }
+    .catch((error) => {
+      showToastMessage(error?.message ?? 'Picture not selected');
+    });
 };
 
 type ResponseImagePickerProps = {
@@ -88,8 +90,12 @@ const manageImage = async (
 ) => {
   if (!callback) return;
   if (Array.isArray(response)) {
+    console.log("response")
+    console.log(response)
     callback(response);
   } else {
+    console.log("no es array")
+    console.log(response)
     if (response.data) {
       callback(response, response.filename ?? response.path);
     } else {
@@ -255,3 +261,15 @@ export async function photoFileToUriBase64(
 
   return {uri, base64};
 }
+
+export const getFileExtension = (filePath: string): string => {
+  const lastDotIndex = filePath.lastIndexOf('.');
+
+  // Si no hay punto o está al final, retornar vacío
+  if (lastDotIndex === -1 || lastDotIndex === filePath.length - 1) {
+    return '';
+  }
+
+  // Retornar extensión incluyendo el punto
+  return filePath.substring(lastDotIndex);
+};

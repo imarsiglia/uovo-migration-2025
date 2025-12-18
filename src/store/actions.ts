@@ -9,10 +9,14 @@ export async function loadingWrapperPromise<T>(
   opts?: {onError?: (e: any) => void},
 ) {
   modalLoadingSetter({loadingVisible: true});
+
+  // ✅ deja un frame para que el modal aparezca
+  await new Promise<void>((r) => requestAnimationFrame(() => r()));
+
   try {
     const res =
       typeof fnOrPromise === 'function'
-        ? await (fnOrPromise as () => Promise<T>)()
+        ? await fnOrPromise()
         : await fnOrPromise;
     return res;
   } catch (e) {
@@ -22,6 +26,25 @@ export async function loadingWrapperPromise<T>(
     modalLoadingSetter({loadingVisible: false});
   }
 }
+
+// export async function loadingWrapperPromise<T>(
+//   fnOrPromise: Promise<T> | (() => Promise<T>),
+//   opts?: {onError?: (e: any) => void},
+// ) {
+//   modalLoadingSetter({loadingVisible: true});
+//   try {
+//     const res =
+//       typeof fnOrPromise === 'function'
+//         ? await (fnOrPromise as () => Promise<T>)()
+//         : await fnOrPromise;
+//     return res;
+//   } catch (e) {
+//     opts?.onError?.(e);
+//     throw e;
+//   } finally {
+//     modalLoadingSetter({loadingVisible: false});
+//   }
+// }
 
 export function openGeneralDialog(props: ModalDialogContentType) {
   modalDialogSetter(props);

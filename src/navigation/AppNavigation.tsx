@@ -113,6 +113,7 @@ import {ConditionSides} from '@screens/reports/photos/ConditionSidesScreen';
 import PhotoCapture from '@screens/reports/photos/PhotoCapture';
 import PhotoCaptureZoom from '@screens/reports/photos/PhotoCaptureZoom';
 import TaskPhotoViewerScreen from '@screens/commons/TaskPhotoViewerScreen';
+import { EditImageURIScreen } from '@screens/editImage/EditImageURIScreen';
 
 // LogBox.ignoreLogs([
 //   'Non-serializable values were found in the navigation state',
@@ -184,6 +185,10 @@ export const AppNavigation = () => {
             <Stack.Screen
               name={RoutesNavigation.EditImage}
               component={EditImageScreen}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.EditImageUri}
+              component={EditImageURIScreen}
             />
             <Stack.Screen
               name={RoutesNavigation.LoginEmail}

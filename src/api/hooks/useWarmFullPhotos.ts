@@ -42,10 +42,15 @@ export function useWarmFullPhotos(params: {
         groupRev: string | undefined;
       }> = [];
       for (const g of groups) {
-        const groupRev = g?.update_time ?? undefined;
+        // const groupRev = g?.update_time ?? undefined;
         if (!g?.photos?.length) continue;
         for (const p of g.photos) {
-          entries.push({photo: p, groupRev});
+          entries.push({
+            photo: p,
+            groupRev: `${p.id ?? p.clientId ?? 'unknown'}-${g.update_time}-${
+              p.photo?.length ?? 0
+            }`,
+          });
           if (entries.length >= maxPrefetch) break;
         }
         if (entries.length >= maxPrefetch) break;
@@ -56,13 +61,13 @@ export function useWarmFullPhotos(params: {
         const q = photo.id
           ? fullPhotoQueryById({
               id: photo.id!,
-              // groupRev
+              groupRev,
             })
           : photo.clientId && photo.photo
           ? localPhotoQueryByClientId({
               clientId: photo.clientId!,
               base64: photo.photo!,
-              // groupRev,
+              groupRev,
             })
           : undefined;
 

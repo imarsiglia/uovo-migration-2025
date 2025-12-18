@@ -2744,6 +2744,11 @@
   dependencies:
     "@sinonjs/commons" "^3.0.0"
 
+"@sourcetoad/react-native-sketch-canvas@^2.4.1":
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/@sourcetoad/react-native-sketch-canvas/-/react-native-sketch-canvas-2.4.1.tgz#6d20eab33a6f96d9500a53b79ccab737b0a6a248"
+  integrity sha512-r1mDSUIuSAru1OpPmZED4xFrW+i7/SIvdsa+bOMSH9UJCSfwnYO1lzKVoWG+J80OXsiE0nNA58OJyBlVsN83Vw==
+
 "@standard-schema/utils@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@standard-schema/utils/-/utils-0.3.0.tgz#3d5e608f16c2390c10528e98e59aef6bf73cae7b"
@@ -6565,7 +6570,7 @@ loose-envify@^1.0.0, loose-envify@^1.4.0:
   dependencies:
     js-tokens "^3.0.0 || ^4.0.0"
 
-lottie-react-native@^7.3.4:
+lottie-react-native@7.3.4:
   version "7.3.4"
   resolved "https://registry.yarnpkg.com/lottie-react-native/-/lottie-react-native-7.3.4.tgz#774bc028e2b93dd88cd87ab84ac51a1c3e015cad"
   integrity sha512-XUh7eGFb7ID8JRdU6U4N4cYQeYmjtdQRvd8ZXJ6xrdSsn5gZD0c79ITOREPcwJg4YupBFHgyV1GXdAHQP+KYUQ==
@@ -7863,7 +7868,7 @@ react-native-image-pan-zoom@2.1.12:
   resolved "https://registry.yarnpkg.com/react-native-image-pan-zoom/-/react-native-image-pan-zoom-2.1.12.tgz#eb98bf56fb5610379bdbfdb63219cc1baca98fd2"
   integrity sha512-BF66XeP6dzuANsPmmFsJshM2Jyh/Mo1t8FsGc1L9Q9/sVP8MJULDabB1hms+eAoqgtyhMr5BuXV3E1hJ5U5H6Q==
 
-react-native-image-viewing@^0.2.2:
+react-native-image-viewing@0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/react-native-image-viewing/-/react-native-image-viewing-0.2.2.tgz#fb26e57d7d3d9ce4559a3af3d244387c0367242b"
   integrity sha512-osWieG+p/d2NPbAyonOMubttajtYEYiRGQaJA54slFxZ69j1V4/dCmcrVQry47ktVKy8/qpFwCpW1eT6MH5T2Q==

@@ -1,0 +1,1858 @@
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/30dbfa9c413b9030513fc37ee86899e2/results.bin b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/30dbfa9c413b9030513fc37ee86899e2/results.bin
+new file mode 100644
+index 0000000..0d259dd
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/30dbfa9c413b9030513fc37ee86899e2/results.bin
+@@ -0,0 +1 @@
++o/classes
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/30dbfa9c413b9030513fc37ee86899e2/transformed/classes/classes_dex/classes.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/30dbfa9c413b9030513fc37ee86899e2/transformed/classes/classes_dex/classes.dex
+new file mode 100644
+index 0000000..3e5bfa0
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/30dbfa9c413b9030513fc37ee86899e2/transformed/classes/classes_dex/classes.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/results.bin b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/results.bin
+new file mode 100644
+index 0000000..7ed749e
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/results.bin
+@@ -0,0 +1 @@
++o/bundleLibRuntimeToDirDebug
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/facebook/react/viewmanagers/RNTSketchCanvasManagerDelegate.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/facebook/react/viewmanagers/RNTSketchCanvasManagerDelegate.dex
+new file mode 100644
+index 0000000..c9d1835
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/facebook/react/viewmanagers/RNTSketchCanvasManagerDelegate.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/facebook/react/viewmanagers/RNTSketchCanvasManagerInterface.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/facebook/react/viewmanagers/RNTSketchCanvasManagerInterface.dex
+new file mode 100644
+index 0000000..06cb664
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/facebook/react/viewmanagers/RNTSketchCanvasManagerInterface.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/BuildConfig.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/BuildConfig.dex
+new file mode 100644
+index 0000000..37cb8bc
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/BuildConfig.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/CanvasText.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/CanvasText.dex
+new file mode 100644
+index 0000000..3bb65b2
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/CanvasText.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/NativeSketchCanvasModuleSpec.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/NativeSketchCanvasModuleSpec.dex
+new file mode 100644
+index 0000000..ca5c273
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/NativeSketchCanvasModuleSpec.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasManagerModule$Companion.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasManagerModule$Companion.dex
+new file mode 100644
+index 0000000..afce140
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasManagerModule$Companion.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasManagerModule.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasManagerModule.dex
+new file mode 100644
+index 0000000..4df0b72
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasManagerModule.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasView.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasView.dex
+new file mode 100644
+index 0000000..8f360d2
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasView.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewManager$Companion.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewManager$Companion.dex
+new file mode 100644
+index 0000000..7cc8a13
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewManager$Companion.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewManager.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewManager.dex
+new file mode 100644
+index 0000000..1b167af
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewManager.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewPackage.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewPackage.dex
+new file mode 100644
+index 0000000..387fe5b
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewPackage.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/SketchCanvas$Companion.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/SketchCanvas$Companion.dex
+new file mode 100644
+index 0000000..ff4428c
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/SketchCanvas$Companion.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/SketchCanvas.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/SketchCanvas.dex
+new file mode 100644
+index 0000000..482090d
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/SketchCanvas.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/SketchData$Companion.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/SketchData$Companion.dex
+new file mode 100644
+index 0000000..e059d46
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/SketchData$Companion.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/SketchData.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/SketchData.dex
+new file mode 100644
+index 0000000..335ea49
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/SketchData.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/Utility.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/Utility.dex
+new file mode 100644
+index 0000000..2d6ebce
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/Utility.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnCanvasReadyEvent$Companion.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnCanvasReadyEvent$Companion.dex
+new file mode 100644
+index 0000000..62a984d
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnCanvasReadyEvent$Companion.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnCanvasReadyEvent.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnCanvasReadyEvent.dex
+new file mode 100644
+index 0000000..a1d17e6
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnCanvasReadyEvent.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnChangeEvent$Companion.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnChangeEvent$Companion.dex
+new file mode 100644
+index 0000000..47921fc
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnChangeEvent$Companion.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnChangeEvent.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnChangeEvent.dex
+new file mode 100644
+index 0000000..48dab57
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnChangeEvent.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnGenerateBase64Event$Companion.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnGenerateBase64Event$Companion.dex
+new file mode 100644
+index 0000000..84a0f9a
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnGenerateBase64Event$Companion.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnGenerateBase64Event.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnGenerateBase64Event.dex
+new file mode 100644
+index 0000000..41c4301
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnGenerateBase64Event.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnInitialPathsLoadedEvent$Companion.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnInitialPathsLoadedEvent$Companion.dex
+new file mode 100644
+index 0000000..9de659a
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnInitialPathsLoadedEvent$Companion.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnInitialPathsLoadedEvent.dex b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnInitialPathsLoadedEvent.dex
+new file mode 100644
+index 0000000..25dec57
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/sourcetoad/reactnativesketchcanvas/event/OnInitialPathsLoadedEvent.dex differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/desugar_graph.bin b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/desugar_graph.bin
+new file mode 100644
+index 0000000..601f245
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/.transforms/5ee6b204a385cf865fd84a20cbdc9ecd/transformed/bundleLibRuntimeToDirDebug/desugar_graph.bin differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/buildConfig/debug/com/sourcetoad/reactnativesketchcanvas/BuildConfig.java b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/buildConfig/debug/com/sourcetoad/reactnativesketchcanvas/BuildConfig.java
+new file mode 100644
+index 0000000..10c04ec
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/buildConfig/debug/com/sourcetoad/reactnativesketchcanvas/BuildConfig.java
+@@ -0,0 +1,12 @@
++/**
++ * Automatically generated file. DO NOT MODIFY
++ */
++package com.sourcetoad.reactnativesketchcanvas;
++
++public final class BuildConfig {
++  public static final boolean DEBUG = Boolean.parseBoolean("true");
++  public static final String LIBRARY_PACKAGE_NAME = "com.sourcetoad.reactnativesketchcanvas";
++  public static final String BUILD_TYPE = "debug";
++  // Field from default config.
++  public static final boolean IS_NEW_ARCHITECTURE_ENABLED = true;
++}
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/java/com/facebook/react/viewmanagers/RNTSketchCanvasManagerDelegate.java b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/java/com/facebook/react/viewmanagers/RNTSketchCanvasManagerDelegate.java
+new file mode 100644
+index 0000000..d916e53
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/java/com/facebook/react/viewmanagers/RNTSketchCanvasManagerDelegate.java
+@@ -0,0 +1,70 @@
++/**
++* This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++*
++* Do not edit this file as changes may cause incorrect behavior and will be lost
++* once the code is regenerated.
++*
++* @generated by codegen project: GeneratePropsJavaDelegate.js
++*/
++
++package com.facebook.react.viewmanagers;
++
++import android.view.View;
++import androidx.annotation.Nullable;
++import com.facebook.react.bridge.ReadableArray;
++import com.facebook.react.bridge.ReadableMap;
++import com.facebook.react.uimanager.BaseViewManager;
++import com.facebook.react.uimanager.BaseViewManagerDelegate;
++import com.facebook.react.uimanager.LayoutShadowNode;
++
++public class RNTSketchCanvasManagerDelegate<T extends View, U extends BaseViewManager<T, ? extends LayoutShadowNode> & RNTSketchCanvasManagerInterface<T>> extends BaseViewManagerDelegate<T, U> {
++  public RNTSketchCanvasManagerDelegate(U viewManager) {
++    super(viewManager);
++  }
++  @Override
++  public void setProperty(T view, String propName, @Nullable Object value) {
++    switch (propName) {
++      case "localSourceImage":
++        mViewManager.setLocalSourceImage(view, (ReadableMap) value);
++        break;
++      case "text":
++        mViewManager.setText(view, (ReadableArray) value);
++        break;
++      default:
++        super.setProperty(view, propName, value);
++    }
++  }
++
++  @Override
++  public void receiveCommand(T view, String commandName, @Nullable ReadableArray args) {
++    switch (commandName) {
++      case "save":
++        mViewManager.save(view, args.getString(0), args.getString(1), args.getString(2), args.getBoolean(3), args.getBoolean(4), args.getBoolean(5), args.getBoolean(6));
++        break;
++      case "addPoint":
++        mViewManager.addPoint(view, args.getDouble(0), args.getDouble(1));
++        break;
++      case "addPath":
++        mViewManager.addPath(view, args.getInt(0), args.getInt(1), args.getDouble(2), args.getArray(3));
++        break;
++      case "addInitialPaths":
++        mViewManager.addInitialPaths(view, args.getArray(0));
++        break;
++      case "newPath":
++        mViewManager.newPath(view, args.getInt(0), args.getInt(1), args.getDouble(2));
++        break;
++      case "deletePath":
++        mViewManager.deletePath(view, args.getInt(0));
++        break;
++      case "endPath":
++        mViewManager.endPath(view);
++        break;
++      case "clear":
++        mViewManager.clear(view);
++        break;
++      case "transferToBase64":
++        mViewManager.transferToBase64(view, args.getString(0), args.getBoolean(1), args.getBoolean(2), args.getBoolean(3), args.getBoolean(4));
++        break;
++    }
++  }
++}
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/java/com/facebook/react/viewmanagers/RNTSketchCanvasManagerInterface.java b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/java/com/facebook/react/viewmanagers/RNTSketchCanvasManagerInterface.java
+new file mode 100644
+index 0000000..3cad5db
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/java/com/facebook/react/viewmanagers/RNTSketchCanvasManagerInterface.java
+@@ -0,0 +1,30 @@
++/**
++* This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++*
++* Do not edit this file as changes may cause incorrect behavior and will be lost
++* once the code is regenerated.
++*
++* @generated by codegen project: GeneratePropsJavaInterface.js
++*/
++
++package com.facebook.react.viewmanagers;
++
++import android.view.View;
++import androidx.annotation.Nullable;
++import com.facebook.react.bridge.ReadableArray;
++import com.facebook.react.bridge.ReadableMap;
++import com.facebook.react.uimanager.ViewManagerWithGeneratedInterface;
++
++public interface RNTSketchCanvasManagerInterface<T extends View> extends ViewManagerWithGeneratedInterface {
++  void setLocalSourceImage(T view, @Nullable ReadableMap value);
++  void setText(T view, @Nullable ReadableArray value);
++  void save(T view, String imageType, String folder, String filename, boolean transparent, boolean includeImage, boolean includeText, boolean cropToImageSize);
++  void addPoint(T view, double x, double y);
++  void addPath(T view, int pathId, int color, double width, ReadableArray points);
++  void addInitialPaths(T view, ReadableArray pathsArray);
++  void newPath(T view, int pathId, int color, double width);
++  void deletePath(T view, int pathId);
++  void endPath(T view);
++  void clear(T view);
++  void transferToBase64(T view, String imageType, boolean transparent, boolean includeImage, boolean includeText, boolean cropToImageSize);
++}
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/java/com/sourcetoad/reactnativesketchcanvas/NativeSketchCanvasModuleSpec.java b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/java/com/sourcetoad/reactnativesketchcanvas/NativeSketchCanvasModuleSpec.java
+new file mode 100644
+index 0000000..b96c226
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/java/com/sourcetoad/reactnativesketchcanvas/NativeSketchCanvasModuleSpec.java
+@@ -0,0 +1,68 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateModuleJavaSpec.js
++ *
++ * @nolint
++ */
++
++package com.sourcetoad.reactnativesketchcanvas;
++
++import com.facebook.proguard.annotations.DoNotStrip;
++import com.facebook.react.bridge.ReactApplicationContext;
++import com.facebook.react.bridge.ReactContextBaseJavaModule;
++import com.facebook.react.bridge.ReactMethod;
++import com.facebook.react.common.build.ReactBuildConfig;
++import com.facebook.react.turbomodule.core.interfaces.TurboModule;
++import java.util.Arrays;
++import java.util.HashSet;
++import java.util.Map;
++import java.util.Set;
++import javax.annotation.Nonnull;
++import javax.annotation.Nullable;
++
++public abstract class NativeSketchCanvasModuleSpec extends ReactContextBaseJavaModule implements TurboModule {
++  public static final String NAME = "SketchCanvasModule";
++
++  public NativeSketchCanvasModuleSpec(ReactApplicationContext reactContext) {
++    super(reactContext);
++  }
++
++  @Override
++  public @Nonnull String getName() {
++    return NAME;
++  }
++
++  protected abstract Map<String, Object> getTypedExportedConstants();
++
++  @Override
++  @DoNotStrip
++  public final @Nullable Map<String, Object> getConstants() {
++    Map<String, Object> constants = getTypedExportedConstants();
++    if (ReactBuildConfig.DEBUG || ReactBuildConfig.IS_INTERNAL_BUILD) {
++      Set<String> obligatoryFlowConstants = new HashSet<>(Arrays.asList(
++          "MainBundlePath",
++          "NSCachesDirectory",
++          "NSDocumentDirectory",
++          "NSLibraryDirectory"
++      ));
++      Set<String> optionalFlowConstants = new HashSet<>();
++      Set<String> undeclaredConstants = new HashSet<>(constants.keySet());
++      undeclaredConstants.removeAll(obligatoryFlowConstants);
++      undeclaredConstants.removeAll(optionalFlowConstants);
++      if (!undeclaredConstants.isEmpty()) {
++        throw new IllegalStateException(String.format("Native Module Flow doesn't declare constants: %s", undeclaredConstants));
++      }
++      undeclaredConstants = obligatoryFlowConstants;
++      undeclaredConstants.removeAll(constants.keySet());
++      if (!undeclaredConstants.isEmpty()) {
++        throw new IllegalStateException(String.format("Native Module doesn't fill in constants: %s", undeclaredConstants));
++      }
++    }
++    return constants;
++  }
++}
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/CMakeLists.txt b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/CMakeLists.txt
+new file mode 100644
+index 0000000..d7cd1d4
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/CMakeLists.txt
+@@ -0,0 +1,36 @@
++# Copyright (c) Meta Platforms, Inc. and affiliates.
++#
++# This source code is licensed under the MIT license found in the
++# LICENSE file in the root directory of this source tree.
++
++cmake_minimum_required(VERSION 3.13)
++set(CMAKE_VERBOSE_MAKEFILE on)
++
++file(GLOB react_codegen_SRCS CONFIGURE_DEPENDS *.cpp react/renderer/components/RNSketchCanvasSpec/*.cpp)
++
++add_library(
++  react_codegen_RNSketchCanvasSpec
++  OBJECT
++  ${react_codegen_SRCS}
++)
++
++target_include_directories(react_codegen_RNSketchCanvasSpec PUBLIC . react/renderer/components/RNSketchCanvasSpec)
++
++target_link_libraries(
++  react_codegen_RNSketchCanvasSpec
++  fbjni
++  jsi
++  # We need to link different libraries based on whether we are building rncore or not, that's necessary
++  # because we want to break a circular dependency between react_codegen_rncore and reactnative
++  reactnative
++)
++
++target_compile_options(
++  react_codegen_RNSketchCanvasSpec
++  PRIVATE
++  -DLOG_TAG=\"ReactNative\"
++  -fexceptions
++  -frtti
++  -std=c++20
++  -Wall
++)
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/RNSketchCanvasSpec-generated.cpp b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/RNSketchCanvasSpec-generated.cpp
+new file mode 100644
+index 0000000..6a08bb4
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/RNSketchCanvasSpec-generated.cpp
+@@ -0,0 +1,32 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateModuleJniCpp.js
++ */
++
++#include "RNSketchCanvasSpec.h"
++
++namespace facebook::react {
++
++static facebook::jsi::Value __hostFunction_NativeSketchCanvasModuleSpecJSI_getConstants(facebook::jsi::Runtime& rt, TurboModule &turboModule, const facebook::jsi::Value* args, size_t count) {
++  static jmethodID cachedMethodId = nullptr;
++  return static_cast<JavaTurboModule &>(turboModule).invokeJavaMethod(rt, ObjectKind, "getConstants", "()Ljava/util/Map;", args, count, cachedMethodId);
++}
++
++NativeSketchCanvasModuleSpecJSI::NativeSketchCanvasModuleSpecJSI(const JavaTurboModule::InitParams &params)
++  : JavaTurboModule(params) {
++  methodMap_["getConstants"] = MethodMetadata {0, __hostFunction_NativeSketchCanvasModuleSpecJSI_getConstants};
++}
++
++std::shared_ptr<TurboModule> RNSketchCanvasSpec_ModuleProvider(const std::string &moduleName, const JavaTurboModule::InitParams &params) {
++  if (moduleName == "SketchCanvasModule") {
++    return std::make_shared<NativeSketchCanvasModuleSpecJSI>(params);
++  }
++  return nullptr;
++}
++
++} // namespace facebook::react
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/RNSketchCanvasSpec.h b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/RNSketchCanvasSpec.h
+new file mode 100644
+index 0000000..a95f968
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/RNSketchCanvasSpec.h
+@@ -0,0 +1,31 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateModuleJniH.js
++ */
++
++#pragma once
++
++#include <ReactCommon/JavaTurboModule.h>
++#include <ReactCommon/TurboModule.h>
++#include <jsi/jsi.h>
++
++namespace facebook::react {
++
++/**
++ * JNI C++ class for module 'NativeSketchCanvasModule'
++ */
++class JSI_EXPORT NativeSketchCanvasModuleSpecJSI : public JavaTurboModule {
++public:
++  NativeSketchCanvasModuleSpecJSI(const JavaTurboModule::InitParams &params);
++};
++
++
++JSI_EXPORT
++std::shared_ptr<TurboModule> RNSketchCanvasSpec_ModuleProvider(const std::string &moduleName, const JavaTurboModule::InitParams &params);
++
++} // namespace facebook::react
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/ComponentDescriptors.cpp b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/ComponentDescriptors.cpp
+new file mode 100644
+index 0000000..807126e
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/ComponentDescriptors.cpp
+@@ -0,0 +1,22 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateComponentDescriptorCpp.js
++ */
++
++#include <react/renderer/components/RNSketchCanvasSpec/ComponentDescriptors.h>
++#include <react/renderer/core/ConcreteComponentDescriptor.h>
++#include <react/renderer/componentregistry/ComponentDescriptorProviderRegistry.h>
++
++namespace facebook::react {
++
++void RNSketchCanvasSpec_registerComponentDescriptorsFromCodegen(
++  std::shared_ptr<const ComponentDescriptorProviderRegistry> registry) {
++registry->add(concreteComponentDescriptorProvider<RNTSketchCanvasComponentDescriptor>());
++}
++
++} // namespace facebook::react
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/ComponentDescriptors.h b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/ComponentDescriptors.h
+new file mode 100644
+index 0000000..e1be43f
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/ComponentDescriptors.h
+@@ -0,0 +1,24 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateComponentDescriptorH.js
++ */
++
++#pragma once
++
++#include <react/renderer/components/RNSketchCanvasSpec/ShadowNodes.h>
++#include <react/renderer/core/ConcreteComponentDescriptor.h>
++#include <react/renderer/componentregistry/ComponentDescriptorProviderRegistry.h>
++
++namespace facebook::react {
++
++using RNTSketchCanvasComponentDescriptor = ConcreteComponentDescriptor<RNTSketchCanvasShadowNode>;
++
++void RNSketchCanvasSpec_registerComponentDescriptorsFromCodegen(
++  std::shared_ptr<const ComponentDescriptorProviderRegistry> registry);
++
++} // namespace facebook::react
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/EventEmitters.cpp b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/EventEmitters.cpp
+new file mode 100644
+index 0000000..7ab6f7e
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/EventEmitters.cpp
+@@ -0,0 +1,54 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateEventEmitterCpp.js
++ */
++
++#include <react/renderer/components/RNSketchCanvasSpec/EventEmitters.h>
++
++
++namespace facebook::react {
++
++void RNTSketchCanvasEventEmitter::onCanvasReady(OnCanvasReady event) const {
++  dispatchEvent("canvasReady", [](jsi::Runtime &runtime) {
++    auto payload = jsi::Object(runtime);
++    
++    return payload;
++  });
++}
++
++
++void RNTSketchCanvasEventEmitter::onChange(OnChange event) const {
++  dispatchEvent("change", [event=std::move(event)](jsi::Runtime &runtime) {
++    auto payload = jsi::Object(runtime);
++    payload.setProperty(runtime, "eventType", event.eventType);
++payload.setProperty(runtime, "pathsUpdate", event.pathsUpdate);
++payload.setProperty(runtime, "success", event.success);
++payload.setProperty(runtime, "path", event.path);
++    return payload;
++  });
++}
++
++
++void RNTSketchCanvasEventEmitter::onGenerateBase64(OnGenerateBase64 event) const {
++  dispatchEvent("generateBase64", [event=std::move(event)](jsi::Runtime &runtime) {
++    auto payload = jsi::Object(runtime);
++    payload.setProperty(runtime, "base64", event.base64);
++    return payload;
++  });
++}
++
++
++void RNTSketchCanvasEventEmitter::onInitialPathsLoaded(OnInitialPathsLoaded event) const {
++  dispatchEvent("initialPathsLoaded", [event=std::move(event)](jsi::Runtime &runtime) {
++    auto payload = jsi::Object(runtime);
++    payload.setProperty(runtime, "loadedCount", event.loadedCount);
++    return payload;
++  });
++}
++
++} // namespace facebook::react
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/EventEmitters.h b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/EventEmitters.h
+new file mode 100644
+index 0000000..689625b
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/EventEmitters.h
+@@ -0,0 +1,46 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateEventEmitterH.js
++ */
++#pragma once
++
++#include <react/renderer/components/view/ViewEventEmitter.h>
++
++
++namespace facebook::react {
++class RNTSketchCanvasEventEmitter : public ViewEventEmitter {
++ public:
++  using ViewEventEmitter::ViewEventEmitter;
++
++  struct OnCanvasReady {
++      
++    };
++
++  struct OnChange {
++      std::string eventType;
++    int pathsUpdate;
++    bool success;
++    std::string path;
++    };
++
++  struct OnGenerateBase64 {
++      std::string base64;
++    };
++
++  struct OnInitialPathsLoaded {
++      int loadedCount;
++    };
++  void onCanvasReady(OnCanvasReady value) const;
++
++  void onChange(OnChange value) const;
++
++  void onGenerateBase64(OnGenerateBase64 value) const;
++
++  void onInitialPathsLoaded(OnInitialPathsLoaded value) const;
++};
++} // namespace facebook::react
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/Props.cpp b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/Props.cpp
+new file mode 100644
+index 0000000..65e23c6
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/Props.cpp
+@@ -0,0 +1,26 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GeneratePropsCpp.js
++ */
++
++#include <react/renderer/components/RNSketchCanvasSpec/Props.h>
++#include <react/renderer/core/PropsParserContext.h>
++#include <react/renderer/core/propsConversions.h>
++
++namespace facebook::react {
++
++RNTSketchCanvasProps::RNTSketchCanvasProps(
++    const PropsParserContext &context,
++    const RNTSketchCanvasProps &sourceProps,
++    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
++
++    localSourceImage(convertRawProp(context, rawProps, "localSourceImage", sourceProps.localSourceImage, {})),
++    text(convertRawProp(context, rawProps, "text", sourceProps.text, {}))
++      {}
++
++} // namespace facebook::react
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/Props.h b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/Props.h
+new file mode 100644
+index 0000000..84298e6
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/Props.h
+@@ -0,0 +1,172 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GeneratePropsH.js
++ */
++#pragma once
++
++#include <react/renderer/components/view/ViewProps.h>
++#include <react/renderer/core/PropsParserContext.h>
++#include <react/renderer/core/propsConversions.h>
++#include <vector>
++
++namespace facebook::react {
++
++struct RNTSketchCanvasLocalSourceImageStruct {
++  std::string filename{};
++  std::string directory{};
++  std::string mode{};
++};
++
++static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, RNTSketchCanvasLocalSourceImageStruct &result) {
++  auto map = (std::unordered_map<std::string, RawValue>)value;
++
++  auto tmp_filename = map.find("filename");
++  if (tmp_filename != map.end()) {
++    fromRawValue(context, tmp_filename->second, result.filename);
++  }
++  auto tmp_directory = map.find("directory");
++  if (tmp_directory != map.end()) {
++    fromRawValue(context, tmp_directory->second, result.directory);
++  }
++  auto tmp_mode = map.find("mode");
++  if (tmp_mode != map.end()) {
++    fromRawValue(context, tmp_mode->second, result.mode);
++  }
++}
++
++static inline std::string toString(const RNTSketchCanvasLocalSourceImageStruct &value) {
++  return "[Object RNTSketchCanvasLocalSourceImageStruct]";
++}
++
++struct RNTSketchCanvasTextAnchorStruct {
++  double x{0.0};
++  double y{0.0};
++};
++
++static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, RNTSketchCanvasTextAnchorStruct &result) {
++  auto map = (std::unordered_map<std::string, RawValue>)value;
++
++  auto tmp_x = map.find("x");
++  if (tmp_x != map.end()) {
++    fromRawValue(context, tmp_x->second, result.x);
++  }
++  auto tmp_y = map.find("y");
++  if (tmp_y != map.end()) {
++    fromRawValue(context, tmp_y->second, result.y);
++  }
++}
++
++static inline std::string toString(const RNTSketchCanvasTextAnchorStruct &value) {
++  return "[Object RNTSketchCanvasTextAnchorStruct]";
++}
++
++struct RNTSketchCanvasTextPositionStruct {
++  double x{0.0};
++  double y{0.0};
++};
++
++static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, RNTSketchCanvasTextPositionStruct &result) {
++  auto map = (std::unordered_map<std::string, RawValue>)value;
++
++  auto tmp_x = map.find("x");
++  if (tmp_x != map.end()) {
++    fromRawValue(context, tmp_x->second, result.x);
++  }
++  auto tmp_y = map.find("y");
++  if (tmp_y != map.end()) {
++    fromRawValue(context, tmp_y->second, result.y);
++  }
++}
++
++static inline std::string toString(const RNTSketchCanvasTextPositionStruct &value) {
++  return "[Object RNTSketchCanvasTextPositionStruct]";
++}
++
++struct RNTSketchCanvasTextStruct {
++  std::string text{};
++  std::string font{};
++  double fontSize{0.0};
++  int fontColor{0};
++  std::string overlay{};
++  RNTSketchCanvasTextAnchorStruct anchor{};
++  RNTSketchCanvasTextPositionStruct position{};
++  std::string coordinate{};
++  std::string alignment{};
++  double lineHeightMultiple{0.0};
++};
++
++static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, RNTSketchCanvasTextStruct &result) {
++  auto map = (std::unordered_map<std::string, RawValue>)value;
++
++  auto tmp_text = map.find("text");
++  if (tmp_text != map.end()) {
++    fromRawValue(context, tmp_text->second, result.text);
++  }
++  auto tmp_font = map.find("font");
++  if (tmp_font != map.end()) {
++    fromRawValue(context, tmp_font->second, result.font);
++  }
++  auto tmp_fontSize = map.find("fontSize");
++  if (tmp_fontSize != map.end()) {
++    fromRawValue(context, tmp_fontSize->second, result.fontSize);
++  }
++  auto tmp_fontColor = map.find("fontColor");
++  if (tmp_fontColor != map.end()) {
++    fromRawValue(context, tmp_fontColor->second, result.fontColor);
++  }
++  auto tmp_overlay = map.find("overlay");
++  if (tmp_overlay != map.end()) {
++    fromRawValue(context, tmp_overlay->second, result.overlay);
++  }
++  auto tmp_anchor = map.find("anchor");
++  if (tmp_anchor != map.end()) {
++    fromRawValue(context, tmp_anchor->second, result.anchor);
++  }
++  auto tmp_position = map.find("position");
++  if (tmp_position != map.end()) {
++    fromRawValue(context, tmp_position->second, result.position);
++  }
++  auto tmp_coordinate = map.find("coordinate");
++  if (tmp_coordinate != map.end()) {
++    fromRawValue(context, tmp_coordinate->second, result.coordinate);
++  }
++  auto tmp_alignment = map.find("alignment");
++  if (tmp_alignment != map.end()) {
++    fromRawValue(context, tmp_alignment->second, result.alignment);
++  }
++  auto tmp_lineHeightMultiple = map.find("lineHeightMultiple");
++  if (tmp_lineHeightMultiple != map.end()) {
++    fromRawValue(context, tmp_lineHeightMultiple->second, result.lineHeightMultiple);
++  }
++}
++
++static inline std::string toString(const RNTSketchCanvasTextStruct &value) {
++  return "[Object RNTSketchCanvasTextStruct]";
++}
++
++static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, std::vector<RNTSketchCanvasTextStruct> &result) {
++  auto items = (std::vector<RawValue>)value;
++  for (const auto &item : items) {
++    RNTSketchCanvasTextStruct newItem;
++    fromRawValue(context, item, newItem);
++    result.emplace_back(newItem);
++  }
++}
++
++class RNTSketchCanvasProps final : public ViewProps {
++ public:
++  RNTSketchCanvasProps() = default;
++  RNTSketchCanvasProps(const PropsParserContext& context, const RNTSketchCanvasProps &sourceProps, const RawProps &rawProps);
++
++#pragma mark - Props
++
++  RNTSketchCanvasLocalSourceImageStruct localSourceImage{};
++  std::vector<RNTSketchCanvasTextStruct> text{};
++};
++
++} // namespace facebook::react
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/RNSketchCanvasSpecJSI-generated.cpp b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/RNSketchCanvasSpecJSI-generated.cpp
+new file mode 100644
+index 0000000..d74e7ac
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/RNSketchCanvasSpecJSI-generated.cpp
+@@ -0,0 +1,26 @@
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateModuleCpp.js
++ */
++
++#include "RNSketchCanvasSpecJSI.h"
++
++namespace facebook::react {
++
++static jsi::Value __hostFunction_NativeSketchCanvasModuleCxxSpecJSI_getConstants(jsi::Runtime &rt, TurboModule &turboModule, const jsi::Value* args, size_t count) {
++  return static_cast<NativeSketchCanvasModuleCxxSpecJSI *>(&turboModule)->getConstants(
++    rt
++  );
++}
++
++NativeSketchCanvasModuleCxxSpecJSI::NativeSketchCanvasModuleCxxSpecJSI(std::shared_ptr<CallInvoker> jsInvoker)
++  : TurboModule("SketchCanvasModule", jsInvoker) {
++  methodMap_["getConstants"] = MethodMetadata {0, __hostFunction_NativeSketchCanvasModuleCxxSpecJSI_getConstants};
++}
++
++
++} // namespace facebook::react
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/RNSketchCanvasSpecJSI.h b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/RNSketchCanvasSpecJSI.h
+new file mode 100644
+index 0000000..fc5f6c7
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/RNSketchCanvasSpecJSI.h
+@@ -0,0 +1,71 @@
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateModuleH.js
++ */
++
++#pragma once
++
++#include <ReactCommon/TurboModule.h>
++#include <react/bridging/Bridging.h>
++
++namespace facebook::react {
++
++
++  class JSI_EXPORT NativeSketchCanvasModuleCxxSpecJSI : public TurboModule {
++protected:
++  NativeSketchCanvasModuleCxxSpecJSI(std::shared_ptr<CallInvoker> jsInvoker);
++
++public:
++  virtual jsi::Object getConstants(jsi::Runtime &rt) = 0;
++
++};
++
++template <typename T>
++class JSI_EXPORT NativeSketchCanvasModuleCxxSpec : public TurboModule {
++public:
++  jsi::Value create(jsi::Runtime &rt, const jsi::PropNameID &propName) override {
++    return delegate_.create(rt, propName);
++  }
++
++  std::vector<jsi::PropNameID> getPropertyNames(jsi::Runtime& runtime) override {
++    return delegate_.getPropertyNames(runtime);
++  }
++
++  static constexpr std::string_view kModuleName = "SketchCanvasModule";
++
++protected:
++  NativeSketchCanvasModuleCxxSpec(std::shared_ptr<CallInvoker> jsInvoker)
++    : TurboModule(std::string{NativeSketchCanvasModuleCxxSpec::kModuleName}, jsInvoker),
++      delegate_(reinterpret_cast<T*>(this), jsInvoker) {}
++
++
++private:
++  class Delegate : public NativeSketchCanvasModuleCxxSpecJSI {
++  public:
++    Delegate(T *instance, std::shared_ptr<CallInvoker> jsInvoker) :
++      NativeSketchCanvasModuleCxxSpecJSI(std::move(jsInvoker)), instance_(instance) {
++
++    }
++
++    jsi::Object getConstants(jsi::Runtime &rt) override {
++      static_assert(
++          bridging::getParameterCount(&T::getConstants) == 1,
++          "Expected getConstants(...) to have 1 parameters");
++
++      return bridging::callFromJs<jsi::Object>(
++          rt, &T::getConstants, jsInvoker_, instance_);
++    }
++
++  private:
++    friend class NativeSketchCanvasModuleCxxSpec;
++    T *instance_;
++  };
++
++  Delegate delegate_;
++};
++
++} // namespace facebook::react
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/ShadowNodes.cpp b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/ShadowNodes.cpp
+new file mode 100644
+index 0000000..c457b86
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/ShadowNodes.cpp
+@@ -0,0 +1,17 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateShadowNodeCpp.js
++ */
++
++#include <react/renderer/components/RNSketchCanvasSpec/ShadowNodes.h>
++
++namespace facebook::react {
++
++extern const char RNTSketchCanvasComponentName[] = "RNTSketchCanvas";
++
++} // namespace facebook::react
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/ShadowNodes.h b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/ShadowNodes.h
+new file mode 100644
+index 0000000..ab71a77
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/ShadowNodes.h
+@@ -0,0 +1,32 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateShadowNodeH.js
++ */
++
++#pragma once
++
++#include <react/renderer/components/RNSketchCanvasSpec/EventEmitters.h>
++#include <react/renderer/components/RNSketchCanvasSpec/Props.h>
++#include <react/renderer/components/RNSketchCanvasSpec/States.h>
++#include <react/renderer/components/view/ConcreteViewShadowNode.h>
++#include <jsi/jsi.h>
++
++namespace facebook::react {
++
++JSI_EXPORT extern const char RNTSketchCanvasComponentName[];
++
++/*
++ * `ShadowNode` for <RNTSketchCanvas> component.
++ */
++using RNTSketchCanvasShadowNode = ConcreteViewShadowNode<
++    RNTSketchCanvasComponentName,
++    RNTSketchCanvasProps,
++    RNTSketchCanvasEventEmitter,
++    RNTSketchCanvasState>;
++
++} // namespace facebook::react
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/States.cpp b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/States.cpp
+new file mode 100644
+index 0000000..ed5cbd5
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/States.cpp
+@@ -0,0 +1,16 @@
++
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateStateCpp.js
++ */
++#include <react/renderer/components/RNSketchCanvasSpec/States.h>
++
++namespace facebook::react {
++
++
++
++} // namespace facebook::react
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/States.h b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/States.h
+new file mode 100644
+index 0000000..1e77ded
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/jni/react/renderer/components/RNSketchCanvasSpec/States.h
+@@ -0,0 +1,29 @@
++/**
++ * This code was generated by [react-native-codegen](https://www.npmjs.com/package/react-native-codegen).
++ *
++ * Do not edit this file as changes may cause incorrect behavior and will be lost
++ * once the code is regenerated.
++ *
++ * @generated by codegen project: GenerateStateH.js
++ */
++#pragma once
++
++#ifdef ANDROID
++#include <folly/dynamic.h>
++#endif
++
++namespace facebook::react {
++
++class RNTSketchCanvasState {
++public:
++  RNTSketchCanvasState() = default;
++
++#ifdef ANDROID
++  RNTSketchCanvasState(RNTSketchCanvasState const &previousState, folly::dynamic data){};
++  folly::dynamic getDynamic() const {
++    return {};
++  };
++#endif
++};
++
++} // namespace facebook::react
+\ No newline at end of file
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/schema.json b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/schema.json
+new file mode 100644
+index 0000000..b46280c
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/source/codegen/schema.json
+@@ -0,0 +1 @@
++{"modules":{"NativeSketchCanvasModule":{"type":"NativeModule","aliasMap":{},"enumMap":{},"spec":{"eventEmitters":[],"methods":[{"name":"getConstants","optional":false,"typeAnnotation":{"type":"FunctionTypeAnnotation","returnTypeAnnotation":{"type":"ObjectTypeAnnotation","properties":[{"name":"MainBundlePath","optional":false,"typeAnnotation":{"type":"StringTypeAnnotation"}},{"name":"NSDocumentDirectory","optional":false,"typeAnnotation":{"type":"StringTypeAnnotation"}},{"name":"NSLibraryDirectory","optional":false,"typeAnnotation":{"type":"StringTypeAnnotation"}},{"name":"NSCachesDirectory","optional":false,"typeAnnotation":{"type":"StringTypeAnnotation"}}]},"params":[]}}]},"moduleName":"SketchCanvasModule"},"RNTSketchCanvas":{"type":"Component","components":{"RNTSketchCanvas":{"extendsProps":[{"type":"ReactNativeBuiltInType","knownTypeName":"ReactNativeCoreViewProps"}],"events":[{"name":"onCanvasReady","optional":true,"bubblingType":"direct","typeAnnotation":{"type":"EventTypeAnnotation","argument":{"type":"ObjectTypeAnnotation","properties":[]}}},{"name":"onChange","optional":true,"bubblingType":"bubble","typeAnnotation":{"type":"EventTypeAnnotation","argument":{"type":"ObjectTypeAnnotation","properties":[{"name":"eventType","optional":false,"typeAnnotation":{"type":"StringTypeAnnotation"}},{"name":"pathsUpdate","optional":true,"typeAnnotation":{"type":"Int32TypeAnnotation"}},{"name":"success","optional":true,"typeAnnotation":{"type":"BooleanTypeAnnotation"}},{"name":"path","optional":true,"typeAnnotation":{"type":"StringTypeAnnotation"}}]}}},{"name":"onGenerateBase64","optional":true,"bubblingType":"direct","typeAnnotation":{"type":"EventTypeAnnotation","argument":{"type":"ObjectTypeAnnotation","properties":[{"name":"base64","optional":false,"typeAnnotation":{"type":"StringTypeAnnotation"}}]}}},{"name":"onInitialPathsLoaded","optional":true,"bubblingType":"direct","typeAnnotation":{"type":"EventTypeAnnotation","argument":{"type":"ObjectTypeAnnotation","properties":[{"name":"loadedCount","optional":false,"typeAnnotation":{"type":"Int32TypeAnnotation"}}]}}}],"props":[{"name":"localSourceImage","optional":true,"typeAnnotation":{"type":"ObjectTypeAnnotation","properties":[{"name":"filename","optional":false,"typeAnnotation":{"type":"StringTypeAnnotation","default":null}},{"name":"directory","optional":true,"typeAnnotation":{"type":"StringTypeAnnotation","default":null}},{"name":"mode","optional":true,"typeAnnotation":{"type":"StringTypeAnnotation","default":null}}]}},{"name":"text","optional":true,"typeAnnotation":{"type":"ArrayTypeAnnotation","elementType":{"type":"ObjectTypeAnnotation","properties":[{"name":"text","optional":false,"typeAnnotation":{"type":"StringTypeAnnotation","default":null}},{"name":"font","optional":true,"typeAnnotation":{"type":"StringTypeAnnotation","default":null}},{"name":"fontSize","optional":true,"typeAnnotation":{"type":"DoubleTypeAnnotation","default":0}},{"name":"fontColor","optional":true,"typeAnnotation":{"type":"Int32TypeAnnotation","default":0}},{"name":"overlay","optional":true,"typeAnnotation":{"type":"StringTypeAnnotation","default":null}},{"name":"anchor","optional":true,"typeAnnotation":{"type":"ObjectTypeAnnotation","properties":[{"name":"x","optional":false,"typeAnnotation":{"type":"DoubleTypeAnnotation","default":0}},{"name":"y","optional":false,"typeAnnotation":{"type":"DoubleTypeAnnotation","default":0}}]}},{"name":"position","optional":false,"typeAnnotation":{"type":"ObjectTypeAnnotation","properties":[{"name":"x","optional":false,"typeAnnotation":{"type":"DoubleTypeAnnotation","default":0}},{"name":"y","optional":false,"typeAnnotation":{"type":"DoubleTypeAnnotation","default":0}}]}},{"name":"coordinate","optional":true,"typeAnnotation":{"type":"StringTypeAnnotation","default":null}},{"name":"alignment","optional":true,"typeAnnotation":{"type":"StringTypeAnnotation","default":null}},{"name":"lineHeightMultiple","optional":true,"typeAnnotation":{"type":"DoubleTypeAnnotation","default":0}}]}}}],"commands":[{"name":"save","optional":false,"typeAnnotation":{"type":"FunctionTypeAnnotation","params":[{"name":"imageType","optional":false,"typeAnnotation":{"type":"StringTypeAnnotation"}},{"name":"folder","optional":false,"typeAnnotation":{"type":"StringTypeAnnotation"}},{"name":"filename","optional":false,"typeAnnotation":{"type":"StringTypeAnnotation"}},{"name":"transparent","optional":false,"typeAnnotation":{"type":"BooleanTypeAnnotation"}},{"name":"includeImage","optional":false,"typeAnnotation":{"type":"BooleanTypeAnnotation"}},{"name":"includeText","optional":false,"typeAnnotation":{"type":"BooleanTypeAnnotation"}},{"name":"cropToImageSize","optional":false,"typeAnnotation":{"type":"BooleanTypeAnnotation"}}],"returnTypeAnnotation":{"type":"VoidTypeAnnotation"}}},{"name":"addPoint","optional":false,"typeAnnotation":{"type":"FunctionTypeAnnotation","params":[{"name":"x","optional":false,"typeAnnotation":{"type":"DoubleTypeAnnotation"}},{"name":"y","optional":false,"typeAnnotation":{"type":"DoubleTypeAnnotation"}}],"returnTypeAnnotation":{"type":"VoidTypeAnnotation"}}},{"name":"addPath","optional":false,"typeAnnotation":{"type":"FunctionTypeAnnotation","params":[{"name":"pathId","optional":false,"typeAnnotation":{"type":"Int32TypeAnnotation"}},{"name":"color","optional":false,"typeAnnotation":{"type":"Int32TypeAnnotation"}},{"name":"width","optional":false,"typeAnnotation":{"type":"DoubleTypeAnnotation"}},{"name":"points","optional":false,"typeAnnotation":{"type":"ArrayTypeAnnotation","elementType":{"type":"StringTypeAnnotation"}}}],"returnTypeAnnotation":{"type":"VoidTypeAnnotation"}}},{"name":"addInitialPaths","optional":false,"typeAnnotation":{"type":"FunctionTypeAnnotation","params":[{"name":"pathsArray","optional":false,"typeAnnotation":{"type":"ArrayTypeAnnotation","elementType":{"type":"MixedTypeAnnotation"}}}],"returnTypeAnnotation":{"type":"VoidTypeAnnotation"}}},{"name":"newPath","optional":false,"typeAnnotation":{"type":"FunctionTypeAnnotation","params":[{"name":"pathId","optional":false,"typeAnnotation":{"type":"Int32TypeAnnotation"}},{"name":"color","optional":false,"typeAnnotation":{"type":"Int32TypeAnnotation"}},{"name":"width","optional":false,"typeAnnotation":{"type":"DoubleTypeAnnotation"}}],"returnTypeAnnotation":{"type":"VoidTypeAnnotation"}}},{"name":"deletePath","optional":false,"typeAnnotation":{"type":"FunctionTypeAnnotation","params":[{"name":"pathId","optional":false,"typeAnnotation":{"type":"Int32TypeAnnotation"}}],"returnTypeAnnotation":{"type":"VoidTypeAnnotation"}}},{"name":"endPath","optional":false,"typeAnnotation":{"type":"FunctionTypeAnnotation","params":[],"returnTypeAnnotation":{"type":"VoidTypeAnnotation"}}},{"name":"clear","optional":false,"typeAnnotation":{"type":"FunctionTypeAnnotation","params":[],"returnTypeAnnotation":{"type":"VoidTypeAnnotation"}}},{"name":"transferToBase64","optional":false,"typeAnnotation":{"type":"FunctionTypeAnnotation","params":[{"name":"imageType","optional":false,"typeAnnotation":{"type":"StringTypeAnnotation"}},{"name":"transparent","optional":false,"typeAnnotation":{"type":"BooleanTypeAnnotation"}},{"name":"includeImage","optional":false,"typeAnnotation":{"type":"BooleanTypeAnnotation"}},{"name":"includeText","optional":false,"typeAnnotation":{"type":"BooleanTypeAnnotation"}},{"name":"cropToImageSize","optional":false,"typeAnnotation":{"type":"BooleanTypeAnnotation"}}],"returnTypeAnnotation":{"type":"VoidTypeAnnotation"}}}]}}}}}
+\ No newline at end of file
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml
+new file mode 100644
+index 0000000..ad4b1fd
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="com.sourcetoad.reactnativesketchcanvas" >
++
++    <uses-sdk android:minSdkVersion="24" />
++
++</manifest>
+\ No newline at end of file
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/output-metadata.json b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/output-metadata.json
+new file mode 100644
+index 0000000..5bde08f
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/output-metadata.json
+@@ -0,0 +1,18 @@
++{
++  "version": 3,
++  "artifactType": {
++    "type": "AAPT_FRIENDLY_MERGED_MANIFESTS",
++    "kind": "Directory"
++  },
++  "applicationId": "com.sourcetoad.reactnativesketchcanvas",
++  "variantName": "debug",
++  "elements": [
++    {
++      "type": "SINGLE",
++      "filters": [],
++      "attributes": [],
++      "outputFile": "AndroidManifest.xml"
++    }
++  ],
++  "elementType": "File"
++}
+\ No newline at end of file
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties
+new file mode 100644
+index 0000000..1211b1e
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties
+@@ -0,0 +1,6 @@
++aarFormatVersion=1.0
++aarMetadataVersion=1.0
++minCompileSdk=1
++minCompileSdkExtension=0
++minAndroidGradlePluginVersion=1.0.0
++coreLibraryDesugaringEnabled=false
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/annotation_processor_list/debug/javaPreCompileDebug/annotationProcessors.json b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/annotation_processor_list/debug/javaPreCompileDebug/annotationProcessors.json
+new file mode 100644
+index 0000000..9e26dfe
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/annotation_processor_list/debug/javaPreCompileDebug/annotationProcessors.json
+@@ -0,0 +1 @@
++{}
+\ No newline at end of file
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar
+new file mode 100644
+index 0000000..e10783e
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar
+new file mode 100644
+index 0000000..030485c
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/compile_symbol_list/debug/generateDebugRFile/R.txt b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/compile_symbol_list/debug/generateDebugRFile/R.txt
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+new file mode 100644
+index 0000000..e68b8da
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+@@ -0,0 +1 @@
++#Wed Dec 17 15:33:29 COT 2025
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
+new file mode 100644
+index 0000000..0314a15
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main" generated-set="main$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/debug/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug" generated-set="debug$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/debug/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/res/resValues/debug"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated" generated-set="generated$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/generated/res/resValues/debug"/></dataSet><mergedItems/></merger>
+\ No newline at end of file
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/incremental/mergeDebugAssets/merger.xml b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/incremental/mergeDebugAssets/merger.xml
+new file mode 100644
+index 0000000..6955aa5
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/incremental/mergeDebugAssets/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/assets"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/debug/assets"/></dataSet><dataSet config="generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/shader_assets/debug/compileDebugShaders/out"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
+new file mode 100644
+index 0000000..bce39af
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/jniLibs"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/debug/jniLibs"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/incremental/mergeDebugShaders/merger.xml b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/incremental/mergeDebugShaders/merger.xml
+new file mode 100644
+index 0000000..f3fb67b
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/incremental/mergeDebugShaders/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/shaders"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/debug/shaders"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/java_res/debug/processDebugJavaRes/out/META-INF/sourcetoad_react-native-sketch-canvas_debug.kotlin_module b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/java_res/debug/processDebugJavaRes/out/META-INF/sourcetoad_react-native-sketch-canvas_debug.kotlin_module
+new file mode 100644
+index 0000000..9dbc290
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/java_res/debug/processDebugJavaRes/out/META-INF/sourcetoad_react-native-sketch-canvas_debug.kotlin_module differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/facebook/react/viewmanagers/RNTSketchCanvasManagerDelegate.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/facebook/react/viewmanagers/RNTSketchCanvasManagerDelegate.class
+new file mode 100644
+index 0000000..35ffed4
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/facebook/react/viewmanagers/RNTSketchCanvasManagerDelegate.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/facebook/react/viewmanagers/RNTSketchCanvasManagerInterface.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/facebook/react/viewmanagers/RNTSketchCanvasManagerInterface.class
+new file mode 100644
+index 0000000..868329d
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/facebook/react/viewmanagers/RNTSketchCanvasManagerInterface.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/sourcetoad/reactnativesketchcanvas/BuildConfig.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/sourcetoad/reactnativesketchcanvas/BuildConfig.class
+new file mode 100644
+index 0000000..efc9132
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/sourcetoad/reactnativesketchcanvas/BuildConfig.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/sourcetoad/reactnativesketchcanvas/NativeSketchCanvasModuleSpec.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/sourcetoad/reactnativesketchcanvas/NativeSketchCanvasModuleSpec.class
+new file mode 100644
+index 0000000..be72464
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/sourcetoad/reactnativesketchcanvas/NativeSketchCanvasModuleSpec.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt
+new file mode 100644
+index 0000000..78ac5b8
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt
+@@ -0,0 +1,2 @@
++R_DEF: Internal format may change without notice
++local
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/manifest_merge_blame_file/debug/processDebugManifest/manifest-merger-blame-debug-report.txt b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/manifest_merge_blame_file/debug/processDebugManifest/manifest-merger-blame-debug-report.txt
+new file mode 100644
+index 0000000..165306c
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/manifest_merge_blame_file/debug/processDebugManifest/manifest-merger-blame-debug-report.txt
+@@ -0,0 +1,7 @@
++1<?xml version="1.0" encoding="utf-8"?>
++2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++3    package="com.sourcetoad.reactnativesketchcanvas" >
++4
++5    <uses-sdk android:minSdkVersion="24" />
++6
++7</manifest>
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml
+new file mode 100644
+index 0000000..ad4b1fd
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="com.sourcetoad.reactnativesketchcanvas" >
++
++    <uses-sdk android:minSdkVersion="24" />
++
++</manifest>
+\ No newline at end of file
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/navigation_json/debug/extractDeepLinksDebug/navigation.json b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/navigation_json/debug/extractDeepLinksDebug/navigation.json
+new file mode 100644
+index 0000000..0637a08
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/navigation_json/debug/extractDeepLinksDebug/navigation.json
+@@ -0,0 +1 @@
++[]
+\ No newline at end of file
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt
+new file mode 100644
+index 0000000..08f4ebe
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt
+@@ -0,0 +1 @@
++0 Warning/Error
+\ No newline at end of file
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/META-INF/sourcetoad_react-native-sketch-canvas_debug.kotlin_module b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/META-INF/sourcetoad_react-native-sketch-canvas_debug.kotlin_module
+new file mode 100644
+index 0000000..9dbc290
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/META-INF/sourcetoad_react-native-sketch-canvas_debug.kotlin_module differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/facebook/react/viewmanagers/RNTSketchCanvasManagerDelegate.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/facebook/react/viewmanagers/RNTSketchCanvasManagerDelegate.class
+new file mode 100644
+index 0000000..35ffed4
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/facebook/react/viewmanagers/RNTSketchCanvasManagerDelegate.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/facebook/react/viewmanagers/RNTSketchCanvasManagerInterface.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/facebook/react/viewmanagers/RNTSketchCanvasManagerInterface.class
+new file mode 100644
+index 0000000..868329d
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/facebook/react/viewmanagers/RNTSketchCanvasManagerInterface.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/BuildConfig.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/BuildConfig.class
+new file mode 100644
+index 0000000..efc9132
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/BuildConfig.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/CanvasText.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/CanvasText.class
+new file mode 100644
+index 0000000..a12c210
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/CanvasText.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/NativeSketchCanvasModuleSpec.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/NativeSketchCanvasModuleSpec.class
+new file mode 100644
+index 0000000..be72464
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/NativeSketchCanvasModuleSpec.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasManagerModule$Companion.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasManagerModule$Companion.class
+new file mode 100644
+index 0000000..f528dbd
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasManagerModule$Companion.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasManagerModule.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasManagerModule.class
+new file mode 100644
+index 0000000..eb17914
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasManagerModule.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasView.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasView.class
+new file mode 100644
+index 0000000..2f0db5f
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasView.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewManager$Companion.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewManager$Companion.class
+new file mode 100644
+index 0000000..9e83f4e
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewManager$Companion.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewManager.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewManager.class
+new file mode 100644
+index 0000000..6491e96
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewManager.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewPackage.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewPackage.class
+new file mode 100644
+index 0000000..940a11c
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewPackage.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/SketchCanvas$Companion.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/SketchCanvas$Companion.class
+new file mode 100644
+index 0000000..4a148e1
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/SketchCanvas$Companion.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/SketchCanvas.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/SketchCanvas.class
+new file mode 100644
+index 0000000..1d7a1cd
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/SketchCanvas.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/SketchData$Companion.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/SketchData$Companion.class
+new file mode 100644
+index 0000000..7a0435b
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/SketchData$Companion.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/SketchData.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/SketchData.class
+new file mode 100644
+index 0000000..17ee963
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/SketchData.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/Utility.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/Utility.class
+new file mode 100644
+index 0000000..941d31e
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/Utility.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnCanvasReadyEvent$Companion.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnCanvasReadyEvent$Companion.class
+new file mode 100644
+index 0000000..beabc73
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnCanvasReadyEvent$Companion.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnCanvasReadyEvent.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnCanvasReadyEvent.class
+new file mode 100644
+index 0000000..7fa29f3
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnCanvasReadyEvent.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnChangeEvent$Companion.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnChangeEvent$Companion.class
+new file mode 100644
+index 0000000..5b60f1c
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnChangeEvent$Companion.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnChangeEvent.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnChangeEvent.class
+new file mode 100644
+index 0000000..468d1ce
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnChangeEvent.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnGenerateBase64Event$Companion.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnGenerateBase64Event$Companion.class
+new file mode 100644
+index 0000000..26b2a2d
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnGenerateBase64Event$Companion.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnGenerateBase64Event.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnGenerateBase64Event.class
+new file mode 100644
+index 0000000..40429ce
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnGenerateBase64Event.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnInitialPathsLoadedEvent$Companion.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnInitialPathsLoadedEvent$Companion.class
+new file mode 100644
+index 0000000..50bffe2
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnInitialPathsLoadedEvent$Companion.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnInitialPathsLoadedEvent.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnInitialPathsLoadedEvent.class
+new file mode 100644
+index 0000000..24292fa
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/sourcetoad/reactnativesketchcanvas/event/OnInitialPathsLoadedEvent.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar
+new file mode 100644
+index 0000000..c497f9e
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt
+new file mode 100644
+index 0000000..708345f
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt
+@@ -0,0 +1 @@
++com.sourcetoad.reactnativesketchcanvas
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab
+new file mode 100644
+index 0000000..2584b4e
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream
+new file mode 100644
+index 0000000..770122d
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream.len
+new file mode 100644
+index 0000000..602e2c5
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.len
+new file mode 100644
+index 0000000..a541356
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at
+new file mode 100644
+index 0000000..7f340c0
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i
+new file mode 100644
+index 0000000..388ddbb
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab
+new file mode 100644
+index 0000000..3e51c9b
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream
+new file mode 100644
+index 0000000..d90531f
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream.len
+new file mode 100644
+index 0000000..30ce4f8
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.len
+new file mode 100644
+index 0000000..8fe89d8
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at
+new file mode 100644
+index 0000000..4e818d9
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i
+new file mode 100644
+index 0000000..2b6f154
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab
+new file mode 100644
+index 0000000..83e8800
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream
+new file mode 100644
+index 0000000..d90531f
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream.len
+new file mode 100644
+index 0000000..30ce4f8
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.len
+new file mode 100644
+index 0000000..8fe89d8
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at
+new file mode 100644
+index 0000000..cddde59
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i
+new file mode 100644
+index 0000000..2b6f154
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab
+new file mode 100644
+index 0000000..d53820e
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab.keystream b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab.keystream
+new file mode 100644
+index 0000000..c8e8fd2
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab.keystream differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab.keystream.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab.keystream.len
+new file mode 100644
+index 0000000..9b00474
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab.keystream.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab.len
+new file mode 100644
+index 0000000..9e27f73
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab.values.at b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab.values.at
+new file mode 100644
+index 0000000..4f9fddc
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab.values.at differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab_i b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab_i
+new file mode 100644
+index 0000000..b69cd85
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab_i differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab_i.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/constants.tab_i.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab
+new file mode 100644
+index 0000000..00cd439
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream
+new file mode 100644
+index 0000000..5b0c717
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream.len
+new file mode 100644
+index 0000000..30ce4f8
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.len
+new file mode 100644
+index 0000000..8fe89d8
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at
+new file mode 100644
+index 0000000..cddde59
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i
+new file mode 100644
+index 0000000..1fa2fbf
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab
+new file mode 100644
+index 0000000..ad3bd0a
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream
+new file mode 100644
+index 0000000..8101450
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream.len
+new file mode 100644
+index 0000000..e66d94d
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.len
+new file mode 100644
+index 0000000..0539f67
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at
+new file mode 100644
+index 0000000..cafed93
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i
+new file mode 100644
+index 0000000..d01ece6
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab
+new file mode 100644
+index 0000000..551b0bf
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream
+new file mode 100644
+index 0000000..770122d
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream.len
+new file mode 100644
+index 0000000..602e2c5
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.len
+new file mode 100644
+index 0000000..a541356
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at
+new file mode 100644
+index 0000000..0ff1c21
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i
+new file mode 100644
+index 0000000..388ddbb
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab
+new file mode 100644
+index 0000000..a8405d9
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream
+new file mode 100644
+index 0000000..8d80252
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream.len
+new file mode 100644
+index 0000000..a67fcae
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.len
+new file mode 100644
+index 0000000..817b326
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at
+new file mode 100644
+index 0000000..2563800
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i
+new file mode 100644
+index 0000000..f4bacc8
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab
+new file mode 100644
+index 0000000..7f2a60e
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream
+new file mode 100644
+index 0000000..ba4fbb6
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream.len
+new file mode 100644
+index 0000000..663261f
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.len
+new file mode 100644
+index 0000000..eb0b8a0
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at
+new file mode 100644
+index 0000000..572e119
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i
+new file mode 100644
+index 0000000..4a57a1e
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/counters.tab b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/counters.tab
+new file mode 100644
+index 0000000..9153a30
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/counters.tab
+@@ -0,0 +1,2 @@
++12
++0
+\ No newline at end of file
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab
+new file mode 100644
+index 0000000..e59ecc0
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream
+new file mode 100644
+index 0000000..770122d
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream.len
+new file mode 100644
+index 0000000..602e2c5
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.len
+new file mode 100644
+index 0000000..a541356
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at
+new file mode 100644
+index 0000000..09947d1
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i
+new file mode 100644
+index 0000000..388ddbb
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab
+new file mode 100644
+index 0000000..7bb54ae
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream
+new file mode 100644
+index 0000000..82dcce2
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len
+new file mode 100644
+index 0000000..1ff194f
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len
+new file mode 100644
+index 0000000..a363176
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at
+new file mode 100644
+index 0000000..f914ebe
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i
+new file mode 100644
+index 0000000..8452381
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab
+new file mode 100644
+index 0000000..622cefa
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream
+new file mode 100644
+index 0000000..cc8500f
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len
+new file mode 100644
+index 0000000..0b537d2
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len
+new file mode 100644
+index 0000000..05d7a06
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at
+new file mode 100644
+index 0000000..1e78728
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i
+new file mode 100644
+index 0000000..2ca9e85
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i.len b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i.len
+new file mode 100644
+index 0000000..131e265
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i.len differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/last-build.bin b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/last-build.bin
+new file mode 100644
+index 0000000..a711f3f
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/cacheable/last-build.bin differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin
+new file mode 100644
+index 0000000..2045d2d
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/local-state/build-history.bin b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/local-state/build-history.bin
+new file mode 100644
+index 0000000..dd27802
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/kotlin/compileDebugKotlin/local-state/build-history.bin differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/outputs/logs/manifest-merger-debug-report.txt b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/outputs/logs/manifest-merger-debug-report.txt
+new file mode 100644
+index 0000000..f437aca
+--- /dev/null
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/outputs/logs/manifest-merger-debug-report.txt
+@@ -0,0 +1,16 @@
++-- Merging decision tree log ---
++manifest
++ADDED from /Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/AndroidManifestNew.xml:1:1-2:12
++INJECTED from /Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/AndroidManifestNew.xml:1:1-2:12
++	package
++		INJECTED from /Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/AndroidManifestNew.xml
++	xmlns:android
++		ADDED from /Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/AndroidManifestNew.xml:1:11-69
++uses-sdk
++INJECTED from /Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/AndroidManifestNew.xml reason: use-sdk injection requested
++INJECTED from /Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/AndroidManifestNew.xml
++INJECTED from /Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/AndroidManifestNew.xml
++	android:targetSdkVersion
++		INJECTED from /Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/AndroidManifestNew.xml
++	android:minSdkVersion
++		INJECTED from /Users/imarsiglia/Development/git/react-native/uovo/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/AndroidManifestNew.xml
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin
+new file mode 100644
+index 0000000..a5f5427
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/META-INF/sourcetoad_react-native-sketch-canvas_debug.kotlin_module b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/META-INF/sourcetoad_react-native-sketch-canvas_debug.kotlin_module
+new file mode 100644
+index 0000000..9dbc290
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/META-INF/sourcetoad_react-native-sketch-canvas_debug.kotlin_module differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/CanvasText.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/CanvasText.class
+new file mode 100644
+index 0000000..a12c210
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/CanvasText.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasManagerModule$Companion.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasManagerModule$Companion.class
+new file mode 100644
+index 0000000..f528dbd
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasManagerModule$Companion.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasManagerModule.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasManagerModule.class
+new file mode 100644
+index 0000000..eb17914
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasManagerModule.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasView.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasView.class
+new file mode 100644
+index 0000000..2f0db5f
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasView.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewManager$Companion.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewManager$Companion.class
+new file mode 100644
+index 0000000..9e83f4e
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewManager$Companion.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewManager.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewManager.class
+new file mode 100644
+index 0000000..6491e96
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewManager.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewPackage.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewPackage.class
+new file mode 100644
+index 0000000..940a11c
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/RNTSketchCanvasViewPackage.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/SketchCanvas$Companion.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/SketchCanvas$Companion.class
+new file mode 100644
+index 0000000..4a148e1
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/SketchCanvas$Companion.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/SketchCanvas.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/SketchCanvas.class
+new file mode 100644
+index 0000000..1d7a1cd
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/SketchCanvas.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/SketchData$Companion.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/SketchData$Companion.class
+new file mode 100644
+index 0000000..7a0435b
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/SketchData$Companion.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/SketchData.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/SketchData.class
+new file mode 100644
+index 0000000..17ee963
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/SketchData.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/Utility.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/Utility.class
+new file mode 100644
+index 0000000..941d31e
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/Utility.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnCanvasReadyEvent$Companion.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnCanvasReadyEvent$Companion.class
+new file mode 100644
+index 0000000..beabc73
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnCanvasReadyEvent$Companion.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnCanvasReadyEvent.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnCanvasReadyEvent.class
+new file mode 100644
+index 0000000..7fa29f3
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnCanvasReadyEvent.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnChangeEvent$Companion.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnChangeEvent$Companion.class
+new file mode 100644
+index 0000000..5b60f1c
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnChangeEvent$Companion.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnChangeEvent.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnChangeEvent.class
+new file mode 100644
+index 0000000..468d1ce
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnChangeEvent.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnGenerateBase64Event$Companion.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnGenerateBase64Event$Companion.class
+new file mode 100644
+index 0000000..26b2a2d
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnGenerateBase64Event$Companion.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnGenerateBase64Event.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnGenerateBase64Event.class
+new file mode 100644
+index 0000000..40429ce
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnGenerateBase64Event.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnInitialPathsLoadedEvent$Companion.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnInitialPathsLoadedEvent$Companion.class
+new file mode 100644
+index 0000000..50bffe2
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnInitialPathsLoadedEvent$Companion.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnInitialPathsLoadedEvent.class b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnInitialPathsLoadedEvent.class
+new file mode 100644
+index 0000000..24292fa
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/build/tmp/kotlin-classes/debug/com/sourcetoad/reactnativesketchcanvas/event/OnInitialPathsLoadedEvent.class differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/java/com/sourcetoad/.DS_Store b/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/java/com/sourcetoad/.DS_Store
+new file mode 100644
+index 0000000..a1247f1
+Binary files /dev/null and b/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/java/com/sourcetoad/.DS_Store differ
+diff --git a/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/java/com/sourcetoad/reactnativesketchcanvas/SketchCanvas.kt b/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/java/com/sourcetoad/reactnativesketchcanvas/SketchCanvas.kt
+index ca917cc..868cce0 100644
+--- a/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/java/com/sourcetoad/reactnativesketchcanvas/SketchCanvas.kt
++++ b/node_modules/@sourcetoad/react-native-sketch-canvas/android/src/main/java/com/sourcetoad/reactnativesketchcanvas/SketchCanvas.kt
+@@ -134,9 +134,13 @@ class SketchCanvas(context: ThemedReactContext) : View(context) {
+         return Pair(validWidth, validHeight)
+     }
+ 
+-    private fun getOptimalBitmapConfig(hasAlpha: Boolean): Bitmap.Config {
++    /*private fun getOptimalBitmapConfig(hasAlpha: Boolean): Bitmap.Config {
+         // Use RGB_565 (2 bytes per pixel) when transparency not needed for better performance
+         return if (hasAlpha) Bitmap.Config.ARGB_8888 else Bitmap.Config.RGB_565
++    }*/
++
++    private fun getOptimalBitmapConfig(hasAlpha: Boolean): Bitmap.Config {
++        return Bitmap.Config.ARGB_8888
+     }
+ 
+     fun isCanvasReady(): Boolean {
+@@ -696,7 +700,7 @@ class SketchCanvas(context: ThemedReactContext) : View(context) {
+                 FileOutputStream(file).use { fos ->
+                     bitmap.compress(
+                         if (format == "png") Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG,
+-                        if (format == "png") 100 else 90,
++                        if (format == "png") 100 else 100,
+                         fos
+                     )
+                 }
+@@ -723,7 +727,7 @@ class SketchCanvas(context: ThemedReactContext) : View(context) {
+         val byteArrayOS = ByteArrayOutputStream()
+         bitmap.compress(
+             if (format == "png") Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG,
+-            if (format == "png") 100 else 90,
++            if (format == "png") 100 else 100,
+             byteArrayOS
+         )
+ 

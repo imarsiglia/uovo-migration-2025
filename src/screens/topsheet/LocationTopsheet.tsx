@@ -548,8 +548,8 @@ export const LocationTopsheet = () => {
             </Label>
             <Label style={styles.notesBody}>
               {typeAddress === AddressTypes.Shipper
-                ? jobDetail?.shipper_comments ?? 'N/A'
-                : jobDetail?.consignee_comments ?? 'N/A'}
+                ? jobDetail?.shipper_comments || 'N/A'
+                : jobDetail?.consignee_comments || 'N/A'}
             </Label>
           </ScrollView>
           <Wrapper style={styles.notesCtaWrap}>

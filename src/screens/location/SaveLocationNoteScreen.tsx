@@ -22,6 +22,7 @@ import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
 import {RootStackParamList} from '@navigation/types';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {showToastMessage} from '@utils/toast';
@@ -40,9 +41,13 @@ export const SaveLocationNoteScreen = (props: Props) => {
     params: {idJob, type},
   } = props.route;
 
+  const {isJobQueue} = useTopSheetStore();
+
   const {refetchAll} = useRefreshIndicator([
     [QUERY_KEYS.LOCATION_NOTES, {idJob, type}],
+    [QUERY_KEYS.TOPSHEET, {id: idJob, queue: isJobQueue}],
   ]);
+
   const {mutateAsync, isPending} = useSaveLocationNotes();
 
   const refVoice = useRef<SpeechFormInputRef>(null);

@@ -1365,7 +1365,7 @@ export const ConditionReportScreen = (props: Props) => {
                           <Label style={[GLOBAL_STYLES.bold]}>CR Status</Label>
                         </Wrapper>
 
-                        <Wrapper style={[GLOBAL_STYLES.fiftyFive]}>
+                        <Wrapper style={{flex: 1}}>
                           <BottomSheetSelectInput
                             onChange={(item) => setPartial(item as string)}
                             options={CONDITION_STATES_LIST}
@@ -1592,7 +1592,8 @@ const styles = StyleSheet.create({
   containerBodyModalClockin: {
     justifyContent: 'space-between',
     paddingTop: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
+    gap: 5
   },
 });
 

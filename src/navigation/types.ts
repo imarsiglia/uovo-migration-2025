@@ -27,6 +27,7 @@ export const RoutesNavigation = {
   Login: 'Login',
   EditProfile: 'EditProfile',
   EditImage: 'EditImage',
+  EditImageUri: 'EditImageUri',
   LoginEmail: 'LoginEmail',
   HelpDesk: 'HelpDesk',
   Account: 'Account',
@@ -84,6 +85,10 @@ export type RootStackParamList = {
     fromProfile?: boolean;
   };
   [RoutesNavigation.EditImage]: {
+    photo: any;
+    photos?: any;
+  };
+  [RoutesNavigation.EditImageUri]: {
     photo: any;
     photos?: any;
   };
@@ -173,7 +178,7 @@ export type RootStackParamList = {
   [RoutesNavigation.SaveImages]:
     | {
         item?: TaskImageType;
-        editedImage?: any;
+        editedUri?: string;
         index?: number;
       }
     | undefined;
