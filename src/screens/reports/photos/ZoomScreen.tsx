@@ -43,7 +43,7 @@ import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {useQueryClient} from '@tanstack/react-query';
-import {generateUUID} from '@utils/functions';
+import {generateUUID, nextFrame} from '@utils/functions';
 import {onLaunchCamera, onSelectImage} from '@utils/image';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
@@ -177,7 +177,7 @@ const ZoomScreen = (props: any) => {
     conditionClientId,
   } = useConditionStore();
 
-  const {navigate, goBack} = useCustomNavigation();
+  const {navigate, goBack, addListener} = useCustomNavigation();
 
   const overviewQueryProps = useMemo(
     () =>
@@ -275,10 +275,21 @@ const ZoomScreen = (props: any) => {
   );
 
   const [state, setState] = useState<any>(() => getInitialState(props));
+  const isProcessing = useRef<boolean>(false);
   const stateRef = useRef(state);
   useEffect(() => {
     stateRef.current = state;
   }, [state]);
+
+  useEffect(() => {
+    const unsub = addListener('beforeRemove', (e) => {
+      if (!isProcessing.current) return;
+      e.preventDefault();
+      Alert.alert('Please wait', 'We’re processing your request.');
+    });
+
+    return unsub;
+  }, [addListener]);
 
   useEffect(() => {
     if (conditionOverview?.idJob) {
@@ -659,8 +670,9 @@ const ZoomScreen = (props: any) => {
           };
           zoomRef.current?.centerOn?.(microZoomLocation);
 
+          await nextFrame();
           // Esperar que se procese el zoom
-          await new Promise((resolve) => setTimeout(resolve, 50));
+          // await new Promise((resolve) => setTimeout(resolve, 50));
 
           // Regresar a escala 1
           const resetLocation = {
@@ -671,8 +683,9 @@ const ZoomScreen = (props: any) => {
           };
           zoomRef.current?.centerOn?.(resetLocation);
 
+          await nextFrame();
           // Esperar que se procese el reset
-          await new Promise((resolve) => setTimeout(resolve, 50));
+          // await new Promise((resolve) => setTimeout(resolve, 50));
         }
 
         // Ahora sí hacer reset normal
@@ -760,27 +773,30 @@ const ZoomScreen = (props: any) => {
 
   const functSave = useCallback(
     async (isConnected: boolean, bodyRequest: SaveZoomScreenProps) => {
+      isProcessing.current = true;
       if (isConnected) {
-        loadingWrapperPromise(
-          saveZoomScreen(bodyRequest)
-            .then((response) => {
-              if (response?.idImg) {
-                setTimeout(() => {
-                  refetchAll();
-                  if (item?.id) {
-                    refetch();
-                  } else {
-                    setReportIdImage(response.idImg);
-                  }
-                }, 500);
-                goBack();
+        loadingWrapperPromise(async () => {
+          await nextFrame();
+          try {
+            const response = await saveZoomScreen(bodyRequest);
+            if (response?.idImg) {
+              await refetchAll();
+
+              if (item?.id) {
+                refetch();
+              } else {
+                setReportIdImage(response.idImg);
               }
-            })
-            .catch((e) => {
-              console.log('error guardando report');
-              console.log(e);
-            }),
-        );
+
+              isProcessing.current = false;
+              goBack();
+            }
+          } catch (e) {
+            console.log('error guardando report');
+            console.log(e);
+            isProcessing.current = false;
+          }
+        });
       } else {
         const clientId = item?.clientId ?? generateUUID();
         if (item?.clientId) {
@@ -1008,7 +1024,7 @@ const ZoomScreen = (props: any) => {
       globalPositionYRef.current = offsetY;
 
       // --- 5. Actualizar notas SIEMPRE a partir del estado previo coherente ---
-      setState((prev) => {
+      setState((prev: any) => {
         if (!prev.notes || !prev.notes.length) {
           return prev;
         }
@@ -1098,7 +1114,10 @@ const ZoomScreen = (props: any) => {
   return (
     <Wrapper style={styles.container}>
       <Wrapper
-        style={[GLOBAL_STYLES.containerBtnOptTop, {backgroundColor: 'white', zIndex: 999999}]}>
+        style={[
+          GLOBAL_STYLES.containerBtnOptTop,
+          {backgroundColor: 'white', zIndex: 999999},
+        ]}>
         <BackButton onPress={goBack} title="Back" />
 
         <Wrapper style={[GLOBAL_STYLES.lateralPadding]}>

@@ -164,11 +164,11 @@ export const ClockinButtonLaborReport = ({list}: Props) => {
             showToastMessage('Job confirmed successfully');
             goBackToIndex(2);
           } else {
-            showErrorToastMessage('An error occurred while confirming');
+            // showErrorToastMessage('An error occurred while confirming');
           }
         })
-        .catch(() =>
-          showErrorToastMessage('An error occurred while confirming'),
+        .catch(() => {}
+          // showErrorToastMessage('An error occurred while confirming'),
         ),
     );
   }, [
@@ -242,7 +242,7 @@ export const ClockinButtonLaborReport = ({list}: Props) => {
                     <BottomSheetSelectInputContext
                       currentId="code"
                       options={laborCodes!}
-                      placeholder="Select a labor code"
+                      placeholderInput="Select a labor code"
                       label="Search"
                       labelKey="description"
                       snapPoints={['95%']}

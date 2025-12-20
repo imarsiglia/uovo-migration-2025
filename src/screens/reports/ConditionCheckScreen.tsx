@@ -70,7 +70,7 @@ import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {useQueryClient} from '@tanstack/react-query';
-import {generateUUID, getFormattedDate} from '@utils/functions';
+import {generateUUID, getFormattedDate, nextFrame} from '@utils/functions';
 import {onLaunchCamera, onSelectImage} from '@utils/image';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import isEqual from 'lodash.isequal';
@@ -282,6 +282,8 @@ export const ConditionCheckScreen = (props: Props) => {
   );
 
   const checkOverview = useCallback((item: ConditionPhotoType) => {
+    // console.log("item")
+    // console.log({item})
     navigate(RoutesNavigation.PhotoDetailCondition, {
       item: item,
       photo: item.thumbnail!,
@@ -543,23 +545,24 @@ export const ConditionCheckScreen = (props: Props) => {
       Keyboard.dismiss();
       if (props) {
         if (online) {
-          loadingWrapperPromise(
-            saveAsync(props)
-              .then((d) => {
-                if (d) {
-                  showToastMessage('Condition check saved successfully');
-                  refetchAll();
-                  refetch();
-                  hardRefreshMany();
-                  goBack();
-                } else {
-                  showErrorToastMessage('Error while saving condition check');
-                }
-              })
-              .catch(() => {
+          loadingWrapperPromise(async () => {
+            try {
+              await nextFrame();
+              const d = await saveAsync(props);
+              if (d) {
+                showToastMessage('Condition check saved successfully');
+                await refetchAll();
+                await refetch();
+                await hardRefreshMany();
+                await nextFrame();
+                goBack();
+              } else {
                 showErrorToastMessage('Error while saving condition check');
-              }),
-          );
+              }
+            } catch (e) {
+              showErrorToastMessage('Error while saving condition check');
+            }
+          });
         } else {
           loadingWrapperPromise(saveReportOffline(props)).then(() => {
             goBack();
@@ -1000,7 +1003,7 @@ export const ConditionCheckScreen = (props: Props) => {
                     options={
                       placeOfExamList?.map((x) => ({id: x, name: x})) ?? []
                     }
-                    placeholder="Select an option"
+                    placeholderInput="Select an option"
                     snapPoints={['95%']}
                     containerStyle={GLOBAL_STYLES.input}
                   />

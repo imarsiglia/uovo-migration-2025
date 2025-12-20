@@ -196,7 +196,7 @@ export const AddInventoryScreen = () => {
           <Wrapper style={{flex: 0.3}}>
             <BottomSheetSelectInput
               onChange={(val) => setType(val as string)}
-              placeholder="Select an option"
+              placeholderInput="Select an option"
               options={CRITERIA_LIST}
               label="Select an option"
               snapPoints={['95%']}

@@ -62,6 +62,7 @@ export const TopsheetScreen = ({route}: Props) => {
     data: jobDetail,
     isLoading,
     refetch,
+    isRefetching: isRefetchingJobQueue
   } = useGetTopsheet({
     id,
     queue,
@@ -198,10 +199,10 @@ export const TopsheetScreen = ({route}: Props) => {
           <BackButton title="Home" onPress={goBack} />
           <Wrapper style={styles.containerBtnTop}>
             <PressableOpacity
-              disabled={isLoading || isRefetching}
+              disabled={isLoading || isRefetching || isRefetchingJobQueue}
               onPress={syncro}
               style={GLOBAL_STYLES.btnOptTop}>
-              <SpinningIcon size={16} spin={isRefetching} />
+              <SpinningIcon size={16} spin={isRefetching || isRefetchingJobQueue} />
             </PressableOpacity>
 
             {jobDetail?.use_bol && (

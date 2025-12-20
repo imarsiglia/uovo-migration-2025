@@ -52,7 +52,12 @@ import {loadingWrapperPromise} from '@store/actions';
 import {useAuth} from '@store/auth';
 import useTopSheetStore from '@store/topsheet';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {generateUUID, getFormattedDate, moveOtherToEnd} from '@utils/functions';
+import {
+  generateUUID,
+  getFormattedDate,
+  moveOtherToEnd,
+  nextFrame,
+} from '@utils/functions';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import {useFormContext, useWatch} from 'react-hook-form';
 import {AutocompleteDropdownItem} from 'react-native-autocomplete-dropdown';
@@ -624,23 +629,24 @@ export const ConditionReportScreen = (props: Props) => {
   const confirmSave = useCallback(() => {
     if (partial && temporalForm) {
       if (online) {
-        loadingWrapperPromise(
-          saveAsync(temporalForm, partial)
-            .then((d) => {
-              if (d) {
-                showToastMessage('Condition report saved successfully');
-                refetchAll();
-                refetch();
-                hardRefreshMany();
-                goBack();
-              } else {
-                showErrorToastMessage('Error while saving condition report');
-              }
-            })
-            .catch(() => {
+        loadingWrapperPromise(async () => {
+          try {
+            await nextFrame();
+            const d = await saveAsync(temporalForm, partial);
+            if (d) {
+              showToastMessage('Condition report saved successfully');
+              await refetchAll();
+              await refetch();
+              await hardRefreshMany();
+              await nextFrame();
+              goBack();
+            } else {
               showErrorToastMessage('Error while saving condition report');
-            }),
-        );
+            }
+          } catch (e) {
+            showErrorToastMessage('Error while saving condition report');
+          }
+        });
       } else {
         loadingWrapperPromise(saveReportOffline(temporalForm, partial)).then(
           () => {
@@ -970,7 +976,7 @@ export const ConditionReportScreen = (props: Props) => {
                     options={
                       placeOfExamList?.map((x) => ({id: x, name: x})) ?? []
                     }
-                    placeholder="Select an option"
+                    placeholderInput="Select an option"
                     snapPoints={['95%']}
                     containerStyle={GLOBAL_STYLES.input}
                   />
@@ -1369,7 +1375,7 @@ export const ConditionReportScreen = (props: Props) => {
                           <BottomSheetSelectInput
                             onChange={(item) => setPartial(item as string)}
                             options={CONDITION_STATES_LIST}
-                            placeholder="Select an option"
+                            placeholderInput="Select an option"
                             searchable={false}
                             snapPoints={['50%']}
                             label="Select an option"
@@ -1593,7 +1599,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingTop: 5,
     paddingHorizontal: 5,
-    gap: 5
+    gap: 5,
   },
 });
 

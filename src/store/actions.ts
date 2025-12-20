@@ -10,7 +10,6 @@ export async function loadingWrapperPromise<T>(
 ) {
   modalLoadingSetter({loadingVisible: true});
 
-  // ✅ deja un frame para que el modal aparezca
   await new Promise<void>((r) => requestAnimationFrame(() => r()));
 
   try {

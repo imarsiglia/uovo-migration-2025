@@ -179,6 +179,7 @@ export type RootStackParamList = {
     | {
         item?: TaskImageType;
         editedUri?: string;
+        editedBase64?: string;
         index?: number;
       }
     | undefined;

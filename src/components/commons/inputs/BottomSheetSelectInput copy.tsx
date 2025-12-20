@@ -33,13 +33,7 @@ import {Label} from '../text/Label';
 import {Wrapper} from '../wrappers/Wrapper';
 import {useCustomInsetBottom} from '@hooks/useCustomInsetBottom';
 
-// ---- Types ----
 export type Primitive = string | number | boolean | null | undefined;
-
-export interface PlaceholderOption {
-  label: string;
-  value: string;
-}
 
 export interface BottomSheetSelectInputRef {
   open: () => void;
@@ -60,10 +54,8 @@ export interface BottomSheetSelectInputProps<T extends Record<string, any>> {
   idKey?: keyof T;
   /** Clave de etiqueta para mostrar (default: 'name') */
   labelKey?: keyof T;
-  /** Texto que aparece en el input cuando no hay selección */
-  placeholderInput?: string;
-  /** Opción placeholder seleccionable que se agrega al inicio de la lista */
-  placeholder?: PlaceholderOption;
+  /** Placeholder cuando no hay selección */
+  placeholder?: string;
   /** Puntos de anclaje del BottomSheet (default: ['50%', '95%']) */
   snapPoints?: Array<string | number>;
   /** Habilitar buscador por nombre */
@@ -91,7 +83,7 @@ function ensureArray(v?: string | string[] | null): string[] {
   return Array.isArray(v) ? v : [v];
 }
 
-// Altura de fila para scroll preciso
+// Altura de fila para scroll preciso (ajústala si tus filas cambian de alto)
 const ROW_HEIGHT = 52;
 
 function useDraftSelection(
@@ -105,6 +97,7 @@ function useDraftSelection(
 ] {
   const [draft, setDraft] = useState<Set<string>>(new Set(initial));
 
+  // reset cuando cambie la dependencia (al abrir)
   useEffect(() => setDraft(new Set(initial)), deps);
 
   const toggle = useCallback((id: string, multi: boolean) => {
@@ -139,8 +132,7 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
     onChange,
     idKey = 'id' as keyof T,
     labelKey = 'name' as keyof T,
-    placeholderInput = 'Select...',
-    placeholder,
+    placeholder = 'Select...',
     snapPoints = ['60%', '95%'],
     searchable = true,
     disabled = false,
@@ -154,64 +146,39 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
 ) {
   const insetBottom = useCustomInsetBottom();
   const modalRef = useRef<BottomSheetModal>(null);
-  const listRef = useRef<BottomSheetFlatListMethods>(null);
+  const listRef = useRef<BottomSheetFlatListMethods>(null); // ref de la FlatList para scroll
   const [query, setQuery] = useState('');
 
   // Visibilidad con animación
   const listOpacity = useRef(new Animated.Value(0)).current;
   const [isListVisible, setIsListVisible] = useState(false);
 
-  // Determinar si placeholder es una opción seleccionable
-  const placeholderOption = useMemo<PlaceholderOption | null>(() => {
-    return placeholder || null;
-  }, [placeholder]);
-
-  // Opciones con placeholder (si aplica)
-  const optionsWithPlaceholder = useMemo<T[]>(() => {
-    if (!placeholderOption) return options;
-    
-    // Crear un objeto placeholder con las claves correctas
-    const placeholderItem = {
-      [idKey]: placeholderOption.value,
-      [labelKey]: placeholderOption.label,
-    } as T;
-    
-    return [placeholderItem, ...options];
-  }, [options, placeholderOption, idKey, labelKey]);
-
   // Normaliza value controlado
   const selected = ensureArray(value);
 
-  // Estado de selección temporal
+  // Estado de selección temporal (solo se confirma con botón)
   const [draft, toggle, resetDraft, setDraftMany] = useDraftSelection(
     selected,
-    [optionsWithPlaceholder, value],
+    [options, value],
   );
 
-  // Memo de opciones filtradas
   const filtered = useMemo(() => {
-    if (!searchable || !query.trim()) return optionsWithPlaceholder;
+    if (!searchable || !query.trim()) return options;
     const q = normalizeStr(query.trim());
-    return optionsWithPlaceholder.filter((o) =>
+    return options.filter((o) =>
       normalizeStr(String(o[labelKey] ?? '')).includes(q),
     );
-  }, [optionsWithPlaceholder, query, searchable, labelKey]);
+  }, [options, query, searchable, labelKey]);
 
-  // Etiqueta a mostrar en el input
   const selectedLabel = useMemo(() => {
-    if (selected.length === 0) return placeholderInput;
+    if (selected.length === 0) return placeholder;
     if (!multiple) {
-      const item = optionsWithPlaceholder.find(
-        (o) => String(o[idKey]) === selected[0]
-      );
-      return (item?.[labelKey] as Primitive) ?? placeholderInput;
+      const item = options.find((o) => String(o[idKey]) === selected[0]);
+      return (item?.[labelKey] as Primitive) ?? placeholder;
     }
-    // multiple: muestra conteo y primeros nombres
     const names: string[] = [];
     for (const id of selected) {
-      const item = optionsWithPlaceholder.find(
-        (o) => String(o[idKey]) === id
-      );
+      const item = options.find((o) => String(o[idKey]) === id);
       if (item && item[labelKey] != null) names.push(String(item[labelKey]));
       if (names.length >= maxItemsToShow) break;
     }
@@ -219,11 +186,11 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
     return more > 0 ? `${names.join(', ')} +${more}` : names.join(', ');
   }, [
     selected,
-    optionsWithPlaceholder,
+    options,
     idKey,
     labelKey,
     multiple,
-    placeholderInput,
+    placeholder,
     maxItemsToShow,
   ]);
 
@@ -255,16 +222,11 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
 
   const confirm = useCallback(() => {
     const ids = Array.from(draft);
-    // Filtrar el placeholder de los items seleccionados si existe
-    const chosenItems = optionsWithPlaceholder.filter((o) => {
-      const itemId = String(o[idKey]);
-      return ids.includes(itemId) && 
-             (!placeholderOption || itemId !== placeholderOption.value);
-    });
+    const chosenItems = options.filter((o) => ids.includes(String(o[idKey])));
     const out = multiple ? ids : ids[0] ?? null;
     onChange(out, chosenItems);
     close();
-  }, [draft, optionsWithPlaceholder, idKey, multiple, onChange, close, placeholderOption]);
+  }, [draft, options, idKey, multiple, onChange, close]);
 
   const cancel = useCallback(() => {
     resetDraft();
@@ -307,6 +269,7 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
     [draft, idKey, labelKey, multiple, toggle],
   );
 
+  /** ------ AUTO-SCROLL AL SELECCIONADO AL ABRIR ------ */
   const scrollToIndexSafely = useCallback(
     (index: number) => {
       if (index < 0) {
@@ -337,11 +300,9 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
 
   const firstSelectedIndex = useMemo(() => {
     const firstId = ensureArray(value)[0];
-    if (firstId === null || firstId === undefined) return -1;
-    return optionsWithPlaceholder.findIndex(
-      (o) => String(o[idKey]) === String(firstId)
-    );
-  }, [value, optionsWithPlaceholder, idKey]);
+    if (!firstId) return -1;
+    return options.findIndex((o) => String(o[idKey]) === String(firstId));
+  }, [value, options, idKey]);
 
   const toggleVisibility = useCallback(
     (isOpen: boolean) => {
@@ -356,7 +317,7 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
         resetListVisibility();
       }
     },
-    [firstSelectedIndex, scrollToIndexSafely, resetListVisibility],
+    [firstSelectedIndex],
   );
 
   return (
@@ -375,7 +336,7 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
           style={[
             styles.inputText,
             inputTextStyle,
-            selected.length === 0 && styles.placeholderText,
+            !selected.length && styles.placeholderText,
           ]}>
           {selectedLabel ?? label}
         </Label>
@@ -393,7 +354,7 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
         keyboardBlurBehavior="restore"
         handleStyle={styles.handle}
         backgroundStyle={styles.sheetBg}
-        onChange={(index) => toggleVisibility(index !== -1)}
+        onChange={(index) => toggleVisibility(index !== -1)} // <- detecta apertura/cierre
         backdropComponent={(props) => (
           <BottomSheetBackdrop
             {...props}
@@ -436,7 +397,7 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
         <Wrapper style={styles.sheetContent}>
           <Wrapper style={styles.header}>
             <Label style={styles.headerTitle}>
-              {searchable ? placeholderInput : label}
+              {searchable ? placeholder : label}
             </Label>
             {searchable && (
               <BottomSheetTextInput
@@ -459,6 +420,7 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
             <BottomSheetFlatList
               ref={listRef}
               data={filtered}
+              // contentContainerStyle={styles.contentContainer}
               contentContainerStyle={{paddingBottom: 70 + (insetBottom || 0)}}
               keyExtractor={keyExtractor}
               renderItem={renderItem}
@@ -469,14 +431,21 @@ function _BottomSheetSelectInput<T extends Record<string, any>>(
               ListEmptyComponent={
                 <Label style={styles.emptyText}>No results</Label>
               }
+              // Scroll preciso y robusto
               getItemLayout={(_, index) => ({
                 length: ROW_HEIGHT,
                 offset: ROW_HEIGHT * index,
                 index,
               })}
+              // initialScrollIndex={20}
               removeClippedSubviews={false}
               windowSize={10}
               maxToRenderPerBatch={20}
+              // onContentSizeChange={() => {
+              //   if (!isListVisible) {
+              //     fadeInList();
+              //   }
+              // }}
               onScrollToIndexFailed={(info) => {
                 const est = (info.averageItemLength ?? ROW_HEIGHT) * info.index;
                 listRef.current?.scrollToOffset({
@@ -529,8 +498,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   placeholderText: {color: '#9CA3AF'},
+
   handle: {borderTopLeftRadius: 16, borderTopRightRadius: 16},
   sheetBg: {backgroundColor: 'white', flex: 1, zIndex: 999999999999999},
+
   header: {paddingHorizontal: 16, gap: 15, paddingTop: 10},
   headerTitle: {
     fontSize: 17,
@@ -548,7 +519,9 @@ const styles = StyleSheet.create({
   },
   row: {
     height: ROW_HEIGHT,
+    // minHeight: ROW_HEIGHT, // <- ayuda a getItemLayout
     paddingHorizontal: 16,
+    // paddingVertical: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -621,7 +594,6 @@ const styles = StyleSheet.create({
   btnGhostText: {color: '#111827'},
   btnPrimary: {backgroundColor: COLORS.primary},
   btnPrimaryText: {color: 'white', fontWeight: '600'},
-  btnText: {},
   emptyText: {
     color: '#6B7280',
     textAlign: 'center',
@@ -633,11 +605,12 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     backgroundColor: 'white',
-    paddingBottom: 70
+    paddingBottom: 70,
   },
   itemContainer: {
     padding: 6,
     margin: 6,
     backgroundColor: '#eee',
   },
+  btnText: {},
 });

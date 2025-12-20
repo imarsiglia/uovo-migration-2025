@@ -29,14 +29,13 @@ const SkeletonBlock: React.FC<SkeletonBlockProps> = ({
   const translateX = useRef(new Animated.Value(-shimmerWidth)).current;
 
   useEffect(() => {
-    // loop del shimmer: se mueve de izquierda a derecha y reinicia
     const loop = Animated.loop(
       Animated.sequence([
         Animated.timing(translateX, {
           toValue: (containerWidth || 200) + shimmerWidth, // si aún no se midió, usa 200 como fallback
           duration,
           easing: Easing.inOut(Easing.quad),
-          useNativeDriver: true, // ✅ transform soporta native driver
+          useNativeDriver: true,
         }),
         Animated.timing(translateX, {
           toValue: -shimmerWidth,
@@ -106,8 +105,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: '-20%',
     opacity: 1,
-    // si quieres un borde suave en los lados del brillo, podrías
-    // envolver 2-3 tiras con diferentes opacidades; aquí lo dejamos simple.
   },
 });
 

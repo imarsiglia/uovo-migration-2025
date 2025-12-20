@@ -1,6 +1,6 @@
 import {COLORS} from '@styles/colors';
 import {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {ActivityIndicator, StyleSheet, View} from 'react-native';
+import {ActivityIndicator, StyleSheet} from 'react-native';
 
 import {
   PAUSED_STATUS,
@@ -18,14 +18,12 @@ import {useOnline} from '@hooks/useOnline';
 import {RoutesNavigation} from '@navigation/types';
 import {useAuth} from '@store/auth';
 import useGeneralStore from '@store/general';
-import {getFormattedDate, nextFrame} from '@utils/functions';
+import {getFormattedDate} from '@utils/functions';
 import {Agenda, DateData} from 'react-native-calendars';
 import {FAIconType} from 'src/types/general';
-import {useFocusEffect} from '@react-navigation/native';
 
 export const TimelineViewCmp = () => {
   const refAgenda = useRef<any>(null);
-  const [isAgendaReady, setIsAgendaReady] = useState(false);
   const sessionUser = useAuth((d) => d.user);
   const {isFilterActive, timelinePressed, selectedDate, setSelectedDate} =
     useGeneralStore();
@@ -33,97 +31,43 @@ export const TimelineViewCmp = () => {
   const {navigate} = useCustomNavigation();
 
   const [mounted, setMounted] = useState(0);
+
   const {data: dataCalendar} = useGetCalendar();
-
-  const increaseMounted = useCallback(() => {
-    setMounted((v) => v + 1);
-  }, []);
-
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     setTimeout(() => {
-  //       increaseMounted();
-  //     }, 1000);
-  //     return () => {};
-  //   }, [increaseMounted]),
-  // );
 
   const {
     data: dataTimeline,
     isLoading: isLoadingTimeline,
-    refetch,
+    isRefetching,
   } = useGetTimeline(selectedDate!);
 
   useEffect(() => {
-    if (!isAgendaReady) return;
     setTimeout(() => {
       setSelectedDate(getFormattedDate(new Date(), 'YYYY-MM-DD'));
-      increaseMounted();
-    }, 1000);
-  }, [isAgendaReady]);
-
-  // Mejorar el collapse con useEffect más robusto
-  useEffect(() => {
-    if (!isAgendaReady || !timelinePressed) return;
-
-    const timer = setTimeout(() => {
-      collapseAgenda();
-    }, 100); // Pequeño delay para asegurar que el Agenda esté listo
-
-    return () => clearTimeout(timer);
-  }, [timelinePressed, isAgendaReady]);
-
-  useEffect(() => {
-    setTimeout(() => {
-      initialRefetch();
-    }, 700);
+      setMounted(mounted + 1);
+    }, 500);
   }, []);
 
-  const initialRefetch = useCallback(() => {
-    if (selectedDate) {
-      refetch();
-    }
-  }, [selectedDate]);
-
-  // Detectar cuando Agenda está listo
   useEffect(() => {
-    const checkAgendaReady = () => {
-      const a = refAgenda.current;
-      if (a?.state?.calendarIsReady) {
-        setIsAgendaReady(true);
-      } else {
-        requestAnimationFrame(checkAgendaReady);
-      }
-    };
-
-    const timer = setTimeout(checkAgendaReady, 300);
-    return () => clearTimeout(timer);
-  }, []);
+    collapseAgenda();
+  }, [timelinePressed]);
 
   const collapseAgenda = useCallback(() => {
     const a = refAgenda.current;
     if (!a) return;
-
-    try {
-      if (
-        !a.state?.calendarIsReady ||
-        !a.initialScrollPadPosition ||
-        !a.setScrollPadPosition
-      ) {
-        return;
-      }
-
-      const closedY = a.initialScrollPadPosition();
-      a.setScrollPadPosition(closedY, true);
-      a.setState?.({calendarScrollable: false});
-
-      const day = a.state?.selectedDay?.clone?.() ?? a.state?.topDay?.clone?.();
-      if (day && a.calendar?.scrollToDay) {
-        a.calendar.scrollToDay(day, a.calendarOffset?.(), true);
-      }
-    } catch (error) {
-      console.warn('Error collapsing agenda:', error);
+    if (
+      !a.state?.calendarIsReady ||
+      !a.initialScrollPadPosition ||
+      !a.setScrollPadPosition
+    ) {
+      requestAnimationFrame(() => collapseAgenda());
+      return;
     }
+
+    const closedY = a.initialScrollPadPosition();
+    a.setScrollPadPosition(closedY, true);
+    a.setState?.({calendarScrollable: false});
+    const day = a.state?.selectedDay?.clone?.() ?? a.state?.topDay?.clone?.();
+    a.calendar?.scrollToDay?.(day, a.calendarOffset?.(), true);
   }, []);
 
   const handleItemPress = useCallback(
@@ -132,20 +76,13 @@ export const TimelineViewCmp = () => {
         id: id as never as string,
         queue: 0,
       });
-      setTimeout(() => {
-        increaseMounted();
-      }, 1000);
     },
-    [navigate, increaseMounted],
+    [navigate],
   );
 
-  const onDayPress = useCallback(
-    async (date: DateData) => {
-      await nextFrame();
-      setSelectedDate(date.dateString);
-    },
-    [setSelectedDate],
-  );
+  function onDayPress(date: DateData) {
+    setSelectedDate(date.dateString);
+  }
 
   const renderItem = useCallback(
     (
@@ -154,12 +91,9 @@ export const TimelineViewCmp = () => {
         statusOwn?: boolean;
         formattedName?: string;
       },
-    ) => {
-      if (!item) return <View />;
-
-      return item.type == WO_TYPE_PLACEHOLDER ? (
+    ) =>
+      item.type == WO_TYPE_PLACEHOLDER ? (
         <PlaceholderCard
-          key={`placeholder-${item.id}`}
           title_instructions={item.instructions}
           instructions={item.wo_title}
           date={item.__dateFmt}
@@ -172,13 +106,12 @@ export const TimelineViewCmp = () => {
         />
       ) : (
         <TimelineCard
-          key={`timeline-${item.id}-${item.instructions?.length || 0}`}
           id={item.id}
           name={item.formattedName!}
           paused={item.paused}
           prepped={item.prepped}
           statusOwn={item.statusOwn}
-          date={item.__dateFmt!}
+          date={item.__dateFmt!} // <- usa preformateada
           bolSended={item.bol_sended}
           crUpdate={item.cr_update}
           icon={item.icon}
@@ -197,18 +130,15 @@ export const TimelineViewCmp = () => {
           isOnline={online}
           userStatus={item.user_status}
         />
-      );
-    },
+      ),
     [handleItemPress, isFilterActive, online],
   );
 
   const renderDay = useCallback(() => <></>, []);
-
   const renderEmptyDate = useCallback(
     () => <Wrapper style={{backgroundColor: '#fafafa', height: '100%'}} />,
     [],
   );
-
   const renderEmptyData = useCallback(
     () => (
       <Wrapper style={styles.emptyData}>
@@ -254,11 +184,7 @@ export const TimelineViewCmp = () => {
   }, [dataCalendar]);
 
   const formattedItems = useMemo(() => {
-    // IMPORTANTE: Siempre retornar un objeto, incluso si está vacío
-    if (!dataTimeline?.length) {
-      // Retornar objeto vacío con la fecha seleccionada para evitar errores
-      return selectedDate ? {[selectedDate]: []} : {};
-    }
+    if (!dataTimeline?.length) return {};
 
     const base = isFilterActive
       ? dataTimeline.filter((job) =>
@@ -270,45 +196,35 @@ export const TimelineViewCmp = () => {
         )
       : dataTimeline;
 
-    // Agrupar por fecha y preformatear
-    const grouped = base.reduce<Record<string, JobType[]>>((acc, job) => {
+    // Agrupar por fecha y preformatear la etiqueta de fecha
+    return base.reduce<Record<string, JobType[]>>((acc, job) => {
       const key = job.scheduled_on.split('T')[0];
       const withFmt = {
         ...job,
-        __dateFmt: getFormattedDate(job.scheduled_on, 'dddd MMM DD • hh:mm A'),
+        __dateFmt: getFormattedDate(
+          job.scheduled_on,
+          'dddd MMM DD [•] hh:mm A',
+        ),
         statusOwn: job.crew?.some(
           (x) => x.id_user == sessionUser?.user_id && x.status == PAUSED_STATUS,
         ),
         formattedName: `${job.wo_order} • ${job.client_name?.substring(
           job.client_name.indexOf(' '),
         )}`,
-      } as JobType & {
-        __dateFmt: string;
-        statusOwn?: boolean;
-        formattedName?: string;
-      };
-
+      } as JobType & {__dateFmt: string};
       (acc[key] ??= []).push(withFmt);
       return acc;
     }, {});
-
-    // Asegurar que la fecha seleccionada siempre exista
-    if (selectedDate && !grouped[selectedDate]) {
-      grouped[selectedDate] = [];
-    }
-
-    return grouped;
-  }, [dataTimeline, isFilterActive, sessionUser?.user_id, selectedDate]);
+  }, [dataTimeline, isFilterActive, sessionUser?.user_id]);
 
   return (
     <>
       <Agenda
-        key={`agenda-${mounted}`}
         ref={refAgenda}
+        key={`agenda_${mounted}`}
         markedDates={markedDates}
         items={formattedItems}
         onDayPress={onDayPress}
-        selected={selectedDate}
         pastScrollRange={6}
         futureScrollRange={12}
         renderDay={renderDay}
@@ -322,9 +238,9 @@ export const TimelineViewCmp = () => {
       {/* {isRefetching && (
         <IndicatorLoading
           containerStyle={{
-            position: 'absolute',
-            alignSelf: 'center',
-            top: '30%',
+            position: "absolute",
+            alignSelf: "center",
+            top: "30%",
           }}
           activityIndicatorProps={{color: COLORS.primary, size: 'large'}}
         />

@@ -132,17 +132,18 @@ type ErrorMap = {
 const errorMessages: ErrorMap = {
   'Request failed with status code 404': 'Server is unavailable',
   'Request failed with status code 500':
-    'Something went wrong in server, please contact support.',
+    'Something went wrong in server, please contact support',
   'Request failed with status code 400':
-    'Something went wrong in server, please contact support.',
+    'Something went wrong in server, please contact support',
   'Network Error': 'Network issue was detected, please verify your connection',
+  'Request failed with status code 504': 'Timeout error, please contact support'
 };
 
 function handleError(error: any) {
   // Caso especial: timeout
   if (error.message.includes('timeout')) {
     showErrorToastMessage(
-      'Something went wrong in server, please contact support.',
+      'Timeout error.',
     );
     return;
   }
@@ -153,6 +154,8 @@ function handleError(error: any) {
     showErrorToastMessage(userMessage);
   } else {
     // fallback
+    console.log("fallback error message")
+    console.log(error.message)
     showErrorToastMessage('Unexpected error occurred');
   }
 }

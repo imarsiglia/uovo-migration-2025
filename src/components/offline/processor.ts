@@ -314,24 +314,10 @@ async function processCore(
   }
 }
 
-// -------------------------------------------------
-// API pública (manteniendo compatibilidad de nombres)
-// -------------------------------------------------
-
-/**
- * ✅ Modo ESTRICTO (con lock). Útil para workers en background.
- * Si no consigue lock, sale sin hacer nada (para evitar colisiones).
- */
 export async function processOnce(qc: QueryClient, opts: ProcessOnceOpts = {}) {
   await processCore(qc, opts, {useLock: true});
 }
 
-/**
- * ✅ Modo FORZADO (sin lock + ping ignorado): pensado para tu UI.
- * - Garantiza que “arranca” aunque NetInfo/ping/lock molesten.
- * - Reencola “in_progress” atascados antes de procesar.
- * - Mantiene tu contrato público (tu UI ya importa este nombre).
- */
 export async function processQueueOnce(
   qc: QueryClient,
   opts: ProcessOnceOpts = {},

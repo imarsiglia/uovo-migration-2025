@@ -167,6 +167,7 @@ export const ReportIssueScreen = (props: Props) => {
               searchable={false}
               snapPoints={['95%']}
               label="Select an issue type"
+              placeholderInput='Select an option'
             />
             <InputTextContext
               currentId="description"

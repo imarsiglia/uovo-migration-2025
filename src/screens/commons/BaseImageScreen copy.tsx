@@ -80,7 +80,6 @@ const ZoomableImage = ({
   const [panEnabled, setPanEnabled] = useState(false);
   const isMountedRef = useRef(true);
 
-  // ✅ Cleanup al desmontar
   useEffect(() => {
     isMountedRef.current = true;
 
@@ -118,7 +117,6 @@ const ZoomableImage = ({
     ],
   }));
 
-  // ✅ CLAVE: Separar los gestos y NO usar simultaneousWithExternalGesture
   const pinch = Gesture.Pinch()
     .onStart(() => {
       'worklet';
@@ -193,7 +191,6 @@ const ZoomableImage = ({
       }
     });
 
-  // ✅ Usa Race en lugar de Simultaneous para evitar conflictos
   const composedGesture = Gesture.Race(
     doubleTap,
     Gesture.Simultaneous(pinch, pan),
@@ -238,7 +235,6 @@ const BaseImageScreen = (props: Props) => {
     [images, type],
   );
 
-  // ✅ Cleanup al desmontar
   useEffect(() => {
     return () => {
       setScrollEnabled(true);

@@ -355,7 +355,7 @@ export const AddLaborReportScreen = (props: Props) => {
               <BottomSheetSelectInputContext
                 currentId="code"
                 options={laborCodes}
-                placeholder="Select a labor code"
+                placeholderInput="Select a labor code"
                 snapPoints={['95%']}
                 label="Search"
                 labelKey="description"

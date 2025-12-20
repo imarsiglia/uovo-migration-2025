@@ -22,8 +22,6 @@ export const EditImageScreen = (props: Props) => {
   const [photo, setPhoto] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("props.route.params.photo")
-    console.log(props.route.params.photo)
     if (props.route.params.photo.path && props.route.params.photo.data) {
       const filepath = `${
         RNFS.TemporaryDirectoryPath

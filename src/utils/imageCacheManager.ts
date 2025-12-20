@@ -71,8 +71,7 @@ class ImageCacheManager {
       // Crear nombre de archivo único basado en el key
       const fileName = `${this.sanitizeKey(key)}.jpg`;
       const filePath = `${CACHE_DIR}/${fileName}`;
-
-      // ✅ SOBRESCRIBIR
+      
       const exists = await RNFS.exists(filePath);
       if (exists) {
         try {

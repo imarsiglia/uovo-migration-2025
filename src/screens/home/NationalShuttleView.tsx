@@ -396,7 +396,7 @@ const NationalShuttleViewCmp = () => {
               options={customLocationPlaces}
               snapPoints={['95%']}
               label="Search service location"
-              placeholder="Select service location"
+              placeholderInput="Select service location"
               value={filter.serviceLocation}
               onChange={(val) => onChangeFilter(val, 'serviceLocation')}
               containerStyle={{

@@ -279,7 +279,7 @@ export const ClockinButton = () => {
                     <BottomSheetSelectInputContext
                       currentId="code"
                       options={laborCodes!}
-                      placeholder="Select a labor code"
+                      placeholderInput="Select a labor code"
                       label="Search"
                       labelKey="description"
                       snapPoints={['95%']}
@@ -300,6 +300,7 @@ export const ClockinButton = () => {
               label="Pause job"
               icon={<Icon name="pause" color="white" size={14} />}
               style={styles.activeButton}
+              disabled={isRefetchingTopsheet}
             />
           ) : (
             <RoundedButton
@@ -307,6 +308,7 @@ export const ClockinButton = () => {
               label="Resume job"
               icon={<Icon name="step-forward" color="white" size={14} />}
               style={styles.activeButton}
+              disabled={isRefetchingTopsheet}
             />
           )}
 
@@ -323,6 +325,7 @@ export const ClockinButton = () => {
               },
             ]}
             labelStyles={{color: COLORS.primary}}
+            disabled={isRefetchingTopsheet}
           />
         </Wrapper>
       )}

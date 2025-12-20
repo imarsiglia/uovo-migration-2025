@@ -17,12 +17,9 @@ export const onLaunchCamera = async (
 ) => {
   let granted = true;
   if (isAndroid()) {
-    granted = await requestWriteExternalStorage();
+    granted = await requestCameraPermission();
     if (!granted) {
-      throw new Error('Write external storage permission not granted');
-    }
-    if (granted) {
-      granted = await requestCameraPermission();
+      showToastMessage('Camera permission not granted');
       throw new Error('Camera permission not granted');
     }
   }
@@ -55,9 +52,6 @@ export const onSelectImage = async (
   }
   if (!granted) throw new Error('Read media permission not granted');
 
-  console.log("granted")
-  console.log(granted)
-
   return ImageCropPicker.openPicker({
     mediaType: 'photo',
     includeBase64: true,
@@ -77,25 +71,14 @@ export const onSelectImage = async (
     });
 };
 
-type ResponseImagePickerProps = {
-  didCancel: boolean;
-  error: Error;
-  customButton: any;
-  data: string;
-} & ImageType;
-
 const manageImage = async (
   response: ImageType | ImageType[],
   callback?: (photo?: ImageType | ImageType[], imagePath?: string) => void,
 ) => {
   if (!callback) return;
   if (Array.isArray(response)) {
-    console.log("response")
-    console.log(response)
     callback(response);
   } else {
-    console.log("no es array")
-    console.log(response)
     if (response.data) {
       callback(response, response.filename ?? response.path);
     } else {

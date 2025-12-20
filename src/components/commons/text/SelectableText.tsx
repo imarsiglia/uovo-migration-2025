@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 
 type props = {
-  children: ReactNode;
+  children: ReactNode | string;
 } & (TextInputProps | TextProps);
 export const SelectableText = ({children, ...rest}: props) => {
   return Platform.OS === 'ios' ? (
@@ -17,9 +17,9 @@ export const SelectableText = ({children, ...rest}: props) => {
       scrollEnabled={false}
       editable={false}
       {...rest}
-      style={[{paddingBottom: 20}, rest?.style]}>
-      {children}
-    </TextInput>
+      style={[{paddingBottom: 20}, rest?.style]}
+      value={children as string}
+    />
   ) : (
     <Text selectable {...rest} style={[{paddingBottom: 20}, rest?.style]}>
       {children}

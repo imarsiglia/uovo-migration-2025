@@ -13,7 +13,6 @@ import {
 import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
 import {InputTextContext} from '@components/commons/form/InputTextContext';
 import {SelectRadioButtonContext} from '@components/commons/form/SelectRadioButtonContext';
-import {PendingIcon} from '@components/commons/icons/PendingIcon';
 import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
@@ -32,7 +31,7 @@ import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {capitalize} from '@utils/functions';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -61,8 +60,6 @@ export const SignaturesScreen = () => {
   const setSignatureForce = useTopSheetStore((d) => d.setSignatureForce);
 
   const hasOffline = useHasPendingSync(ENTITY_TYPES.SIGNATURE, idJob);
-
-  console.log({hasOffline})
 
   const formRef = useRef<BasicFormHandle<PreSaveSignatureSchemaType>>(null);
 
@@ -102,7 +99,7 @@ export const SignaturesScreen = () => {
     (props: PreSaveSignatureSchemaType) => {
       Keyboard.dismiss();
 
-      if (signatures?.length! > 2) {
+      if (new Set((signatures ?? []).map((s) => s.type)).size > 2) {
         showErrorToastMessage('All signatures have already been registered');
         return;
       }

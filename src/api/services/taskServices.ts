@@ -270,8 +270,6 @@ export type SaveImageApiProps = {
   photos: string[];
 } & TaskBaseApiProps;
 const registerImage = async (props: SaveImageApiProps): Promise<boolean> => {
-  console.log("register image")
-  console.log(props)
   const response = await postRequest(API_REGISTER_IMAGES, props);
   return response.message === SUCCESS_MESSAGES.SUCCESS;
 };
@@ -282,8 +280,6 @@ export type UpdateImageApiProps = {
   photos: {id: string; photo: string}[];
 } & TaskBaseApiProps;
 const updateImage = async (props: UpdateImageApiProps): Promise<boolean> => {
-  console.log("update image service")
-  console.log(props)
   const response = await postRequest(API_UPDATE_IMAGES, props);
   return response.message === SUCCESS_MESSAGES.SUCCESS;
 };

@@ -358,7 +358,7 @@ export const TakeDimensionsScreen = (props: Props) => {
                 <Wrapper style={{marginTop: 10}}>
                   <BottomSheetSelectInputContext
                     currentId="packing_detail"
-                    placeholder="Select an option"
+                    placeholderInput="Select an option"
                     label="Search"
                     options={packingDetails ?? []}
                     snapPoints={['95%']}

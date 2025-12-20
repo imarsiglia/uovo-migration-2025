@@ -218,7 +218,7 @@ export const JobQueueViewCmp = () => {
           <BottomSheetSelectInput
             options={locationPlaces ?? []}
             label="Search places"
-            placeholder="Service location"
+            placeholderInput="Service location"
             idKey="name"
             value={serviceLocation}
             multiple
@@ -234,7 +234,11 @@ export const JobQueueViewCmp = () => {
                 searchable={false}
                 options={woStatusList}
                 label="Status"
-                placeholder="All"
+                placeholderInput="All"
+                placeholder={{
+                  value: '',
+                  label: 'All',
+                }}
                 value={filter as string}
                 onChange={(val) =>
                   onChangeValueByType(val as string, JOBQUEUE_STATUS)
@@ -259,7 +263,11 @@ export const JobQueueViewCmp = () => {
                 searchable={false}
                 options={woTypeList}
                 label="WO Type"
-                placeholder="All"
+                placeholderInput="All"
+                placeholder={{
+                  label: 'All',
+                  value: '',
+                }}
                 value={filter as string}
                 onChange={(val) =>
                   onChangeValueByType(val as string, JOBQUEUE_WOTYPE)

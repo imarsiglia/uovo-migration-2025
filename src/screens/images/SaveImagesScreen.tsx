@@ -1,6 +1,6 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Keyboard, Platform, StyleSheet, Text, View} from 'react-native';
+import {Alert, Keyboard, Platform, StyleSheet, Text, View} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
 import {QUERY_KEYS} from '@api/contants/constants';
@@ -124,6 +124,7 @@ const usePhotoManagement = (
     if (!item || !isInitialized || initialGroupPhotos.length === 0 || !online)
       return;
 
+    // @ts-ignore
     const hasNewData = photoQueries.some((q) => q.data && !q.isPreviousData);
     if (!hasNewData) return;
 
@@ -142,9 +143,6 @@ const usePhotoManagement = (
         if (existingIndex === -1) continue;
 
         const existingPhoto = photos[existingIndex];
-
-        console.log('item.update_time');
-        console.log(item.update_time);
 
         // 🎯 Guardar SOLO UNA VEZ en cache con nombre único
         const cacheKey = `photo_${base.id}_${item.update_time}_L_${q.data.length}`;
@@ -204,7 +202,7 @@ const usePhotoManagement = (
 const useSaveOperations = (
   idJob: number,
   online: boolean,
-  item: Props['route']['params']['item'],
+  item: TaskImageType | undefined,
 ) => {
   const sessionUser = useAuth((d) => d.user);
   const {mutateAsync: registerImages} = useRegisterPictures();
@@ -260,7 +258,9 @@ const useSaveOperations = (
         });
         if (!ok) throw new Error('Register images failed');
         showToastMessage('Images saved successfully');
-        await refetchAll();
+        setTimeout(() => {
+          refetchAll();
+        }, 500);
       } else {
         const clientId = generateUUID();
         upsertImages({
@@ -335,8 +335,25 @@ const useSaveOperations = (
           });
         }
 
+        if (unchangedPhotos.length > 0) {
+          const base64List = await readPhotosAsBase64(unchangedPhotos);
+          const listWithIds = unchangedPhotos.map((x, idx) => ({
+            id: x.id!.toString(),
+            photo: base64List[idx] ?? '',
+          }));
+
+          await updateImages({
+            idJob: item!.id_job,
+            title,
+            description,
+            photos: listWithIds,
+          });
+        }
+
         showToastMessage('Images updated successfully');
-        await refetchAll();
+        setTimeout(() => {
+          refetchAll();
+        }, 500);
       } else {
         // Modo offline similar
         const clientId = item?.clientId ?? generateUUID();
@@ -393,7 +410,7 @@ const useSaveOperations = (
 };
 
 export const SaveImagesScreen = (props: Props) => {
-  const {goBack, navigate} = useCustomNavigation();
+  const {goBack, navigate, addListener} = useCustomNavigation();
   const {online} = useOnline();
   const {id: idJob} = useTopSheetStore((s) => s.jobDetail!);
 
@@ -404,6 +421,7 @@ export const SaveImagesScreen = (props: Props) => {
   const [editingInternalId, setEditingInternalId] = useState<string | null>(
     null,
   );
+  const isProcessing = useRef<boolean>(false);
 
   const {photos, setPhotos, removedIds, setRemovedIds, isHydratingFullRes} =
     usePhotoManagement(item, online, idJob);
@@ -414,6 +432,16 @@ export const SaveImagesScreen = (props: Props) => {
   const canAddMore = photos.length < MAX_PHOTOS;
 
   const closeSheet = useCallback(() => refCallSheet.current?.close(), []);
+
+  useEffect(() => {
+    const unsub = addListener('beforeRemove', (e) => {
+      if (!isProcessing.current) return;
+      e.preventDefault();
+      Alert.alert('Please wait', 'We’re processing your request.');
+    });
+
+    return unsub;
+  }, [addListener]);
 
   // 🎯 Agregar fotos - NO duplicar en cache si ya viene con path
   const addPhotos = useCallback(
@@ -586,7 +614,8 @@ export const SaveImagesScreen = (props: Props) => {
       }
 
       try {
-        await loadingWrapperPromise(async () => {
+        isProcessing.current = true;
+        loadingWrapperPromise(async () => {
           await nextFrame();
           if (item) {
             await handleUpdate(
@@ -598,8 +627,11 @@ export const SaveImagesScreen = (props: Props) => {
           } else {
             await handleCreate(photos, title.trim(), description?.trim() ?? '');
           }
+          await nextFrame();
+
+          isProcessing.current = false;
+          goBack();
         });
-        goBack();
       } catch (e) {
         console.error('Save error:', e);
         showErrorToastMessage('Error while saving images');

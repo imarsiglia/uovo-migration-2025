@@ -50,17 +50,17 @@ import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {useQueryClient} from '@tanstack/react-query';
-import {generateUUID} from '@utils/functions';
+import {generateUUID, nextFrame} from '@utils/functions';
 import {onLaunchCamera, onSelectImage} from '@utils/image';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Keyboard, Platform, StyleSheet} from 'react-native';
+import {Alert, Keyboard, Platform, StyleSheet} from 'react-native';
 import {Image as ImageType} from 'react-native-image-crop-picker';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-controller';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PhotoDetailCondition'>;
 export const PhotoDetailCondition = (props: Props) => {
-  const {goBack, navigate} = useCustomNavigation();
+  const {goBack, navigate, addListener} = useCustomNavigation();
   const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
   const {
     conditionType,
@@ -99,6 +99,7 @@ export const PhotoDetailCondition = (props: Props) => {
 
   const refCallSheet = useRef<RBSheetRef>(null);
   const refVoice = useRef<SpeechFormInputRef>(null);
+  const isProcessing = useRef<boolean>(false);
 
   const queryKeyPayload = {
     conditionType: conditionType!,
@@ -118,11 +119,22 @@ export const PhotoDetailCondition = (props: Props) => {
 
   const {refetchAll} = useRefreshIndicator([
     queryKey,
-    [QUERY_KEYS.TOTAL_PHOTOS_CONDITION_REPORT, {id: conditionId}],
-    [QUERY_KEYS.TOTAL_PHOTOS_CONDITION_CHECK, {id: conditionId}],
+    conditionType == 'conditioncheck'
+      ? [QUERY_KEYS.TOTAL_PHOTOS_CONDITION_CHECK, {id: conditionId}]
+      : [QUERY_KEYS.TOTAL_PHOTOS_CONDITION_REPORT, {id: conditionId}],
   ]);
 
   const upsertPhoto = useUpsertArrayCache<ConditionPhotoType>(queryKey);
+
+  useEffect(() => {
+    const unsub = addListener('beforeRemove', (e) => {
+      if (!isProcessing.current) return;
+      e.preventDefault();
+      Alert.alert('Please wait', 'We’re processing your request.');
+    });
+
+    return unsub;
+  }, [addListener]);
 
   useEffect(() => {
     if (data?.photo) {
@@ -187,36 +199,43 @@ export const PhotoDetailCondition = (props: Props) => {
         refVoice.current.stop();
       }
       if (online) {
-        loadingWrapperPromise(
-          savePhotoAsync({
-            conditionType: conditionType!,
-            idJob,
-            reportId: conditionId!,
-            idJobInventory: inventoryId!,
-            type: conditionPhotoType!,
-            title: form.title,
-            description: form.description,
-            id: item?.id,
-            photo: image!,
-            idStickyNote: item?.id_sticky_note ?? note?.id ?? null,
-            subType: item?.subtype ?? conditionPhotoSubtype,
-          })
-            .then((isSuccess) => {
-              if (isSuccess) {
-                refetchAll();
-                if (item?.id) {
-                  refetch();
-                }
-                showToastMessage('Photo saved successfully');
-                goBack();
-              } else {
-                showErrorToastMessage(
-                  'Error while saving photo, please reattempt',
-                );
+        isProcessing.current = true;
+        loadingWrapperPromise(async () => {
+          await nextFrame();
+          try {
+            const isSuccess = await savePhotoAsync({
+              conditionType: conditionType!,
+              idJob,
+              reportId: conditionId!,
+              idJobInventory: inventoryId!,
+              type: conditionPhotoType!,
+              title: form.title,
+              description: form.description,
+              id: item?.id,
+              photo: image!,
+              idStickyNote: item?.id_sticky_note ?? note?.id ?? null,
+              subType: item?.subtype ?? conditionPhotoSubtype,
+            });
+
+            if (isSuccess) {
+              await refetchAll();
+              if (item?.id) {
+                refetch();
               }
-            })
-            .catch(() => {}),
-        );
+              showToastMessage('Photo saved successfully');
+              isProcessing.current = false;
+              goBack();
+            } else {
+              isProcessing.current = false;
+              showErrorToastMessage(
+                'Error while saving photo, please reattempt',
+              );
+            }
+          } catch (e) {
+            isProcessing.current = false;
+            showErrorToastMessage('Error while saving photo, please reattempt');
+          }
+        });
       } else {
         const clientId = item?.clientId ?? generateUUID();
         const jsonRequest = {
