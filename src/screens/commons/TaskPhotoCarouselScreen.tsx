@@ -62,8 +62,8 @@ const TaskPhotoCarouselScreen = (props: Props) => {
 
   const keyExtractor = useCallback(
     (item: TaskPhotoType, index: number) =>
-      `${item.id ?? item.clientId ?? index}-${groupRev}`,
-    [groupRev],
+      `carousel-${item.id ?? item.clientId ?? index}`,
+    [],
   );
 
   const getItemLayout = useCallback(
@@ -138,7 +138,6 @@ const TaskPhotoCarouselScreen = (props: Props) => {
   const renderItem = useCallback(
     ({item, index}: {item: TaskPhotoType; index: number}) => {
       const isVisible = Math.abs(index - currentIndex) <= 1;
-
       return (
         <View style={[styles.slide, {width, height}]}>
           <ProgressivePhoto
@@ -163,26 +162,28 @@ const TaskPhotoCarouselScreen = (props: Props) => {
       0,
       Math.min(initialIndex ?? 0, validPhotos.length - 1),
     );
+
     setCurrentIndex(safe);
 
-    requestAnimationFrame(() => {
-      listRef.current?.scrollToIndex({index: safe, animated: false});
-    });
-  }, [groupRev, initialIndex, validPhotos.length, width]);
-  // useEffect(() => {
-  //   if (initialIndex > 0 && validPhotos.length > 0 && listRef.current) {
-  //     setTimeout(() => {
-  //       try {
-  //         listRef.current?.scrollToIndex({
-  //           index: Math.min(initialIndex, validPhotos.length - 1),
-  //           animated: false,
-  //         });
-  //       } catch (error) {
-  //         console.log('Scroll to index error:', error);
-  //       }
-  //     }, 100);
-  //   }
-  // }, []);
+    const timer = setTimeout(() => {
+      try {
+        listRef.current?.scrollToIndex({
+          index: safe,
+          animated: false,
+          viewPosition: 0.5, // 🔥 Centrar la imagen
+        });
+      } catch (error) {
+        console.log('Scroll to index error:', error);
+        // Fallback: scroll con offset
+        listRef.current?.scrollToOffset({
+          offset: safe * width,
+          animated: false,
+        });
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [initialIndex, validPhotos.length, width]);
 
   if (validPhotos.length === 0) {
     return (
@@ -212,7 +213,7 @@ const TaskPhotoCarouselScreen = (props: Props) => {
         </Wrapper>
 
         <FlatList
-          key={groupRev}
+          // key={groupRev}
           ref={listRef}
           data={validPhotos}
           keyExtractor={keyExtractor}
@@ -229,7 +230,7 @@ const TaskPhotoCarouselScreen = (props: Props) => {
           initialNumToRender={1}
           maxToRenderPerBatch={2}
           windowSize={3}
-          removeClippedSubviews={false}
+          removeClippedSubviews={Platform.OS === 'android'}
           scrollEventThrottle={16}
         />
       </Wrapper>

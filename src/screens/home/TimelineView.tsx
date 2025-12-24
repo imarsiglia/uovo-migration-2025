@@ -27,10 +27,15 @@ export const TimelineViewCmp = () => {
   const refAgenda = useRef<any>(null);
   const [isAgendaReady, setIsAgendaReady] = useState(false);
   const sessionUser = useAuth((d) => d.user);
-  const {isFilterActive, timelinePressed, selectedDate, setSelectedDate} =
-    useGeneralStore();
+  const {
+    isFilterActive,
+    timelinePressed,
+    selectedDate,
+    setSelectedDate,
+    activeTab,
+  } = useGeneralStore();
   const {online} = useOnline();
-  const {navigate} = useCustomNavigation();
+  const {navigate, isFocused} = useCustomNavigation();
 
   const [mounted, setMounted] = useState(0);
   const {data: dataCalendar} = useGetCalendar();
@@ -38,15 +43,6 @@ export const TimelineViewCmp = () => {
   const increaseMounted = useCallback(() => {
     setMounted((v) => v + 1);
   }, []);
-
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     setTimeout(() => {
-  //       increaseMounted();
-  //     }, 1000);
-  //     return () => {};
-  //   }, [increaseMounted]),
-  // );
 
   const {
     data: dataTimeline,
@@ -62,16 +58,26 @@ export const TimelineViewCmp = () => {
     }, 1000);
   }, [isAgendaReady]);
 
-  // Mejorar el collapse con useEffect más robusto
   useEffect(() => {
-    if (!isAgendaReady || !timelinePressed) return;
+    if (!isAgendaReady) return;
 
     const timer = setTimeout(() => {
       collapseAgenda();
-    }, 100); // Pequeño delay para asegurar que el Agenda esté listo
+    }, 100);
 
     return () => clearTimeout(timer);
-  }, [timelinePressed, isAgendaReady]);
+  }, [isAgendaReady]);
+
+  useEffect(() => {
+    if (timelinePressed) {
+      collapseAgenda();
+      if (activeTab == 0) {
+        setTimeout(() => {
+          increaseMounted();
+        }, 500);
+      }
+    }
+  }, [timelinePressed, increaseMounted]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -302,23 +308,26 @@ export const TimelineViewCmp = () => {
 
   return (
     <>
-      <Agenda
-        key={`agenda-${mounted}`}
-        ref={refAgenda}
-        markedDates={markedDates}
-        items={formattedItems}
-        onDayPress={onDayPress}
-        selected={selectedDate}
-        pastScrollRange={6}
-        futureScrollRange={12}
-        renderDay={renderDay}
-        renderEmptyDate={renderEmptyDate}
-        renderKnob={renderKnob}
-        renderItem={renderItem}
-        renderEmptyData={renderEmptyData}
-        theme={theme}
-        style={styles.agenda}
-      />
+      {activeTab == 0 && (
+        <Agenda
+          key={`agenda-timeline`}
+          ref={refAgenda}
+          markedDates={markedDates}
+          items={formattedItems}
+          onDayPress={onDayPress}
+          selected={selectedDate}
+          pastScrollRange={6}
+          futureScrollRange={12}
+          renderDay={renderDay}
+          renderEmptyDate={renderEmptyDate}
+          renderKnob={renderKnob}
+          renderItem={renderItem}
+          renderEmptyData={renderEmptyData}
+          theme={theme}
+          style={styles.agenda}
+        />
+      )}
+
       {/* {isRefetching && (
         <IndicatorLoading
           containerStyle={{

@@ -1,58 +1,58 @@
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Alert, Keyboard, StyleSheet, Text, View} from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Alert, Keyboard, StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
-import {QUERY_KEYS} from '@api/contants/constants';
+import { QUERY_KEYS } from '@api/contants/constants';
 import {
   useDeletePicture,
   useRegisterPictures,
   useUpdatePictures,
 } from '@api/hooks/HooksTaskServices';
-import {taskServices} from '@api/services/taskServices';
-import {TaskImageType, TaskPhotoType} from '@api/types/Task';
+import { taskServices } from '@api/services/taskServices';
+import { TaskImageType, TaskPhotoType } from '@api/types/Task';
 import {
   ImageOptionSheet,
   RBSheetRef,
 } from '@components/commons/bottomsheets/ImageOptionSheet';
-import {BackButton} from '@components/commons/buttons/BackButton';
-import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
-import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
-import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
-import {InputTextContext} from '@components/commons/form/InputTextContext';
+import { BackButton } from '@components/commons/buttons/BackButton';
+import { PressableOpacity } from '@components/commons/buttons/PressableOpacity';
+import { BasicFormProvider } from '@components/commons/form/BasicFormProvider';
+import { ButtonSubmit } from '@components/commons/form/ButtonSubmit';
+import { InputTextContext } from '@components/commons/form/InputTextContext';
 import {
   SpeechFormContext,
   SpeechFormInputRef,
 } from '@components/commons/form/SpeechFormContext';
-import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
+import { GeneralLoading } from '@components/commons/loading/GeneralLoading';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import {Wrapper} from '@components/commons/wrappers/Wrapper';
-import {PhotoSlot} from '@components/images/PhotoSlot';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
+import { PhotoSlot } from '@components/images/PhotoSlot';
 import {
   offlineCreateImage,
   offlineDeleteImage,
   offlineUpdateImage,
 } from '@features/images/offline';
-import {ImageType} from '@generalTypes/general';
+import { ImageType } from '@generalTypes/general';
 import {
   SaveTaskImageSchema,
   SaveTaskImageSchemaType,
 } from '@generalTypes/schemas';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {useOnline} from '@hooks/useOnline';
-import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
-import {useUpsertArrayCache} from '@hooks/useToolsReactQueryCache';
-import {RootStackParamList, RoutesNavigation} from '@navigation/types';
-import {loadingWrapperPromise} from '@store/actions';
-import {useAuth} from '@store/auth';
+import { useCustomNavigation } from '@hooks/useCustomNavigation';
+import { useOnline } from '@hooks/useOnline';
+import { useRefreshIndicator } from '@hooks/useRefreshIndicator';
+import { useUpsertArrayCache } from '@hooks/useToolsReactQueryCache';
+import { RootStackParamList, RoutesNavigation } from '@navigation/types';
+import { loadingWrapperPromise } from '@store/actions';
+import { useAuth } from '@store/auth';
 import useTopSheetStore from '@store/topsheet';
-import {COLORS} from '@styles/colors';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {useQueries} from '@tanstack/react-query';
-import {generateUUID, isAndroid, nextFrame} from '@utils/functions';
-import {onLaunchCamera, onSelectImage} from '@utils/image';
-import {imageCacheManager} from '@utils/imageCacheManager';
-import {showErrorToastMessage, showToastMessage} from '@utils/toast';
+import { COLORS } from '@styles/colors';
+import { GLOBAL_STYLES } from '@styles/globalStyles';
+import { useQueries } from '@tanstack/react-query';
+import { generateUUID, isAndroid, nextFrame } from '@utils/functions';
+import { onLaunchCamera, onSelectImage } from '@utils/image';
+import { imageCacheManager } from '@utils/imageCacheManager';
+import { showErrorToastMessage, showToastMessage } from '@utils/toast';
 import RNFS from 'react-native-fs';
 import {
   KeyboardAwareScrollView,
@@ -82,13 +82,13 @@ const usePhotoManagement = (
   const [removedIds, setRemovedIds] = useState<number[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
   const [loadingHighRes, setLoadingHighRes] = useState(false);
-  const isMounted = useRef(true);
 
   const initialGroupPhotos = useMemo(
     () => (item?.photos ? item.photos.slice(0, MAX_PHOTOS) : []),
     [item],
   );
 
+  // Queries para cargar imágenes full-res SOLO cuando sea necesario
   const photoQueries = useQueries({
     queries: initialGroupPhotos.map((p) => ({
       queryKey: [
@@ -97,63 +97,40 @@ const usePhotoManagement = (
       ],
       queryFn: () => taskServices.getFullImage({id: p.id!}),
       enabled: !!p.id && !!item && online,
-      staleTime: 5 * 60 * 1000,
-      retry: 2, // 🔥 Reintentar solo 2 veces
+      staleTime: 5 * 60 * 1000, // 5 minutos de cache
     })),
   });
 
-  // 🚀 Inicialización con validación estricta
+  // 🚀 Inicialización - usar photo base64 existente SIN guardar en cache
   useEffect(() => {
     if (!item || isInitialized) return;
 
-    console.log('🎯 Initializing photos:', initialGroupPhotos.length);
+    const initPhotos = initialGroupPhotos.map((p, index) => ({
+      ...p,
+      internalId: `init_${p.id ?? p.clientId ?? index}`,
+      isNew: false,
+      isDirty: false,
+      // ⚠️ NO guardamos en cache aquí, usamos el base64 existente
+      photo: p.photo,
+    }));
 
-    const initPhotos = initialGroupPhotos.map((p, index) => {
-      // 🔥 Validar base64
-      const hasValidBase64 =
-        p.photo && typeof p.photo === 'string' && p.photo.length > 100;
-
-      // 🔥 Validar path
-      const hasValidPath =
-        p.path && typeof p.path === 'string' && p.path.length > 0;
-
-      const photo: OptimizedPhoto = {
-        ...p,
-        internalId: `init_${p.id ?? p.clientId ?? index}`,
-        isNew: false,
-        isDirty: false,
-        photo: hasValidBase64 ? p.photo : undefined,
-        uri: hasValidPath ? p.path : undefined,
-      };
-
-      console.log(`📸 Photo ${index}:`, {
-        hasBase64: hasValidBase64,
-        hasPath: hasValidPath,
-        base64Length: p.photo?.length,
-        path: p.path,
-      });
-
-      return photo;
-    });
-
-    setPhotos(initPhotos);
+    setPhotos(initPhotos as OptimizedPhoto[]);
     setRemovedIds([]);
     setIsInitialized(true);
   }, [item, initialGroupPhotos, isInitialized]);
 
-  // 🚀 Actualizar con high-res de forma segura
+  // 🚀 Actualizar con high-res SOLO si es necesario
   useEffect(() => {
     if (!item || !isInitialized || initialGroupPhotos.length === 0 || !online)
       return;
 
-    const hasNewData = photoQueries.some((q) => q.data && q.isSuccess);
+    // @ts-ignore
+    const hasNewData = photoQueries.some((q) => q.data && !q.isPreviousData);
     if (!hasNewData) return;
 
     setLoadingHighRes(true);
 
     (async () => {
-      if (!isMounted.current) return;
-
       const updates: {index: number; photo: OptimizedPhoto}[] = [];
 
       for (let i = 0; i < initialGroupPhotos.length; i++) {
@@ -167,38 +144,19 @@ const usePhotoManagement = (
 
         const existingPhoto = photos[existingIndex];
 
-        // 🔥 Validar que el base64 descargado sea válido
-        if (!q.data || typeof q.data !== 'string' || q.data.length < 100) {
-          console.warn(`⚠️ Invalid high-res data for photo ${base.id}`);
-          continue;
-        }
+        // 🎯 Guardar SOLO UNA VEZ en cache con nombre único
+        const cacheKey = `photo_${base.id}_${item.update_time}_L_${q.data.length}`;
+        const uri = await imageCacheManager.saveBase64ToCache(q.data, cacheKey);
 
-        try {
-          const cacheKey = `photo_${base.id}_${item.update_time}_L_${q.data.length}`;
-          const uri = await imageCacheManager.saveBase64ToCache(
-            q.data,
-            cacheKey,
-          );
-
-          if (!isMounted.current) return;
-
-          console.log(`✅ Cached high-res for photo ${base.id}`);
-
-          updates.push({
-            index: existingIndex,
-            photo: {
-              ...existingPhoto,
-              uri,
-              photo: undefined, // Liberar memoria
-            },
-          });
-        } catch (error) {
-          console.error(`❌ Error caching photo ${base.id}:`, error);
-          // Mantener el base64 original si falla
-        }
+        updates.push({
+          index: existingIndex,
+          photo: {
+            ...existingPhoto,
+            uri,
+            photo: undefined, // 🔥 Liberar base64 de memoria
+          },
+        });
       }
-
-      if (!isMounted.current) return;
 
       if (updates.length > 0) {
         setPhotos((prev) => {
@@ -208,7 +166,6 @@ const usePhotoManagement = (
           });
           return next;
         });
-        console.log(`🔄 Updated ${updates.length} photos with high-res`);
       }
 
       setLoadingHighRes(false);
@@ -217,23 +174,18 @@ const usePhotoManagement = (
     item,
     isInitialized,
     online,
-    photoQueries.map((q) => q.dataUpdatedAt).join(','),
+    photoQueries.map((q) => `${q.dataUpdatedAt}`).join(','),
   ]);
 
-  // 🧹 Cleanup al desmontar
+  // 🧹 Cleanup al desmontar - eliminar SOLO archivos de cache de esta sesión
   useEffect(() => {
-    isMounted.current = true;
-
     return () => {
-      isMounted.current = false;
-
-      setTimeout(() => {
-        photos.forEach((p) => {
-          if (p.uri?.includes('image_cache') && (p.isNew || p.isDirty)) {
-            imageCacheManager.deleteFromCache(p.uri).catch(() => {});
-          }
-        });
-      }, 1000);
+      photos.forEach((p) => {
+        // Solo eliminar si tiene URI de cache Y no es una foto original del servidor
+        if (p.uri?.includes('image_cache') && (p.isNew || p.isDirty)) {
+          imageCacheManager.deleteFromCache(p.uri).catch(() => {});
+        }
+      });
     };
   }, []);
 
@@ -777,12 +729,12 @@ export const SaveImagesScreen = (props: Props) => {
                   }
 
                   const realIdx = photos.indexOf(slot);
-
+                  const displayUri =
+                    slot.uri || `data:image/jpeg;base64,${slot.photo}`;
                   return (
                     <PhotoSlot
                       key={slot.internalId}
-                      uri={slot.uri}
-                      base64={slot.photo}
+                      uri={displayUri}
                       onEdit={() => editSlot(realIdx)}
                       onRemove={() => removeSlot(realIdx)}
                     />
