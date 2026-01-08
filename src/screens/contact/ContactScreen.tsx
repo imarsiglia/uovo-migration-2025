@@ -16,6 +16,7 @@ import {CustomPressable} from '@components/commons/pressable/CustomPressable';
 import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {useCustomInsetBottom} from '@hooks/useCustomInsetBottom';
 import {RoutesNavigation} from '@navigation/types';
 import {useRoute} from '@react-navigation/native';
 import {COLORS} from '@styles/colors';
@@ -32,10 +33,12 @@ import {
 } from 'react-native-keyboard-controller';
 import {useCustomNavigation} from 'src/hooks/useCustomNavigation';
 import {ContactUsSchema, ContactUsSchemaType} from 'src/types/schemas';
+import {StatusBar as StatusBarComponent} from 'react-native-scrollable-navigation-bar';
 
 export const ContactScreen = () => {
   const {goBack, navigate} = useCustomNavigation();
   const route = useRoute<any>();
+  const insetBottom = useCustomInsetBottom();
 
   const {mutateAsync, isPending} = useContactUsService();
   const [photo, setPhoto] = useState<ImageType | null>(null);
@@ -211,7 +214,8 @@ export const ContactScreen = () => {
             </Wrapper>
           </KeyboardAwareScrollView>
 
-          <KeyboardStickyView style={styles.containerBottom}>
+          <KeyboardStickyView
+            style={[styles.containerBottom, {bottom: -insetBottom}]}>
             <ButtonSubmit
               label="Submit"
               icon={<Icons.Save fontSize={21} color="white" />}

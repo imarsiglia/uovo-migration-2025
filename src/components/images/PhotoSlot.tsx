@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     height: 140,
     borderRadius: 10,
     backgroundColor: '#f0f0f0',
-    overflow: 'hidden',
+    // overflow: 'hidden',
   },
   image: {
     width: '100%',

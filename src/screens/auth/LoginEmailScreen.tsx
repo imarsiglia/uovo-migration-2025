@@ -2,7 +2,10 @@ import {useRegularLogin} from '@api/hooks/HooksAuthentication';
 import {Icons} from '@assets/icons/icons';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
-import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
+import {
+  ButtonSubmit,
+  ButtonSubmitRef,
+} from '@components/commons/form/ButtonSubmit';
 import {InputPasswordContext} from '@components/commons/form/InputPasswordContext';
 import {InputTextContext} from '@components/commons/form/InputTextContext';
 import {Label} from '@components/commons/text/Label';
@@ -39,7 +42,7 @@ export const LoginEmailScreen = () => {
   const showDialog = useModalDialogStore((d) => d.showVisible);
 
   const passwordInputRef = useRef<TextInput>(null);
-  const buttonSubmitRef = useRef<View>(null);
+  const buttonSubmitRef = useRef<ButtonSubmitRef>(null);
 
   const setSession = useAuth((d) => d.setSession);
 
@@ -78,8 +81,7 @@ export const LoginEmailScreen = () => {
 
   function onPressSubmit() {
     if (buttonSubmitRef.current) {
-      // @ts-ignore
-      buttonSubmitRef.current.onPress();
+      buttonSubmitRef.current?.submit();
     }
   }
   return (
@@ -90,7 +92,7 @@ export const LoginEmailScreen = () => {
             <Wrapper
               style={[
                 GLOBAL_STYLES.containerBtnOptTop,
-                {position: 'absolute', left: 0, top: 5},
+                {position: 'absolute', left: 0},
               ]}>
               <PressableOpacity onPress={goBack}>
                 <Wrapper style={styles.backBtn}>
@@ -130,7 +132,7 @@ export const LoginEmailScreen = () => {
                 ref={passwordInputRef}
                 currentId="password"
                 label="Password"
-                returnKeyType="send"
+                returnKeyType="done"
                 editable={!isPending}
                 labelProps={{style: styles.inputTitle}}
                 inputProps={{

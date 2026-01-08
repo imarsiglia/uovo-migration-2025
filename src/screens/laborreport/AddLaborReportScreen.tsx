@@ -198,9 +198,9 @@ export const AddLaborReportScreen = (props: Props) => {
               })
               .catch((e) => {
                 console.log('error', e);
-                showErrorToastMessage(
-                  'Error while saving labor report, try again',
-                );
+                // showErrorToastMessage(
+                //   'Error while saving labor report, try again',
+                // );
               }),
           );
         },

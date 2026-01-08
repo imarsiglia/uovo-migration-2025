@@ -18,9 +18,12 @@ import {
   useWindowDimensions,
   ViewToken,
   Platform,
+  Text,
 } from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {ProgressivePhoto} from './ProgressivePhoto';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { COLORS } from '@styles/colors';
 
 export type TaskPhotoCarouselType = {
   photos: TaskPhotoType[];
@@ -42,6 +45,7 @@ const TaskPhotoCarouselScreen = (props: Props) => {
   const {width, height} = useWindowDimensions();
   const {goBack} = useCustomNavigation();
   const qc = useQueryClient();
+  const insets = useSafeAreaInsets();
 
   const {
     photos = [],
@@ -189,7 +193,7 @@ const TaskPhotoCarouselScreen = (props: Props) => {
     return (
       <GestureHandlerRootView style={styles.flex}>
         <Wrapper style={styles.container}>
-          <Wrapper style={styles.header}>
+          <Wrapper style={[styles.header, {paddingTop: insets.top}]}>
             <BackButton onPress={goBack} />
           </Wrapper>
           <View style={styles.emptyContainer}>
@@ -203,7 +207,7 @@ const TaskPhotoCarouselScreen = (props: Props) => {
   return (
     <GestureHandlerRootView style={styles.flex}>
       <Wrapper style={styles.container}>
-        <Wrapper style={styles.header}>
+        <Wrapper style={[styles.header, {paddingTop: insets.top}]}>
           <BackButton onPress={goBack} />
           <Wrapper style={styles.counterPill}>
             <Label style={styles.counterText}>
@@ -244,7 +248,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: 'black',
+    backgroundColor: COLORS.black,
   },
   slide: {
     justifyContent: 'center',
@@ -273,6 +277,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
+    position: "absolute",
+    top: 0
   },
   emptyContainer: {
     flex: 1,

@@ -51,6 +51,12 @@ export const TimelineViewCmp = () => {
   } = useGetTimeline(selectedDate!);
 
   useEffect(() => {
+    return () => {
+      setSelectedDate(getFormattedDate(new Date(), 'YYYY-MM-DD'));
+    };
+  }, []);
+
+  useEffect(() => {
     if (!isAgendaReady) return;
     setTimeout(() => {
       setSelectedDate(getFormattedDate(new Date(), 'YYYY-MM-DD'));

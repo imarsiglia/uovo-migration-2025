@@ -361,7 +361,7 @@ export const TopsheetScreen = ({route}: Props) => {
             <Wrapper
               style={{
                 position: 'absolute',
-                bottom: insetBottom,
+                bottom: -insetBottom,
                 width: '100%',
                 backgroundColor: 'white',
                 paddingHorizontal: 10,

@@ -19,6 +19,7 @@ import Reanimated, {
 
 import type {TaskPhotoType} from '@api/types/Task';
 import {useFullPhotoUri} from '@api/hooks/HooksTaskServices';
+import { COLORS } from '@styles/colors';
 
 type ImageType = 'jpeg' | 'png' | 'webp' | 'gif';
 const ensureDataUri = (s: string, type: ImageType) =>
@@ -357,7 +358,7 @@ export const ProgressivePhoto: React.FC<Props> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {width: '100%', height: '100%', backgroundColor: 'black'},
+  container: {width: '100%', height: '100%', backgroundColor: COLORS.black},
   absoluteImg: {
     ...StyleSheet.absoluteFillObject,
     width: undefined,

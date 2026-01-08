@@ -1,25 +1,23 @@
+import { useFullPhotoUri } from '@api/hooks/HooksTaskServices';
 import {
   fullPhotoQueryById,
   localPhotoQueryByClientId,
 } from '@api/queries/fullPhotoQuery';
-import type {TaskPhotoType} from '@api/types/Task';
-import {useFullPhotoUri} from '@api/hooks/HooksTaskServices';
-import {BackButton} from '@components/commons/buttons/BackButton';
-import {Label} from '@components/commons/text/Label';
-import {Wrapper} from '@components/commons/wrappers/Wrapper';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import type {RootStackParamList} from '@navigation/types';
-import type {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {useQueryClient} from '@tanstack/react-query';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import type { TaskPhotoType } from '@api/types/Task';
+import { BackButton } from '@components/commons/buttons/BackButton';
+import { Label } from '@components/commons/text/Label';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
+import { useCustomNavigation } from '@hooks/useCustomNavigation';
+import type { RootStackParamList } from '@navigation/types';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   StyleSheet,
-  useWindowDimensions,
-  ActivityIndicator,
-  View,
+  useWindowDimensions
 } from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import ImageViewing from 'react-native-image-viewing';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type ImageType = 'jpeg' | 'png' | 'webp' | 'gif';
 
@@ -93,6 +91,7 @@ const PhotoLoader = ({
   useEffect(() => {
     // Primero envía el low-res inmediatamente
     if (lowResUri) {
+      // @ts-ignore
       onPhotoReady(photoId, lowResUri);
     }
   }, [lowResUri, photoId, onPhotoReady]);
@@ -100,6 +99,7 @@ const PhotoLoader = ({
   useEffect(() => {
     // Cuando esté disponible el high-res, actualiza
     if (hiResUri) {
+      // @ts-ignore
       onPhotoReady(photoId, hiResUri);
     }
   }, [hiResUri, photoId, onPhotoReady]);

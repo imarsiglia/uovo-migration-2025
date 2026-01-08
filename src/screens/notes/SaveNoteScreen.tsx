@@ -31,7 +31,8 @@ import {
 } from 'react-native-keyboard-controller';
 import {useCustomNavigation} from 'src/hooks/useCustomNavigation';
 import {HelpDeskSchema, SaveNoteSchemaType} from 'src/types/schemas';
-import { generateUUID } from '@utils/functions';
+import {generateUUID} from '@utils/functions';
+import {useCustomInsetBottom} from '@hooks/useCustomInsetBottom';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SaveNote'>;
 
@@ -50,6 +51,7 @@ export const SaveNoteScreen = (props: Props) => {
   const item = props.route.params?.item;
   const {goBack} = useCustomNavigation();
   const {id: idJob} = useTopSheetStore((d) => d.jobDetail!);
+  const insetBottom = useCustomInsetBottom();
 
   const {online} = useOnline();
   const qc = useQueryClient();
@@ -222,7 +224,8 @@ export const SaveNoteScreen = (props: Props) => {
             </Wrapper>
           </KeyboardAwareScrollView>
 
-          <KeyboardStickyView style={styles.containerBottom}>
+          <KeyboardStickyView
+            style={[styles.containerBottom, {bottom: -insetBottom}]}>
             <ButtonSubmit
               label="Save notes"
               icon={<Icons.Save fontSize={21} color="white" />}

@@ -4,16 +4,22 @@ import {QueryClient, focusManager, onlineManager} from '@tanstack/react-query';
 import {PersistQueryClientProvider} from '@tanstack/react-query-persist-client';
 import {mmkvPersister} from '@api/storage/react-query-mmkv';
 import {QUERY_KEYS} from '@api/contants/constants';
-import {AppState, AppStateStatus, useColorScheme} from 'react-native';
+import {
+  AppState,
+  AppStateStatus,
+  useColorScheme,
+  SafeAreaView,
+} from 'react-native';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {AutocompleteDropdownContextProvider} from 'react-native-autocomplete-dropdown';
 import {KeyboardProvider} from 'react-native-keyboard-controller';
 import {ColorScheme, EDSProvider} from '@equinor/mad-components';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
 import EditModal from '@components/condition/notes/EditModal';
 import {createModalStack, ModalProvider} from 'react-native-modalfy';
 import {DEFAULT_OPTIONS_MODALFY} from '@utils/functions';
 import EditDeleteModal from '@components/condition/notes/EditDeleteModal';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import { COLORS } from '@styles/colors';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -68,7 +74,7 @@ export default function AppProviders({children}: {children: React.ReactNode}) {
   const scheme = useColorScheme();
 
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider style={{flex: 1, backgroundColor: COLORS.white}}>
       <AutocompleteDropdownContextProvider>
         <BottomSheetModalProvider>
           <KeyboardProvider>

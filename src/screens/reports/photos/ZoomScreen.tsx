@@ -796,6 +796,8 @@ const ZoomScreen = (props: any) => {
             console.log(e);
             isProcessing.current = false;
           }
+        }).catch(() => {
+          isProcessing.current = false;
         });
       } else {
         const clientId = item?.clientId ?? generateUUID();

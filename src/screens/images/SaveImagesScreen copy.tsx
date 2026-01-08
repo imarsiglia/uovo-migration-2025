@@ -1,58 +1,58 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Keyboard, StyleSheet, Text, View } from 'react-native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {Alert, Keyboard, StyleSheet, Text, View} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
-import { QUERY_KEYS } from '@api/contants/constants';
+import {QUERY_KEYS} from '@api/contants/constants';
 import {
   useDeletePicture,
   useRegisterPictures,
   useUpdatePictures,
 } from '@api/hooks/HooksTaskServices';
-import { taskServices } from '@api/services/taskServices';
-import { TaskImageType, TaskPhotoType } from '@api/types/Task';
+import {taskServices} from '@api/services/taskServices';
+import {TaskImageType, TaskPhotoType} from '@api/types/Task';
 import {
   ImageOptionSheet,
   RBSheetRef,
 } from '@components/commons/bottomsheets/ImageOptionSheet';
-import { BackButton } from '@components/commons/buttons/BackButton';
-import { PressableOpacity } from '@components/commons/buttons/PressableOpacity';
-import { BasicFormProvider } from '@components/commons/form/BasicFormProvider';
-import { ButtonSubmit } from '@components/commons/form/ButtonSubmit';
-import { InputTextContext } from '@components/commons/form/InputTextContext';
+import {BackButton} from '@components/commons/buttons/BackButton';
+import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
+import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
+import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
+import {InputTextContext} from '@components/commons/form/InputTextContext';
 import {
   SpeechFormContext,
   SpeechFormInputRef,
 } from '@components/commons/form/SpeechFormContext';
-import { GeneralLoading } from '@components/commons/loading/GeneralLoading';
+import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import { Wrapper } from '@components/commons/wrappers/Wrapper';
-import { PhotoSlot } from '@components/images/PhotoSlot';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {PhotoSlot} from '@components/images/PhotoSlot';
 import {
   offlineCreateImage,
   offlineDeleteImage,
   offlineUpdateImage,
 } from '@features/images/offline';
-import { ImageType } from '@generalTypes/general';
+import {ImageType} from '@generalTypes/general';
 import {
   SaveTaskImageSchema,
   SaveTaskImageSchemaType,
 } from '@generalTypes/schemas';
-import { useCustomNavigation } from '@hooks/useCustomNavigation';
-import { useOnline } from '@hooks/useOnline';
-import { useRefreshIndicator } from '@hooks/useRefreshIndicator';
-import { useUpsertArrayCache } from '@hooks/useToolsReactQueryCache';
-import { RootStackParamList, RoutesNavigation } from '@navigation/types';
-import { loadingWrapperPromise } from '@store/actions';
-import { useAuth } from '@store/auth';
+import {useCustomNavigation} from '@hooks/useCustomNavigation';
+import {useOnline} from '@hooks/useOnline';
+import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
+import {useUpsertArrayCache} from '@hooks/useToolsReactQueryCache';
+import {RootStackParamList, RoutesNavigation} from '@navigation/types';
+import {loadingWrapperPromise} from '@store/actions';
+import {useAuth} from '@store/auth';
 import useTopSheetStore from '@store/topsheet';
-import { COLORS } from '@styles/colors';
-import { GLOBAL_STYLES } from '@styles/globalStyles';
-import { useQueries } from '@tanstack/react-query';
-import { generateUUID, isAndroid, nextFrame } from '@utils/functions';
-import { onLaunchCamera, onSelectImage } from '@utils/image';
-import { imageCacheManager } from '@utils/imageCacheManager';
-import { showErrorToastMessage, showToastMessage } from '@utils/toast';
+import {COLORS} from '@styles/colors';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {useQueries} from '@tanstack/react-query';
+import {generateUUID, isAndroid, nextFrame} from '@utils/functions';
+import {onLaunchCamera, onSelectImage} from '@utils/image';
+import {imageCacheManager} from '@utils/imageCacheManager';
+import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import RNFS from 'react-native-fs';
 import {
   KeyboardAwareScrollView,
@@ -494,7 +494,7 @@ export const SaveImagesScreen = (props: Props) => {
       );
       await nextFrame();
       await addPhotos(res as ImageType);
-    }).catch(console.error);
+    }).catch(() => {});
   }, [closeSheet, addPhotos]);
 
   const initGallery = useCallback(async () => {
@@ -515,7 +515,7 @@ export const SaveImagesScreen = (props: Props) => {
         );
         await nextFrame();
         await addPhotos(res as ImageType[]);
-      }).catch(console.error);
+      }).catch(() => {});
     } else {
       const res = await onSelectImage(
         () => {},
@@ -631,6 +631,8 @@ export const SaveImagesScreen = (props: Props) => {
 
           isProcessing.current = false;
           goBack();
+        }).catch(() => {
+          isProcessing.current = false;
         });
       } catch (e) {
         console.error('Save error:', e);

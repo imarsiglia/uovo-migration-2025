@@ -112,8 +112,8 @@ export const ReportMaterialsScreen = () => {
                     );
                   }
                 })
-                .catch(() =>
-                  showErrorToastMessage('Error while removing material'),
+                .catch(() => {}
+                  // showErrorToastMessage('Error while removing material'),
                 ),
             );
           } else {

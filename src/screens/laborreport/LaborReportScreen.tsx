@@ -4,33 +4,32 @@ import {
   STARTED_STATUS,
 } from '@api/contants/constants';
 import {
-  useDeleteNote,
   useGetLaborReports,
-  useGetNotes,
-  useRegisterLaborReport,
+  useRegisterLaborReport
 } from '@api/hooks/HooksTaskServices';
-import {LaborReportType, NoteType} from '@api/types/Task';
-import {ClockinButtonLaborReport} from '@components/clockin/ClockinButtonLaborReport';
-import {BackButton} from '@components/commons/buttons/BackButton';
-import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
+import { LaborReportType } from '@api/types/Task';
+import { ClockinButtonLaborReport } from '@components/clockin/ClockinButtonLaborReport';
+import { BackButton } from '@components/commons/buttons/BackButton';
+import { GeneralLoading } from '@components/commons/loading/GeneralLoading';
 import {
   SwipeableListProvider,
   SwipeableRow,
 } from '@components/commons/swipeable/SwipeableRow';
-import {Label} from '@components/commons/text/Label';
+import { Label } from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import {Wrapper} from '@components/commons/wrappers/Wrapper';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
-import {RoutesNavigation} from '@navigation/types';
-import {loadingWrapperPromise} from '@store/actions';
-import {useModalDialogStore} from '@store/modals';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
+import { useCustomInsetBottom } from '@hooks/useCustomInsetBottom';
+import { useCustomNavigation } from '@hooks/useCustomNavigation';
+import { useRefreshIndicator } from '@hooks/useRefreshIndicator';
+import { RoutesNavigation } from '@navigation/types';
+import { loadingWrapperPromise } from '@store/actions';
+import { useModalDialogStore } from '@store/modals';
 import useTopSheetStore from '@store/topsheet';
-import {COLORS} from '@styles/colors';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {getFormattedDate} from '@utils/functions';
-import {showErrorToastMessage, showToastMessage} from '@utils/toast';
-import {useCallback, useMemo} from 'react';
+import { COLORS } from '@styles/colors';
+import { GLOBAL_STYLES } from '@styles/globalStyles';
+import { getFormattedDate } from '@utils/functions';
+import { showErrorToastMessage, showToastMessage } from '@utils/toast';
+import { useCallback, useMemo } from 'react';
 import {
   FlatList,
   ListRenderItemInfo,
@@ -48,6 +47,7 @@ export const LaborReportScreen = () => {
   const isJobQueue = useTopSheetStore((d) => d.isJobQueue);
   const {goBack, navigate} = useCustomNavigation();
   const showDialog = useModalDialogStore((d) => d.showVisible);
+  const insetBottom = useCustomInsetBottom();
 
   const {refetchAll} = useRefreshIndicator([
     [QUERY_KEYS.TASK_COUNT, {idJob: jobDetail!.id}],
@@ -272,7 +272,7 @@ export const LaborReportScreen = () => {
       <Wrapper
         style={{
           position: 'absolute',
-          bottom: 0,
+          bottom: -insetBottom,
           width: '100%',
           paddingVertical: 5,
           backgroundColor: 'white',

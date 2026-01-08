@@ -1,42 +1,38 @@
-import { useHelpDeskService } from '@api/hooks/HooksGeneralServices';
-import { Icons } from '@assets/icons/icons';
+import {useHelpDeskService} from '@api/hooks/HooksGeneralServices';
+import {Icons} from '@assets/icons/icons';
 import {
-    ImageOptionSheet,
-    RBSheetRef,
+  ImageOptionSheet,
+  RBSheetRef,
 } from '@components/commons/bottomsheets/ImageOptionSheet';
-import { PressableOpacity } from '@components/commons/buttons/PressableOpacity';
-import { BasicFormProvider } from '@components/commons/form/BasicFormProvider';
-import { ButtonSubmit } from '@components/commons/form/ButtonSubmit';
-import { InputTextContext } from '@components/commons/form/InputTextContext';
+import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
+import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
+import {ButtonSubmit} from '@components/commons/form/ButtonSubmit';
+import {InputTextContext} from '@components/commons/form/InputTextContext';
 import {
-    SpeechFormContext,
-    SpeechFormInputRef,
+  SpeechFormContext,
+  SpeechFormInputRef,
 } from '@components/commons/form/SpeechFormContext';
-import { CustomPressable } from '@components/commons/pressable/CustomPressable';
-import { Label } from '@components/commons/text/Label';
+import {CustomPressable} from '@components/commons/pressable/CustomPressable';
+import {Label} from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import { Wrapper } from '@components/commons/wrappers/Wrapper';
-import { RoutesNavigation } from '@navigation/types';
-import { useRoute } from '@react-navigation/native';
-import { COLORS } from '@styles/colors';
-import { GLOBAL_STYLES } from '@styles/globalStyles';
-import { getDeviceInfoAsString } from '@utils/functions';
-import { onLaunchCamera, onSelectImage } from '@utils/image';
-import { showToastMessage } from '@utils/toast';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {Wrapper} from '@components/commons/wrappers/Wrapper';
+import {useCustomInsetBottom} from '@hooks/useCustomInsetBottom';
+import {RoutesNavigation} from '@navigation/types';
+import {useRoute} from '@react-navigation/native';
+import {COLORS} from '@styles/colors';
+import {GLOBAL_STYLES} from '@styles/globalStyles';
+import {getDeviceInfoAsString} from '@utils/functions';
+import {onLaunchCamera, onSelectImage} from '@utils/image';
+import {showToastMessage} from '@utils/toast';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {ActivityIndicator, Image, Keyboard, StyleSheet} from 'react-native';
+import type {Image as ImageType} from 'react-native-image-crop-picker';
 import {
-    ActivityIndicator,
-    Image,
-    Keyboard,
-    StyleSheet
-} from 'react-native';
-import type { Image as ImageType } from 'react-native-image-crop-picker';
-import {
-    KeyboardAwareScrollView,
-    KeyboardStickyView,
+  KeyboardAwareScrollView,
+  KeyboardStickyView,
 } from 'react-native-keyboard-controller';
-import { useCustomNavigation } from 'src/hooks/useCustomNavigation';
-import { HelpDeskSchema, HelpDeskSchemaType } from 'src/types/schemas';
+import {useCustomNavigation} from 'src/hooks/useCustomNavigation';
+import {HelpDeskSchema, HelpDeskSchemaType} from 'src/types/schemas';
 
 export const HelpDeskScreen = () => {
   const {goBack, navigate} = useCustomNavigation();
@@ -47,6 +43,8 @@ export const HelpDeskScreen = () => {
 
   const refCallSheet = useRef<RBSheetRef>(null);
   const refVoice = useRef<SpeechFormInputRef>(null);
+
+  const insetBottom = useCustomInsetBottom();
 
   const deviceInfo = useMemo(() => {
     return getDeviceInfoAsString();
@@ -102,10 +100,12 @@ export const HelpDeskScreen = () => {
   }, [refCallSheet?.current]);
 
   const initCamera = useCallback(() => {
+    // @ts-ignore
     onLaunchCamera(closeSheet, generateImagePathIOS);
   }, []);
 
   const initGallery = useCallback(() => {
+    // @ts-ignore
     onSelectImage(closeSheet, generateImagePathIOS);
   }, []);
 
@@ -206,7 +206,8 @@ export const HelpDeskScreen = () => {
             </Wrapper>
           </KeyboardAwareScrollView>
 
-          <KeyboardStickyView style={styles.containerBottom}>
+          <KeyboardStickyView
+            style={[styles.containerBottom, {bottom: -insetBottom}]}>
             <ButtonSubmit
               label="Submit"
               icon={<Icons.Save fontSize={21} color="white" />}

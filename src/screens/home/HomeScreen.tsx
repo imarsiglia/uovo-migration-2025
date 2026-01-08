@@ -240,7 +240,7 @@ export const HomeScreen = () => {
               {
                 flexDirection: 'row',
                 alignItems: 'center',
-                bottom: insetBottom,
+                bottom: -insetBottom,
               },
             ]}>
             <Icon name="exclamation" size={15} color="orange" type="solid" />

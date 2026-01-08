@@ -27,6 +27,7 @@ export const COLORS = {
   borderInputColor: '#CECECE',
   tobTapTextInactive: "#9e9e9e",
   subtitleColor: '#3C424A',
+  black: '#000000',
 
   // icons
   pausedIcon: '#ffe041',

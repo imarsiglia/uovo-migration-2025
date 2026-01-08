@@ -91,7 +91,7 @@ export const ReportIssueScreen = (props: Props) => {
       });
   };
 
-  const initEdit = useCallback((photo?: ImageType) => {
+  const initEdit = useCallback((photo?: ImageType | ImageType[]) => {
     navigate(RoutesNavigation.EditImage, {photo});
   }, []);
 

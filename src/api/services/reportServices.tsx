@@ -194,6 +194,9 @@ const getPhotosCondition = async ({
   sideType,
   reportId,
 }: GetPhotosConditionApiProps): Promise<ConditionPhotoType[]> => {
+  if (!reportId) {
+    return [];
+  }
   const response = await getRequest<Paginated<ConditionPhotoType[]>>(
     `/${conditionType}${API_GET_PHOTOS_CONDITION}?reportType=${sideType}&reportId=${reportId}`,
   );

@@ -251,8 +251,8 @@ export const SaveReportMaterialScreen = (props: Props) => {
                   );
                 }
               })
-              .catch(() =>
-                showErrorToastMessage('Error while saving material, try again'),
+              .catch(() => {}
+                // showErrorToastMessage('Error while saving material, try again'),
               ),
           );
         },

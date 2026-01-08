@@ -11,7 +11,7 @@ import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 import RNFS from 'react-native-fs';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'EditImage'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'EditImageUri'>;
 export const EditImageURIScreen = (props: Props) => {
   const refCanvas = useRef<SketchCanvas | undefined>(null);
   const {navigate, getState} = useCustomNavigation();

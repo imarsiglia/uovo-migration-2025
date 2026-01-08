@@ -431,3 +431,8 @@ export const DEFAULT_OPTIONS_MODALFY = {
 
 export const nextFrame = () =>
   new Promise<void>((r) => requestAnimationFrame(() => r()));
+
+
+export const satinizeBase64 = (base64: string) => {
+  return base64.replace(/(\r\n|\n|\r)/gm, '');
+}

@@ -6,7 +6,7 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {SketchCanvas} from '@sourcetoad/react-native-sketch-canvas';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {writeToFileSystem} from '@utils/filesystem';
-import {nextFrame} from '@utils/functions';
+import {nextFrame, satinizeBase64} from '@utils/functions';
 import {getFileExtension} from '@utils/image';
 import {useEffect, useRef, useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
@@ -65,7 +65,7 @@ export const EditImageScreen = (props: Props) => {
       {
         editedImage: {
           ...props.route.params.photo,
-          data: base64,
+          data: satinizeBase64(base64),
           compress: false,
         },
         photos: props.route.params?.photos,

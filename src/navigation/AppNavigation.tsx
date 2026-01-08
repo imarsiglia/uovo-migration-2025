@@ -1,119 +1,69 @@
-import {NavigationContainer} from '@react-navigation/native';
-import {useEffect, useState} from 'react';
-import {enableScreens} from 'react-native-screens';
-// import {connect} from 'react-redux';
-// import * as UserActions from '../actions/user';
-// import Splash from '../screens/splash';
-// import {fetchData} from '../utils/fetch';
-//Screens
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-// import ConfirmPhoto from '../components/general/ConfirmPhoto';
-// import AddLabor from '../screens/addLabor';
-// import AddLocationNote from '../screens/addLocationNote';
-// import AddMaterials from '../screens/addMaterials';
-// import Attachments from '../screens/attachments';
-// import ClientLocations from '../screens/clientLocations';
-// import EditImage from '../screens/editImage';
-// import Images from '../screens/images';
-// import ItemDetail from '../screens/itemDetail';
-// import ReportMaterialsItemDetail from '../screens/itemDetails/reportMaterials';
-// import LaborReport from '../screens/laborReport';
-// import LocationNotes from '../screens/locationNotes';
-
-// import ReportMaterials from '../screens/reportMaterials';
-// import Reports from '../screens/reports';
-// import Signature from '../screens/signature';
-// import TakeImages from '../screens/takeImages';
-
-// import VisualizePdf from '../screens/visualizePdf';
-// import VisualizePhoto from '../screens/visualizePhoto';
-
-//Condition report
-// import {GeneralModal} from '../components/general/GeneralModal';
-// import OfflineComponentSync from '../components/offline/OfflineComponentSync';
-// import OfflineCompSecondSync from '../components/offline/OfflineCompSecondSync';
-// import ConditionSides from '../screens/conditionReport/ConditionSides';
-// import Gallery from '../screens/conditionReport/Gallery';
-// import GalleryDetail from '../screens/conditionReport/GalleryDetail';
-// import PhotoCapture from '../screens/conditionReport/PhotoCapture';
-// import PhotoCaptureZoom from '../screens/conditionReport/PhotoCaptureZoom';
-// import PhotoCaptureZoomEdit from '../screens/conditionReport/PhotoCaptureZoomEdit';
-// import PhotoDetail from '../screens/conditionReport/PhotoDetail';
-// import PhotoView from '../screens/conditionReport/PhotoView';
-// import PhotoZoom from '../screens/conditionReport/PhotoZoom';
-// import ZoomScreen from '../screens/conditionReport/ZoomScreen';
-// import {isInternet} from '../utils/internet';
-// import {
-//   TOKEN_KEY_STORAGE,
-//   USER_INFO_KEY_STORAGE,
-//   getFromStorage,
-//   saveToStorage,
-// } from '../utils/storage';
-
-//national shuttle
 import {useRefreshToken} from '@api/hooks/HooksAuthentication';
+import CallPhoneSheet from '@components/bottomSheets/CallPhoneSheet';
+import {ModalDialog} from '@components/commons/modals/ModalDialog';
+import {ModalLoading} from '@components/commons/modals/ModalLoading';
+import {ModalOffline} from '@components/offline/ModalOffline';
 import {Splash} from '@components/splash/Splash';
 import {CustomStatusBar} from '@components/statusbar/CustomStatusBar';
+import {PortalHost} from '@gorhom/portal';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {AccountScreen} from '@screens/account/AccountScreen';
 import {LoginEmailScreen} from '@screens/auth/LoginEmailScreen';
+import {VisualizeBolScreen} from '@screens/bol/VisualizeBolScreen';
+import BaseImageScreen from '@screens/commons/BaseImageScreen';
+import TaskPhotoCarouselScreen from '@screens/commons/TaskPhotoCarouselScreen';
+import TaskPhotoViewerScreen from '@screens/commons/TaskPhotoViewerScreen';
 import {ContactScreen} from '@screens/contact/ContactScreen';
 import {HelpDeskScreen} from '@screens/contact/HelpDeskScreen';
+import {DigitalIdScreen} from '@screens/digitalid/DigitalIdScreen';
 import {EditImageScreen} from '@screens/editImage/EditImageScreen';
+import {EditImageURIScreen} from '@screens/editImage/EditImageURIScreen';
 import {HomeScreen} from '@screens/home/HomeScreen';
+import {ImagesScreen} from '@screens/images/ImagesScreen';
+import {SaveImagesScreen} from '@screens/images/SaveImagesScreen';
+import {AddInventoryScreen} from '@screens/inventory/AddInventoryScreen';
+import {InventoryScreen} from '@screens/inventory/InventoryScreen';
+import {ItemDetailScreen} from '@screens/inventory/ItemDetailScreen';
+import {TakeDimensionsScreen} from '@screens/inventory/TakeDimensions';
+import {AddLaborReportScreen} from '@screens/laborreport/AddLaborReportScreen';
+import {LaborReportScreen} from '@screens/laborreport/LaborReportScreen';
+import {LocationNotesScreen} from '@screens/location/LocationNotesScreen';
+import {ReportIssueScreen} from '@screens/location/ReportIssueScreen';
+import {SaveLocationNoteScreen} from '@screens/location/SaveLocationNoteScreen';
+import {InventoryNSScreen} from '@screens/nationalshuttle/InventoryNSScreen';
+import {NotesScreen} from '@screens/notes/NotesScreen';
+import {SaveNoteScreen} from '@screens/notes/SaveNoteScreen';
+import {EditPieceCountScreen} from '@screens/piececount/EditPieceCountScreen';
+import {EditProfileScreen} from '@screens/profile/EditProfileScreen';
+import {ReportMaterialsScreen} from '@screens/reportmaterials/ReportMaterialsScreen';
+import {SaveReportMaterialScreen} from '@screens/reportmaterials/SaveReportMaterialScreen';
+import {ConditionCheckScreen} from '@screens/reports/ConditionCheckScreen';
+import {ConditionReportScreen} from '@screens/reports/ConditionReportScreen';
+import {ConditionSides} from '@screens/reports/photos/ConditionSidesScreen';
+import {GalleryCondition} from '@screens/reports/photos/GalleryConditionScreen';
+import PhotoCapture from '@screens/reports/photos/PhotoCapture';
+import PhotoCaptureZoom from '@screens/reports/photos/PhotoCaptureZoom';
+import PhotoCaptureZoomEdit from '@screens/reports/photos/PhotoCaptureZoomEdit';
+import {PhotoDetailCondition} from '@screens/reports/photos/PhotoDetailConditionScreen';
+import ZoomScreen from '@screens/reports/photos/ZoomScreen';
+import {ReportsScreen} from '@screens/reports/ReportsScreen';
+import {SignaturesScreen} from '@screens/signatures/SignaturesScreen';
+import {TakeSignatureScreen} from '@screens/signatures/TakeSignatureScreen';
+import {TopsheetScreen} from '@screens/topsheet/TopsheetScreen';
+import {WoAttachmentScreen} from '@screens/woattachments/WoAttachmentScreen';
 import {useAuth} from '@store/auth';
 import {getDeviceInfo} from '@utils/functions';
 import {isInternet} from '@utils/internet';
+import {navigationRef} from '@utils/navigationService';
+import {useEffect, useState} from 'react';
+import {configureFontAwesomePro} from 'react-native-fontawesome-pro';
+import {enableScreens} from 'react-native-screens';
 import {LoginScreen} from '../screens/auth/LoginScreen';
 import {RootStackParamList, RoutesNavigation} from './types';
-import {AccountScreen} from '@screens/account/AccountScreen';
-import Icon, {configureFontAwesomePro} from 'react-native-fontawesome-pro';
-import {TopsheetScreen} from '@screens/topsheet/TopsheetScreen';
-import {ReportIssueScreen} from '@screens/location/ReportIssueScreen';
-import {LocationNotesScreen} from '@screens/location/LocationNotesScreen';
-import {SaveLocationNoteScreen} from '@screens/location/SaveLocationNoteScreen';
-import {DigitalIdScreen} from '@screens/digitalid/DigitalIdScreen';
-import {VisualizeBolScreen} from '@screens/bol/VisualizeBolScreen';
-import {SignaturesScreen} from '@screens/signatures/SignaturesScreen';
-import {TakeSignatureScreen} from '@screens/signatures/TakeSignatureScreen';
-import {NotesScreen} from '@screens/notes/NotesScreen';
-import {SaveNoteScreen} from '@screens/notes/SaveNoteScreen';
-import {ReportMaterialsScreen} from '@screens/reportmaterials/ReportMaterialsScreen';
-import {SaveReportMaterialScreen} from '@screens/reportmaterials/SaveReportMaterialScreen';
-import BaseImageScreen from '@screens/commons/BaseImageScreen';
-import {WoAttachmentScreen} from '@screens/woattachments/WoAttachmentScreen';
-import {EditPieceCountScreen} from '@screens/piececount/EditPieceCountScreen';
-import {LaborReportScreen} from '@screens/laborreport/LaborReportScreen';
-import {AddLaborReportScreen} from '@screens/laborreport/AddLaborReportScreen';
-import {ModalDialog} from '@components/commons/modals/ModalDialog';
-import {ModalLoading} from '@components/commons/modals/ModalLoading';
-import {PortalHost} from '@gorhom/portal';
-import {InventoryScreen} from '@screens/inventory/InventoryScreen';
-import {AddInventoryScreen} from '@screens/inventory/AddInventoryScreen';
-import {ItemDetailScreen} from '@screens/inventory/ItemDetailScreen';
-import {TakeDimensionsScreen} from '@screens/inventory/TakeDimensions';
-import {ReportsScreen} from '@screens/reports/ReportsScreen';
-import {ConditionReportScreen} from '@screens/reports/ConditionReportScreen';
-import {ConditionCheckScreen} from '@screens/reports/ConditionCheckScreen';
-import {EditProfileScreen} from '@screens/profile/EditProfileScreen';
-import CallPhoneSheet from '@components/bottomSheets/CallPhoneSheet';
-import {navigationRef} from '@utils/navigationService';
-import {InventoryNSScreen} from '@screens/nationalshuttle/InventoryNSScreen';
-import {OfflineBanner} from '@components/offline/OfflineBanner';
-import {ModalOffline} from '@components/offline/ModalOffline';
-import {ImagesScreen} from '@screens/images/ImagesScreen';
-import TaskPhotoCarouselScreen from '@screens/commons/TaskPhotoCarouselScreen';
-import {SaveImagesScreen} from '@screens/images/SaveImagesScreen';
-import {GalleryCondition} from '@screens/reports/photos/GalleryConditionScreen';
-import {PhotoDetailCondition} from '@screens/reports/photos/PhotoDetailConditionScreen';
-import PhotoCaptureZoomEdit from '@screens/reports/photos/PhotoCaptureZoomEdit';
-import ZoomScreen from '@screens/reports/photos/ZoomScreen';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {LayoutScreen} from '@components/layouts/LayoutScreen';
 import {COLORS} from '@styles/colors';
-import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
-import {BackButton} from '@components/commons/buttons/BackButton';
-import {ConditionSides} from '@screens/reports/photos/ConditionSidesScreen';
-import PhotoCapture from '@screens/reports/photos/PhotoCapture';
-import PhotoCaptureZoom from '@screens/reports/photos/PhotoCaptureZoom';
-import TaskPhotoViewerScreen from '@screens/commons/TaskPhotoViewerScreen';
-import { EditImageURIScreen } from '@screens/editImage/EditImageURIScreen';
 
 // LogBox.ignoreLogs([
 //   'Non-serializable values were found in the navigation state',
@@ -128,6 +78,8 @@ export const AppNavigation = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const {token, user, setSession, clearSession} = useAuth();
   const {mutateAsync: refreshToken, isSuccess, isError} = useRefreshToken();
+
+  const {top} = useSafeAreaInsets();
 
   useEffect(() => {
     if (token) {
@@ -164,202 +116,162 @@ export const AppNavigation = () => {
                 ? RoutesNavigation.EditProfile
                 : RoutesNavigation.Home
             }
-            screenOptions={{headerShown: false}}>
+            screenOptions={{
+              headerShown: false,
+            }}>
             <Stack.Screen
               name={RoutesNavigation.Login}
-              component={LoginScreen}
+              component={withLayout(LoginScreen, COLORS.primary)}
             />
             <Stack.Screen
               name={RoutesNavigation.EditProfile}
-              component={EditProfileScreen}
+              component={withLayout(EditProfileScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.ContactUs}
-              component={ContactScreen}
+              component={withLayout(ContactScreen)}
             />
-            <Stack.Screen name={RoutesNavigation.Home} component={HomeScreen} />
+            <Stack.Screen
+              name={RoutesNavigation.Home}
+              component={withLayout(HomeScreen)}
+            />
             <Stack.Screen
               name={RoutesNavigation.Topsheet}
-              component={TopsheetScreen}
+              component={withLayout(TopsheetScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.EditImage}
-              component={EditImageScreen}
+              component={withLayout(EditImageScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.EditImageUri}
-              component={EditImageURIScreen}
+              component={withLayout(EditImageURIScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.LoginEmail}
-              component={LoginEmailScreen}
+              component={withLayout(LoginEmailScreen, COLORS.primary)}
             />
             <Stack.Screen
               name={RoutesNavigation.HelpDesk}
-              component={HelpDeskScreen}
+              component={withLayout(HelpDeskScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.Account}
-              component={AccountScreen}
+              component={withLayout(AccountScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.ReportIssue}
-              component={ReportIssueScreen}
+              component={withLayout(ReportIssueScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.LocationNotes}
-              component={LocationNotesScreen}
+              component={withLayout(LocationNotesScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.SaveLocationNotes}
-              component={SaveLocationNoteScreen}
+              component={withLayout(SaveLocationNoteScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.DigitalId}
-              component={DigitalIdScreen}
+              component={withLayout(DigitalIdScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.VisualizeBOL}
-              component={VisualizeBolScreen}
+              component={withLayout(VisualizeBolScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.Signatures}
-              component={SignaturesScreen}
+              component={withLayout(SignaturesScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.TakeSignature}
-              component={TakeSignatureScreen}
+              component={withLayout(TakeSignatureScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.Notes}
-              component={NotesScreen}
+              component={withLayout(NotesScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.SaveNote}
-              component={SaveNoteScreen}
+              component={withLayout(SaveNoteScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.ReportMaterials}
-              component={ReportMaterialsScreen}
+              component={withLayout(ReportMaterialsScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.SaveReportMaterials}
-              component={SaveReportMaterialScreen}
+              component={withLayout(SaveReportMaterialScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.WoAttachment}
-              component={WoAttachmentScreen}
+              component={withLayout(WoAttachmentScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.EditPieceCount}
-              component={EditPieceCountScreen}
+              component={withLayout(EditPieceCountScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.LaborReport}
-              component={LaborReportScreen}
+              component={withLayout(LaborReportScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.AddLaborReport}
-              component={AddLaborReportScreen}
+              component={withLayout(AddLaborReportScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.Inventory}
-              component={InventoryScreen}
+              component={withLayout(InventoryScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.AddInventory}
-              component={AddInventoryScreen}
+              component={withLayout(AddInventoryScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.ItemDetail}
-              component={ItemDetailScreen}
+              component={withLayout(ItemDetailScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.TakeDimensions}
-              component={TakeDimensionsScreen}
+              component={withLayout(TakeDimensionsScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.InventoryNationalShuttle}
-              component={InventoryNSScreen}
+              component={withLayout(InventoryNSScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.Images}
-              component={ImagesScreen}
+              component={withLayout(ImagesScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.SaveImages}
-              component={SaveImagesScreen}
+              component={withLayout(SaveImagesScreen)}
             />
             {/* condition report / condition check */}
             <Stack.Screen
               name={RoutesNavigation.Reports}
-              component={ReportsScreen}
+              component={withLayout(ReportsScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.ConditionReport}
-              component={ConditionReportScreen}
+              component={withLayout(ConditionReportScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.ConditionCheck}
-              component={ConditionCheckScreen}
+              component={withLayout(ConditionCheckScreen)}
             />
             <Stack.Screen
               name={RoutesNavigation.GalleryCondition}
-              component={GalleryCondition}
+              component={withLayout(GalleryCondition)}
             />
             <Stack.Screen
               name={RoutesNavigation.PhotoDetailCondition}
-              component={PhotoDetailCondition}
+              component={withLayout(PhotoDetailCondition)}
             />
 
             <Stack.Screen
               name={RoutesNavigation.ZoomScreen}
-              component={ZoomScreen}
-              // @ts-ignore
-              options={({navigation}) => ({
-                // headerShown: true,
-                // headerLargeStyle: {
-                //   height: 30
-                // },
-                // headerStyle: {
-                //   backgroundColor: COLORS.bgWhite,
-                //   height: 30
-                // },
-                // headerTitleStyle: {
-                //   color: COLORS.titleColor,
-                // },
-                // headerLeft: () => (
-                //   <BackButton
-                //     style={{marginLeft: -10}}
-                //     title="Back"
-                //     onPress={navigation.goBack}
-                //   />
-                // ),
-                // headerBackTitleStyle: {
-                //   color: COLORS.gray,
-                // },
-              })}
-
-              // options={{
-              //   headerShown: true,
-              //   headerStyle: {
-              //     backgroundColor: COLORS.bgWhite,
-              //   },
-              //   headerTitleStyle: {
-              //     color: COLORS.titleColor,
-              //   },
-              //   headerBackImageSource: (
-              //     <Icon
-              //       name="chevron-left"
-              //       color={COLORS.gray}
-              //       type="light"
-              //       size={15}
-              //     />
-              //   ),
-              //   headerBackTitleStyle: {
-              //     color: COLORS.gray
-              //   }
-              // }}
+              component={withLayout(ZoomScreen)}
             />
 
             <Stack.Screen
@@ -379,7 +291,7 @@ export const AppNavigation = () => {
             />
             <Stack.Screen
               name={RoutesNavigation.ConditionSides}
-              component={ConditionSides}
+              component={withLayout(ConditionSides)}
             />
 
             {/* visualizar imagenes */}
@@ -393,7 +305,7 @@ export const AppNavigation = () => {
             />
             <Stack.Screen
               name={RoutesNavigation.TaskPhotoViewerScreen}
-              component={TaskPhotoViewerScreen}
+              component={withLayout(TaskPhotoViewerScreen)}
             />
           </Stack.Navigator>
           <ModalDialog />
@@ -407,5 +319,16 @@ export const AppNavigation = () => {
         // <OfflineCompSecondSync />
       )}
     </>
+  );
+};
+
+const withLayout = <P extends object>(
+  Component: React.ComponentType<P>,
+  backgroundColor?: string,
+) => {
+  return (props: P) => (
+    <LayoutScreen backgroundColor={backgroundColor}>
+      <Component {...props} />
+    </LayoutScreen>
   );
 };

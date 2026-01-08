@@ -58,6 +58,7 @@ import {
   KeyboardAwareScrollView,
   KeyboardStickyView,
 } from 'react-native-keyboard-controller';
+import {useCustomInsetBottom} from '@hooks/useCustomInsetBottom';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SaveImages'>;
 
@@ -106,7 +107,7 @@ const usePhotoManagement = (
   useEffect(() => {
     if (!item || isInitialized) return;
 
-    console.log('🎯 Initializing photos:', initialGroupPhotos.length);
+    // console.log('🎯 Initializing photos:', initialGroupPhotos.length);
 
     const initPhotos = initialGroupPhotos.map((p, index) => {
       // 🔥 Validar base64
@@ -126,12 +127,12 @@ const usePhotoManagement = (
         uri: hasValidPath ? p.path : undefined,
       };
 
-      console.log(`📸 Photo ${index}:`, {
-        hasBase64: hasValidBase64,
-        hasPath: hasValidPath,
-        base64Length: p.photo?.length,
-        path: p.path,
-      });
+      // console.log(`📸 Photo ${index}:`, {
+      //   hasBase64: hasValidBase64,
+      //   hasPath: hasValidPath,
+      //   base64Length: p.photo?.length,
+      //   path: p.path,
+      // });
 
       return photo;
     });
@@ -182,7 +183,7 @@ const usePhotoManagement = (
 
           if (!isMounted.current) return;
 
-          console.log(`✅ Cached high-res for photo ${base.id}`);
+          // console.log(`✅ Cached high-res for photo ${base.id}`);
 
           updates.push({
             index: existingIndex,
@@ -208,7 +209,7 @@ const usePhotoManagement = (
           });
           return next;
         });
-        console.log(`🔄 Updated ${updates.length} photos with high-res`);
+        // console.log(`🔄 Updated ${updates.length} photos with high-res`);
       }
 
       setLoadingHighRes(false);
@@ -461,6 +462,7 @@ export const SaveImagesScreen = (props: Props) => {
   const {goBack, navigate, addListener} = useCustomNavigation();
   const {online} = useOnline();
   const {id: idJob} = useTopSheetStore((s) => s.jobDetail!);
+  const insetBottom = useCustomInsetBottom();
 
   const item = props.route.params?.item;
 
@@ -528,21 +530,35 @@ export const SaveImagesScreen = (props: Props) => {
   }, []);
 
   const initCamera = useCallback(async () => {
-    closeSheet();
-    loadingWrapperPromise(async () => {
-      await nextFrame();
+    if (isAndroid()) {
+      closeSheet();
+      loadingWrapperPromise(async () => {
+        await nextFrame();
+        const res = await onLaunchCamera(
+          () => {},
+          () => {},
+          {
+            compressImageQuality: 0.8,
+            includeBase64: true,
+            writeTempFile: true,
+          },
+        );
+        await nextFrame();
+        await addPhotos(res as ImageType);
+      }).catch(() => {});
+    } else {
       const res = await onLaunchCamera(
         () => {},
         () => {},
         {
-          compressImageQuality: 0.9, // 90% calidad
+          compressImageQuality: 0.8,
           includeBase64: true,
           writeTempFile: true,
         },
       );
-      await nextFrame();
-      await addPhotos(res as ImageType);
-    }).catch(console.error);
+      closeSheet();
+      addPhotos(res as ImageType[]);
+    }
   }, [closeSheet, addPhotos]);
 
   const initGallery = useCallback(async () => {
@@ -556,14 +572,14 @@ export const SaveImagesScreen = (props: Props) => {
           {
             maxFiles: totalMissingPhotos,
             multiple: true,
-            compressImageQuality: 0.9,
+            compressImageQuality: 0.8,
             includeBase64: true,
             writeTempFile: true,
           },
         );
         await nextFrame();
         await addPhotos(res as ImageType[]);
-      }).catch(console.error);
+      }).catch(() => {});
     } else {
       const res = await onSelectImage(
         () => {},
@@ -571,7 +587,7 @@ export const SaveImagesScreen = (props: Props) => {
         {
           maxFiles: totalMissingPhotos,
           multiple: true,
-          compressImageQuality: 0.9,
+          compressImageQuality: 0.8,
           includeBase64: true,
           writeTempFile: true,
         },
@@ -679,6 +695,8 @@ export const SaveImagesScreen = (props: Props) => {
 
           isProcessing.current = false;
           goBack();
+        }).catch(() => {
+          isProcessing.current = false;
         });
       } catch (e) {
         console.error('Save error:', e);
@@ -812,7 +830,8 @@ export const SaveImagesScreen = (props: Props) => {
           </View>
         </KeyboardAwareScrollView>
 
-        <KeyboardStickyView style={styles.containerBottom}>
+        <KeyboardStickyView
+          style={[styles.containerBottom, {bottom: -insetBottom}]}>
           <View style={styles.bottomButtons}>
             <PressableOpacity
               style={styles.btnDeletePhoto}
@@ -931,7 +950,6 @@ const styles = StyleSheet.create({
   bottomButtons: {
     flexDirection: 'row',
     marginTop: 10,
-    marginBottom: 20,
     justifyContent: 'space-between',
   },
   scrollview: {

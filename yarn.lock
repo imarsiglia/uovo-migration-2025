@@ -1133,14 +1133,6 @@
   dependencies:
     tslib "^2.4.0"
 
-"@equinor/mad-components@*":
-  version "0.24.2"
-  resolved "https://registry.yarnpkg.com/@equinor/mad-components/-/mad-components-0.24.2.tgz#46ca41bf907ca16dcab81879d6e0276adca298fc"
-  integrity sha512-1KBMky6xaJZADfu5XMmT7Pv8dI8w2lheqfqODNgkYcZIH81s/zv7Q+uExt1lM3U0WFVqyzNt0OUopsTgPndKcA==
-  dependencies:
-    "@floating-ui/react-native" "^0.10.1"
-    react-error-boundary "^4.0.11"
-
 "@equinor/mad-components@0.22.0":
   version "0.22.0"
   resolved "https://registry.yarnpkg.com/@equinor/mad-components/-/mad-components-0.22.0.tgz#68afc48117205031324737fb653a14289baab703"
@@ -1148,13 +1140,6 @@
   dependencies:
     "@floating-ui/react-native" "^0.10.1"
     react-error-boundary "^4.0.11"
-
-"@equinor/react-native-skia-draw@0.5.8":
-  version "0.5.8"
-  resolved "https://registry.yarnpkg.com/@equinor/react-native-skia-draw/-/react-native-skia-draw-0.5.8.tgz#1a8694138efc75f4c04bea459f5155691abb351c"
-  integrity sha512-45W0uzJrxus5BQVuxrkE0McrFynAEUcrNpthz7C4dJcqyDyX5EUvypeuITmSq5hNcUkgSJ0Ns7XzrhUWo+oqcw==
-  dependencies:
-    "@equinor/mad-components" "*"
 
 "@eslint-community/eslint-utils@^4.2.0", "@eslint-community/eslint-utils@^4.4.0":
   version "4.9.0"
@@ -2700,14 +2685,6 @@
   resolved "https://registry.yarnpkg.com/@rneui/themed/-/themed-4.0.0-rc.8.tgz#5c0e1aaa3d190ead88936693c5cef50ec404cd05"
   integrity sha512-8L/XOrL9OK/r+/iBLvx63TbIdZOXF8SIjN9eArMYm6kRbMr8m4BitXllDN8nBhBsSPNYvL6EAgjk+i2MfY4sBA==
 
-"@shopify/react-native-skia@2.2.3":
-  version "2.2.3"
-  resolved "https://registry.yarnpkg.com/@shopify/react-native-skia/-/react-native-skia-2.2.3.tgz#18ba6c12f5e23a851bc3738576ae3bdb53427097"
-  integrity sha512-B2g/V5HVbsGblUDjETDh+Vo91PQoZnqufYcXBFA3zD6GkNG+BNyU4SiDnXye27hpJ+ZvcJopXGwDCc4b2m8dqQ==
-  dependencies:
-    canvaskit-wasm "0.40.0"
-    react-reconciler "0.31.0"
-
 "@sideway/address@^4.1.5":
   version "4.1.5"
   resolved "https://registry.yarnpkg.com/@sideway/address/-/address-4.1.5.tgz#4bc149a0076623ced99ca8208ba780d65a99b9d5"
@@ -2744,7 +2721,7 @@
   dependencies:
     "@sinonjs/commons" "^3.0.0"
 
-"@sourcetoad/react-native-sketch-canvas@^2.4.1":
+"@sourcetoad/react-native-sketch-canvas@2.4.1":
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/@sourcetoad/react-native-sketch-canvas/-/react-native-sketch-canvas-2.4.1.tgz#6d20eab33a6f96d9500a53b79ccab737b0a6a248"
   integrity sha512-r1mDSUIuSAru1OpPmZED4xFrW+i7/SIvdsa+bOMSH9UJCSfwnYO1lzKVoWG+J80OXsiE0nNA58OJyBlVsN83Vw==
@@ -3206,11 +3183,6 @@
   version "9.3.1"
   resolved "https://registry.yarnpkg.com/@vscode/sudo-prompt/-/sudo-prompt-9.3.1.tgz#c562334bc6647733649fd42afc96c0eea8de3b65"
   integrity sha512-9ORTwwS74VaTn38tNbQhsA5U44zkJfcb0BdTSyyG6frP4e8KMtHuTXYmwefe5dpL8XB1aGSIVTaLjD3BbWb5iA==
-
-"@webgpu/types@0.1.21":
-  version "0.1.21"
-  resolved "https://registry.yarnpkg.com/@webgpu/types/-/types-0.1.21.tgz#b181202daec30d66ccd67264de23814cfd176d3a"
-  integrity sha512-pUrWq3V5PiSGFLeLxoGqReTZmiiXwY3jRkIG5sLLKjyqNxrwm/04b4nw7LSmGWJcKk59XOM/YRTUwOzo4MMlow==
 
 "@xmldom/xmldom@^0.8.8":
   version "0.8.11"
@@ -3813,13 +3785,6 @@ caniuse-lite@^1.0.30001754:
   version "1.0.30001757"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001757.tgz#a46ff91449c69522a462996c6aac4ef95d7ccc5e"
   integrity sha512-r0nnL/I28Zi/yjk1el6ilj27tKcdjLsNqAOZr0yVjWPrSQyHgKI2INaEWw21bAQSv2LXRt1XuCS/GomNpWOxsQ==
-
-canvaskit-wasm@0.40.0:
-  version "0.40.0"
-  resolved "https://registry.yarnpkg.com/canvaskit-wasm/-/canvaskit-wasm-0.40.0.tgz#61a77657259fddfc0025ad1c3f57ac8d4d5850ff"
-  integrity sha512-Od2o+ZmoEw9PBdN/yCGvzfu0WVqlufBPEWNG452wY7E9aT8RBE+ChpZF526doOlg7zumO4iCS+RAeht4P0Gbpw==
-  dependencies:
-    "@webgpu/types" "0.1.21"
 
 chalk@^2.4.2:
   version "2.4.2"
@@ -8141,13 +8106,6 @@ react-native@0.80.2:
     ws "^6.2.3"
     yargs "^17.6.2"
 
-react-reconciler@0.31.0:
-  version "0.31.0"
-  resolved "https://registry.yarnpkg.com/react-reconciler/-/react-reconciler-0.31.0.tgz#6b7390fe8fab59210daf523d7400943973de1458"
-  integrity sha512-7Ob7Z+URmesIsIVRjnLoDGwBEG/tVitidU0nMsqX/eeJaLY89RISO/10ERe0MqmzuKUUB1rmY+h1itMbUHg9BQ==
-  dependencies:
-    scheduler "^0.25.0"
-
 react-refresh@^0.14.0:
   version "0.14.2"
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.14.2.tgz#3833da01ce32da470f1f936b9d477da5c7028bf9"
@@ -8417,11 +8375,6 @@ scheduler@0.26.0, scheduler@^0.26.0:
   version "0.26.0"
   resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.26.0.tgz#4ce8a8c2a2095f13ea11bf9a445be50c555d6337"
   integrity sha512-NlHwttCI/l5gCPR3D1nNXtWABUmBwvZpEQiD4IXSbIDq8BzLIK/7Ir5gTFSGZDUu37K5cMNp0hFtzO38sC7gWA==
-
-scheduler@^0.25.0:
-  version "0.25.0"
-  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.25.0.tgz#336cd9768e8cceebf52d3c80e3dcf5de23e7e015"
-  integrity sha512-xFVuu11jh+xcO7JOAGJNOXld8/TcEHK/4CituBUeUb5hqxJLj9YuemAEuvm9gQ/+pgXYfbQuqAkiYu+u7YEsNA==
 
 semver@^6.3.0, semver@^6.3.1:
   version "6.3.1"

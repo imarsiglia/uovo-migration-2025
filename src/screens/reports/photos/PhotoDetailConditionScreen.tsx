@@ -235,6 +235,8 @@ export const PhotoDetailCondition = (props: Props) => {
             isProcessing.current = false;
             showErrorToastMessage('Error while saving photo, please reattempt');
           }
+        }).catch(() => {
+          isProcessing.current = false;
         });
       } else {
         const clientId = item?.clientId ?? generateUUID();
