@@ -5,52 +5,45 @@ import {PERMISSIONS, request, RESULTS} from 'react-native-permissions';
 import {PhotoFile} from 'react-native-vision-camera';
 import {isAndroid} from './functions';
 import {showToastMessage} from './toast';
-import {cameraLifecycle} from './cameraLifecycle';
 
 const PHOTO_DIR = `${RNFS.CachesDirectoryPath}/photos`;
-
-const isUserCancel = (error: any) => error?.code === 'E_PICKER_CANCELLED';
 
 export const onLaunchCamera = async (
   closeModal: () => void,
   callback: (photo?: ImageType | ImageType[], path?: string) => void,
   options?: Options,
-  onCancel?: () => void,
 ) => {
+  console.log("on launch camera");
   let granted = true;
   if (isAndroid()) {
-    granted = await requestCameraPermission();
-    if (!granted) {
-      showToastMessage('Camera permission not granted');
-      throw new Error('Camera permission not granted');
+    granted = await requestWriteExternalStorage();
+  }
+  console.log("granted")
+  console.log(granted)
+  if (!granted) throw new Error('Read media permission not granted');
+  if (isAndroid()) {
+    granted = await requestWriteExternalStorage();
+    if (granted) {
+      granted = await requestCameraPermission();
     }
   }
-  cameraLifecycle.notifyBeforeOpen();
+  console.log('PERMISO CONCEDIDO DE CAMARA');
   return ImageCropPicker.openCamera({
     compressImageQuality: 0.7,
     includeBase64: true,
     writeTempFile: false,
     mediaType: 'photo',
     forceJpg: true,
-    cropping: true,
     ...options,
   })
     .then((image) => {
       closeModal?.();
-      manageImage(image as any, callback);
+      manageImage(image, callback);
       return image as ImageType | ImageType[];
     })
-    .catch((error) => {
-      console.log("error?.code")
-      console.log(error?.code)
-      if (isUserCancel(error) && onCancel) {
-        onCancel();
-      }
-      showToastMessage(error?.message ?? 'Picture not captured');
-    })
-    .finally(() => {
-      cameraLifecycle.notifyAfterClose();
-    });
+    .catch((error) =>
+      showToastMessage(error?.message ?? 'Picture not captured'),
+    );
 };
 
 export const onSelectImage = async (
@@ -68,14 +61,14 @@ export const onSelectImage = async (
     mediaType: 'photo',
     includeBase64: true,
     writeTempFile: false,
-    compressImageQuality: 0.5,
+    compressImageQuality: 0.7,
     forceJpg: true,
     waitAnimationEnd: false,
     ...options,
   })
     .then((image) => {
       closeModal?.();
-      manageImage(image as any, callback);
+      manageImage(image, callback);
       return image as ImageType | ImageType[];
     })
     .catch((error) => {

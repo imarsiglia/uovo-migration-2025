@@ -48,17 +48,11 @@ export const TimelineViewCmp = () => {
     data: dataTimeline,
     isLoading: isLoadingTimeline,
     refetch,
-  } = useGetTimeline(selectedDate!);
+  } = useGetTimeline(selectedDate!);  
 
   useEffect(() => {
     return () => {
-      console.log("TIMELINE UNMOUNT")
-    }
-  }, [])
-
-  useEffect(() => {
-    return () => {
-      // setSelectedDate(getFormattedDate(new Date(), 'YYYY-MM-DD'));
+      setSelectedDate(getFormattedDate(new Date(), 'YYYY-MM-DD'));
     };
   }, []);
 

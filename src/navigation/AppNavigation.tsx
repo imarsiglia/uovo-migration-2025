@@ -65,6 +65,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {LayoutScreen} from '@components/layouts/LayoutScreen';
 import {COLORS} from '@styles/colors';
 import {CameraScreen} from '@screens/camera/CameraScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // LogBox.ignoreLogs([
 //   'Non-serializable values were found in the navigation state',
@@ -80,7 +81,22 @@ export const AppNavigation = () => {
   const {token, user, setSession, clearSession} = useAuth();
   const {mutateAsync: refreshToken, isSuccess, isError} = useRefreshToken();
 
-  const {top} = useSafeAreaInsets();
+  const [isReady, setIsReady] = useState(false);
+  const [initialState, setInitialState] = useState();
+
+  useEffect(() => {
+    const restoreState = async () => {
+      try {
+        const savedState = await AsyncStorage.getItem('NAVIGATION_STATE');
+        const state = savedState ? JSON.parse(savedState) : undefined;
+        setInitialState(state);
+      } finally {
+        setIsReady(true);
+      }
+    };
+
+    restoreState();
+  }, []);
 
   useEffect(() => {
     if (token) {
@@ -102,12 +118,21 @@ export const AppNavigation = () => {
     }
   }, []);
 
+  if (!isReady) {
+    return null;
+  }
+
   return (
     <>
       {/* {loading == true && <Splash />} */}
       {!isSuccess && !isError && !isLoaded && <Splash />}
       {(isSuccess || isLoaded) && (
-        <NavigationContainer ref={navigationRef}>
+        <NavigationContainer
+          ref={navigationRef}
+          initialState={initialState}
+          onStateChange={(state) =>
+            AsyncStorage.setItem('NAVIGATION_STATE', JSON.stringify(state))
+          }>
           <CustomStatusBar />
           <Stack.Navigator
             initialRouteName={
