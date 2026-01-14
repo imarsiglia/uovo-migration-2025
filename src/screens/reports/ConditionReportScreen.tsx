@@ -240,6 +240,7 @@ export const ConditionReportScreen = (props: Props) => {
   useEffect(() => {
     setConditionType(CONDITION_TYPES.ConditionReport);
     return () => {
+      console.log("condition report UNMOUNT")
       setConditionType(undefined);
       setConditionId(undefined);
       setConditionClientId(undefined);

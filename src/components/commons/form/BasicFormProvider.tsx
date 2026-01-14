@@ -25,6 +25,7 @@ export type SubmitModulesFormProps<T> = {
   defaultValue?: any;
   resetDefaultValue?: boolean;
   key?: string;
+  onReady?: (methods: any) => void;
 };
 
 function BasicFormProviderInner<T>(
@@ -34,6 +35,7 @@ function BasicFormProviderInner<T>(
     schema,
     resetDefaultValue,
     key,
+    onReady,
   }: SubmitModulesFormProps<T>,
   ref: Ref<BasicFormHandle<T>>,
 ) {
@@ -42,7 +44,12 @@ function BasicFormProviderInner<T>(
     mode: 'onTouched',
     reValidateMode: 'onChange',
     resolver: schema ? yupResolver(schema) : undefined,
+    shouldUnregister: false,
   });
+
+  useEffect(() => {
+    onReady?.(currentMethods);
+  }, []);
 
   useImperativeHandle(
     ref,

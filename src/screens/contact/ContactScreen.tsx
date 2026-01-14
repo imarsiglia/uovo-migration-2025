@@ -33,7 +33,6 @@ import {
 } from 'react-native-keyboard-controller';
 import {useCustomNavigation} from 'src/hooks/useCustomNavigation';
 import {ContactUsSchema, ContactUsSchemaType} from 'src/types/schemas';
-import {StatusBar as StatusBarComponent} from 'react-native-scrollable-navigation-bar';
 
 export const ContactScreen = () => {
   const {goBack, navigate} = useCustomNavigation();
@@ -75,7 +74,14 @@ export const ContactScreen = () => {
       });
   }, []);
 
-  const generateImagePathIOS = useCallback(
+  const goToEditImageFromCamera = useCallback(
+    (photo?: ImageType | ImageType[]) => {
+      navigate(RoutesNavigation.EditImage, {photo, backIndex: 2});
+    },
+    [],
+  );
+
+  const goToEditImage = useCallback(
     (photo?: ImageType) => {
       navigate(RoutesNavigation.EditImage, {photo});
     },
@@ -84,9 +90,9 @@ export const ContactScreen = () => {
 
   const initEdit = useCallback(
     (image: ImageType) => {
-      generateImagePathIOS(image);
+      goToEditImage(image);
     },
-    [generateImagePathIOS],
+    [goToEditImage],
   );
 
   const initOptions = useCallback(() => {
@@ -105,15 +111,22 @@ export const ContactScreen = () => {
     }
   }, []);
 
-  const initCamera = useCallback(() => {
-    // @ts-ignore
-    onLaunchCamera(closeSheet, generateImagePathIOS);
-  }, [closeSheet, generateImagePathIOS]);
+  const initCamera = useCallback(async () => {
+    navigate(RoutesNavigation.CameraScreen);
+    onLaunchCamera(
+      () => {
+        closeSheet();
+      },
+      goToEditImageFromCamera,
+      undefined,
+      () => goBack(),
+    );
+  }, [closeSheet, goToEditImageFromCamera]);
 
   const initGallery = useCallback(() => {
     // @ts-ignore
-    onSelectImage(closeSheet, generateImagePathIOS);
-  }, [closeSheet, generateImagePathIOS]);
+    onSelectImage(closeSheet, goToEditImage);
+  }, [closeSheet, goToEditImage]);
 
   const removeImage = useCallback(() => {
     setPhoto(null);
@@ -205,7 +218,7 @@ export const ContactScreen = () => {
               ]}>
               <CustomPressable
                 style={[GLOBAL_STYLES.row, styles.btnAttachPhoto]}
-                onPress={() => initOptions()}>
+                onPress={initOptions}>
                 <Icons.Camera color={'white'} fontSize={16} />
                 <Label style={{color: 'white'}}>
                   {photo != null ? 'Change photo' : 'Attach photo'}

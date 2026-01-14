@@ -52,7 +52,13 @@ export const TimelineViewCmp = () => {
 
   useEffect(() => {
     return () => {
-      setSelectedDate(getFormattedDate(new Date(), 'YYYY-MM-DD'));
+      console.log("TIMELINE UNMOUNT")
+    }
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      // setSelectedDate(getFormattedDate(new Date(), 'YYYY-MM-DD'));
     };
   }, []);
 

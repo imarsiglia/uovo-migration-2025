@@ -126,6 +126,7 @@ export const GalleryCondition = (props: Props) => {
   const checkOverview = useCallback((item: ConditionPhotoType) => {
     if (item.is_overview) {
       navigate(RoutesNavigation.ZoomScreen, {
+        // @ts-ignore
         data: {
           photo: {base64: item.thumbnail},
         },
@@ -141,7 +142,10 @@ export const GalleryCondition = (props: Props) => {
   }, []);
 
   const generateImagePathIOS = useCallback(
-    (photo?: ImageType) => {
+    (photo?: ImageType, shouldBack?: boolean) => {
+      if (shouldBack) {
+        goBack();
+      }
       if (
         photos?.some((x) => x.is_overview) ||
         conditionPhotoType == CONDITION_PHOTO_SIDE_TYPE.Details
@@ -206,8 +210,14 @@ export const GalleryCondition = (props: Props) => {
         );
       }
     } else {
+      navigate(RoutesNavigation.CameraScreen);
       // @ts-ignore
-      onLaunchCamera(closeSheet, generateImagePathIOS);
+      onLaunchCamera(
+        closeSheet,
+        (photo) => generateImagePathIOS(photo, true),
+        undefined,
+        goBack,
+      );
     }
   }, [generateImagePathIOS]);
 

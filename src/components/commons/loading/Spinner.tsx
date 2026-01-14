@@ -8,7 +8,10 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-export const LoadingSpinner = () => {
+type Props = {
+  color?: string;
+};
+export const LoadingSpinner = ({color = COLORS.primary}: Props) => {
   const rotation = useSharedValue(0);
 
   useEffect(() => {
@@ -21,7 +24,7 @@ export const LoadingSpinner = () => {
 
   return (
     <Animated.View style={[animatedStyle]}>
-      <Icons.Spinner width={50} height={50} color={COLORS.primary} />
+      <Icons.Spinner width={50} height={50} color={color} />
     </Animated.View>
   );
 };

@@ -174,7 +174,7 @@ const TimelineCardCmp = ({
                     <Label
                       style={style.textStatus}
                       maxFontSizeMultiplier={GLOBAL_FONT_SIZE_MULTIPLIER_MD}>
-                      Group status
+                      User status
                     </Label>
                     <Wrapper
                       style={[

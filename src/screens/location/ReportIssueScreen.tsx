@@ -91,7 +91,14 @@ export const ReportIssueScreen = (props: Props) => {
       });
   };
 
-  const initEdit = useCallback((photo?: ImageType | ImageType[]) => {
+  const goToEditImageFromCamera = useCallback(
+    (photo?: ImageType | ImageType[]) => {
+      navigate(RoutesNavigation.EditImage, {photo, backIndex: 2});
+    },
+    [],
+  );
+
+  const goToEditImage = useCallback((photo?: ImageType | ImageType[]) => {
     navigate(RoutesNavigation.EditImage, {photo});
   }, []);
 
@@ -106,11 +113,14 @@ export const ReportIssueScreen = (props: Props) => {
   }, [refCallSheet?.current]);
 
   const initCamera = useCallback(() => {
-    onLaunchCamera(closeSheet, initEdit);
-  }, []);
+    navigate(RoutesNavigation.CameraScreen);
+    onLaunchCamera(closeSheet, goToEditImageFromCamera, undefined, () =>
+      goBack(),
+    );
+  }, [closeSheet, goToEditImageFromCamera]);
 
   const initGallery = useCallback(() => {
-    onSelectImage(closeSheet, initEdit);
+    onSelectImage(closeSheet, goToEditImage);
   }, []);
 
   const initOptions = useCallback(() => {
@@ -167,7 +177,7 @@ export const ReportIssueScreen = (props: Props) => {
               searchable={false}
               snapPoints={['95%']}
               label="Select an issue type"
-              placeholderInput='Select an option'
+              placeholderInput="Select an option"
             />
             <InputTextContext
               currentId="description"
@@ -183,7 +193,7 @@ export const ReportIssueScreen = (props: Props) => {
 
             {photo?.data && (
               <Wrapper style={styles.containerEditImage}>
-                <PressableOpacity onPress={() => initEdit(photo)}>
+                <PressableOpacity onPress={() => goToEditImage(photo)}>
                   <Image
                     resizeMode="contain"
                     style={styles.imageEdit}

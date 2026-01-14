@@ -30,9 +30,11 @@ export const EditImageScreen = (props: Props) => {
         filepath,
         contents: props.route.params.photo.data,
         encodingOrOptions: 'base64',
-      }).then(() => setPhoto(filepath)).catch((error) => {
-        console.error(error)
-      });
+      })
+        .then(() => setPhoto(filepath))
+        .catch((error) => {
+          console.error(error);
+        });
     }
   }, [props.route.params.photo]);
 
@@ -61,7 +63,8 @@ export const EditImageScreen = (props: Props) => {
 
   const updateImage = (base64: string) => {
     navigate(
-      getState().routes[getState().index - 1]?.name as any,
+      getState().routes[getState().index - (props.route.params.backIndex || 1)]
+        ?.name as any,
       {
         editedImage: {
           ...props.route.params.photo,

@@ -30,7 +30,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-controller';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditProfile'>;
 export const EditProfileScreen = (props: Props) => {
-  const {goBack, resetTo} = useCustomNavigation();
+  const {goBack, resetTo, navigate} = useCustomNavigation();
 
   const refCallSheet = useRef<ImageOptionSheetHandle>(null);
   const [photo, setPhoto] = useState<string | null>(null);
@@ -63,7 +63,10 @@ export const EditProfileScreen = (props: Props) => {
   }, []);
 
   const onChangePhoto = useCallback(
-    (photo?: ImageType) => {
+    (photo?: ImageType, shouldBack?: boolean) => {
+      if (shouldBack) {
+        goBack();
+      }
       if (photo?.data) {
         setPhoto(photo?.data);
       }
@@ -72,10 +75,13 @@ export const EditProfileScreen = (props: Props) => {
   );
 
   const initCamera = useCallback(() => {
-    onLaunchCamera(closeSheet, onChangePhoto);
+    navigate(RoutesNavigation.CameraScreen);
+    // @ts-ignore
+    onLaunchCamera(closeSheet, (photo) => onChangePhoto(photo, true), undefined, goBack);
   }, [onChangePhoto, closeSheet]);
 
   const initGallery = useCallback(() => {
+    // @ts-ignore
     onSelectImage(closeSheet, onChangePhoto);
   }, [onChangePhoto, closeSheet]);
 

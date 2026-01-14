@@ -1,14 +1,10 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Keyboard, Platform, ScrollView, StyleSheet} from 'react-native';
-import Icon from 'react-native-fontawesome-pro';
-import {QUERY_KEYS} from '@api/contants/constants';
+import { QUERY_KEYS } from '@api/contants/constants';
 import {
-  DEFAULT_PERSISTENCE_CONFIG,
   useGetArtists,
   useGetArtTypes,
-  useGetPlacesConditionReport,
+  useGetPlacesConditionReport
 } from '@api/hooks/HooksGeneralServices';
-import {useGetJobInventory} from '@api/hooks/HooksInventoryServices';
+import { useGetJobInventory } from '@api/hooks/HooksInventoryServices';
 import {
   useGetConditionCheckbyInventory,
   useGetResumeConditionCheck,
@@ -30,54 +26,57 @@ import {
   JobInventoryType,
   ReportResumeType,
 } from '@api/types/Inventory';
-import {Paginated} from '@api/types/Response';
-import {CustomAutocomplete} from '@components/commons/autocomplete/CustomAutocomplete';
+import { Paginated } from '@api/types/Response';
+import { CustomAutocomplete } from '@components/commons/autocomplete/CustomAutocomplete';
 import {
   ImageOptionSheet,
   RBSheetRef,
 } from '@components/commons/bottomsheets/ImageOptionSheet';
-import {BackButton} from '@components/commons/buttons/BackButton';
-import {ButtonPhotosCount} from '@components/commons/buttons/ButtonPhotosCount';
-import {RoundedButtonProps} from '@components/commons/buttons/RoundedButton';
-import {AutocompleteContext} from '@components/commons/form/AutocompleteContext';
-import {BasicFormProvider} from '@components/commons/form/BasicFormProvider';
-import {BottomSheetSelectInputContext} from '@components/commons/form/BottomSheetSelectInputContext';
+import { BackButton } from '@components/commons/buttons/BackButton';
+import { ButtonPhotosCount } from '@components/commons/buttons/ButtonPhotosCount';
+import { RoundedButtonProps } from '@components/commons/buttons/RoundedButton';
+import { AutocompleteContext } from '@components/commons/form/AutocompleteContext';
+import { BasicFormProvider } from '@components/commons/form/BasicFormProvider';
+import { BottomSheetSelectInputContext } from '@components/commons/form/BottomSheetSelectInputContext';
 import {
   ButtonSubmit,
   findFirstError,
 } from '@components/commons/form/ButtonSubmit';
-import {InputTextContext} from '@components/commons/form/InputTextContext';
-import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
-import {Label} from '@components/commons/text/Label';
+import { InputTextContext } from '@components/commons/form/InputTextContext';
+import { SpeechFormContext } from '@components/commons/form/SpeechFormContext';
+import { GeneralLoading } from '@components/commons/loading/GeneralLoading';
+import { Label } from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import {Wrapper} from '@components/commons/wrappers/Wrapper';
-import {offlineUpdateConditionCheck} from '@features/conditionCheck/offline';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
+import { offlineUpdateConditionCheck } from '@features/conditionCheck/offline';
 import {
   ConditionCheckSchema,
   ConditionCheckSchemaType,
 } from '@generalTypes/schemas';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {useOnline} from '@hooks/useOnline';
-import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
-import {useUpsertObjectCache} from '@hooks/useToolsReactQueryCache';
-import {RootStackParamList, RoutesNavigation} from '@navigation/types';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {loadingWrapperPromise} from '@store/actions';
-import {useAuth} from '@store/auth';
+import { useCustomNavigation } from '@hooks/useCustomNavigation';
+import { useOnline } from '@hooks/useOnline';
+import { useRefreshIndicator } from '@hooks/useRefreshIndicator';
+import { useUpsertObjectCache } from '@hooks/useToolsReactQueryCache';
+import { RootStackParamList, RoutesNavigation } from '@navigation/types';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { loadingWrapperPromise } from '@store/actions';
+import { useAuth } from '@store/auth';
 import useConditionStore from '@store/condition';
 import useInventoryStore from '@store/inventory';
 import useTopSheetStore from '@store/topsheet';
-import {COLORS} from '@styles/colors';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {useQueryClient} from '@tanstack/react-query';
-import {generateUUID, getFormattedDate, nextFrame} from '@utils/functions';
-import {onLaunchCamera, onSelectImage} from '@utils/image';
-import {showErrorToastMessage, showToastMessage} from '@utils/toast';
+import { COLORS } from '@styles/colors';
+import { GLOBAL_STYLES } from '@styles/globalStyles';
+import { useQueryClient } from '@tanstack/react-query';
+import { generateUUID, getFormattedDate, nextFrame } from '@utils/functions';
+import { onLaunchCamera, onSelectImage } from '@utils/image';
+import { showErrorToastMessage, showToastMessage } from '@utils/toast';
 import isEqual from 'lodash.isequal';
-import {useFormContext, useWatch} from 'react-hook-form';
-import {AutocompleteDropdownItem} from 'react-native-autocomplete-dropdown';
-import type {Image as ImageType} from 'react-native-image-crop-picker';
-import {SpeechFormContext} from '@components/commons/form/SpeechFormContext';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
+import { Keyboard, Platform, ScrollView, StyleSheet } from 'react-native';
+import { AutocompleteDropdownItem } from 'react-native-autocomplete-dropdown';
+import Icon from 'react-native-fontawesome-pro';
+import type { Image as ImageType } from 'react-native-image-crop-picker';
 // import OfflineValidation from '../components/offline/OfflineValidation';
 
 var offlineInventory = {};
@@ -108,7 +107,6 @@ export const ConditionCheckScreen = (props: Props) => {
     setInventoryId,
     setConditionId,
     setReportIdImage,
-    setConditionPhotoSubtype,
     setConditionPhotoType,
     setConditionClientId,
     conditionClientId,
@@ -205,12 +203,12 @@ export const ConditionCheckScreen = (props: Props) => {
     setConditionType(CONDITION_TYPES.ConditionCheck);
     // initAll();
     return () => {
+      console.log("CONDITION CHECK SCREEN UNMOUNT")
       setConditionType(undefined);
       setConditionId(undefined);
       setConditionClientId(undefined);
       setConditionPhotoType(undefined);
       setInventoryId(undefined);
-      setConditionPhotoSubtype(undefined);
       setReportIdImage(undefined);
     };
   }, []);
@@ -293,7 +291,6 @@ export const ConditionCheckScreen = (props: Props) => {
   const goToDetails = () => {
     Keyboard.dismiss();
     setConditionPhotoType(CONDITION_PHOTO_SIDE_TYPE.Details);
-    setConditionPhotoSubtype(undefined);
     navigate(RoutesNavigation.GalleryCondition);
   };
 
@@ -705,11 +702,17 @@ export const ConditionCheckScreen = (props: Props) => {
     }
   }, [currentItem?.id]);
 
-  const generateImagePathIOS = useCallback((photo?: ImageType) => {
-    navigate(RoutesNavigation.PhotoDetailCondition, {
-      photo: photo?.data!,
-    });
-  }, []);
+  const generateImagePathIOS = useCallback(
+    (photo?: ImageType, shouldBack?: boolean) => {
+      if (shouldBack) {
+        goBack();
+      }
+      navigate(RoutesNavigation.PhotoDetailCondition, {
+        photo: photo?.data!,
+      });
+    },
+    [],
+  );
 
   // ---------- Seleccionar desde galería ----------
   const initGallery = useCallback(async () => {
@@ -722,8 +725,9 @@ export const ConditionCheckScreen = (props: Props) => {
       closeSheet();
       navigate(RoutesNavigation.PhotoCaptureZoom);
     } else {
+      navigate(RoutesNavigation.CameraScreen);
       // @ts-ignore
-      onLaunchCamera(closeSheet, generateImagePathIOS);
+      onLaunchCamera(closeSheet, (photo) => generateImagePathIOS(photo, true), undefined, goBack);
     }
   }, [generateImagePathIOS]);
 
@@ -742,7 +746,6 @@ export const ConditionCheckScreen = (props: Props) => {
 
   const goToGallery = useCallback(
     async (type: ConditionPhotoSideType) => {
-      setConditionPhotoSubtype(undefined);
       setConditionPhotoType(type);
       Keyboard.dismiss();
       if (
@@ -804,7 +807,6 @@ export const ConditionCheckScreen = (props: Props) => {
       conditionClientId,
       online,
       queryClient,
-      setConditionPhotoSubtype,
       setConditionPhotoType,
       checkOverview,
       takeNewPhoto,

@@ -1,17 +1,21 @@
-import { ImageType } from '@generalTypes/general';
+import {ImageType} from '@generalTypes/general';
 import RNFS from 'react-native-fs';
-import ImageCropPicker, { Options } from 'react-native-image-crop-picker';
-import { PERMISSIONS, request, RESULTS } from 'react-native-permissions';
-import { PhotoFile } from 'react-native-vision-camera';
-import { isAndroid } from './functions';
-import { showToastMessage } from './toast';
+import ImageCropPicker, {Options} from 'react-native-image-crop-picker';
+import {PERMISSIONS, request, RESULTS} from 'react-native-permissions';
+import {PhotoFile} from 'react-native-vision-camera';
+import {isAndroid} from './functions';
+import {showToastMessage} from './toast';
+import {cameraLifecycle} from './cameraLifecycle';
 
 const PHOTO_DIR = `${RNFS.CachesDirectoryPath}/photos`;
+
+const isUserCancel = (error: any) => error?.code === 'E_PICKER_CANCELLED';
 
 export const onLaunchCamera = async (
   closeModal: () => void,
   callback: (photo?: ImageType | ImageType[], path?: string) => void,
   options?: Options,
+  onCancel?: () => void,
 ) => {
   let granted = true;
   if (isAndroid()) {
@@ -21,12 +25,14 @@ export const onLaunchCamera = async (
       throw new Error('Camera permission not granted');
     }
   }
+  cameraLifecycle.notifyBeforeOpen();
   return ImageCropPicker.openCamera({
-    compressImageQuality: 0.5,
+    compressImageQuality: 0.7,
     includeBase64: true,
     writeTempFile: false,
     mediaType: 'photo',
     forceJpg: true,
+    cropping: true,
     ...options,
   })
     .then((image) => {
@@ -34,9 +40,17 @@ export const onLaunchCamera = async (
       manageImage(image as any, callback);
       return image as ImageType | ImageType[];
     })
-    .catch((error) =>
-      showToastMessage(error?.message ?? 'Picture not captured'),
-    );
+    .catch((error) => {
+      console.log("error?.code")
+      console.log(error?.code)
+      if (isUserCancel(error) && onCancel) {
+        onCancel();
+      }
+      showToastMessage(error?.message ?? 'Picture not captured');
+    })
+    .finally(() => {
+      cameraLifecycle.notifyAfterClose();
+    });
 };
 
 export const onSelectImage = async (

@@ -64,6 +64,7 @@ import {RootStackParamList, RoutesNavigation} from './types';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {LayoutScreen} from '@components/layouts/LayoutScreen';
 import {COLORS} from '@styles/colors';
+import {CameraScreen} from '@screens/camera/CameraScreen';
 
 // LogBox.ignoreLogs([
 //   'Non-serializable values were found in the navigation state',
@@ -306,6 +307,10 @@ export const AppNavigation = () => {
             <Stack.Screen
               name={RoutesNavigation.TaskPhotoViewerScreen}
               component={withLayout(TaskPhotoViewerScreen)}
+            />
+            <Stack.Screen
+              name={RoutesNavigation.CameraScreen}
+              component={withLayout(CameraScreen)}
             />
           </Stack.Navigator>
           <ModalDialog />

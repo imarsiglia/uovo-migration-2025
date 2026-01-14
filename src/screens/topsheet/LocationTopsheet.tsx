@@ -43,6 +43,7 @@ import {
   MapAppBottomSheet,
   MapAppBottomSheetRef,
 } from '@components/commons/bottomsheets/MapAppBottomSheet';
+import {useFocusEffect} from '@react-navigation/native';
 
 const INITIAL_DELTAS = {
   latitudeDelta: 0.015,
@@ -64,6 +65,17 @@ export const LocationTopsheet = () => {
   const showModalDialogVisible = useModalDialogStore((d) => d.showVisible);
   const jobDetail = useTopSheetStore((d) => d.jobDetail);
   const {navigate} = useCustomNavigation();
+
+  const [showMap, setShowMap] = useState(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      setShowMap(true);
+      return () => {
+        setShowMap(false);
+      };
+    }, []),
+  );
 
   const {mutateAsync: requestLetsGo} = useLetsGo({
     onError: () => {
@@ -407,22 +419,25 @@ export const LocationTopsheet = () => {
             containerStyle={styles.mapSpinner}
           />
         )}
-
-        <MapView
-          provider={PROVIDER_GOOGLE}
-          style={styles.map}
-          initialRegion={initialRegion}
-          region={controlledRegion}>
-          {coordinate && (
-            <Marker
-              key="active"
-              pinColor="#ff9500"
-              coordinate={coordinate}
-              title={typeAddress}
-              description={formattedAddress}
-            />
-          )}
-        </MapView>
+        {showMap ? (
+          <MapView
+            provider={PROVIDER_GOOGLE}
+            style={styles.map}
+            initialRegion={initialRegion}
+            region={controlledRegion}>
+            {coordinate && (
+              <Marker
+                key="active"
+                pinColor="#ff9500"
+                coordinate={coordinate}
+                title={typeAddress}
+                description={formattedAddress}
+              />
+            )}
+          </MapView>
+        ) : (
+          <Wrapper style={styles.map} />
+        )}
 
         {!hasValidAddress && (
           <Wrapper style={styles.mapOverlay}>

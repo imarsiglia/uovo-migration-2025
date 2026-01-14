@@ -38,6 +38,7 @@ import {
   SaveTaskImageSchema,
   SaveTaskImageSchemaType,
 } from '@generalTypes/schemas';
+import {useCamera} from '@hooks/useCamera';
 import {useCustomNavigation} from '@hooks/useCustomNavigation';
 import {useOnline} from '@hooks/useOnline';
 import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
@@ -50,12 +51,15 @@ import useTopSheetStore from '@store/topsheet';
 import {COLORS} from '@styles/colors';
 import {GLOBAL_STYLES} from '@styles/globalStyles';
 import {useQueryClient} from '@tanstack/react-query';
-import {generateUUID, nextFrame} from '@utils/functions';
-import {onLaunchCamera, onSelectImage} from '@utils/image';
+import {generateUUID, isAndroid, nextFrame} from '@utils/functions';
+import {onSelectImage, requestCameraPermission} from '@utils/image';
 import {showErrorToastMessage, showToastMessage} from '@utils/toast';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Alert, Keyboard, Platform, StyleSheet} from 'react-native';
-import {Image as ImageType} from 'react-native-image-crop-picker';
+import ImageCropPicker, {
+  Image as ImageType,
+  Options,
+} from 'react-native-image-crop-picker';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-controller';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PhotoDetailCondition'>;
@@ -79,6 +83,7 @@ export const PhotoDetailCondition = (props: Props) => {
   const {photo, item} = props.route.params;
   const [image, setImage] = useState<string | null | undefined>(photo);
   const {online} = useOnline();
+  const {onLaunchCamera} = useCamera();
 
   const detailQueryProps = useMemo(
     () =>
@@ -167,7 +172,10 @@ export const PhotoDetailCondition = (props: Props) => {
   }, []);
 
   const manageImage = useCallback(
-    (image: ImageType) => {
+    (image: ImageType, shouldBack?: boolean) => {
+      // if (shouldBack) {
+      //   goBack();
+      // }
       setImage(image.data);
     },
     [setImage],
@@ -178,13 +186,14 @@ export const PhotoDetailCondition = (props: Props) => {
       closeSheet();
       navigate(RoutesNavigation.PhotoCaptureZoomEdit);
     } else {
-      onLaunchCamera(closeSheet, (img) => manageImage(img as ImageType));
+      // navigate(RoutesNavigation.CameraScreen);
+      onLaunchCamera(closeSheet, (img) => manageImage(img as ImageType, true));
     }
-  }, [navigate, setImage]);
+  }, [closeSheet, manageImage]);
 
   const initGallery = useCallback(() => {
     onSelectImage(closeSheet, (img) => manageImage(img as ImageType));
-  }, [closeSheet]);
+  }, [closeSheet, manageImage]);
 
   const retakePhoto = useCallback(() => {
     if (refCallSheet.current) {
@@ -322,6 +331,9 @@ export const PhotoDetailCondition = (props: Props) => {
       conditionClientId,
     ],
   );
+
+  console.log('conditionPhotoType');
+  console.log(conditionPhotoType);
 
   const titleHeader = useMemo(() => {
     return conditionPhotoType == CONDITION_PHOTO_SIDE_TYPE.Details

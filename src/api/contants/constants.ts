@@ -399,3 +399,7 @@ export const ENTITY_TYPES = {
   CONDITION_PHOTO: 'condition_photo',
   CONDITION_ZOOM_PHOTO: 'condition_zoom_photo',
 };
+
+
+export const CONTACT_FORM_KEY = 'CONTACT_US_FORM';
+export const HELP_DESK_FORM_KEY = 'HELPDESK_US_FORM';

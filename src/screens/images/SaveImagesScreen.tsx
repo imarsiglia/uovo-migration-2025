@@ -495,7 +495,10 @@ export const SaveImagesScreen = (props: Props) => {
 
   // 🎯 Agregar fotos - NO duplicar en cache si ya viene con path
   const addPhotos = useCallback(
-    async (newPhotos: ImageType | ImageType[]) => {
+    async (newPhotos: ImageType | ImageType[], shouldBack?: boolean) => {
+      if (shouldBack) {
+        goBack();
+      }
       if (!newPhotos) return;
       const photosArray = Array.isArray(newPhotos) ? newPhotos : [newPhotos];
 
@@ -531,6 +534,7 @@ export const SaveImagesScreen = (props: Props) => {
 
   const initCamera = useCallback(async () => {
     if (isAndroid()) {
+      navigate(RoutesNavigation.CameraScreen);
       closeSheet();
       loadingWrapperPromise(async () => {
         await nextFrame();
@@ -544,7 +548,7 @@ export const SaveImagesScreen = (props: Props) => {
           },
         );
         await nextFrame();
-        await addPhotos(res as ImageType);
+        await addPhotos(res as ImageType, true);
       }).catch(() => {});
     } else {
       const res = await onLaunchCamera(

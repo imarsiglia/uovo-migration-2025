@@ -67,6 +67,7 @@ export const RoutesNavigation = {
   PhotoCapture: 'PhotoCapture',
   ZoomScreen: 'ZoomScreen',
   ConditionSides: 'ConditionSides',
+  CameraScreen: 'CameraScreen',
 } as const;
 
 // Union de nombres de ruta: "Home" | "ContactUs" | ...
@@ -87,10 +88,14 @@ export type RootStackParamList = {
   [RoutesNavigation.EditImage]: {
     photo: any;
     photos?: any;
+    backIndex?: number;
+    onSuccess?: (editedImage: any) => void
   };
   [RoutesNavigation.EditImageUri]: {
     photo: any;
     photos?: any;
+    backIndex?: number;
+    onSuccess?: (editedImage: any) => void
   };
   [RoutesNavigation.LoginEmail]: undefined;
   [RoutesNavigation.HelpDesk]: undefined;
@@ -222,6 +227,13 @@ export type RootStackParamList = {
     item?: ConditionPhotoType;
   };
   [RoutesNavigation.ConditionSides]: undefined;
+  [RoutesNavigation.CameraScreen]:
+    | undefined
+    | {
+        onClose?: () => void;
+        manageImage?: (photo: ImageTypePicker | null) => void;
+        open?: boolean;
+      };
 };
 
 export const TopSheetRoutesNavigation = {
