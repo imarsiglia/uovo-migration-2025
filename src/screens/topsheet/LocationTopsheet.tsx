@@ -66,17 +66,6 @@ export const LocationTopsheet = () => {
   const jobDetail = useTopSheetStore((d) => d.jobDetail);
   const {navigate} = useCustomNavigation();
 
-  const [showMap, setShowMap] = useState(true);
-
-  useFocusEffect(
-    useCallback(() => {
-      setShowMap(true);
-      return () => {
-        setShowMap(false);
-      };
-    }, []),
-  );
-
   const {mutateAsync: requestLetsGo} = useLetsGo({
     onError: () => {
       showToastMessage('Could not start navigation, try again.');
