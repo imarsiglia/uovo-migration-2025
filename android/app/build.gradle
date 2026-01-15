@@ -81,11 +81,12 @@ android {
 
     namespace "com.uovo"
     defaultConfig {
-        applicationId "com.uovo"
+        // applicationId "com.uovo"
+        applicationId "com.uovosandbox"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2026010801
-        versionName "1.0.2026010801"
+        versionCode 2026011401
+        versionName "1.0.2026011401"
     }
     signingConfigs {
         debug {

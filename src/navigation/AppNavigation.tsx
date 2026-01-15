@@ -2,10 +2,12 @@ import {useRefreshToken} from '@api/hooks/HooksAuthentication';
 import CallPhoneSheet from '@components/bottomSheets/CallPhoneSheet';
 import {ModalDialog} from '@components/commons/modals/ModalDialog';
 import {ModalLoading} from '@components/commons/modals/ModalLoading';
+import {LayoutScreen} from '@components/layouts/LayoutScreen';
 import {ModalOffline} from '@components/offline/ModalOffline';
 import {Splash} from '@components/splash/Splash';
 import {CustomStatusBar} from '@components/statusbar/CustomStatusBar';
 import {PortalHost} from '@gorhom/portal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {AccountScreen} from '@screens/account/AccountScreen';
@@ -53,6 +55,7 @@ import {TakeSignatureScreen} from '@screens/signatures/TakeSignatureScreen';
 import {TopsheetScreen} from '@screens/topsheet/TopsheetScreen';
 import {WoAttachmentScreen} from '@screens/woattachments/WoAttachmentScreen';
 import {useAuth} from '@store/auth';
+import {COLORS} from '@styles/colors';
 import {getDeviceInfo} from '@utils/functions';
 import {isInternet} from '@utils/internet';
 import {navigationRef} from '@utils/navigationService';
@@ -61,11 +64,7 @@ import {configureFontAwesomePro} from 'react-native-fontawesome-pro';
 import {enableScreens} from 'react-native-screens';
 import {LoginScreen} from '../screens/auth/LoginScreen';
 import {RootStackParamList, RoutesNavigation} from './types';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {LayoutScreen} from '@components/layouts/LayoutScreen';
-import {COLORS} from '@styles/colors';
-import {CameraScreen} from '@screens/camera/CameraScreen';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {AppStateProvider} from './AppStateManager';
 
 // LogBox.ignoreLogs([
 //   'Non-serializable values were found in the navigation state',
@@ -81,22 +80,22 @@ export const AppNavigation = () => {
   const {token, user, setSession, clearSession} = useAuth();
   const {mutateAsync: refreshToken, isSuccess, isError} = useRefreshToken();
 
-  const [isReady, setIsReady] = useState(false);
-  const [initialState, setInitialState] = useState();
+  // const [isReady, setIsReady] = useState(false);
+  // const [initialState, setInitialState] = useState();
 
-  useEffect(() => {
-    const restoreState = async () => {
-      try {
-        const savedState = await AsyncStorage.getItem('NAVIGATION_STATE');
-        const state = savedState ? JSON.parse(savedState) : undefined;
-        setInitialState(state);
-      } finally {
-        setIsReady(true);
-      }
-    };
+  // useEffect(() => {
+  //   const restoreState = async () => {
+  //     try {
+  //       const savedState = await AsyncStorage.getItem('NAVIGATION_STATE');
+  //       const state = savedState ? JSON.parse(savedState) : undefined;
+  //       setInitialState(state);
+  //     } finally {
+  //       setIsReady(true);
+  //     }
+  //   };
 
-    restoreState();
-  }, []);
+  //   restoreState();
+  // }, []);
 
   useEffect(() => {
     if (token) {
@@ -118,233 +117,226 @@ export const AppNavigation = () => {
     }
   }, []);
 
-  if (!isReady) {
-    return null;
-  }
+  // if (!isReady) {
+  //   return null;
+  // }
 
   return (
     <>
       {/* {loading == true && <Splash />} */}
       {!isSuccess && !isError && !isLoaded && <Splash />}
       {(isSuccess || isLoaded) && (
-        <NavigationContainer
-          ref={navigationRef}
-          initialState={initialState}
-          onStateChange={(state) =>
-            AsyncStorage.setItem('NAVIGATION_STATE', JSON.stringify(state))
-          }>
-          <CustomStatusBar />
-          <Stack.Navigator
-            initialRouteName={
-              token == null
-                ? RoutesNavigation.Login
-                : user?.user_updated == 0
-                ? RoutesNavigation.EditProfile
-                : RoutesNavigation.Home
-            }
-            screenOptions={{
-              headerShown: false,
-            }}>
-            <Stack.Screen
-              name={RoutesNavigation.Login}
-              component={withLayout(LoginScreen, COLORS.primary)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.EditProfile}
-              component={withLayout(EditProfileScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.ContactUs}
-              component={withLayout(ContactScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.Home}
-              component={withLayout(HomeScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.Topsheet}
-              component={withLayout(TopsheetScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.EditImage}
-              component={withLayout(EditImageScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.EditImageUri}
-              component={withLayout(EditImageURIScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.LoginEmail}
-              component={withLayout(LoginEmailScreen, COLORS.primary)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.HelpDesk}
-              component={withLayout(HelpDeskScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.Account}
-              component={withLayout(AccountScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.ReportIssue}
-              component={withLayout(ReportIssueScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.LocationNotes}
-              component={withLayout(LocationNotesScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.SaveLocationNotes}
-              component={withLayout(SaveLocationNoteScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.DigitalId}
-              component={withLayout(DigitalIdScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.VisualizeBOL}
-              component={withLayout(VisualizeBolScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.Signatures}
-              component={withLayout(SignaturesScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.TakeSignature}
-              component={withLayout(TakeSignatureScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.Notes}
-              component={withLayout(NotesScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.SaveNote}
-              component={withLayout(SaveNoteScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.ReportMaterials}
-              component={withLayout(ReportMaterialsScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.SaveReportMaterials}
-              component={withLayout(SaveReportMaterialScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.WoAttachment}
-              component={withLayout(WoAttachmentScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.EditPieceCount}
-              component={withLayout(EditPieceCountScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.LaborReport}
-              component={withLayout(LaborReportScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.AddLaborReport}
-              component={withLayout(AddLaborReportScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.Inventory}
-              component={withLayout(InventoryScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.AddInventory}
-              component={withLayout(AddInventoryScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.ItemDetail}
-              component={withLayout(ItemDetailScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.TakeDimensions}
-              component={withLayout(TakeDimensionsScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.InventoryNationalShuttle}
-              component={withLayout(InventoryNSScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.Images}
-              component={withLayout(ImagesScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.SaveImages}
-              component={withLayout(SaveImagesScreen)}
-            />
-            {/* condition report / condition check */}
-            <Stack.Screen
-              name={RoutesNavigation.Reports}
-              component={withLayout(ReportsScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.ConditionReport}
-              component={withLayout(ConditionReportScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.ConditionCheck}
-              component={withLayout(ConditionCheckScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.GalleryCondition}
-              component={withLayout(GalleryCondition)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.PhotoDetailCondition}
-              component={withLayout(PhotoDetailCondition)}
-            />
+        <AppStateProvider>
+          <NavigationContainer ref={navigationRef}>
+            <CustomStatusBar />
+            <Stack.Navigator
+              initialRouteName={
+                token == null
+                  ? RoutesNavigation.Login
+                  : user?.user_updated == 0
+                  ? RoutesNavigation.EditProfile
+                  : RoutesNavigation.Home
+              }
+              screenOptions={{
+                headerShown: false,
+              }}>
+              <Stack.Screen
+                name={RoutesNavigation.Login}
+                component={withLayout(LoginScreen, COLORS.primary)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.EditProfile}
+                component={withLayout(EditProfileScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.ContactUs}
+                component={withLayout(ContactScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.Home}
+                component={withLayout(HomeScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.Topsheet}
+                component={withLayout(TopsheetScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.EditImage}
+                component={withLayout(EditImageScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.EditImageUri}
+                component={withLayout(EditImageURIScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.LoginEmail}
+                component={withLayout(LoginEmailScreen, COLORS.primary)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.HelpDesk}
+                component={withLayout(HelpDeskScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.Account}
+                component={withLayout(AccountScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.ReportIssue}
+                component={withLayout(ReportIssueScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.LocationNotes}
+                component={withLayout(LocationNotesScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.SaveLocationNotes}
+                component={withLayout(SaveLocationNoteScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.DigitalId}
+                component={withLayout(DigitalIdScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.VisualizeBOL}
+                component={withLayout(VisualizeBolScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.Signatures}
+                component={withLayout(SignaturesScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.TakeSignature}
+                component={withLayout(TakeSignatureScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.Notes}
+                component={withLayout(NotesScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.SaveNote}
+                component={withLayout(SaveNoteScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.ReportMaterials}
+                component={withLayout(ReportMaterialsScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.SaveReportMaterials}
+                component={withLayout(SaveReportMaterialScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.WoAttachment}
+                component={withLayout(WoAttachmentScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.EditPieceCount}
+                component={withLayout(EditPieceCountScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.LaborReport}
+                component={withLayout(LaborReportScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.AddLaborReport}
+                component={withLayout(AddLaborReportScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.Inventory}
+                component={withLayout(InventoryScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.AddInventory}
+                component={withLayout(AddInventoryScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.ItemDetail}
+                component={withLayout(ItemDetailScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.TakeDimensions}
+                component={withLayout(TakeDimensionsScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.InventoryNationalShuttle}
+                component={withLayout(InventoryNSScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.Images}
+                component={withLayout(ImagesScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.SaveImages}
+                component={withLayout(SaveImagesScreen)}
+              />
+              {/* condition report / condition check */}
+              <Stack.Screen
+                name={RoutesNavigation.Reports}
+                component={withLayout(ReportsScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.ConditionReport}
+                component={withLayout(ConditionReportScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.ConditionCheck}
+                component={withLayout(ConditionCheckScreen)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.GalleryCondition}
+                component={withLayout(GalleryCondition)}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.PhotoDetailCondition}
+                component={withLayout(PhotoDetailCondition)}
+              />
 
-            <Stack.Screen
-              name={RoutesNavigation.ZoomScreen}
-              component={withLayout(ZoomScreen)}
-            />
+              <Stack.Screen
+                name={RoutesNavigation.ZoomScreen}
+                component={withLayout(ZoomScreen)}
+              />
 
-            <Stack.Screen
-              name={RoutesNavigation.PhotoCaptureZoomEdit}
-              component={PhotoCaptureZoomEdit}
-              options={{headerShown: true}}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.PhotoCaptureZoom}
-              component={PhotoCaptureZoom}
-              options={{headerShown: true}}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.PhotoCapture}
-              component={PhotoCapture}
-              options={{headerShown: true}}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.ConditionSides}
-              component={withLayout(ConditionSides)}
-            />
+              <Stack.Screen
+                name={RoutesNavigation.PhotoCaptureZoomEdit}
+                component={PhotoCaptureZoomEdit}
+                options={{headerShown: true}}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.PhotoCaptureZoom}
+                component={PhotoCaptureZoom}
+                options={{headerShown: true}}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.PhotoCapture}
+                component={PhotoCapture}
+                options={{headerShown: true}}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.ConditionSides}
+                component={withLayout(ConditionSides)}
+              />
 
-            {/* visualizar imagenes */}
-            <Stack.Screen
-              name={RoutesNavigation.BaseImageScreen}
-              component={BaseImageScreen}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.TaskPhotoCarouselScreen}
-              component={TaskPhotoCarouselScreen}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.TaskPhotoViewerScreen}
-              component={withLayout(TaskPhotoViewerScreen)}
-            />
-            <Stack.Screen
-              name={RoutesNavigation.CameraScreen}
-              component={withLayout(CameraScreen)}
-            />
-          </Stack.Navigator>
-          <ModalDialog />
-          <ModalLoading />
-          <PortalHost name="root" />
-          <CallPhoneSheet />
-          {/* <OfflineBanner /> */}
-          <ModalOffline />
-        </NavigationContainer>
+              {/* visualizar imagenes */}
+              <Stack.Screen
+                name={RoutesNavigation.BaseImageScreen}
+                component={BaseImageScreen}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.TaskPhotoCarouselScreen}
+                component={TaskPhotoCarouselScreen}
+              />
+              <Stack.Screen
+                name={RoutesNavigation.TaskPhotoViewerScreen}
+                component={withLayout(TaskPhotoViewerScreen)}
+              />
+            </Stack.Navigator>
+            <ModalDialog />
+            <ModalLoading />
+            <PortalHost name="root" />
+            <CallPhoneSheet />
+            {/* <OfflineBanner /> */}
+            <ModalOffline />
+          </NavigationContainer>
+        </AppStateProvider>
         // <OfflineComponentSync />
         // <OfflineCompSecondSync />
       )}

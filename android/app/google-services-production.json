@@ -67,34 +67,34 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:6924787437:android:b1b190ca38ac9deff876e4",
+        "mobilesdk_app_id": "1:6924787437:android:3e0f527b5ceae381f876e4",
         "android_client_info": {
-          "package_name": "com.uovosandbox"
+          "package_name": "com.uovo.sandbox"
         }
       },
       "oauth_client": [
         {
-          "client_id": "6924787437-f0vujiq9p6sf0hgsjbatndqfla8hgo2c.apps.googleusercontent.com",
+          "client_id": "6924787437-35oo56prm5t0vsccm29vetgsatr8fkiq.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.uovosandbox",
+            "package_name": "com.uovo.sandbox",
+            "certificate_hash": "73045f560697f46897482bc06dd0df02846d66ba"
+          }
+        },
+        {
+          "client_id": "6924787437-9411qbv1nl5l3cb3ga7b04b8fjg154ra.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.uovo.sandbox",
             "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
           }
         },
         {
-          "client_id": "6924787437-frvklkndhcut8qt4dsgsv9gsc2b7q5m9.apps.googleusercontent.com",
+          "client_id": "6924787437-cjc0bt40kc7vrmbl6qunfv9dgu4dbvnh.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.uovosandbox",
+            "package_name": "com.uovo.sandbox",
             "certificate_hash": "120fd13bd5e132468bf52d67b8a35d1e26b02668"
-          }
-        },
-        {
-          "client_id": "6924787437-l5ibi6mbbqc0lbpss1is1hepsahkdvh0.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.uovosandbox",
-            "certificate_hash": "73045f560697f46897482bc06dd0df02846d66ba"
           }
         },
         {

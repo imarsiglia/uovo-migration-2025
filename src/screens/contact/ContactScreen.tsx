@@ -74,15 +74,8 @@ export const ContactScreen = () => {
       });
   }, []);
 
-  const goToEditImageFromCamera = useCallback(
-    (photo?: ImageType | ImageType[]) => {
-      navigate(RoutesNavigation.EditImage, {photo, backIndex: 2});
-    },
-    [],
-  );
-
   const goToEditImage = useCallback(
-    (photo?: ImageType) => {
+    (photo?: ImageType | ImageType[]) => {
       navigate(RoutesNavigation.EditImage, {photo});
     },
     [navigate],
@@ -112,19 +105,10 @@ export const ContactScreen = () => {
   }, []);
 
   const initCamera = useCallback(async () => {
-    navigate(RoutesNavigation.CameraScreen);
-    onLaunchCamera(
-      () => {
-        closeSheet();
-      },
-      goToEditImageFromCamera,
-      undefined,
-      () => goBack(),
-    );
-  }, [closeSheet, goToEditImageFromCamera]);
+    onLaunchCamera(closeSheet, goToEditImage);
+  }, [closeSheet, goToEditImage]);
 
   const initGallery = useCallback(() => {
-    // @ts-ignore
     onSelectImage(closeSheet, goToEditImage);
   }, [closeSheet, goToEditImage]);
 

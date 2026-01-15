@@ -702,17 +702,11 @@ export const ConditionCheckScreen = (props: Props) => {
     }
   }, [currentItem?.id]);
 
-  const generateImagePathIOS = useCallback(
-    (photo?: ImageType, shouldBack?: boolean) => {
-      if (shouldBack) {
-        goBack();
-      }
-      navigate(RoutesNavigation.PhotoDetailCondition, {
-        photo: photo?.data!,
-      });
-    },
-    [],
-  );
+  const generateImagePathIOS = useCallback((photo?: ImageType) => {
+    navigate(RoutesNavigation.PhotoDetailCondition, {
+      photo: photo?.data!,
+    });
+  }, []);
 
   // ---------- Seleccionar desde galería ----------
   const initGallery = useCallback(async () => {

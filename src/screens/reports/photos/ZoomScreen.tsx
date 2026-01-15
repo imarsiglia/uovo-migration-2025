@@ -934,10 +934,7 @@ const ZoomScreen = (props: any) => {
   }, []);
 
   const manageImage = useCallback(
-    (image: ImageType, shouldBack?: boolean) => {
-      if (shouldBack) {
-        goBack();
-      }
+    (image: ImageType) => {
       navigate(RoutesNavigation.PhotoDetailCondition, {
         photo: image.data!,
       });
@@ -950,9 +947,8 @@ const ZoomScreen = (props: any) => {
       closeSheet();
       navigate(RoutesNavigation.PhotoCaptureZoom);
     } else {
-      navigate(RoutesNavigation.CameraScreen);
       // @ts-ignore
-      onLaunchCamera(closeSheet, (photo) => manageImage(photo, true), undefined, goBack);
+      onLaunchCamera(closeSheet, manageImage);
     }
   }, [manageImage]);
 

@@ -419,25 +419,21 @@ export const LocationTopsheet = () => {
             containerStyle={styles.mapSpinner}
           />
         )}
-        {showMap ? (
-          <MapView
-            provider={PROVIDER_GOOGLE}
-            style={styles.map}
-            initialRegion={initialRegion}
-            region={controlledRegion}>
-            {coordinate && (
-              <Marker
-                key="active"
-                pinColor="#ff9500"
-                coordinate={coordinate}
-                title={typeAddress}
-                description={formattedAddress}
-              />
-            )}
-          </MapView>
-        ) : (
-          <Wrapper style={styles.map} />
-        )}
+        <MapView
+          provider={PROVIDER_GOOGLE}
+          style={styles.map}
+          initialRegion={initialRegion}
+          region={controlledRegion}>
+          {coordinate && (
+            <Marker
+              key="active"
+              pinColor="#ff9500"
+              coordinate={coordinate}
+              title={typeAddress}
+              description={formattedAddress}
+            />
+          )}
+        </MapView>
 
         {!hasValidAddress && (
           <Wrapper style={styles.mapOverlay}>

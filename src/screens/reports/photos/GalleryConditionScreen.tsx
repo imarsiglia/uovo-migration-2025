@@ -142,10 +142,7 @@ export const GalleryCondition = (props: Props) => {
   }, []);
 
   const generateImagePathIOS = useCallback(
-    (photo?: ImageType, shouldBack?: boolean) => {
-      if (shouldBack) {
-        goBack();
-      }
+    (photo?: ImageType) => {
       if (
         photos?.some((x) => x.is_overview) ||
         conditionPhotoType == CONDITION_PHOTO_SIDE_TYPE.Details
@@ -210,14 +207,8 @@ export const GalleryCondition = (props: Props) => {
         );
       }
     } else {
-      navigate(RoutesNavigation.CameraScreen);
       // @ts-ignore
-      onLaunchCamera(
-        closeSheet,
-        (photo) => generateImagePathIOS(photo, true),
-        undefined,
-        goBack,
-      );
+      onLaunchCamera(closeSheet, generateImagePathIOS);
     }
   }, [generateImagePathIOS]);
 

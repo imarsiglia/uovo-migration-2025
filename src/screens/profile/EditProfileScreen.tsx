@@ -63,10 +63,7 @@ export const EditProfileScreen = (props: Props) => {
   }, []);
 
   const onChangePhoto = useCallback(
-    (photo?: ImageType, shouldBack?: boolean) => {
-      if (shouldBack) {
-        goBack();
-      }
+    (photo?: ImageType) => {
       if (photo?.data) {
         setPhoto(photo?.data);
       }
@@ -75,9 +72,8 @@ export const EditProfileScreen = (props: Props) => {
   );
 
   const initCamera = useCallback(() => {
-    navigate(RoutesNavigation.CameraScreen);
     // @ts-ignore
-    onLaunchCamera(closeSheet, (photo) => onChangePhoto(photo, true), undefined, goBack);
+    onLaunchCamera(closeSheet, onChangePhoto);
   }, [onChangePhoto, closeSheet]);
 
   const initGallery = useCallback(() => {

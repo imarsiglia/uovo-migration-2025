@@ -172,10 +172,7 @@ export const PhotoDetailCondition = (props: Props) => {
   }, []);
 
   const manageImage = useCallback(
-    (image: ImageType, shouldBack?: boolean) => {
-      // if (shouldBack) {
-      //   goBack();
-      // }
+    (image: ImageType) => {
       setImage(image.data);
     },
     [setImage],
@@ -186,8 +183,7 @@ export const PhotoDetailCondition = (props: Props) => {
       closeSheet();
       navigate(RoutesNavigation.PhotoCaptureZoomEdit);
     } else {
-      // navigate(RoutesNavigation.CameraScreen);
-      onLaunchCamera(closeSheet, (img) => manageImage(img as ImageType, true));
+      onLaunchCamera(closeSheet, (img) => manageImage(img as ImageType));
     }
   }, [closeSheet, manageImage]);
 

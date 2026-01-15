@@ -91,13 +91,6 @@ export const ReportIssueScreen = (props: Props) => {
       });
   };
 
-  const goToEditImageFromCamera = useCallback(
-    (photo?: ImageType | ImageType[]) => {
-      navigate(RoutesNavigation.EditImage, {photo, backIndex: 2});
-    },
-    [],
-  );
-
   const goToEditImage = useCallback((photo?: ImageType | ImageType[]) => {
     navigate(RoutesNavigation.EditImage, {photo});
   }, []);
@@ -113,11 +106,8 @@ export const ReportIssueScreen = (props: Props) => {
   }, [refCallSheet?.current]);
 
   const initCamera = useCallback(() => {
-    navigate(RoutesNavigation.CameraScreen);
-    onLaunchCamera(closeSheet, goToEditImageFromCamera, undefined, () =>
-      goBack(),
-    );
-  }, [closeSheet, goToEditImageFromCamera]);
+    onLaunchCamera(closeSheet, goToEditImage);
+  }, [closeSheet, goToEditImage]);
 
   const initGallery = useCallback(() => {
     onSelectImage(closeSheet, goToEditImage);

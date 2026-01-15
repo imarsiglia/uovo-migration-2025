@@ -2809,7 +2809,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNImageCropPicker (0.51.0):
+  - RNImageCropPicker (0.51.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -2837,11 +2837,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNImageCropPicker/QBImagePickerController (= 0.51.0)
+    - RNImageCropPicker/QBImagePickerController (= 0.51.1)
     - SocketRocket
-    - TOCropViewController (~> 2.7.4)
+    - TOCropViewController (~> 2.8.0)
     - Yoga
-  - RNImageCropPicker/QBImagePickerController (0.51.0):
+  - RNImageCropPicker/QBImagePickerController (0.51.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -2870,7 +2870,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - SocketRocket
-    - TOCropViewController (~> 2.7.4)
+    - TOCropViewController (~> 2.8.0)
     - Yoga
   - RNLocalize (3.5.1):
     - boost
@@ -3288,7 +3288,7 @@ PODS:
     - Yoga
   - SocketRocket (0.7.1)
   - Toast (4.1.1)
-  - TOCropViewController (2.7.4)
+  - TOCropViewController (2.8.0)
   - VisionCamera (4.7.2):
     - VisionCamera/Core (= 4.7.2)
     - VisionCamera/React (= 4.7.2)
@@ -3785,7 +3785,7 @@ SPEC CHECKSUMS:
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
   RNGestureHandler: d02f35d6340a788d67d859598c37cb580126d42d
   RNGoogleSignin: 0f9deae0357018403a3c34b367456dee09c95b2c
-  RNImageCropPicker: 7fae017f7f9e7a002ccd82f67175e6eaf31cbe31
+  RNImageCropPicker: 557668ee5bd4d93517127fde0945e14c8cb7e8ab
   RNLocalize: 7a74b29785cd0bc55514c1faba75cf59351838e1
   RNPermissions: bb2a699d7b2b3edad7f8b4f1861639f680e3e6fb
   RNReanimated: 0b4147a00b6e539c484a12e182396dfc7443f310
@@ -3796,7 +3796,7 @@ SPEC CHECKSUMS:
   RNVectorIcons: 0567525e0a344458329daa09068cf9e8090ec791
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Toast: 1f5ea13423a1e6674c4abdac5be53587ae481c4e
-  TOCropViewController: 80b8985ad794298fb69d3341de183f33d1853654
+  TOCropViewController: 797deaf39c90e6e9ddd848d88817f6b9a8a09888
   VisionCamera: 30b358b807324c692064f78385e9a732ce1bebfe
   VoiceToText: a6969eb1b4f4ba0395eb501bf9795c51287f2a67
   Yoga: ce248fb32065c9b00451491b06607f1c25b2f1ed

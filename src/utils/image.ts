@@ -13,21 +13,14 @@ export const onLaunchCamera = async (
   callback: (photo?: ImageType | ImageType[], path?: string) => void,
   options?: Options,
 ) => {
-  console.log("on launch camera");
   let granted = true;
   if (isAndroid()) {
-    granted = await requestWriteExternalStorage();
-  }
-  console.log("granted")
-  console.log(granted)
-  if (!granted) throw new Error('Read media permission not granted');
-  if (isAndroid()) {
-    granted = await requestWriteExternalStorage();
-    if (granted) {
-      granted = await requestCameraPermission();
+    granted = await requestCameraPermission();
+    if (!granted) {
+      showToastMessage('Camera permission not granted');
+      throw new Error('Camera permission not granted');
     }
   }
-  console.log('PERMISO CONCEDIDO DE CAMARA');
   return ImageCropPicker.openCamera({
     compressImageQuality: 0.7,
     includeBase64: true,
@@ -38,12 +31,14 @@ export const onLaunchCamera = async (
   })
     .then((image) => {
       closeModal?.();
-      manageImage(image, callback);
+      manageImage(image as any, callback);
       return image as ImageType | ImageType[];
     })
-    .catch((error) =>
-      showToastMessage(error?.message ?? 'Picture not captured'),
-    );
+    .catch((error) => {
+      console.log('error?.code');
+      console.log(error?.code);
+      showToastMessage(error?.message ?? 'Picture not captured');
+    });
 };
 
 export const onSelectImage = async (

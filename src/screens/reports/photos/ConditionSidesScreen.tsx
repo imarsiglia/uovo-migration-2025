@@ -156,10 +156,7 @@ export const ConditionSides = () => {
   );
 
   const generateImagePathIOS = useCallback(
-    (photo?: ImageType, shouldBack?: boolean) => {
-      if (shouldBack) {
-        goBack();
-      }
+    (photo?: ImageType) => {
       if (groupedImages[selectedType!]?.some((x: any) => x.is_overview)) {
         navigate(RoutesNavigation.PhotoDetailCondition, {
           photo: photo?.data!,
@@ -192,9 +189,8 @@ export const ConditionSides = () => {
         navigate(RoutesNavigation.PhotoCapture);
       }
     } else {
-      navigate(RoutesNavigation.CameraScreen)
       // @ts-ignore
-      onLaunchCamera(closeSheet, (photo) => generateImagePathIOS(photo, true), undefined, goBack);
+      onLaunchCamera(closeSheet, generateImagePathIOS);
     }
   }, [selectedType, images, generateImagePathIOS]);
 

@@ -1,38 +1,37 @@
-import {ENTITY_TYPES, QUERY_KEYS} from '@api/contants/constants';
+import { ENTITY_TYPES, QUERY_KEYS } from '@api/contants/constants';
 import {
   useDeletePictureGroup,
   useGetPictures,
 } from '@api/hooks/HooksTaskServices';
-import {TaskImageType} from '@api/types/Task';
-import {BackButton} from '@components/commons/buttons/BackButton';
-import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
-import {PendingIcon} from '@components/commons/icons/PendingIcon';
-import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
+import { TaskImageType } from '@api/types/Task';
+import { BackButton } from '@components/commons/buttons/BackButton';
+import { PressableOpacity } from '@components/commons/buttons/PressableOpacity';
+import { GeneralLoading } from '@components/commons/loading/GeneralLoading';
 import {
   SwipeableListProvider,
   SwipeableRow,
 } from '@components/commons/swipeable/SwipeableRow';
-import {Label} from '@components/commons/text/Label';
+import { Label } from '@components/commons/text/Label';
 import MinRoundedView from '@components/commons/view/MinRoundedView';
-import {Wrapper} from '@components/commons/wrappers/Wrapper';
-import {CustomImage} from '@components/images/CustomImage';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
+import { CustomImage } from '@components/images/CustomImage';
 import OfflineValidation from '@components/offline/OfflineValidation';
-import {offlineDeleteImage} from '@features/images/offline';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {useOnline} from '@hooks/useOnline';
-import {useRefreshIndicator} from '@hooks/useRefreshIndicator';
-import {useHasPendingSync} from '@hooks/useSyncIndicator';
-import {useRemoveFromArrayCache} from '@hooks/useToolsReactQueryCache';
-import {RoutesNavigation} from '@navigation/types';
-import {loadingWrapperPromise} from '@store/actions';
-import {useModalDialogStore} from '@store/modals';
+import { offlineDeleteImage } from '@features/images/offline';
+import { useCustomNavigation } from '@hooks/useCustomNavigation';
+import { useOnline } from '@hooks/useOnline';
+import { useRefreshIndicator } from '@hooks/useRefreshIndicator';
+import { useHasPendingSync } from '@hooks/useSyncIndicator';
+import { useRemoveFromArrayCache } from '@hooks/useToolsReactQueryCache';
+import { RoutesNavigation } from '@navigation/types';
+import { loadingWrapperPromise } from '@store/actions';
+import { useModalDialogStore } from '@store/modals';
 import useTopSheetStore from '@store/topsheet';
-import {COLORS} from '@styles/colors';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {useQueryClient} from '@tanstack/react-query';
-import {getFormattedDateWithTimezone, nextFrame} from '@utils/functions';
-import {showErrorToastMessage, showToastMessage} from '@utils/toast';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import { COLORS } from '@styles/colors';
+import { GLOBAL_STYLES } from '@styles/globalStyles';
+import { useQueryClient } from '@tanstack/react-query';
+import { getFormattedDateWithTimezone, nextFrame } from '@utils/functions';
+import { showErrorToastMessage, showToastMessage } from '@utils/toast';
+import { useCallback, useEffect, useMemo } from 'react';
 import {
   FlatList,
   InteractionManager,
