@@ -1,49 +1,47 @@
 import Geolocation from '@react-native-community/geolocation';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   Easing,
   Platform,
   ScrollView,
-  StyleSheet,
-  View,
+  StyleSheet
 } from 'react-native';
 import {
   isLocationEnabled,
   promptForEnableLocationIfNeeded,
 } from 'react-native-android-location-enabler';
 import Icon from 'react-native-fontawesome-pro';
-import MapView, {Marker, PROVIDER_GOOGLE, Region} from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
 
-import {CANDIDATES_IOS} from '@api/contants/constants';
+import { CANDIDATES_IOS } from '@api/contants/constants';
 import {
   useGetEstimatedTimeByLocation,
   useGetLatLong,
 } from '@api/hooks/HooksGeneralServices';
-import {useLetsGo} from '@api/hooks/HooksJobServices';
-import {AddressType, AddressTypes} from '@api/types/Jobs';
-import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
-import {IndicatorLoading} from '@components/commons/loading/IndicatorLoading';
-import CustomMenu from '@components/commons/menu/CustomMenu';
-import {Label} from '@components/commons/text/Label';
-import {Wrapper} from '@components/commons/wrappers/Wrapper';
-import {openDirectionsChooser} from '@components/helpers/openDirectionsChooser';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {RoutesNavigation} from '@navigation/types';
-import {loadingWrapperPromise} from '@store/actions';
-import {useModalDialogStore} from '@store/modals';
-import useTopSheetStore from '@store/topsheet';
-import {COLORS} from '@styles/colors';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {formatAddress, openInMaps} from '@utils/functions';
-import {requestAccessFineLocationAndroid} from '@utils/permissions';
-import {showToastMessage} from '@utils/toast';
-import {ReportLocationProblem} from '@components/topheet/ReportLocationProblem';
+import { useLetsGo } from '@api/hooks/HooksJobServices';
+import { AddressType, AddressTypes } from '@api/types/Jobs';
 import {
   MapAppBottomSheet,
   MapAppBottomSheetRef,
 } from '@components/commons/bottomsheets/MapAppBottomSheet';
-import {useFocusEffect} from '@react-navigation/native';
+import { PressableOpacity } from '@components/commons/buttons/PressableOpacity';
+import { IndicatorLoading } from '@components/commons/loading/IndicatorLoading';
+import CustomMenu from '@components/commons/menu/CustomMenu';
+import { Label } from '@components/commons/text/Label';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
+import { openDirectionsChooser } from '@components/helpers/openDirectionsChooser';
+import { ReportLocationProblem } from '@components/topheet/ReportLocationProblem';
+import { useCustomNavigation } from '@hooks/useCustomNavigation';
+import { RoutesNavigation } from '@navigation/types';
+import { loadingWrapperPromise } from '@store/actions';
+import { useModalDialogStore } from '@store/modals';
+import useTopSheetStore from '@store/topsheet';
+import { COLORS } from '@styles/colors';
+import { GLOBAL_STYLES } from '@styles/globalStyles';
+import { formatAddress, openInMaps } from '@utils/functions';
+import { requestAccessFineLocationAndroid } from '@utils/permissions';
+import { showToastMessage } from '@utils/toast';
 
 const INITIAL_DELTAS = {
   latitudeDelta: 0.015,
@@ -65,17 +63,6 @@ export const LocationTopsheet = () => {
   const showModalDialogVisible = useModalDialogStore((d) => d.showVisible);
   const jobDetail = useTopSheetStore((d) => d.jobDetail);
   const {navigate} = useCustomNavigation();
-
-  const [showMap, setShowMap] = useState(true);
-
-  useFocusEffect(
-    useCallback(() => {
-      setShowMap(true);
-      return () => {
-        setShowMap(false);
-      };
-    }, []),
-  );
 
   const {mutateAsync: requestLetsGo} = useLetsGo({
     onError: () => {
