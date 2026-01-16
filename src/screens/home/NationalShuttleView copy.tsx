@@ -5,6 +5,8 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import {
@@ -22,10 +24,14 @@ import {
   useGetWestCoastDropoff,
   useGetWestCoastPickup,
 } from '@api/hooks/HooksNationalShuttle';
+// import {SendBOLBottomSheet} from '../../components/bottomSheets/SendBOLBottomSheet';
 
+import {isInternet} from '../../utils/internet';
+// import InventoryViewNationalShuttle from '../../components/nationalShuttle/InventoryViewNationalShuttle';
 import {EmptyCard} from '@components/commons/cards/EmptyCard';
 import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 import CardNationalShuttle from '@components/jobqueu/CardNationalShuttle';
+import {getFormattedDate} from '@utils/functions';
 import {CustomSwitch} from '@components/commons/switch/CustomSwitch';
 import {BottomSheetSelectInput} from '@components/commons/inputs/BottomSheetSelectInput';
 import {useDebounce} from '@hooks/useDebounce';
@@ -37,9 +43,10 @@ import {
   FILTER_TYPES_ACTIVITY,
   GLOBAL_FONT_SIZE_MULTIPLIER_SM,
   NATIONAL_SHUTTLE_TYPE,
+  NationalShuttleType,
 } from '@api/contants/constants';
 import {COLORS} from '@styles/colors';
-import {NSJobType} from '@api/types/Jobs';
+import {JobDetailType, NSJobType} from '@api/types/Jobs';
 import {PressableOpacity} from '@components/commons/buttons/PressableOpacity';
 import {Label} from '@components/commons/text/Label';
 import {Wrapper} from '@components/commons/wrappers/Wrapper';
@@ -60,6 +67,7 @@ type FilterTypeKeys = keyof FilterType;
 
 const NationalShuttleViewCmp = () => {
   const {navigate} = useCustomNavigation();
+  const [list, setList] = useState<NSJobType[] | undefined>([]);
   const {
     inventoryList,
     setInventoryList,
@@ -68,10 +76,13 @@ const NationalShuttleViewCmp = () => {
     setIsInventoryMode,
   } = useNationalShuttleStore();
 
+  //send BOL
   const [isVisibleSendBOL, setIsVisibleSendBOL] = useState(false);
   const [jobDetail, setJobDetail] = useState<NSJobType | null>(null);
 
   const updateJobDetail = useTopSheetStore((d) => d.setJobDetail);
+
+  const activeTab = useGeneralStore((d) => d.activeTab);
   const syncroNS = useGeneralStore((d) => d.syncroNS);
 
   const [filter, setFilter] = useState<FilterType>({
@@ -86,165 +97,233 @@ const NationalShuttleViewCmp = () => {
   const {data: locationPlaces, isLoading: isLoadingLocationPlaces} =
     useGetLocationPlaces();
 
-  const queryParams = useMemo(
-    () => ({
+  const {refetch: getEastCoastPickup, isFetching: isFetchingEastCoast} =
+    useGetEastCoastPickup({
       date: filter.date,
       location: filter.serviceLocation,
       wo_number: filterWoNumber,
-    }),
-    [filter.date, filter.serviceLocation, filterWoNumber],
-  );
+    });
 
-  const eastCoastPickup = useGetEastCoastPickup(
-    queryParams,
-    filter.type === NATIONAL_SHUTTLE_TYPE.EAST_COAST_PICKUP && !isInventoryMode,
-  );
+  const {refetch: getWestCoastPickup, isFetching: isFetchingWestCoastPickup} =
+    useGetWestCoastPickup({
+      date: filter.date,
+      location: filter.serviceLocation,
+      wo_number: filterWoNumber,
+    });
 
-  const westCoastPickup = useGetWestCoastPickup(
-    queryParams,
-    filter.type === NATIONAL_SHUTTLE_TYPE.WEST_COAST_PICKUP && !isInventoryMode,
-  );
+  const {refetch: getWestCoastDropoff, isFetching: isFetchingWestCoastDropoff} =
+    useGetWestCoastDropoff({
+      date: filter.date,
+      location: filter.serviceLocation,
+      wo_number: filterWoNumber,
+    });
 
-  const westCoastDropoff = useGetWestCoastDropoff(
-    queryParams,
-    filter.type === NATIONAL_SHUTTLE_TYPE.WEST_COAST_DROPOFF &&
-      !isInventoryMode,
-  );
+  const {refetch: getEastCoastDropoff, isFetching: isFetchingEastCoastDropoff} =
+    useGetEastCoastDropoff({
+      date: filter.date,
+      location: filter.serviceLocation,
+      wo_number: filterWoNumber,
+    });
 
-  const eastCoastDropoff = useGetEastCoastDropoff(
-    queryParams,
-    filter.type === NATIONAL_SHUTTLE_TYPE.EAST_COAST_DROPOFF &&
-      !isInventoryMode,
-  );
+  const {
+    refetch: getInventoryEastCoastPickup,
+    isFetching: isFetchingInventoryEastCoast,
+  } = useGetInventoryEastCoastPickup({
+    date: filter.date,
+    location: filter.serviceLocation,
+    wo_number: filterWoNumber,
+  });
 
-  const uniqueRoutePickup = useGetUniqueRoutePickup(
-    queryParams,
-    filter.type === NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_PICKUP &&
-      !isInventoryMode,
-  );
+  const {
+    refetch: getInventoryWestCoastPickup,
+    isFetching: isFetchingInventoryWestCoastPickup,
+  } = useGetInventoryWestCoastPickup({
+    date: filter.date,
+    location: filter.serviceLocation,
+    wo_number: filterWoNumber,
+  });
 
-  const uniqueRouteDropoff = useGetUniqueRouteDropoff(
-    queryParams,
-    filter.type === NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_DROPOFF &&
-      !isInventoryMode,
-  );
+  const {
+    refetch: getInventoryWestCoastDropoff,
+    isFetching: isFetchingInventoryWestCoastDropoff,
+  } = useGetInventoryWestCoastDropoff({
+    date: filter.date,
+    location: filter.serviceLocation,
+    wo_number: filterWoNumber,
+  });
 
-  const inventoryEastCoastPickup = useGetInventoryEastCoastPickup(
-    queryParams,
-    filter.type === NATIONAL_SHUTTLE_TYPE.EAST_COAST_PICKUP &&
-      isInventoryMode === true,
-  );
+  const {
+    refetch: getInventoryEastCoastDropoff,
+    isFetching: isFetchingInventoryEastCoastDropoff,
+  } = useGetInventoryEastCoastDropoff({
+    date: filter.date,
+    location: filter.serviceLocation,
+    wo_number: filterWoNumber,
+  });
 
-  const inventoryWestCoastPickup = useGetInventoryWestCoastPickup(
-    queryParams,
-    filter.type === NATIONAL_SHUTTLE_TYPE.WEST_COAST_PICKUP &&
-      isInventoryMode === true,
-  );
+  //unique route
+  const {
+    refetch: getUniqueRoutePickup,
+    isFetching: isFetchingUniqueRoutePickup,
+  } = useGetUniqueRoutePickup({
+    date: filter.date,
+    location: filter.serviceLocation,
+    wo_number: filterWoNumber,
+  });
 
-  const inventoryWestCoastDropoff = useGetInventoryWestCoastDropoff(
-    queryParams,
-    filter.type === NATIONAL_SHUTTLE_TYPE.WEST_COAST_DROPOFF &&
-      isInventoryMode === true,
-  );
+  const {
+    refetch: getUniqueRouteDropoff,
+    isFetching: isFetchingUniqueRouteDropoff,
+  } = useGetUniqueRouteDropoff({
+    date: filter.date,
+    location: filter.serviceLocation,
+    wo_number: filterWoNumber,
+  });
 
-  const inventoryEastCoastDropoff = useGetInventoryEastCoastDropoff(
-    queryParams,
-    filter.type === NATIONAL_SHUTTLE_TYPE.EAST_COAST_DROPOFF &&
-      isInventoryMode === true,
-  );
+  const {
+    refetch: getInventoryUniqueRoutePickup,
+    isFetching: isFetchingInventoryUniqueRoutePickup,
+  } = useGetInventoryUniqueRoutePickup({
+    date: filter.date,
+    location: filter.serviceLocation,
+    wo_number: filterWoNumber,
+  });
 
-  const inventoryUniqueRoutePickup = useGetInventoryUniqueRoutePickup(
-    queryParams,
-    filter.type === NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_PICKUP &&
-      isInventoryMode === true,
-  );
-
-  const inventoryUniqueRouteDropoff = useGetInventoryUniqueRouteDropoff(
-    queryParams,
-    filter.type === NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_DROPOFF &&
-      isInventoryMode === true,
-  );
-
-  const normalQueries = useMemo(
-    () => ({
-      [NATIONAL_SHUTTLE_TYPE.EAST_COAST_PICKUP]: eastCoastPickup,
-      [NATIONAL_SHUTTLE_TYPE.WEST_COAST_PICKUP]: westCoastPickup,
-      [NATIONAL_SHUTTLE_TYPE.EAST_COAST_DROPOFF]: eastCoastDropoff,
-      [NATIONAL_SHUTTLE_TYPE.WEST_COAST_DROPOFF]: westCoastDropoff,
-      [NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_PICKUP]: uniqueRoutePickup,
-      [NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_DROPOFF]: uniqueRouteDropoff,
-    }),
-    [
-      eastCoastPickup,
-      westCoastPickup,
-      eastCoastDropoff,
-      westCoastDropoff,
-      uniqueRoutePickup,
-      uniqueRouteDropoff,
-    ],
-  );
-
-  const inventoryQueries = useMemo(
-    () => ({
-      [NATIONAL_SHUTTLE_TYPE.EAST_COAST_PICKUP]: inventoryEastCoastPickup,
-      [NATIONAL_SHUTTLE_TYPE.WEST_COAST_PICKUP]: inventoryWestCoastPickup,
-      [NATIONAL_SHUTTLE_TYPE.EAST_COAST_DROPOFF]: inventoryEastCoastDropoff,
-      [NATIONAL_SHUTTLE_TYPE.WEST_COAST_DROPOFF]: inventoryWestCoastDropoff,
-      [NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_PICKUP]: inventoryUniqueRoutePickup,
-      [NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_DROPOFF]: inventoryUniqueRouteDropoff,
-    }),
-    [
-      inventoryEastCoastPickup,
-      inventoryWestCoastPickup,
-      inventoryEastCoastDropoff,
-      inventoryWestCoastDropoff,
-      inventoryUniqueRoutePickup,
-      inventoryUniqueRouteDropoff,
-    ],
-  );
-
-  const activeQuery = isInventoryMode
-    ? // @ts-ignore
-      inventoryQueries[filter.type]
-    : // @ts-ignore
-      normalQueries[filter.type];
-
-  const displayData = activeQuery?.data;
-
-  const isLoading = activeQuery?.isFetching || activeQuery?.isLoading;
-
-  useEffect(() => {
-    if (isInventoryMode && activeQuery?.data) {
-      setInventoryList(activeQuery.data);
-      setFetchInventory(activeQuery.refetch);
-    }
-  }, [isInventoryMode, activeQuery?.data, setInventoryList, setFetchInventory]);
-
-  useEffect(() => {
-    if (syncroNS && activeQuery) {
-      activeQuery.refetch();
-    }
-  }, [syncroNS, activeQuery]);
+  const {
+    refetch: getInventoryUniqueRouteDropoff,
+    isFetching: isFetchingInventoryUniqueRouteDropoff,
+  } = useGetInventoryUniqueRouteDropoff({
+    date: filter.date,
+    location: filter.serviceLocation,
+    wo_number: filterWoNumber,
+  });
 
   const onChangeFilter = (value: any, key: FilterTypeKeys) => {
     setFilter({...filter, [key]: value});
   };
+
+  useEffect(() => {
+    if (syncroNS) {
+      syncro();
+    }
+  }, [syncroNS]);
+
+  const filterJobs = useCallback(async () => {
+    if (filter?.serviceLocation === '-1') return;
+
+    if (!isInventoryMode) {
+      const actions: Record<string, () => Promise<void>> = {
+        [NATIONAL_SHUTTLE_TYPE.EAST_COAST_PICKUP]: async () => {
+          const {data} = await getEastCoastPickup();
+          setList(data);
+        },
+        [NATIONAL_SHUTTLE_TYPE.WEST_COAST_PICKUP]: async () => {
+          const {data} = await getWestCoastPickup();
+          setList(data);
+        },
+        [NATIONAL_SHUTTLE_TYPE.EAST_COAST_DROPOFF]: async () => {
+          const {data} = await getEastCoastDropoff();
+          setList(data);
+        },
+        [NATIONAL_SHUTTLE_TYPE.WEST_COAST_DROPOFF]: async () => {
+          const {data} = await getWestCoastDropoff();
+          setList(data);
+        },
+        [NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_PICKUP]: async () => {
+          const {data} = await getUniqueRoutePickup();
+          setList(data);
+        },
+        [NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_DROPOFF]: async () => {
+          const {data} = await getUniqueRouteDropoff();
+          setList(data);
+        },
+      };
+
+      await actions[filter.type]?.();
+    } else {
+      const actions: Record<string, () => Promise<void>> = {
+        [NATIONAL_SHUTTLE_TYPE.EAST_COAST_PICKUP]: async () => {
+          const {data} = await getInventoryEastCoastPickup();
+          setInventoryList(data!);
+          setFetchInventory(getInventoryEastCoastPickup);
+        },
+        [NATIONAL_SHUTTLE_TYPE.WEST_COAST_PICKUP]: async () => {
+          const {data} = await getInventoryWestCoastPickup();
+          setInventoryList(data!);
+          setFetchInventory(getInventoryWestCoastPickup);
+        },
+        [NATIONAL_SHUTTLE_TYPE.EAST_COAST_DROPOFF]: async () => {
+          const {data} = await getInventoryEastCoastDropoff();
+          setInventoryList(data!);
+          setFetchInventory(getInventoryEastCoastDropoff);
+        },
+        [NATIONAL_SHUTTLE_TYPE.WEST_COAST_DROPOFF]: async () => {
+          const {data} = await getInventoryWestCoastDropoff();
+          setInventoryList(data!);
+          setFetchInventory(getInventoryWestCoastDropoff);
+        },
+        [NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_PICKUP]: async () => {
+          const {data} = await getInventoryUniqueRoutePickup();
+          setInventoryList(data!);
+          setFetchInventory(getInventoryUniqueRoutePickup);
+        },
+        [NATIONAL_SHUTTLE_TYPE.UNIQUE_ROUTE_DROPOFF]: async () => {
+          const {data} = await getInventoryUniqueRouteDropoff();
+          setInventoryList(data!);
+          setFetchInventory(getInventoryUniqueRouteDropoff);
+        },
+      };
+
+      await actions[filter.type]?.();
+    }
+  }, [
+    filter,
+    isInventoryMode,
+    setList,
+    setInventoryList,
+    setFetchInventory,
+    getEastCoastPickup,
+    getWestCoastPickup,
+    getEastCoastDropoff,
+    getWestCoastDropoff,
+    getUniqueRoutePickup,
+    getUniqueRouteDropoff,
+    getInventoryEastCoastPickup,
+    getInventoryWestCoastPickup,
+    getInventoryEastCoastDropoff,
+    getInventoryWestCoastDropoff,
+    getInventoryUniqueRoutePickup,
+    getInventoryUniqueRouteDropoff,
+  ]);
+
+  // useEffect(() => {
+  //   if (activeTab == 2) {
+  //     console.log('use effect active tab = 2');
+  //     filterJobs();
+  //   }
+  // }, [activeTab, filterJobs]);
+
+  const syncro = useCallback(() => {
+    filterJobs();
+  }, [filterJobs]);
 
   const goToTopSheet = async (item: NSJobType) => {
     navigate(RoutesNavigation.Topsheet, {id: item.id.toString(), queue: 1});
   };
 
   const onInitSignature = useCallback((idJob: number) => {
+    // @ts-ignore
     updateJobDetail({
       id: idJob,
-    } as any);
+    });
     navigate(RoutesNavigation.Signatures);
   }, []);
 
   const onInitEditPieceCount = useCallback((idJob: number) => {
+    //@ts-ignore
     updateJobDetail({
       id: idJob,
-    } as any);
+    });
     navigate(RoutesNavigation.EditPieceCount);
   }, []);
 
@@ -257,7 +336,7 @@ const NationalShuttleViewCmp = () => {
     navigate(RoutesNavigation.InventoryNationalShuttle, {
       initialList: inventoryList,
     });
-  }, [navigate, inventoryList]);
+  }, [navigate]);
 
   const customLocationPlaces = useMemo(() => {
     return [
@@ -268,10 +347,6 @@ const NationalShuttleViewCmp = () => {
       })) ?? []),
     ];
   }, [locationPlaces]);
-
-  const syncro = useCallback(() => {
-    activeQuery?.refetch();
-  }, [activeQuery]);
 
   return (
     <Wrapper
@@ -358,7 +433,10 @@ const NationalShuttleViewCmp = () => {
             />
           </Wrapper>
 
-          <Wrapper style={{flex: 1}}>
+          <Wrapper
+            style={{
+              flex: 1,
+            }}>
             <CustomSwitch
               disabledLabel="Manifest View"
               enabledLabel="Job View"
@@ -369,7 +447,20 @@ const NationalShuttleViewCmp = () => {
         </Wrapper>
       </Wrapper>
 
-      {isLoading && <ActivityIndicator size="small" color={COLORS.primary} />}
+      {(isFetchingEastCoast ||
+        isFetchingWestCoastDropoff ||
+        isFetchingWestCoastPickup ||
+        isFetchingEastCoastDropoff ||
+        isFetchingInventoryEastCoast ||
+        isFetchingInventoryWestCoastDropoff ||
+        isFetchingInventoryWestCoastPickup ||
+        isFetchingInventoryEastCoastDropoff ||
+        isFetchingUniqueRoutePickup ||
+        isFetchingUniqueRouteDropoff ||
+        isFetchingInventoryUniqueRoutePickup ||
+        isFetchingInventoryUniqueRouteDropoff) && (
+        <ActivityIndicator size="small" color={COLORS.primary} />
+      )}
 
       {filter?.serviceLocation == '-1' ? (
         <Wrapper style={{marginTop: 10}}>
@@ -379,7 +470,7 @@ const NationalShuttleViewCmp = () => {
         <FlatList
           contentContainerStyle={{gap: 20, padding: 10, paddingBottom: 150}}
           style={{marginBottom: 20}}
-          data={displayData as NSJobType[]}
+          data={list}
           ListEmptyComponent={<EmptyCard text="No jobs found" />}
           keyExtractor={(_, index) => index.toString()}
           renderItem={({item, index}) => (

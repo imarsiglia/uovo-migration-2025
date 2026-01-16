@@ -85,8 +85,8 @@ android {
         applicationId "com.uovosandbox"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2026011401
-        versionName "1.0.2026011401"
+        versionCode 2026011501
+        versionName "1.0.2026011501"
     }
     signingConfigs {
         debug {

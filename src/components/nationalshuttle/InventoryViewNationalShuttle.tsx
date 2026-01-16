@@ -1,4 +1,4 @@
-import {memo, ReactNode, useCallback, useEffect, useState} from 'react';
+import { ReactNode, useCallback } from 'react';
 import {
   Dimensions,
   ScrollView,
@@ -11,20 +11,17 @@ import {
 } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 
-import {getItemColorStatus} from '../../utils/functions';
-import useNationalShuttleStore from '@store/nationalShuttle';
-import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 import {
   GLOBAL_FONT_SIZE_MULTIPLIER_XS,
   STATUS_NATIONAL_SHUTTLE,
 } from '@api/contants/constants';
-import {EmptyCard} from '@components/commons/cards/EmptyCard';
-import {CustomPressable} from '@components/commons/pressable/CustomPressable';
-import {COLORS} from '@styles/colors';
-import {NSItemListType} from '@api/types/Jobs';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {RoutesNavigation} from '@navigation/types';
-import useTopSheetStore from '@store/topsheet';
+import { NSItemListType } from '@api/types/Jobs';
+import { EmptyCard } from '@components/commons/cards/EmptyCard';
+import { CustomPressable } from '@components/commons/pressable/CustomPressable';
+import { useCustomNavigation } from '@hooks/useCustomNavigation';
+import { RoutesNavigation } from '@navigation/types';
+import { COLORS } from '@styles/colors';
+import { getItemColorStatus } from '../../utils/functions';
 
 export const COLUMN_HEADER_HEIGHT = 35;
 

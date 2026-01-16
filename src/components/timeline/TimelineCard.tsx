@@ -137,32 +137,10 @@ const TimelineCardCmp = ({
                     style={[
                       style.containerStatus,
                       containerByVisual[getGroupStatusType(isOnline, status)],
-                      // isOnline
-                      //   ? status == WO_CONFIRMED_STATUS ||
-                      //     status === 'Scheduled' ||
-                      //     status.includes(STARTED_STATUS)
-                      //     ? style.scheduled
-                      //     : status.includes(PAUSED_STATUS)
-                      //     ? style.paused
-                      //     : status.includes(REPREPPED_STATUS)
-                      //     ? style.reprepped
-                      //     : style.canceled
-                      //   : style.offline,
                     ]}>
                     <Label
                       style={
                         labelByVisual[getGroupStatusType(isOnline, status)]
-                        // isOnline
-                        //   ? status == WO_CONFIRMED_STATUS ||
-                        //     status === 'Scheduled' ||
-                        //     status.includes(STARTED_STATUS)
-                        //     ? style.scheduled_text
-                        //     : status.includes(PAUSED_STATUS)
-                        //     ? style.paused_text
-                        //     : status.includes(REPREPPED_STATUS)
-                        //     ? style.reprepped_text
-                        //     : style.canceled_text
-                        //   : style.offline_text
                       }>
                       {!isOnline ? 'Offline' : status}
                     </Label>
@@ -230,7 +208,7 @@ const TimelineCardCmp = ({
             </Wrapper>
           }
 
-          {(!jobQueue || (jobQueue && instructions)) && (
+          {instructions?.trim() && (
             <ScrollView
               style={[
                 style.note,

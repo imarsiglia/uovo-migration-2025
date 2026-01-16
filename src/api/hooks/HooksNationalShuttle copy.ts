@@ -9,146 +9,161 @@ export const useGetLocationPlaces = () => {
     select({body: {data}}) {
       return data ?? [];
     },
-    staleTime: 5 * 60 * 1000,
   });
 };
 
-// Configuración base para queries que siempre deben refetch
-const createQueryConfig = (enabled: boolean) => ({
-  staleTime: 0,
-  gcTime: 5 * 60 * 1000,
-  refetchOnMount: true,
-  enabled,
-});
-
-export const useGetEastCoastPickup = (param: NSRequestType, enabled: boolean = true) => {
+export const useGetEastCoastPickup = (param: NSRequestType) => {
   return useQuery({
+    refetchOnMount: false,
     queryKey: [QUERY_KEYS.NS_EAST_COAST_PICKUP, param],
     queryFn: () => NSEndpoints.getEastCoastPickup(param),
+    gcTime: 0,
     select(data) {
       return data?.body?.data ?? [];
     },
-    ...createQueryConfig(enabled && param.location !== '-1' && param.location !== null),
+    enabled: param.location != '-1',
   });
 };
 
-export const useGetWestCoastPickup = (param: NSRequestType, enabled: boolean = true) => {
+export const useGetWestCoastPickup = (param: NSRequestType) => {
   return useQuery({
+    refetchOnMount: false,
     queryKey: [QUERY_KEYS.NS_WEST_COAST_PICKUP, param],
     queryFn: () => NSEndpoints.getWestCoastPickup(param),
+    gcTime: 0,
     select(data) {
       return data?.body?.data ?? [];
     },
-    ...createQueryConfig(enabled && param.location !== '-1' && param.location !== null),
+    enabled: param.location != '-1',
   });
 };
 
-export const useGetWestCoastDropoff = (param: NSRequestType, enabled: boolean = true) => {
+export const useGetWestCoastDropoff = (param: NSRequestType) => {
   return useQuery({
+    refetchOnMount: false,
     queryKey: [QUERY_KEYS.NS_WEST_COAST_DROPOFF, param],
     queryFn: () => NSEndpoints.getWestCoastDropoff(param),
+    gcTime: 0,
     select(data) {
       return data?.body?.data ?? [];
     },
-    ...createQueryConfig(enabled && param.location !== '-1' && param.location !== null),
+    enabled: param.location != '-1',
   });
 };
 
-export const useGetEastCoastDropoff = (param: NSRequestType, enabled: boolean = true) => {
+export const useGetEastCoastDropoff = (param: NSRequestType) => {
   return useQuery({
+    refetchOnMount: false,
     queryKey: [QUERY_KEYS.NS_EAST_COAST_DROPOFF, param],
     queryFn: () => NSEndpoints.getEastCoastDropoff(param),
+    gcTime: 0,
     select(data) {
       return data?.body?.data ?? [];
     },
-    ...createQueryConfig(enabled && param.location !== '-1' && param.location !== null),
+    enabled: param.location != '-1',
   });
 };
 
-export const useGetInventoryEastCoastPickup = (param: NSRequestType, enabled: boolean = true) => {
+export const useGetInventoryEastCoastPickup = (param: NSRequestType) => {
   return useQuery({
+    refetchOnMount: false,
     queryKey: [QUERY_KEYS.NS_INVENTORY_EAST_COAST_PICKUP, param],
     queryFn: () => NSEndpoints.getInventoryEastCoastPickup(param),
+    gcTime: 0,
     select(data) {
       return data?.body?.data ?? [];
     },
-    ...createQueryConfig(enabled && param.location !== '-1' && param.location !== null),
+    enabled: param.location != '-1',
   });
 };
 
-export const useGetInventoryWestCoastPickup = (param: NSRequestType, enabled: boolean = true) => {
+export const useGetInventoryWestCoastPickup = (param: NSRequestType) => {
   return useQuery({
+    refetchOnMount: false,
     queryKey: [QUERY_KEYS.NS_INVENTORY_WEST_COAST_PICKUP, param],
     queryFn: () => NSEndpoints.getInventoryWestCoastPickup(param),
+    gcTime: 0,
     select(data) {
       return data?.body?.data ?? [];
     },
-    ...createQueryConfig(enabled && param.location !== '-1' && param.location !== null),
+    enabled: param.location != '-1',
   });
 };
 
-export const useGetInventoryWestCoastDropoff = (param: NSRequestType, enabled: boolean = true) => {
+export const useGetInventoryWestCoastDropoff = (param: NSRequestType) => {
   return useQuery({
+    refetchOnMount: false,
     queryKey: [QUERY_KEYS.NS_INVENTORY_WEST_COAST_DROPOFF, param],
     queryFn: () => NSEndpoints.getInventoryWestCoastDropoff(param),
+    gcTime: 0,
     select(data) {
       return data?.body?.data ?? [];
     },
-    ...createQueryConfig(enabled && param.location !== '-1' && param.location !== null),
+    enabled: param.location != '-1',
   });
 };
 
-export const useGetInventoryEastCoastDropoff = (param: NSRequestType, enabled: boolean = true) => {
+export const useGetInventoryEastCoastDropoff = (param: NSRequestType) => {
   return useQuery({
+    refetchOnMount: false,
     queryKey: [QUERY_KEYS.NS_INVENTORY_EAST_COAST_DROPOFF, param],
     queryFn: () => NSEndpoints.getInventoryEastCoastDropoff(param),
+    gcTime: 0,
     select(data) {
       return data?.body?.data ?? [];
     },
-    ...createQueryConfig(enabled && param.location !== '-1' && param.location !== null),
+    enabled: param.location != '-1',
   });
 };
 
-export const useGetUniqueRoutePickup = (param: NSRequestType, enabled: boolean = true) => {
+export const useGetUniqueRoutePickup = (param: NSRequestType) => {
   return useQuery({
+    refetchOnMount: false,
     queryKey: [QUERY_KEYS.NS_UNIQUE_ROUTE_PICKUP, param],
     queryFn: () => NSEndpoints.getUniqueRoutePickup(param),
+    gcTime: 0,
     select(data) {
       return data?.body?.data ?? [];
     },
-    ...createQueryConfig(enabled && param.location !== '-1' && param.location !== null),
+    enabled: param.location != '-1',
   });
 };
 
-export const useGetUniqueRouteDropoff = (param: NSRequestType, enabled: boolean = true) => {
+export const useGetUniqueRouteDropoff = (param: NSRequestType) => {
   return useQuery({
+    refetchOnMount: false,
     queryKey: [QUERY_KEYS.NS_UNIQUE_ROUTE_DROPOFF, param],
     queryFn: () => NSEndpoints.getUniqueRouteDropoff(param),
+    gcTime: 0,
     select(data) {
       return data?.body?.data ?? [];
     },
-    ...createQueryConfig(enabled && param.location !== '-1' && param.location !== null),
+    enabled: param.location != '-1',
   });
 };
 
-export const useGetInventoryUniqueRoutePickup = (param: NSRequestType, enabled: boolean = true) => {
+export const useGetInventoryUniqueRoutePickup = (param: NSRequestType) => {
   return useQuery({
+    refetchOnMount: false,
     queryKey: [QUERY_KEYS.NS_INVENTORY_UNIQUE_ROUTE_PICKUP, param],
     queryFn: () => NSEndpoints.getInventoryUniqueRoutePickup(param),
+    gcTime: 0,
     select(data) {
       return data?.body?.data ?? [];
     },
-    ...createQueryConfig(enabled && param.location !== '-1' && param.location !== null),
+    enabled: param.location != '-1',
   });
 };
 
-export const useGetInventoryUniqueRouteDropoff = (param: NSRequestType, enabled: boolean = true) => {
+export const useGetInventoryUniqueRouteDropoff = (param: NSRequestType) => {
   return useQuery({
+    refetchOnMount: false,
     queryKey: [QUERY_KEYS.NS_INVENTORY_UNIQUE_ROUTE_DROPOFF, param],
     queryFn: () => NSEndpoints.getInventoryUniqueRouteDropoff(param),
+    gcTime: 0,
     select(data) {
       return data?.body?.data ?? [];
     },
-    ...createQueryConfig(enabled && param.location !== '-1' && param.location !== null),
+    enabled: param.location != '-1',
   });
 };

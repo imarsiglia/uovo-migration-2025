@@ -1,5 +1,4 @@
-import {LaborCodeType} from '@api/types/Jobs';
-import {EmployeeType, IdReportMaterialType} from '@api/types/Task';
+import { EmployeeType, IdReportMaterialType } from '@api/types/Task';
 import * as yup from 'yup';
 
 const DEFAULT_REQUIRED_MESSAGE = 'This field is required';

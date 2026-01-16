@@ -87,7 +87,13 @@ const CardNationalShuttle = ({
       </View>
       <StatusJob status={item?.wo_status} />
 
-      <View style={{display: 'flex', flexDirection: 'row', flex: 1}}>
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          flex: 1,
+          marginBottom: 10,
+        }}>
         <View
           style={{display: 'flex', flex: 0.5, flexDirection: 'column', gap: 3}}>
           <Text
@@ -108,32 +114,33 @@ const CardNationalShuttle = ({
         </View>
       </View>
 
-      <ScrollView
-        style={[
-          {
-            backgroundColor: '#F3F3F3',
-            marginBottom: 5,
-            marginTop: 10,
-            paddingHorizontal: 20,
-            paddingVertical: 10,
-            borderRadius: 8,
-            flexGrow: 1,
-            paddingLeft: 20,
-            maxHeight: 85,
-          },
-        ]}
-        nestedScrollEnabled={true}>
-        <Text style={{fontSize: 14, marginBottom: 5, fontWeight: '500'}}>
-          Dispatcher notes:
-        </Text>
-        <SelectableText
-          style={{fontSize: 13, color: '#707070', paddingBottom: 20}}>
-          {item.instructions || 'N/A'}
-        </SelectableText>
-      </ScrollView>
+      {item.instructions?.trim() && (
+        <ScrollView
+          style={[
+            {
+              backgroundColor: '#F3F3F3',
+              paddingHorizontal: 20,
+              paddingVertical: 10,
+              borderRadius: 8,
+              flexGrow: 1,
+              paddingLeft: 20,
+              maxHeight: 85,
+            },
+          ]}
+          nestedScrollEnabled={true}>
+          <Text style={{fontSize: 14, marginBottom: 5, fontWeight: '500'}}>
+            Dispatcher notes:
+          </Text>
+          <SelectableText
+            style={{fontSize: 13, color: '#707070', paddingBottom: 20}}>
+            {item.instructions || 'N/A'}
+          </SelectableText>
+        </ScrollView>
+      )}
 
       <View
         style={{
+          marginTop: 5,
           display: 'flex',
           flexDirection: 'row',
           flex: 1,

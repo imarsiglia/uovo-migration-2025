@@ -1,12 +1,35 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import { useDeleteItem } from '@api/hooks/HooksInventoryServices';
+import { NSItemListType } from '@api/types/Jobs';
+import { DebouncedTouchableOpacity } from '@components/commons/buttons/DebouncePressableOpacity';
+import { EmptyCard } from '@components/commons/cards/EmptyCard';
+import { GeneralLoading } from '@components/commons/loading/GeneralLoading';
+import { Wrapper } from '@components/commons/wrappers/Wrapper';
 import {
-  Alert,
+  COLUMN_HEADER_HEIGHT,
+  COLUMN_WIDTH,
+  ColumnHeaderNS,
+  NSInventoryStyles,
+  RowNS,
+} from '@components/nationalshuttle/InventoryViewNationalShuttle';
+import { useCustomNavigation } from '@hooks/useCustomNavigation';
+import { RootStackParamList, RoutesNavigation } from '@navigation/types';
+import { useIsFocused } from '@react-navigation/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { loadingWrapperPromise } from '@store/actions';
+import { useModalDialogStore } from '@store/modals';
+import useNationalShuttleStore from '@store/nationalShuttle';
+import { COLORS } from '@styles/colors';
+import { GLOBAL_STYLES } from '@styles/globalStyles';
+import { lockToLandscape, lockToPortrait, sortList } from '@utils/functions';
+import { showErrorToastMessage, showToastMessage } from '@utils/toast';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import {
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import Icon from 'react-native-fontawesome-pro';
 import Animated, {
@@ -15,31 +38,6 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {RootStackParamList, RoutesNavigation} from '@navigation/types';
-import useNationalShuttleStore from '@store/nationalShuttle';
-import {NSItemListType} from '@api/types/Jobs';
-import {useCustomNavigation} from '@hooks/useCustomNavigation';
-import {useIsFocused} from '@react-navigation/native';
-import {lockToLandscape, lockToPortrait, sortList} from '@utils/functions';
-import {Wrapper} from '@components/commons/wrappers/Wrapper';
-import {GLOBAL_STYLES} from '@styles/globalStyles';
-import {DebouncedTouchableOpacity} from '@components/commons/buttons/DebouncePressableOpacity';
-import {EmptyCard} from '@components/commons/cards/EmptyCard';
-import {COLORS} from '@styles/colors';
-import {
-  COLUMN_HEADER_HEIGHT,
-  COLUMN_WIDTH,
-  ColumnHeaderNS,
-  NSInventoryStyles,
-  RowNS,
-} from '@components/nationalshuttle/InventoryViewNationalShuttle';
-import useTopSheetStore from '@store/topsheet';
-import {useModalDialogStore} from '@store/modals';
-import {loadingWrapperPromise} from '@store/actions';
-import {useDeleteItem} from '@api/hooks/HooksInventoryServices';
-import {showErrorToastMessage, showToastMessage} from '@utils/toast';
-import {GeneralLoading} from '@components/commons/loading/GeneralLoading';
 
 type Props = NativeStackScreenProps<
   RootStackParamList,
